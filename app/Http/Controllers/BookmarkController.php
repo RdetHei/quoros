@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\Auth;
 
 class BookmarkController extends Controller
 {
+    public function index()
+    {
+        $bookmarks = Auth::user()->bookmarks()
+            ->with(['novel.author', 'novel.genres'])
+            ->latest()
+            ->paginate(18);
+
+        return view('user.bookmarks', compact('bookmarks'));
+    }
+
     public function toggle(Novel $novel)
     {
         $user = Auth::user();

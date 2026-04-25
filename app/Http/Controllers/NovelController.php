@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Genre;
 use App\Models\Novel;
 use App\Models\Tag;
+use App\Models\NovelRequest;
+use App\Models\ReadingHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -27,9 +29,73 @@ class NovelController extends Controller
         }
 
         $novels = $query->latest()->paginate(12)->withQueryString();
+        
+        // Recently Updated: Novels with the most recent chapters
+        $recentlyUpdated = Novel::with(['author', 'genres'])
+            ->whereHas('chapters')
+            ->withMax('chapters', 'created_at')
+            ->orderByDesc('chapters_max_created_at')
+            ->take(6)
+            ->get();
+
         $genres = Genre::all();
 
-        return view('novels.index', compact('novels', 'genres'));
+        return view('novels.index', compact('novels', 'genres', 'recentlyUpdated'));
+    }
+
+    public function updated()
+    {
+        $novels = Novel::with(['author', 'genres'])
+            ->whereHas('chapters')
+            ->withMax('chapters', 'created_at')
+            ->orderByDesc('chapters_max_created_at')
+            ->paginate(18);
+
+        return view('novels.updated', compact('novels'));
+    }
+
+    public function genres()
+    {
+        $genres = Genre::withCount('novels')->orderBy('name')->get();
+        return view('novels.genres', compact('genres'));
+    }
+
+    public function tags()
+    {
+        $tags = Tag::withCount('novels')->orderBy('name')->get();
+        return view('novels.tags', compact('tags'));
+    }
+
+    public function history()
+    {
+        $histories = ReadingHistory::where('user_id', Auth::id())
+            ->with(['novel.author', 'chapter'])
+            ->latest()
+            ->paginate(15);
+
+        return view('user.history', compact('histories'));
+    }
+
+    public function requests()
+    {
+        $requests = NovelRequest::with('user')->latest()->paginate(15);
+        return view('user.requests', compact('requests'));
+    }
+
+    public function storeRequest(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        NovelRequest::create([
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+            'description' => $request->description,
+        ]);
+
+        return back()->with('success', 'Permintaan novel berhasil dikirim!');
     }
 
     public function writerIndex()

@@ -28,6 +28,26 @@ class User extends Authenticatable
         return $this->hasMany(ReadingHistory::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function novels(): HasMany
+    {
+        return $this->hasMany(Novel::class, 'author_id');
+    }
+
+    public function novelRequests(): HasMany
+    {
+        return $this->hasMany(NovelRequest::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

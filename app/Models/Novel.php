@@ -43,4 +43,9 @@ class Novel extends Model
     {
         return $this->hasMany(Bookmark::class);
     }
+
+    public function readingHistories(): HasMany
+    {
+        return $this->hasMany(ReadingHistory::class);
+    }
 }

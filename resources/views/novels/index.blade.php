@@ -36,6 +36,45 @@
     </div>
 </div>
 
+<!-- Section: Baru Diupdate -->
+<div class="mb-16">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-1.5 h-8 bg-emerald-500 rounded-full"></div>
+            <h2 class="text-2xl font-bold">Baru Diupdate</h2>
+        </div>
+        <a href="{{ route('novels.updated') }}" class="text-emerald-600 dark:text-emerald-400 text-sm font-bold hover:underline">Lihat Semua</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($recentlyUpdated as $novel)
+            <a href="{{ route('novels.show', $novel->slug) }}" class="flex gap-4 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-emerald-500 transition-all group">
+                <div class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
+                    @if($novel->cover_image)
+                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover">
+                    @else
+                        <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2">
+                            <span class="text-[10px] text-slate-400 font-bold text-center">{{ $novel->title }}</span>
+                        </div>
+                    @endif
+                </div>
+                <div class="flex flex-col justify-center flex-grow">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 transition-colors line-clamp-1 mb-1">{{ $novel->title }}</h3>
+                    <p class="text-xs text-slate-500 mb-2">Oleh {{ $novel->author->name }}</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-100 dark:border-emerald-800">
+                            Chapter {{ $novel->chapters->count() }}
+                        </span>
+                        <span class="text-[10px] text-slate-400 italic">
+                            {{ $novel->chapters->max('created_at')->diffForHumans() }}
+                        </span>
+                    </div>
+                </div>
+            </a>
+        @endforeach
+    </div>
+</div>
+
 <!-- Section: Novel Terbaru -->
 <div class="mb-16">
     <div class="flex items-center justify-between mb-6">

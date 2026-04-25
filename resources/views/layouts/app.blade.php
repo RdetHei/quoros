@@ -35,8 +35,15 @@
                         </a>
                         
                         <div class="hidden md:flex items-center gap-6">
-                            <a href="{{ route('home') }}" class="text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Katalog</a>
-                            <a href="#" class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-slate-500 hover:text-indigo-600 transition-colors">Populer</a>
+                            <a href="{{ route('home') }}" class="text-sm font-medium {{ request()->routeIs('home') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Katalog</a>
+                            <a href="{{ route('novels.updated') }}" class="text-sm font-medium {{ request()->routeIs('novels.updated') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Updated</a>
+                            <a href="{{ route('genres.index') }}" class="text-sm font-medium {{ request()->routeIs('genres.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Genre</a>
+                            <a href="{{ route('tags.index') }}" class="text-sm font-medium {{ request()->routeIs('tags.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Tag</a>
+                            @auth
+                                <a href="{{ route('bookmarks.index') }}" class="text-sm font-medium {{ request()->routeIs('bookmarks.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Bookmark</a>
+                                <a href="{{ route('history.index') }}" class="text-sm font-medium {{ request()->routeIs('history.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">History</a>
+                            @endauth
+                            <a href="{{ route('requests.index') }}" class="text-sm font-medium {{ request()->routeIs('requests.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Request</a>
                         </div>
                     </div>
 

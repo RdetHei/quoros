@@ -23,6 +23,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Public Novel Routes
 Route::get('/novels/{novel:slug}', [NovelController::class, 'show'])->name('novels.show');
 Route::get('/novels/{novel:slug}/read/{chapterSlug}', [ChapterController::class, 'show'])->name('chapters.show');
+Route::get('/updated', [NovelController::class, 'updated'])->name('novels.updated');
+Route::get('/genres', [NovelController::class, 'genres'])->name('genres.index');
+Route::get('/tags', [NovelController::class, 'tags'])->name('tags.index');
 
 // Auth Required Routes
 Route::middleware('auth')->group(function () {
@@ -33,6 +36,14 @@ Route::middleware('auth')->group(function () {
         
         return view('dashboard', compact('bookmarks', 'histories'));
     })->name('dashboard');
+
+    // Bookmark & History dedicated views
+    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+    Route::get('/history', [NovelController::class, 'history'])->name('history.index');
+    
+    // Request Novel
+    Route::get('/requests', [NovelController::class, 'requests'])->name('requests.index');
+    Route::post('/requests', [NovelController::class, 'storeRequest'])->name('requests.store');
 
     // Bookmark
     Route::post('/novels/{novel}/bookmark', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
