@@ -23,7 +23,11 @@ class ReviewController extends Controller
             'content' => $request->content,
         ]);
 
-        return back()->with('success', 'Review submitted successfully!');
+        // Recalculate average rating
+        $novel->rating_avg = $novel->reviews()->avg('rating') ?: 0;
+        $novel->save();
+
+        return back()->with('success', 'Ulasan berhasil dikirim!');
     }
 
     public function destroy(Review $review)
@@ -32,8 +36,13 @@ class ReviewController extends Controller
             abort(403);
         }
 
+        $novel = $review->novel;
         $review->delete();
 
-        return back()->with('success', 'Review deleted successfully!');
+        // Recalculate average rating
+        $novel->rating_avg = $novel->reviews()->avg('rating') ?: 0;
+        $novel->save();
+
+        return back()->with('success', 'Ulasan berhasil dihapus!');
     }
 }

@@ -27,4 +27,26 @@ class Chapter extends Model
     {
         return $this->hasMany(ReadingHistory::class);
     }
+
+    /**
+     * Get the previous chapter in the same novel.
+     */
+    public function previous()
+    {
+        return static::where('novel_id', $this->novel_id)
+            ->where('id', '<', $this->id)
+            ->orderBy('id', 'desc')
+            ->first();
+    }
+
+    /**
+     * Get the next chapter in the same novel.
+     */
+    public function next()
+    {
+        return static::where('novel_id', $this->novel_id)
+            ->where('id', '>', $this->id)
+            ->orderBy('id', 'asc')
+            ->first();
+    }
 }

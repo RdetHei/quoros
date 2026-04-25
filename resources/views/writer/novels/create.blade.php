@@ -21,10 +21,45 @@
             </div>
 
             <div>
+                <label for="alternative_title" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Judul Alternatif (Opsional)</label>
+                <input type="text" name="alternative_title" id="alternative_title" 
+                    class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all" 
+                    value="{{ old('alternative_title') }}" placeholder="Contoh: The Sorcerer's Adventure">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <label for="type" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Jenis Novel</label>
+                    <select name="type" id="type" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all">
+                        <option value="original" {{ old('type') == 'original' ? 'selected' : '' }}>Original Story</option>
+                        <option value="web_novel" {{ old('type') == 'web_novel' ? 'selected' : '' }}>Web Novel</option>
+                        <option value="light_novel" {{ old('type') == 'light_novel' ? 'selected' : '' }}>Light Novel</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="content_rating" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Rating Usia</label>
+                    <select name="content_rating" id="content_rating" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all">
+                        <option value="everyone" {{ old('content_rating') == 'everyone' ? 'selected' : '' }}>Everyone (Semua Umur)</option>
+                        <option value="teen" {{ old('content_rating') == 'teen' ? 'selected' : '' }}>Teen (Remaja)</option>
+                        <option value="mature" {{ old('content_rating') == 'mature' ? 'selected' : '' }}>Mature (Dewasa)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
                 <label for="description" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Deskripsi / Sinopsis</label>
                 <textarea name="description" id="description" rows="6" 
                     class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all" 
                     placeholder="Ceritakan sedikit tentang alur ceritamu...">{{ old('description') }}</textarea>
+            </div>
+
+            <div>
+                <label for="status" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Status Novel</label>
+                <select name="status" id="status" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all">
+                    <option value="ongoing" {{ old('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                    <option value="hiatus" {{ old('status') == 'hiatus' ? 'selected' : '' }}>Hiatus</option>
+                    <option value="complete" {{ old('status') == 'complete' ? 'selected' : '' }}>Complete</option>
+                </select>
             </div>
 
             <div>

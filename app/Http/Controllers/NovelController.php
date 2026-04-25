@@ -115,7 +115,11 @@ class NovelController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'alternative_title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'status' => 'required|in:ongoing,hiatus,complete',
+            'type' => 'required|in:web_novel,light_novel,original',
+            'content_rating' => 'required|in:everyone,teen,mature',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'genres' => 'required|array',
             'tags' => 'nullable|array',
@@ -129,8 +133,12 @@ class NovelController extends Controller
 
         $novel = new Novel();
         $novel->title = $request->title;
+        $novel->alternative_title = $request->alternative_title;
         $novel->slug = $slug;
         $novel->description = $request->description;
+        $novel->status = $request->status;
+        $novel->type = $request->type;
+        $novel->content_rating = $request->content_rating;
         $novel->author_id = Auth::id();
 
         if ($request->hasFile('cover_image')) {
@@ -150,6 +158,7 @@ class NovelController extends Controller
 
     public function show(Novel $novel)
     {
+        $novel->increment('view_count');
         $novel->load(['author', 'chapters', 'genres', 'tags', 'reviews.user']);
         return view('novels.show', compact('novel'));
     }
@@ -173,14 +182,22 @@ class NovelController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
+            'alternative_title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'status' => 'required|in:ongoing,hiatus,complete',
+            'type' => 'required|in:web_novel,light_novel,original',
+            'content_rating' => 'required|in:everyone,teen,mature',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'genres' => 'required|array',
             'tags' => 'nullable|array',
         ]);
 
         $novel->title = $request->title;
+        $novel->alternative_title = $request->alternative_title;
         $novel->description = $request->description;
+        $novel->status = $request->status;
+        $novel->type = $request->type;
+        $novel->content_rating = $request->content_rating;
 
         if ($request->hasFile('cover_image')) {
             if ($novel->cover_image) {

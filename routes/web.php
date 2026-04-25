@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\GenreController as AdminGenreController;
+use App\Http\Controllers\Admin\TagController as AdminTagController;
+use App\Http\Controllers\Api\ChapterController as ApiChapterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ChapterController;
@@ -9,6 +12,9 @@ use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [NovelController::class, 'index'])->name('home');
+
+// API for Discord Bot
+Route::get('/api/latest-chapter', [ApiChapterController::class, 'latest']);
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
@@ -74,5 +80,7 @@ Route::middleware('auth')->group(function () {
     // Admin Only
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/novels', [NovelController::class, 'index'])->name('admin.novels.index');
+        Route::resource('/admin/genres', AdminGenreController::class, ['as' => 'admin']);
+        Route::resource('/admin/tags', AdminTagController::class, ['as' => 'admin']);
     });
 });

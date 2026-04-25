@@ -63,8 +63,11 @@ class ChapterController extends Controller
                 ['chapter_id' => $chapter->id]
             );
         }
+
+        $previousChapter = $chapter->previous();
+        $nextChapter = $chapter->next();
         
-        return view('chapters.show', compact('novel', 'chapter'));
+        return view('chapters.show', compact('novel', 'chapter', 'previousChapter', 'nextChapter'));
     }
 
     public function edit(Novel $novel, Chapter $chapter)

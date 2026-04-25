@@ -84,6 +84,13 @@
                                         @if(Auth::user()->role === 'writer' || Auth::user()->role === 'admin')
                                             <a href="{{ route('writer.novels.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Novel Saya</a>
                                         @endif
+                                        @if(Auth::user()->role === 'admin')
+                                            <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                                <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin</p>
+                                                <a href="{{ route('admin.genres.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Kelola Genre</a>
+                                                <a href="{{ route('admin.tags.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Kelola Tag</a>
+                                            </div>
+                                        @endif
                                     </div>
                                     <div class="p-2">
                                         <form action="{{ route('logout') }}" method="POST">

@@ -4,13 +4,8 @@
 <div class="max-w-4xl mx-auto">
     <!-- Chapter Navigation (Top) -->
     <div class="flex items-center justify-between mb-10 p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-        @php
-            $prevChapter = $novel->chapters->where('id', '<', $chapter->id)->last();
-            $nextChapter = $novel->chapters->where('id', '>', $chapter->id)->first();
-        @endphp
-
-        <a href="{{ $prevChapter ? route('chapters.show', [$novel->slug, $prevChapter->slug]) : '#' }}" 
-           class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all {{ $prevChapter ? 'text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed' }}">
+        <a href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}" 
+           class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all {{ $previousChapter ? 'text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
             <span class="hidden sm:block">Sebelumnya</span>
         </a>
@@ -46,8 +41,8 @@
 
     <!-- Chapter Navigation (Bottom) -->
     <div class="flex items-center justify-between mb-16">
-        <a href="{{ $prevChapter ? route('chapters.show', [$novel->slug, $prevChapter->slug]) : '#' }}" 
-           class="flex items-center gap-3 px-6 py-4 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-600 transition-all shadow-sm {{ !$prevChapter ? 'opacity-50 cursor-not-allowed' : '' }}">
+        <a href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}" 
+           class="flex items-center gap-3 px-6 py-4 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-600 transition-all shadow-sm {{ !$previousChapter ? 'opacity-50 cursor-not-allowed' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
             Sebelumnya
         </a>

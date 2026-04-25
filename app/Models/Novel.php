@@ -12,7 +12,19 @@ class Novel extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['author_id', 'title', 'slug', 'description', 'cover_image'];
+    protected $fillable = [
+        'author_id', 
+        'title', 
+        'alternative_title', 
+        'slug', 
+        'description', 
+        'status', 
+        'type', 
+        'content_rating', 
+        'view_count', 
+        'rating_avg', 
+        'cover_image'
+    ];
 
     public function author(): BelongsTo
     {
