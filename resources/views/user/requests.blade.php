@@ -23,11 +23,11 @@
                     <div class="flex items-center gap-3 mb-2">
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-wide leading-none">{{ $request->title }}</h3>
                         <span class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full 
-                            {{ $request->status === 'fulfilled' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : '' }}
-                            {{ $request->status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' : '' }}
-                            {{ $request->status === 'rejected' ? 'bg-rose-50 text-rose-600 border border-rose-100' : '' }}
+                            {{ $request->status === 'fulfilled' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : '' }}
+                            {{ $request->status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : '' }}
+                            {{ $request->status === 'rejected' ? 'bg-rose-50 text-rose-600 border border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800' : '' }}
                         ">
-                            {{ $request->status }}
+                            {{ $request->status === 'fulfilled' ? 'Accepted' : ($request->status === 'rejected' ? 'Declined' : 'Pending') }}
                         </span>
                     </div>
                     <p class="text-sm text-slate-500 mb-3 italic line-clamp-2">"{{ $request->description ?: 'Tidak ada deskripsi.' }}"</p>

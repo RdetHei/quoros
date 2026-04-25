@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
+use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
 use App\Http\Controllers\Api\ChapterController as ApiChapterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NovelController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [NovelController::class, 'index'])->name('home');
@@ -35,13 +37,7 @@ Route::get('/tags', [NovelController::class, 'tags'])->name('tags.index');
 
 // Auth Required Routes
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        $user = Auth::user();
-        $bookmarks = $user->bookmarks()->with('novel.author')->latest()->take(6)->get();
-        $histories = $user->readingHistories()->with(['novel', 'chapter'])->latest()->take(6)->get();
-        
-        return view('dashboard', compact('bookmarks', 'histories'));
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Bookmark & History dedicated views
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
@@ -72,6 +68,7 @@ Route::middleware('auth')->group(function () {
         // Chapters Management
         Route::get('/writer/novels/{novel}/chapters/create', [ChapterController::class, 'create'])->name('writer.chapters.create');
         Route::post('/writer/novels/{novel}/chapters', [ChapterController::class, 'store'])->name('writer.chapters.store');
+        Route::post('/writer/novels/{novel}/chapters/bulk', [ChapterController::class, 'bulkStore'])->name('writer.chapters.bulk');
         Route::get('/writer/novels/{novel}/chapters/{chapter}/edit', [ChapterController::class, 'edit'])->name('writer.chapters.edit');
         Route::put('/writer/novels/{novel}/chapters/{chapter}', [ChapterController::class, 'update'])->name('writer.chapters.update');
         Route::delete('/writer/novels/{novel}/chapters/{chapter}', [ChapterController::class, 'destroy'])->name('writer.chapters.destroy');
@@ -82,5 +79,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/novels', [NovelController::class, 'index'])->name('admin.novels.index');
         Route::resource('/admin/genres', AdminGenreController::class, ['as' => 'admin']);
         Route::resource('/admin/tags', AdminTagController::class, ['as' => 'admin']);
+        
+        // Novel Requests Management
+        Route::get('/admin/requests', [AdminNovelRequestController::class, 'index'])->name('admin.requests.index');
+        Route::patch('/admin/requests/{novelRequest}/status', [AdminNovelRequestController::class, 'updateStatus'])->name('admin.requests.status');
+        Route::delete('/admin/requests/{novelRequest}', [AdminNovelRequestController::class, 'destroy'])->name('admin.requests.destroy');
     });
 });

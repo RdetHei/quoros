@@ -1,0 +1,117 @@
+<?php
+
+namespace App\Services;
+
+use ZipArchive;
+use DOMDocument;
+use DOMXPath;
+use Illuminate\Support\Str;
+
+class EpubParserService
+{
+    public function parse($filePath)
+    {
+        $zip = new ZipArchive();
+        if ($zip->open($filePath) !== true) {
+            throw new \Exception("Gagal membuka file EPUB.");
+        }
+
+        // 1. Cari file container.xml untuk menemukan path ke file .opf
+        $containerContent = $zip->getFromName('META-INF/container.xml');
+        if (!$containerContent) {
+            throw new \Exception("Format EPUB tidak valid (META-INF/container.xml tidak ditemukan).");
+        }
+
+        $containerDom = new DOMDocument();
+        $containerDom->loadXML($containerContent);
+        $opfPath = $containerDom->getElementsByTagName('rootfile')->item(0)->getAttribute('full-path');
+        $baseDir = dirname($opfPath);
+        if ($baseDir === '.') $baseDir = '';
+        else $baseDir .= '/';
+
+        // 2. Baca file .opf untuk mendapatkan daftar item (manifest) dan urutan bab (spine)
+        $opfContent = $zip->getFromName($opfPath);
+        $opfDom = new DOMDocument();
+        $opfDom->loadXML($opfContent);
+        $xpath = new DOMXPath($opfDom);
+        $xpath->registerNamespace('opf', 'http://www.idpf.org/2007/opf');
+
+        $manifest = [];
+        $items = $opfDom->getElementsByTagName('item');
+        foreach ($items as $item) {
+            $manifest[$item->getAttribute('id')] = [
+                'href' => $item->getAttribute('href'),
+                'media-type' => $item->getAttribute('media-type')
+            ];
+        }
+
+        $spine = [];
+        $itemrefs = $opfDom->getElementsByTagName('itemref');
+        foreach ($itemrefs as $itemref) {
+            $idref = $itemref->getAttribute('idref');
+            if (isset($manifest[$idref])) {
+                $spine[] = $manifest[$idref]['href'];
+            }
+        }
+
+        // 3. Ekstrak konten dari setiap file di spine
+        $chapters = [];
+        foreach ($spine as $index => $href) {
+            $fullPath = $baseDir . $href;
+            $content = $zip->getFromName($fullPath);
+            if (!$content) continue;
+
+            $chapterData = $this->cleanChapterContent($content);
+            
+            // Jika konten kosong setelah dibersihkan, lewati
+            if (empty(trim(strip_tags($chapterData['content'])))) {
+                continue;
+            }
+
+            $chapters[] = [
+                'title' => $chapterData['title'] ?: "Chapter " . ($index + 1),
+                'content' => $chapterData['content']
+            ];
+        }
+
+        $zip->close();
+        return $chapters;
+    }
+
+    private function cleanChapterContent($html)
+    {
+        $dom = new DOMDocument();
+        // Sembunyikan error karena HTML di EPUB mungkin tidak valid sempurna
+        @$dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        
+        // Ambil judul dari tag h1, h2, atau title
+        $title = '';
+        $h1 = $dom->getElementsByTagName('h1')->item(0);
+        $h2 = $dom->getElementsByTagName('h2')->item(0);
+        $titleTag = $dom->getElementsByTagName('title')->item(0);
+
+        if ($h1) $title = $h1->textContent;
+        elseif ($h2) $title = $h2->textContent;
+        elseif ($titleTag) $title = $titleTag->textContent;
+
+        // Bersihkan body
+        $body = $dom->getElementsByTagName('body')->item(0);
+        if ($body) {
+            // Hapus script, style, dsb jika ada
+            $content = $dom->saveHTML($body);
+            // Hilangkan tag body itu sendiri
+            $content = preg_replace('/<\/?body[^>]*>/i', '', $content);
+        } else {
+            $content = $html;
+        }
+
+        // Pembersihan tambahan: hapus link internal, CSS inline, dsb
+        $content = preg_replace('/style="[^"]*"/i', '', $content);
+        $content = preg_replace('/class="[^"]*"/i', '', $content);
+        
+        return [
+            'title' => trim($title),
+            'content' => trim($content)
+        ];
+    }
+}
