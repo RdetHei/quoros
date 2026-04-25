@@ -1,0 +1,120 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Chapter;
+use App\Models\Novel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+
+class ChapterController extends Controller
+{
+    public function create(Novel $novel)
+    {
+        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
+            abort(403);
+        }
+        return view('writer.chapters.create', compact('novel'));
+    }
+
+    public function store(Request $request, Novel $novel)
+    {
+        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'nullable|string',
+            'file' => 'nullable|file|mimes:pdf,epub,docx|max:10240', // 10MB max
+        ]);
+
+        $slug = Str::slug($request->title);
+        
+        $chapter = new Chapter();
+        $chapter->novel_id = $novel->id;
+        $chapter->title = $request->title;
+        $chapter->slug = $slug;
+        $chapter->content = $request->content;
+
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('chapters', 'public');
+            $chapter->file_path = $path;
+        }
+
+        $chapter->save();
+
+        return redirect()->route('novels.show', $novel->slug)->with('success', 'Chapter added successfully!');
+    }
+
+    public function show(Novel $novel, $chapterSlug)
+    {
+        $chapter = Chapter::where('novel_id', $novel->id)
+            ->where('slug', $chapterSlug)
+            ->firstOrFail();
+            
+        $chapter->load('comments.user');
+
+        if (Auth::check()) {
+            \App\Models\ReadingHistory::updateOrCreate(
+                ['user_id' => Auth::id(), 'novel_id' => $novel->id],
+                ['chapter_id' => $chapter->id]
+            );
+        }
+        
+        return view('chapters.show', compact('novel', 'chapter'));
+    }
+
+    public function edit(Novel $novel, Chapter $chapter)
+    {
+        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
+            abort(403);
+        }
+        return view('writer.chapters.edit', compact('novel', 'chapter'));
+    }
+
+    public function update(Request $request, Novel $novel, Chapter $chapter)
+    {
+        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'nullable|string',
+            'file' => 'nullable|file|mimes:pdf,epub,docx|max:10240',
+        ]);
+
+        $chapter->title = $request->title;
+        $chapter->content = $request->content;
+
+        if ($request->hasFile('file')) {
+            if ($chapter->file_path) {
+                Storage::disk('public')->delete($chapter->file_path);
+            }
+            $path = $request->file('file')->store('chapters', 'public');
+            $chapter->file_path = $path;
+        }
+
+        $chapter->save();
+
+        return redirect()->route('novels.show', $novel->slug)->with('success', 'Chapter updated successfully!');
+    }
+
+    public function destroy(Novel $novel, Chapter $chapter)
+    {
+        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($chapter->file_path) {
+            Storage::disk('public')->delete($chapter->file_path);
+        }
+
+        $chapter->delete();
+
+        return redirect()->route('novels.show', $novel->slug)->with('success', 'Chapter deleted successfully!');
+    }
+}
