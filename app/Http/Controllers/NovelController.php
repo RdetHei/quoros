@@ -40,7 +40,22 @@ class NovelController extends Controller
 
         $genres = Genre::all();
 
-        return view('novels.index', compact('novels', 'genres', 'recentlyUpdated'));
+        // Leaderboard: Top Novels Weekly & Monthly
+        $weeklyTop = Novel::with(['author', 'genres'])
+            ->withCount(['chapters', 'bookmarks'])
+            ->where('created_at', '>=', now()->subDays(7))
+            ->orderByDesc('view_count')
+            ->take(5)
+            ->get();
+
+        $monthlyTop = Novel::with(['author', 'genres'])
+            ->withCount(['chapters', 'bookmarks'])
+            ->where('created_at', '>=', now()->subMonth())
+            ->orderByDesc('view_count')
+            ->take(5)
+            ->get();
+
+        return view('novels.index', compact('novels', 'genres', 'recentlyUpdated', 'weeklyTop', 'monthlyTop'));
     }
 
     public function updated()
@@ -100,7 +115,10 @@ class NovelController extends Controller
 
     public function writerIndex()
     {
-        $novels = Novel::where('author_id', Auth::id())->latest()->get();
+        $novels = Novel::where('author_id', Auth::id())
+            ->withCount(['chapters', 'bookmarks'])
+            ->latest()
+            ->get();
         return view('writer.novels.index', compact('novels'));
     }
 
@@ -159,8 +177,41 @@ class NovelController extends Controller
     public function show(Novel $novel)
     {
         $novel->increment('view_count');
-        $novel->load(['author', 'chapters', 'genres', 'tags', 'reviews.user']);
-        return view('novels.show', compact('novel'));
+        
+        $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
+
+        $novel->load(['author', 'genres', 'tags', 'reviews.user', 'chapters' => function($query) use ($isAuthorOrAdmin) {
+            if (!$isAuthorOrAdmin) {
+                $query->published();
+            }
+            $query->orderBy('created_at', 'asc');
+        }]);
+
+        // Personalized Recommendations: Novel Serupa berdasarkan Genre dan Tag
+        $genreIds = $novel->genres->pluck('id');
+        $tagIds = $novel->tags->pluck('id');
+
+        $similarNovels = Novel::where('id', '!=', $novel->id)
+            ->where(function($query) use ($genreIds, $tagIds) {
+                $query->whereHas('genres', function($q) use ($genreIds) {
+                    $q->whereIn('genres.id', $genreIds);
+                })
+                ->orWhereHas('tags', function($q) use ($tagIds) {
+                    $q->whereIn('tags.id', $tagIds);
+                });
+            })
+            ->with(['author', 'genres'])
+            ->withCount(['genres as matched_genres_count' => function($query) use ($genreIds) {
+                $query->whereIn('genres.id', $genreIds);
+            }])
+            ->withCount(['tags as matched_tags_count' => function($query) use ($tagIds) {
+                $query->whereIn('tags.id', $tagIds);
+            }])
+            ->orderByRaw('(matched_genres_count + matched_tags_count) DESC')
+            ->take(6)
+            ->get();
+
+        return view('novels.show', compact('novel', 'similarNovels'));
     }
 
     public function edit(Novel $novel)

@@ -20,6 +20,7 @@
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Novel</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Genre</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Chapter</th>
+                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Stats</th>
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Aksi</th>
                 </tr>
             </thead>
@@ -50,8 +51,24 @@
                         </td>
                         <td class="px-6 py-4 text-center">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-400">
-                                {{ $novel->chapters->count() }}
+                                {{ $novel->chapters_count }}
                             </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-center gap-4">
+                                <div class="flex flex-col items-center">
+                                    <span class="text-xs font-bold text-slate-900 dark:text-white">{{ number_format($novel->view_count) }}</span>
+                                    <span class="text-[10px] text-slate-400 uppercase tracking-tighter">Views</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <span class="text-xs font-bold text-slate-900 dark:text-white">{{ $novel->bookmarks_count }}</span>
+                                    <span class="text-[10px] text-slate-400 uppercase tracking-tighter">Saved</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <span class="text-xs font-bold text-amber-500">{{ number_format($novel->rating_avg, 1) }}</span>
+                                    <span class="text-[10px] text-slate-400 uppercase tracking-tighter">Rating</span>
+                                </div>
+                            </div>
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex justify-end gap-2">

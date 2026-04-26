@@ -6,6 +6,7 @@ use App\Models\Novel;
 use App\Models\ReadingHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -68,5 +69,31 @@ class DashboardController extends Controller
             'histories',
             'recommendations'
         ));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        
+        $request->validate([
+            'username' => 'required|string|alpha_dash|max:255|unique:users,username,' . $user->id,
+            'bio' => 'nullable|string|max:500',
+            'is_public_reading_list' => 'required|boolean',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $data = $request->only(['username', 'bio', 'is_public_reading_list']);
+
+        if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo) {
+                Storage::delete('public/' . $user->profile_photo);
+            }
+            $path = $request->file('profile_photo')->store('profiles', 'public');
+            $data['profile_photo'] = $path;
+        }
+
+        $user->update($data);
+
+        return back()->with('success', 'Profile updated successfully!');
     }
 }

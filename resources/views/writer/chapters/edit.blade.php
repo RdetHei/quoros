@@ -8,7 +8,7 @@
             <p class="text-slate-500 dark:text-slate-400">Mengubah bab <span class="font-bold text-indigo-600">{{ $chapter->title }}</span> pada novel <span class="font-bold text-indigo-600">{{ $novel->title }}</span>.</p>
         </div>
 
-        <form action="{{ route('writer.chapters.update', [$novel->id, $chapter->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+        <form action="{{ route('writer.chapters.update', [$novel->id, $chapter->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-8" x-data="{ status: '{{ old('status', $chapter->status) }}' }">
             @csrf
             @method('PUT')
             <div>
@@ -29,6 +29,28 @@
                 @error('content')
                     <p class="mt-2 text-xs text-red-500 font-medium">{{ $message }}</p>
                 @enderror
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="status" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Status Publikasi</label>
+                    <select name="status" id="status" x-model="status"
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all">
+                        <option value="published">Terbit</option>
+                        <option value="draft">Draf</option>
+                        <option value="scheduled">Jadwalkan</option>
+                    </select>
+                </div>
+
+                <div x-show="status === 'scheduled'" x-transition>
+                    <label for="published_at" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Tanggal & Waktu Rilis</label>
+                    <input type="datetime-local" name="published_at" id="published_at" 
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all"
+                        value="{{ old('published_at', $chapter->published_at ? $chapter->published_at->format('Y-m-d\TH:i') : '') }}">
+                    @error('published_at')
+                        <p class="mt-2 text-xs text-red-500 font-medium">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div>

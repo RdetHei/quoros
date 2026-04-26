@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
@@ -30,6 +32,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Public Novel Routes
 Route::get('/novels/{novel:slug}', [NovelController::class, 'show'])->name('novels.show');
+Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
 Route::get('/novels/{novel:slug}/read/{chapterSlug}', [ChapterController::class, 'show'])->name('chapters.show');
 Route::get('/updated', [NovelController::class, 'updated'])->name('novels.updated');
 Route::get('/genres', [NovelController::class, 'genres'])->name('genres.index');
@@ -38,6 +41,7 @@ Route::get('/tags', [NovelController::class, 'tags'])->name('tags.index');
 // Auth Required Routes
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::put('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
 
     // Bookmark & History dedicated views
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
@@ -55,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::post('/chapters/{chapter}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/reactions/{type}/{id}', [ReactionController::class, 'toggle'])->name('reactions.toggle');
 
     // Writer & Admin Routes
     Route::middleware('role:writer,admin')->group(function () {

@@ -11,10 +11,35 @@ class BookmarkController extends Controller
 {
     public function index()
     {
-        $bookmarks = Auth::user()->bookmarks()
+        $user = Auth::user();
+        $bookmarks = $user->bookmarks()
             ->with(['novel.author', 'novel.genres'])
+            ->withCount('novel as total_chapters')
             ->latest()
             ->paginate(18);
+
+        // Menambahkan progress membaca untuk setiap bookmark
+        foreach ($bookmarks as $bookmark) {
+            $lastRead = \App\Models\ReadingHistory::where('user_id', $user->id)
+                ->where('novel_id', $bookmark->novel_id)
+                ->with('chapter')
+                ->latest()
+                ->first();
+
+            $totalChapters = \App\Models\Chapter::where('novel_id', $bookmark->novel_id)->count();
+            
+            // Mencari urutan bab yang dibaca (berdasarkan ID atau urutan waktu)
+            // Di sini kita asumsikan progress berdasarkan jumlah bab unik yang pernah dibaca oleh user untuk novel tersebut
+            $readChaptersCount = \App\Models\ReadingHistory::where('user_id', $user->id)
+                ->where('novel_id', $bookmark->novel_id)
+                ->distinct('chapter_id')
+                ->count('chapter_id');
+
+            $bookmark->read_chapters_count = $readChaptersCount;
+            $bookmark->total_chapters = $totalChapters;
+            $bookmark->progress_percentage = $totalChapters > 0 ? min(($readChaptersCount / $totalChapters) * 100, 100) : 0;
+            $bookmark->last_read_chapter = $lastRead ? $lastRead->chapter : null;
+        }
 
         return view('user.bookmarks', compact('bookmarks'));
     }

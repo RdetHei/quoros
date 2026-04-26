@@ -11,7 +11,23 @@ class Chapter extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['novel_id', 'title', 'slug', 'content', 'file_path'];
+    protected $fillable = ['novel_id', 'title', 'slug', 'content', 'file_path', 'status', 'published_at'];
+
+    protected $casts = [
+        'published_at' => 'datetime',
+    ];
+
+    /**
+     * Scope a query to only include published chapters.
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published')
+            ->where(function ($q) {
+                $q->whereNull('published_at')
+                    ->orWhere('published_at', '<=', now());
+            });
+    }
 
     public function novel(): BelongsTo
     {
@@ -31,22 +47,30 @@ class Chapter extends Model
     /**
      * Get the previous chapter in the same novel.
      */
-    public function previous()
+    public function previous($onlyPublished = true)
     {
-        return static::where('novel_id', $this->novel_id)
-            ->where('id', '<', $this->id)
-            ->orderBy('id', 'desc')
-            ->first();
+        $query = static::where('novel_id', $this->novel_id)
+            ->where('id', '<', $this->id);
+        
+        if ($onlyPublished) {
+            $query->published();
+        }
+
+        return $query->orderBy('id', 'desc')->first();
     }
 
     /**
      * Get the next chapter in the same novel.
      */
-    public function next()
+    public function next($onlyPublished = true)
     {
-        return static::where('novel_id', $this->novel_id)
-            ->where('id', '>', $this->id)
-            ->orderBy('id', 'asc')
-            ->first();
+        $query = static::where('novel_id', $this->novel_id)
+            ->where('id', '>', $this->id);
+
+        if ($onlyPublished) {
+            $query->published();
+        }
+
+        return $query->orderBy('id', 'asc')->first();
     }
 }

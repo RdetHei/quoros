@@ -21,4 +21,19 @@ class Comment extends Model
     {
         return $this->belongsTo(Chapter::class);
     }
+
+    public function reactions()
+    {
+        return $this->morphMany(Reaction::class, 'reactable');
+    }
+
+    public function likes()
+    {
+        return $this->reactions()->where('type', 'like');
+    }
+
+    public function dislikes()
+    {
+        return $this->reactions()->where('type', 'dislike');
+    }
 }

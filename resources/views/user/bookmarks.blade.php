@@ -25,7 +25,15 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
                     <h3 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-rose-500 transition-colors line-clamp-1 text-sm mb-1">{{ $bookmark->novel->title }}</h3>
-                    <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">{{ $bookmark->novel->author->name }}</p>
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider truncate">{{ $bookmark->novel->author->name }}</p>
+                        <span class="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">{{ $bookmark->read_chapters_count }}/{{ $bookmark->total_chapters }}</span>
+                    </div>
+
+                    <!-- Reading Progress Bar -->
+                    <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-2">
+                        <div class="h-full bg-indigo-500 transition-all duration-500" style="width: {{ $bookmark->progress_percentage }}%"></div>
+                    </div>
                 </a>
                 
                 <form action="{{ route('bookmarks.toggle', $bookmark->novel->id) }}" method="POST" class="absolute top-2 right-2">

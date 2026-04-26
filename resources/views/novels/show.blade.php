@@ -180,7 +180,18 @@
                 @forelse($novel->chapters as $chapter)
                     <div class="group flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800 rounded-2xl transition-all">
                         <a href="{{ route('chapters.show', [$novel->slug, $chapter->slug]) }}" class="flex-grow flex items-center justify-between">
-                            <span class="font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $chapter->title }}</span>
+                            <div class="flex flex-col">
+                                <span class="font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $chapter->title }}</span>
+                                @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $novel->author_id))
+                                    <div class="flex items-center gap-2 mt-1">
+                                        @if($chapter->status === 'draft')
+                                            <span class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-[8px] font-bold rounded uppercase tracking-widest">Draft</span>
+                                        @elseif($chapter->status === 'scheduled')
+                                            <span class="px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[8px] font-bold rounded uppercase tracking-widest">Scheduled: {{ $chapter->published_at->format('d/m/y H:i') }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
                         </a>
                         
                         @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $novel->author_id))
@@ -272,4 +283,41 @@
         </div>
     </div>
 </div>
+
+<!-- Recommendations: Novel Serupa -->
+@if($similarNovels->count() > 0)
+    <div class="mt-16 mb-20">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Novel Serupa</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1">Berdasarkan kesamaan genre dan tag novel ini.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            @foreach($similarNovels as $similar)
+                <a href="{{ route('novels.show', $similar->slug) }}" class="group block">
+                    <div class="relative aspect-[3/4] rounded-2xl overflow-hidden mb-3 shadow-lg shadow-slate-200/50 dark:shadow-none transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl group-hover:shadow-indigo-200/40 dark:group-hover:shadow-indigo-900/20">
+                        @if($similar->cover_image)
+                            <img src="{{ asset('storage/' . $similar->cover_image) }}" alt="{{ $similar->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        @else
+                            <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                        @endif
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                            <span class="text-[10px] font-bold text-white uppercase tracking-widest bg-indigo-600 w-fit px-2 py-1 rounded-md mb-2">Lihat Detail</span>
+                        </div>
+                    </div>
+                    <h3 class="font-bold text-slate-900 dark:text-white text-sm line-clamp-2 group-hover:text-indigo-600 transition-colors">{{ $similar->title }}</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        {{ $similar->author->name }}
+                    </p>
+                </a>
+            @endforeach
+        </div>
+    </div>
+@endif
 @endsection

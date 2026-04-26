@@ -30,6 +30,8 @@ class ChapterController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
             'file' => 'nullable|file|mimes:pdf,epub,docx|max:10240', // 10MB max
+            'status' => 'required|in:draft,published,scheduled',
+            'published_at' => 'nullable|required_if:status,scheduled|date|after:now',
         ]);
 
         $slug = Str::slug($request->title);
@@ -39,6 +41,8 @@ class ChapterController extends Controller
         $chapter->title = $request->title;
         $chapter->slug = $slug;
         $chapter->content = $request->content;
+        $chapter->status = $request->status;
+        $chapter->published_at = $request->status === 'scheduled' ? $request->published_at : ($request->status === 'published' ? now() : null);
 
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('chapters', 'public');
@@ -98,6 +102,13 @@ class ChapterController extends Controller
         $chapter = Chapter::where('novel_id', $novel->id)
             ->where('slug', $chapterSlug)
             ->firstOrFail();
+
+        // Check if user is author or admin to see non-published chapters
+        $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
+
+        if (!$isAuthorOrAdmin && ($chapter->status !== 'published' || ($chapter->published_at && $chapter->published_at->isFuture()))) {
+            abort(404);
+        }
             
         $chapter->load('comments.user');
 
@@ -108,8 +119,8 @@ class ChapterController extends Controller
             );
         }
 
-        $previousChapter = $chapter->previous();
-        $nextChapter = $chapter->next();
+        $previousChapter = $chapter->previous(!$isAuthorOrAdmin);
+        $nextChapter = $chapter->next(!$isAuthorOrAdmin);
         
         return view('chapters.show', compact('novel', 'chapter', 'previousChapter', 'nextChapter'));
     }
@@ -132,10 +143,21 @@ class ChapterController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
             'file' => 'nullable|file|mimes:pdf,epub,docx|max:10240',
+            'status' => 'required|in:draft,published,scheduled',
+            'published_at' => 'nullable|required_if:status,scheduled|date|after:now',
         ]);
 
         $chapter->title = $request->title;
         $chapter->content = $request->content;
+        $chapter->status = $request->status;
+        
+        if ($request->status === 'scheduled') {
+            $chapter->published_at = $request->published_at;
+        } elseif ($request->status === 'published' && !$chapter->published_at) {
+            $chapter->published_at = now();
+        } elseif ($request->status === 'draft') {
+            $chapter->published_at = null;
+        }
 
         if ($request->hasFile('file')) {
             if ($chapter->file_path) {

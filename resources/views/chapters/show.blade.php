@@ -92,20 +92,45 @@
                     </div>
                     <div class="flex-grow">
                         <div class="flex items-center justify-between mb-1">
-                            <h4 class="font-bold text-sm text-slate-900 dark:text-white">{{ $comment->user->name }}</h4>
+                            <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}" class="font-bold text-sm text-slate-900 dark:text-white hover:text-indigo-600 transition-colors">{{ $comment->user->name }}</a>
                             <span class="text-[10px] font-medium text-slate-400 uppercase tracking-widest">{{ $comment->created_at->diffForHumans() }}</span>
                         </div>
                         <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $comment->content }}</p>
                         
-                        @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $comment->user_id))
-                            <div class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <form action="{{ route('comments.destroy', $comment->id) }}" method="POST">
+                        <div class="mt-3 flex items-center gap-4">
+                            <!-- Reaction Buttons -->
+                            <div class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-lg p-1 border border-slate-100 dark:border-slate-700">
+                                <form action="{{ route('reactions.toggle', ['type' => 'comment', 'id' => $comment->id]) }}" method="POST" class="inline">
                                     @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-500 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors" onclick="return confirm('Hapus komentar ini?')">Hapus</button>
+                                    <input type="hidden" name="reaction_type" value="like">
+                                    <button type="submit" class="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all {{ $comment->likes->where('user_id', Auth::id())->first() ? 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30' : 'text-slate-500 hover:text-indigo-600' }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="{{ $comment->likes->where('user_id', Auth::id())->first() ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.757c1.246 0 2.256 1.01 2.256 2.256 0 .42-.116.83-.335 1.189l-2.723 4.856c-.466.83-1.34 1.343-2.285 1.343H10m4-9.644V7a3 3 0 00-3-3H9m1.5 14H7a3 3 0 01-3-3V10a3 3 0 013-3h2.5" />
+                                        </svg>
+                                        <span class="text-xs font-bold">{{ $comment->likes->count() }}</span>
+                                    </button>
+                                </form>
+                                <div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                                <form action="{{ route('reactions.toggle', ['type' => 'comment', 'id' => $comment->id]) }}" method="POST" class="inline">
+                                    @csrf
+                                    <input type="hidden" name="reaction_type" value="dislike">
+                                    <button type="submit" class="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all {{ $comment->dislikes->where('user_id', Auth::id())->first() ? 'text-rose-600 bg-rose-50 dark:bg-rose-900/30' : 'text-slate-500 hover:text-rose-600' }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="{{ $comment->dislikes->where('user_id', Auth::id())->first() ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.243c-1.246 0-2.256-1.01-2.256-2.256 0-.42.116-.83.335-1.189l2.723-4.856c.466-.83 1.34-1.343 2.285-1.343H14m-4 9.644V17a3 3 0 003 3h2m-1.5-14H17a3 3 0 013 3v7a3 3 0 01-3 3h-2.5" />
+                                        </svg>
+                                        <span class="text-xs font-bold">{{ $comment->dislikes->count() }}</span>
+                                    </button>
                                 </form>
                             </div>
-                        @endif
+
+                            @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $comment->user_id))
+                                <form action="{{ route('comments.destroy', $comment->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-slate-400 hover:text-red-500 text-[10px] font-bold uppercase tracking-widest transition-colors" onclick="return confirm('Hapus komentar ini?')">Hapus</button>
+                                </form>
+                            @endif
+                        </div>
                     </div>
                 </div>
             @empty
