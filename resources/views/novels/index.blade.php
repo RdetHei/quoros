@@ -1,30 +1,86 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Hero Section / Search -->
-<div class="relative mb-12 py-16 px-6 rounded-3xl overflow-hidden shadow-2xl shadow-indigo-200 dark:shadow-none">
-    <!-- Video Background -->
-    <video autoplay muted playsinline class="absolute inset-0 w-full h-full object-cover">
-        <source src="{{ asset('storage/video/2025-09-22-1758551629959.mp4') }}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+<!-- Banner Carousel -->
+<div class="relative mb-12 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-100 dark:shadow-none" 
+     x-data="{ 
+        activeSlide: 0, 
+        slides: {{ $featuredNovels->count() }},
+        next() { this.activeSlide = (this.activeSlide + 1) % this.slides },
+        prev() { this.activeSlide = (this.activeSlide - 1 + this.slides) % this.slides },
+        init() { setInterval(() => this.next(), 5000) }
+     }">
     
-    <!-- Overlay for readability -->
-    <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
-    
-    <div class="relative z-10 text-center max-w-2xl mx-auto">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Temukan Petualangan Tanpa Batas</h1>
-        <p class="text-indigo-100 mb-8 text-lg">Ribuan novel dari berbagai genre menunggu untuk kamu jelajahi.</p>
-        
-        <form action="{{ route('home') }}" method="GET" class="relative max-w-xl mx-auto">
-            <input type="text" name="search" value="{{ request('search') }}" 
-                class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-indigo-200 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all shadow-xl"
-                placeholder="Cari judul novel atau penulis...">
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+    <div class="relative h-[400px] md:h-[500px] overflow-hidden">
+        @foreach($featuredNovels as $index => $novel)
+            <div x-show="activeSlide === {{ $index }}" 
+                 x-transition:enter="transition ease-out duration-500"
+                 x-transition:enter-start="opacity-0 transform scale-105"
+                 x-transition:enter-end="opacity-100 transform scale-100"
+                 class="absolute inset-0 w-full h-full">
+                
+                <!-- Background Image -->
+                <div class="absolute inset-0">
+                    @if($novel->cover_image)
+                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover">
+                    @else
+                        <div class="w-full h-full bg-slate-800 flex items-center justify-center">
+                            <span class="text-white font-bold">{{ $novel->title }}</span>
+                        </div>
+                    @endif
+                    <!-- Dark Overlay Gradient -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/60 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
+                </div>
+
+                <!-- Content -->
+                <div class="relative h-full flex items-center px-8 md:px-16 max-w-4xl">
+                    <div class="space-y-4">
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($novel->genres->take(3) as $genre)
+                                <span class="px-3 py-1 bg-indigo-600/20 backdrop-blur-md text-indigo-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-indigo-500/30">
+                                    {{ $genre->name }}
+                                </span>
+                            @endforeach
+                        </div>
+                        <h2 class="text-3xl md:text-5xl font-black text-white leading-tight drop-shadow-lg">
+                            {{ $novel->title }}
+                        </h2>
+                        <p class="text-sm md:text-base text-slate-300 font-medium italic">
+                            Oleh <span class="text-white">{{ $novel->author->name }}</span>
+                        </p>
+                        <p class="text-slate-400 text-sm md:text-base line-clamp-2 md:line-clamp-3 max-w-xl">
+                            {{ $novel->description }}
+                        </p>
+                        <div class="pt-4">
+                            <a href="{{ route('novels.show', $novel->slug) }}" class="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-900/20">
+                                <span>Baca Sekarang</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-white text-indigo-600 font-bold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg">Cari</button>
-        </form>
+        @endforeach
+    </div>
+
+    <!-- Navigation Arrows -->
+    <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 backdrop-blur-md text-white rounded-full hover:bg-white/20 transition-all border border-white/20 z-20 hidden md:block">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+    </button>
+    <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 backdrop-blur-md text-white rounded-full hover:bg-white/20 transition-all border border-white/20 z-20 hidden md:block">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+    </button>
+
+    <!-- Indicators -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+        @foreach($featuredNovels as $index => $novel)
+            <button @click="activeSlide = {{ $index }}" 
+                    :class="activeSlide === {{ $index }} ? 'w-8 bg-indigo-500' : 'w-2 bg-white/40'" 
+                    class="h-2 rounded-full transition-all duration-300"></button>
+        @endforeach
     </div>
 </div>
 

@@ -97,21 +97,51 @@ class EpubParserService
         // Bersihkan body
         $body = $dom->getElementsByTagName('body')->item(0);
         if ($body) {
-            // Hapus script, style, dsb jika ada
-            $content = $dom->saveHTML($body);
-            // Hilangkan tag body itu sendiri
-            $content = preg_replace('/<\/?body[^>]*>/i', '', $content);
+            // Hapus elemen yang tidak perlu dibaca.
+            $xpath = new DOMXPath($dom);
+            foreach ($xpath->query('//script|//style|//noscript') as $node) {
+                $node->parentNode?->removeChild($node);
+            }
+
+            $content = $this->extractReadableText($body);
         } else {
-            $content = $html;
+            $content = $this->normalizeText(strip_tags(html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
         }
 
-        // Pembersihan tambahan: hapus link internal, CSS inline, dsb
-        $content = preg_replace('/style="[^"]*"/i', '', $content);
-        $content = preg_replace('/class="[^"]*"/i', '', $content);
-        
         return [
             'title' => trim($title),
             'content' => trim($content)
         ];
+    }
+
+    private function extractReadableText(\DOMNode $body): string
+    {
+        $blockTags = ['p', 'div', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
+        $lines = [];
+
+        foreach ($blockTags as $tag) {
+            foreach ($body->getElementsByTagName($tag) as $node) {
+                $text = $this->normalizeText($node->textContent ?? '');
+                if ($text !== '') {
+                    $lines[] = $text;
+                }
+            }
+        }
+
+        if (!empty($lines)) {
+            return implode("\n\n", $lines);
+        }
+
+        return $this->normalizeText($body->textContent ?? '');
+    }
+
+    private function normalizeText(string $text): string
+    {
+        $decoded = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $decoded = str_replace(["\r\n", "\r"], "\n", $decoded);
+        $decoded = preg_replace("/[ \t]+/u", ' ', $decoded);
+        $decoded = preg_replace("/\n{3,}/u", "\n\n", $decoded);
+
+        return trim($decoded ?? '');
     }
 }

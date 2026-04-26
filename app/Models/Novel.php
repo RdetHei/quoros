@@ -23,7 +23,8 @@ class Novel extends Model
         'content_rating', 
         'view_count', 
         'rating_avg', 
-        'cover_image'
+        'cover_image',
+        'is_featured'
     ];
 
     public function author(): BelongsTo

@@ -5,6 +5,7 @@ use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
+use App\Http\Controllers\Admin\CarouselController as AdminCarouselController;
 use App\Http\Controllers\Api\ChapterController as ApiChapterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
@@ -31,6 +32,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Public Novel Routes
+Route::get('/search', [NovelController::class, 'search'])->name('novels.search');
 Route::get('/novels/{novel:slug}', [NovelController::class, 'show'])->name('novels.show');
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
 Route::get('/novels/{novel:slug}/read/{chapterSlug}', [ChapterController::class, 'show'])->name('chapters.show');
@@ -89,5 +91,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/requests', [AdminNovelRequestController::class, 'index'])->name('admin.requests.index');
         Route::patch('/admin/requests/{novelRequest}/status', [AdminNovelRequestController::class, 'updateStatus'])->name('admin.requests.status');
         Route::delete('/admin/requests/{novelRequest}', [AdminNovelRequestController::class, 'destroy'])->name('admin.requests.destroy');
+
+        // Carousel Management
+        Route::get('/admin/carousel', [AdminCarouselController::class, 'index'])->name('admin.carousel.index');
+        Route::post('/admin/carousel/{novel}/toggle', [AdminCarouselController::class, 'toggle'])->name('admin.carousel.toggle');
     });
 });

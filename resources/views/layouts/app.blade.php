@@ -35,12 +35,12 @@
         <nav id="navbar" class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
-                    <div class="flex items-center gap-8">
-                        <a href="{{ url('/') }}" class="flex items-center gap-2 group">
+                    <div class="flex items-center gap-8 flex-1">
+                        <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
                             <span class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent group-hover:from-indigo-500 group-hover:to-violet-500 transition-all">Mural</span>
                         </a>
                         
-                        <div class="hidden md:flex items-center gap-6">
+                        <div class="hidden lg:flex items-center gap-6">
                             <a href="{{ route('home') }}" class="text-sm font-medium {{ request()->routeIs('home') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Katalog</a>
                             <a href="{{ route('novels.updated') }}" class="text-sm font-medium {{ request()->routeIs('novels.updated') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Updated</a>
                             <a href="{{ route('genres.index') }}" class="text-sm font-medium {{ request()->routeIs('genres.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Genre</a>
@@ -49,23 +49,46 @@
                                 <a href="{{ route('bookmarks.index') }}" class="text-sm font-medium {{ request()->routeIs('bookmarks.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Bookmark</a>
                                 <a href="{{ route('history.index') }}" class="text-sm font-medium {{ request()->routeIs('history.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">History</a>
                             @endauth
-                            <a href="{{ route('requests.index') }}" class="text-sm font-medium {{ request()->routeIs('requests.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Request</a>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-4">
+                        <!-- Search Bar (Desktop - Right Side) -->
+                        <div class="hidden md:flex items-center w-64 lg:w-80">
+                            <form action="{{ route('novels.search') }}" method="GET" class="relative w-full">
+                                <input type="text" name="q" value="{{ request('q') }}" 
+                                    class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
+                                    placeholder="Cari novel...">
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                </div>
+                            </form>
+                        </div>
                         <!-- Search Toggle (Mobile) -->
-                        <button class="md:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                        </button>
+                        <div x-data="{ open: false }" class="md:hidden">
+                            <button @click="open = !open" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            </button>
 
-                        <!-- Dark Mode Toggle -->
-                        <button id="theme-toggle" type="button" class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                            <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
-                        </button>
+                            <!-- Mobile Search Overlay -->
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             @click.away="open = false"
+                             class="absolute left-0 right-0 top-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 shadow-xl z-50">
+                            <form action="{{ route('novels.search') }}" method="GET" class="relative">
+                                <input type="text" name="q" value="{{ request('q') }}" 
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+                                    placeholder="Cari novel...">
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
-                        <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
 
                         @guest
                             <div class="flex items-center gap-2">

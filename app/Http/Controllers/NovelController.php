@@ -30,6 +30,20 @@ class NovelController extends Controller
 
         $novels = $query->latest()->paginate(12)->withQueryString();
         
+        // Featured Novels for Carousel (Selected by Admin)
+        $featuredNovels = Novel::with(['author', 'genres'])
+            ->where('is_featured', true)
+            ->take(5)
+            ->get();
+            
+        // Fallback to top viewed if no featured novels selected
+        if ($featuredNovels->isEmpty()) {
+            $featuredNovels = Novel::with(['author', 'genres'])
+                ->orderByDesc('view_count')
+                ->take(5)
+                ->get();
+        }
+
         // Recently Updated: Novels with the most recent chapters
         $recentlyUpdated = Novel::with(['author', 'genres'])
             ->whereHas('chapters')
@@ -55,7 +69,26 @@ class NovelController extends Controller
             ->take(5)
             ->get();
 
-        return view('novels.index', compact('novels', 'genres', 'recentlyUpdated', 'weeklyTop', 'monthlyTop'));
+        return view('novels.index', compact('novels', 'genres', 'recentlyUpdated', 'weeklyTop', 'monthlyTop', 'featuredNovels'));
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->get('q');
+        
+        $novels = Novel::with(['author', 'genres'])
+            ->where(function($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('alternative_title', 'like', "%{$search}%")
+                    ->orWhereHas('author', function($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            })
+            ->latest()
+            ->paginate(18)
+            ->withQueryString();
+
+        return view('novels.search', compact('novels', 'search'));
     }
 
     public function updated()

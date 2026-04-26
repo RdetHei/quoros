@@ -1,293 +1,450 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-10 pb-10" x-data="{ activeTab: 'bookmarks' }">
-    <!-- Header Dinamis & Stats -->
-    <header class="relative overflow-hidden bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-            <div>
-                <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
-                    Selamat {{ \Carbon\Carbon::now()->hour < 12 ? 'Pagi' : (\Carbon\Carbon::now()->hour < 18 ? 'Siang' : 'Malam') }}, 
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">{{ $user->name }}!</span>
-                </h1>
-                <p class="text-slate-500 dark:text-slate-400 font-medium">Senang melihatmu kembali. Siap melanjutkan petualangan hari ini?</p>
-            </div>
-            
-            <div class="grid grid-cols-3 gap-4">
-                <div class="text-center px-4 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jam Baca</p>
-                    <p class="text-lg font-black text-indigo-600 dark:text-indigo-400">{{ $totalReadingHours }}h</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="{ activeTab: 'bookmarks' }">
+    <!-- Clean Header Section -->
+    <div class="relative mb-8 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        
+        <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div class="flex items-center gap-6">
+                <div class="relative">
+                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden ring-4 ring-slate-50 dark:ring-slate-800 shadow-md">
+                        @if($user->profile_photo)
+                            <img src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-indigo-600">
+                                {{ substr($user->name, 0, 1) }}
+                            </div>
+                        @endif
+                    </div>
+                    <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-4 border-white dark:border-slate-900 shadow-sm"></div>
                 </div>
-                <div class="text-center px-4 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Favorit</p>
-                    <p class="text-lg font-black text-violet-600 dark:text-violet-400 line-clamp-1" title="{{ $favoriteNovel->title ?? '-' }}">
-                        {{ $favoriteNovel ? count($user->bookmarks) : '-' }}
+
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">
+                        Selamat datang, {{ $user->name }}
+                    </h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                        {{ $user->role === 'admin' ? 'Administrator' : ($user->role === 'writer' ? 'Penulis' : 'Pembaca') }} • Member sejak {{ $user->created_at->format('M Y') }}
                     </p>
                 </div>
-                <div class="text-center px-4 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Koin</p>
-                    <p class="text-lg font-black text-amber-500">{{ $userPoints }}</p>
+            </div>
+
+            <div class="flex gap-4">
+                <div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Jam Baca</p>
+                    <p class="text-xl font-bold text-slate-900 dark:text-white">{{ $totalReadingHours }}<span class="text-xs ml-0.5 text-slate-400 font-medium">h</span></p>
+                </div>
+                <div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Koin</p>
+                    <p class="text-xl font-bold text-amber-500">{{ $userPoints }}</p>
                 </div>
             </div>
         </div>
-        
-        <!-- Background Decoration -->
-        <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-600/5 rounded-full blur-3xl"></div>
-        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-violet-600/5 rounded-full blur-3xl"></div>
-    </header>
+    </div>
 
-    <!-- Hero Section: Lanjutkan Membaca -->
-    @if($lastRead)
-    <section class="relative group overflow-hidden rounded-[2.5rem] bg-slate-900 text-white min-h-[300px] flex items-center shadow-2xl shadow-indigo-200 dark:shadow-none">
-        <!-- Cover Background Blur -->
-        <div class="absolute inset-0 opacity-30 grayscale group-hover:grayscale-0 transition-all duration-700">
-            <img src="{{ asset('storage/' . $lastRead->novel->cover_image) }}" class="w-full h-full object-cover">
-        </div>
-        <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/80 to-transparent"></div>
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <!-- Sidebar Navigation -->
+        <div class="lg:col-span-3 space-y-6 sticky top-24 self-start">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <nav class="space-y-1">
+                    <button @click="activeTab = 'bookmarks'" 
+                        :class="activeTab === 'bookmarks' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                        <span>Bookmark</span>
+                    </button>
 
-        <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 w-full">
-            <div class="w-32 md:w-44 flex-shrink-0 shadow-2xl rounded-2xl overflow-hidden transform group-hover:scale-105 transition-transform duration-500">
-                <img src="{{ asset('storage/' . $lastRead->novel->cover_image) }}" class="w-full h-full object-cover aspect-[3/4]">
-            </div>
-            
-            <div class="flex-grow space-y-6">
-                <div>
-                    <span class="inline-block px-4 py-1.5 bg-indigo-600/20 backdrop-blur-md border border-indigo-500/30 rounded-full text-indigo-400 text-xs font-bold uppercase tracking-widest mb-4">Lanjutkan Membaca</span>
-                    <h2 class="text-3xl md:text-4xl font-black text-white mb-2 leading-tight">{{ $lastRead->novel->title }}</h2>
-                    <p class="text-slate-400 font-medium italic">Sampai di: {{ $lastRead->chapter->title }}</p>
-                </div>
+                    <button @click="activeTab = 'history'" 
+                        :class="activeTab === 'history' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>Riwayat Baca</span>
+                    </button>
 
-                <div class="max-w-md">
-                    <div class="flex justify-between items-end mb-2">
-                        <p class="text-xs font-bold text-slate-400 uppercase">Progress</p>
-                        <p class="text-sm font-black text-indigo-400">{{ $lastRead->progress }}% <span class="text-slate-500 text-[10px] font-medium uppercase ml-1">({{ $lastRead->current_pos }}/{{ $lastRead->total_chapters }} Chapter)</span></p>
-                    </div>
-                    <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-indigo-600 to-violet-600 rounded-full transition-all duration-1000" style="width: {{ $lastRead->progress }}%"></div>
-                    </div>
-                </div>
+                    <button @click="activeTab = 'recommendations'" 
+                        :class="activeTab === 'recommendations' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        <span>Rekomendasi</span>
+                    </button>
 
-                <a href="{{ route('chapters.show', [$lastRead->novel->slug, $lastRead->chapter->slug]) }}" class="inline-flex items-center gap-3 px-8 py-4 bg-white text-slate-900 font-black rounded-2xl hover:bg-indigo-50 transition-all transform hover:-translate-y-1 shadow-xl">
-                    Baca Sekarang
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                </a>
-            </div>
-        </div>
-    </section>
-    @endif
+                    <button @click="activeTab = 'settings'" 
+                        :class="activeTab === 'settings' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <span>Pengaturan</span>
+                    </button>
+                </nav>
 
-    <!-- Statistik Penulis (Conditional) -->
-            @if($writerStats)
-            <section class="space-y-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </div>
-                        Statistik Penulis
-                    </h2>
-                    <div class="flex items-center gap-4">
+                @if($user->role === 'admin' || $user->role === 'writer')
+                <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Kontributor</p>
+                    <div class="space-y-1">
                         @if($user->role === 'admin')
-                            <a href="{{ route('admin.requests.index') }}" class="text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                Request Novel
+                            <a href="{{ route('admin.carousel.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                                <span>Carousel</span>
                             </a>
                         @endif
-                        <a href="{{ route('writer.novels.index') }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 transition-colors">Kelola Karya &rarr;</a>
+                        <a href="{{ route('writer.novels.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            <span>Karya Saya</span>
+                        </a>
+                    </div>
+                </div>
+                @endif
+            </div>
+
+            <!-- Daily Goal Card -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white">Target Harian</h3>
+                    </div>
+                    <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 rounded-full">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                        <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Active</span>
                     </div>
                 </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-violet-500/30 transition-all">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Total Views</p>
-                <h3 class="text-3xl font-black text-slate-900 dark:text-white">{{ number_format($writerStats['total_views']) }}</h3>
-            </div>
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-violet-500/30 transition-all">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Ulasan</p>
-                <h3 class="text-3xl font-black text-slate-900 dark:text-white">{{ $writerStats['total_comments'] }}</h3>
-            </div>
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-violet-500/30 transition-all">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Avg Rating</p>
-                <h3 class="text-3xl font-black text-slate-900 dark:text-white">{{ number_format($writerStats['avg_rating'], 1) }}<span class="text-sm text-amber-500 ml-1">★</span></h3>
-            </div>
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-violet-500/30 transition-all">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Karya</p>
-                <h3 class="text-3xl font-black text-slate-900 dark:text-white">{{ $writerStats['novel_count'] }}</h3>
-            </div>
-        </div>
-    </section>
-    @endif
-
-    <!-- Tabbed Content Section -->
-    <section class="space-y-8">
-        <div class="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl w-fit">
-            <button @click="activeTab = 'bookmarks'" :class="activeTab === 'bookmarks' ? 'bg-white dark:bg-slate-900 text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'" class="px-6 py-2.5 text-sm font-bold rounded-xl transition-all">
-                Bookmark
-            </button>
-            <button @click="activeTab = 'history'" :class="activeTab === 'history' ? 'bg-white dark:bg-slate-900 text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'" class="px-6 py-2.5 text-sm font-bold rounded-xl transition-all">
-                Riwayat
-            </button>
-            <button @click="activeTab = 'recommendations'" :class="activeTab === 'recommendations' ? 'bg-white dark:bg-slate-900 text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'" class="px-6 py-2.5 text-sm font-bold rounded-xl transition-all">
-                Rekomendasi
-            </button>
-            <button @click="activeTab = 'settings'" :class="activeTab === 'settings' ? 'bg-white dark:bg-slate-900 text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'" class="px-6 py-2.5 text-sm font-bold rounded-xl transition-all">
-                Pengaturan Profil
-            </button>
-        </div>
-
-        <!-- Bookmark Tab -->
-        <div x-show="activeTab === 'bookmarks'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-                @forelse($bookmarks as $bookmark)
-                    <a href="{{ route('novels.show', $bookmark->novel->slug) }}" class="group space-y-3">
-                        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-sm group-hover:shadow-xl group-hover:shadow-indigo-100 dark:group-hover:shadow-none transition-all duration-500">
-                            <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 transition-colors">{{ $bookmark->novel->title }}</h4>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $bookmark->novel->author->name }}</p>
-                        </div>
-                    </a>
-                @empty
-                    <div class="col-span-full py-20 text-center space-y-4 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
-                        <div class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                        </div>
-                        <p class="text-slate-500 font-medium">Belum ada novel yang dibookmark.</p>
-                        <a href="{{ route('home') }}" class="inline-block text-sm font-bold text-indigo-600 hover:underline">Cari Novel &rarr;</a>
+                <div class="mb-6">
+                    <div class="flex items-baseline gap-1 mb-1">
+                        <span class="text-4xl font-bold text-slate-900 dark:text-white">45</span>
+                        <span class="text-sm font-medium text-slate-400">/ 60 min</span>
                     </div>
-                @endforelse
-            </div>
-        </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">15 menit lagi untuk mencapai target!</p>
+                </div>
 
-        <!-- History Tab -->
-        <div x-show="activeTab === 'history'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm divide-y divide-slate-50 dark:divide-slate-800/50">
-                @forelse($histories as $history)
-                    <div class="flex items-center gap-6 p-6 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all first:rounded-t-[2.5rem] last:rounded-b-[2.5rem]">
-                        <div class="w-12 h-16 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
-                            <img src="{{ asset('storage/' . $history->novel->cover_image) }}" class="w-full h-full object-cover">
-                        </div>
-                        <div class="flex-grow min-w-0">
-                            <h4 class="font-bold text-slate-900 dark:text-white truncate">{{ $history->novel->title }}</h4>
-                            <p class="text-xs text-slate-500 font-medium">{{ $history->chapter->title }}</p>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{{ $history->updated_at->diffForHumans() }}</p>
-                            <a href="{{ route('chapters.show', [$history->novel->slug, $history->chapter->slug]) }}" class="inline-flex px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-indigo-600 hover:text-white transition-all">Lanjut</a>
-                        </div>
+                <div class="space-y-4">
+                    <div class="relative h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div class="absolute top-0 left-0 h-full bg-indigo-600 rounded-full transition-all duration-500" style="width: 75%"></div>
                     </div>
-                @empty
-                    <div class="py-20 text-center space-y-4">
-                        <p class="text-slate-500 font-medium">Belum ada riwayat bacaan.</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Recommendations Tab -->
-        <div x-show="activeTab === 'recommendations'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($recommendations as $novel)
-                    <a href="{{ route('novels.show', $novel->slug) }}" class="group bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex gap-4 hover:border-indigo-500/30 hover:shadow-xl transition-all">
-                        <div class="w-24 h-32 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover">
-                        </div>
-                        <div class="flex-grow flex flex-col justify-between py-1">
+                    <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                        <div class="flex items-center gap-3">
+                            <div class="text-xl">🔥</div>
                             <div>
-                                <h4 class="font-bold text-slate-900 dark:text-white line-clamp-2 group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</h4>
-                                <div class="flex items-center gap-1 mt-1">
-                                    <span class="text-xs font-bold text-amber-500">{{ number_format($novel->rating_avg, 1) }}</span>
-                                    <div class="flex text-amber-400 text-[10px]">
-                                        @for($i = 0; $i < 5; $i++)
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $i < floor($novel->rating_avg) ? 'fill-current' : 'text-slate-200 dark:text-slate-700' }}" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                        @endfor
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap gap-1">
-                                @foreach($novel->genres->take(2) as $genre)
-                                    <span class="px-2 py-0.5 bg-slate-50 dark:bg-slate-800 text-slate-400 text-[10px] font-bold rounded-md uppercase tracking-widest">{{ $genre->name }}</span>
-                                @endforeach
+                                <p class="text-xs font-bold text-slate-900 dark:text-white">5 Hari Beruntun!</p>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Jangan biarkan apinya padam.</p>
                             </div>
                         </div>
-                    </a>
-                @endforeach
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Settings Tab -->
-        <div x-show="activeTab === 'settings'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm p-8 md:p-12">
-                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
+        <!-- Main Content Area -->
+        <div class="lg:col-span-9 space-y-12">
+            <!-- Hero: Continue Reading -->
+            @if($lastRead)
+            <section class="bg-slate-900 dark:bg-indigo-950 rounded-3xl overflow-hidden shadow-sm">
+                <div class="flex flex-col md:flex-row items-center gap-8 p-6 md:p-10">
+                    <div class="w-32 md:w-40 flex-shrink-0 rounded-2xl overflow-hidden shadow-lg">
+                        <img src="{{ asset('storage/' . $lastRead->novel->cover_image) }}" class="w-full h-full object-cover aspect-[3/4]">
+                    </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <div class="space-y-6">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Foto Profil</label>
-                                <div class="flex items-center gap-6">
-                                    <div class="w-24 h-24 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0">
-                                        @if($user->profile_photo)
-                                            <img src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover">
-                                        @else
-                                            <div class="w-full h-full flex items-center justify-center text-2xl font-black text-slate-300 uppercase">
-                                                {{ substr($user->name, 0, 1) }}
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <input type="file" name="profile_photo" class="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition-all">
-                                </div>
+                    <div class="flex-grow space-y-6 text-center md:text-left">
+                        <div>
+                            <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 rounded-full text-indigo-300 text-[10px] font-bold uppercase tracking-wider mb-4">
+                                <span class="flex h-2 w-2 rounded-full bg-indigo-500"></span>
+                                Sedang Dibaca
                             </div>
+                            <h2 class="text-2xl md:text-4xl font-bold text-white mb-2">{{ $lastRead->novel->title }}</h2>
+                            <p class="text-slate-400 text-sm font-medium">
+                                Terakhir: <span class="text-white font-bold">{{ $lastRead->chapter->title }}</span>
+                            </p>
+                        </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Username</label>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">@</span>
-                                    <input type="text" name="username" value="{{ old('username', $user->username) }}" 
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                                        placeholder="username_kamu">
-                                </div>
-                                @error('username') <p class="text-red-500 text-[10px] mt-1 font-bold uppercase">{{ $message }}</p> @enderror
+                        <div class="max-w-xs mx-auto md:mx-0">
+                            <div class="flex justify-between items-end mb-2">
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Progress</p>
+                                <span class="text-indigo-400 text-sm font-bold">{{ $lastRead->progress }}%</span>
                             </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bio</label>
-                                <textarea name="bio" rows="4" 
-                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
-                                    placeholder="Ceritakan sedikit tentang dirimu...">{{ old('bio', $user->bio) }}</textarea>
-                                @error('bio') <p class="text-red-500 text-[10px] mt-1 font-bold uppercase">{{ $message }}</p> @enderror
+                            <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000" style="width: {{ $lastRead->progress }}%"></div>
                             </div>
                         </div>
 
-                        <div class="space-y-6">
-                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                <h4 class="font-bold text-slate-900 dark:text-white mb-4">Privasi Daftar Bacaan</h4>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-slate-600 dark:text-slate-400">Tampilkan daftar bacaan di profil publik?</span>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="hidden" name="is_public_reading_list" value="0">
-                                        <input type="checkbox" name="is_public_reading_list" value="1" class="sr-only peer" {{ $user->is_public_reading_list ? 'checked' : '' }}>
-                                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
-                                    </label>
-                                </div>
-                            </div>
+                        <a href="{{ route('chapters.show', [$lastRead->novel->slug, $lastRead->chapter->slug]) }}" class="inline-flex items-center gap-3 px-8 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-indigo-50 transition-all active:scale-95">
+                            Lanjutkan Membaca
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </a>
+                    </div>
+                </div>
+            </section>
+            @endif
 
-                            <div class="pt-6">
-                                <button type="submit" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 dark:shadow-none">
-                                    Simpan Perubahan
-                                </button>
-                                <a href="{{ route('profile.show', $user->username ?? $user->id) }}" class="block text-center mt-4 text-sm font-bold text-slate-400 hover:text-indigo-600 transition-colors">
-                                    Lihat Profil Publik &rarr;
+            <!-- Writer Insights (Only for Writers/Admins) -->
+            @if($writerStats)
+            <section class="bg-white dark:bg-slate-900 p-6 md:p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Writer Insights</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Statistik performa karya Anda bulan ini.</p>
+                    </div>
+                    <a href="{{ route('writer.novels.index') }}" class="inline-flex items-center px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-xs font-bold hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-colors">
+                        Kelola Semua Karya
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Views Stat -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Views</p>
+                        <h4 class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($writerStats['total_views']) }}</h4>
+                    </div>
+
+                    <!-- Reviews Stat -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+                        <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-600 dark:text-violet-400 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Ulasan</p>
+                        <h4 class="text-2xl font-bold text-slate-900 dark:text-white">{{ $writerStats['total_comments'] }}</h4>
+                    </div>
+
+                    <!-- Rating Stat -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.54 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784.57-1.838-.196-1.539-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Avg Rating</p>
+                        <h4 class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($writerStats['avg_rating'], 1) }}</h4>
+                    </div>
+
+                    <!-- Works Stat -->
+                    <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Karya</p>
+                        <h4 class="text-2xl font-bold text-slate-900 dark:text-white">{{ $writerStats['novel_count'] }}</h4>
+                    </div>
+                </div>
+            </section>
+            @endif
+
+            <!-- Tab Contents -->
+            <div class="min-h-[500px]">
+                <!-- Bookmark Tab -->
+                <div x-show="activeTab === 'bookmarks'" class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Bookmark Saya</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Kumpulan novel yang Anda ikuti.</p>
+                        </div>
+                        <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                            {{ count($bookmarks) }} Novel
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+                        @forelse($bookmarks as $bookmark)
+                            <a href="{{ route('novels.show', $bookmark->novel->slug) }}" class="group block">
+                                <div class="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-sm transition-all duration-300 group-hover:shadow-md">
+                                    <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80"></div>
+                                    <div class="absolute inset-0 flex flex-col justify-end p-4">
+                                        <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">{{ $bookmark->novel->author->name }}</p>
+                                        <h4 class="text-white font-bold text-sm line-clamp-2 leading-tight">{{ $bookmark->novel->title }}</h4>
+                                    </div>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="col-span-full py-20 text-center bg-slate-50 dark:bg-slate-800/30 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+                                <div class="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto text-slate-300 dark:text-slate-600 mb-4 shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                                </div>
+                                <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Belum Ada Bookmark</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Mulai jelajahi novel menarik dan simpan di sini!</p>
+                                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-sm">
+                                    Cari Novel
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                 </a>
                             </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div x-show="activeTab === 'history'" class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Riwayat Baca</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Lanjutkan petualangan yang sempat tertunda.</p>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Terakhir Dibaca</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        @forelse($histories as $history)
+                            <div class="group bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center gap-6 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-sm">
+                                <div class="w-20 h-28 sm:w-24 sm:h-32 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
+                                    <img src="{{ asset('storage/' . $history->novel->cover_image) }}" class="w-full h-full object-cover">
+                                </div>
+
+                                <div class="flex-grow">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded uppercase tracking-wider">
+                                            {{ $history->novel->genres->first()->name ?? 'Novel' }}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400 font-medium">{{ $history->updated_at->diffForHumans() }}</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors mb-1">{{ $history->novel->title }}</h4>
+                                    <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                                        <p class="text-xs font-medium">{{ $history->chapter->title }}</p>
+                                    </div>
+                                </div>
+
+                                <a href="{{ route('chapters.show', [$history->novel->slug, $history->chapter->slug]) }}" class="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all text-center">
+                                    Lanjutkan
+                                </a>
+                            </div>
+                        @empty
+                            <div class="py-20 text-center bg-slate-50 dark:bg-slate-800/30 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+                                <div class="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto text-slate-300 dark:text-slate-600 mb-4 shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </div>
+                                <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Belum Ada Riwayat</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Sepertinya Anda belum mulai membaca novel apa pun.</p>
+                                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all">
+                                    Jelajahi Novel
+                                </a>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Recommendations Tab -->
+                <div x-show="activeTab === 'recommendations'" class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Pilihan Untuk Anda</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Berdasarkan novel yang Anda sukai.</p>
                         </div>
                     </div>
-                </form>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        @foreach($recommendations as $novel)
+                            <a href="{{ route('novels.show', $novel->slug) }}" class="group bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex gap-4 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-sm">
+                                <div class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
+                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover">
+                                </div>
+                                
+                                <div class="flex-grow flex flex-col justify-between py-1">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1.5">
+                                            <div class="flex text-amber-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 fill-current" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                            </div>
+                                            <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">{{ number_format($novel->rating_avg, 1) }}</span>
+                                        </div>
+                                        <h4 class="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 group-hover:text-indigo-600 transition-colors mb-2">{{ $novel->title }}</h4>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        @foreach($novel->genres->take(2) as $genre)
+                                            <span class="px-2 py-0.5 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded uppercase tracking-wider border border-slate-100 dark:border-slate-700/50">{{ $genre->name }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div x-show="activeTab === 'settings'" class="space-y-6">
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800">
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Profil Saya</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Kelola informasi publik dan pengaturan akun Anda.</p>
+                        </div>
+
+                        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="p-6 md:p-8">
+                            @csrf
+                            @method('PUT')
+                            
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+                                <div class="space-y-8">
+                                    <!-- Photo Upload -->
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Foto Profil</label>
+                                        <div class="flex items-center gap-6">
+                                            <div class="relative">
+                                                <div class="w-24 h-24 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-4 border-slate-50 dark:border-slate-800 shadow-sm">
+                                                    @if($user->profile_photo)
+                                                        <img src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover">
+                                                    @else
+                                                        <div class="w-full h-full bg-indigo-600 flex items-center justify-center text-3xl font-bold text-white uppercase">
+                                                            {{ substr($user->name, 0, 1) }}
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow">
+                                                <label for="profile_photo" class="inline-flex items-center px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold rounded-lg cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-colors">
+                                                    Ganti Foto
+                                                </label>
+                                                <input id="profile_photo" name="profile_photo" type="file" class="hidden" />
+                                                <p class="mt-2 text-[10px] text-slate-400">JPG, PNG, GIF (Maks. 2MB)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Nama Lengkap</label>
+                                            <input type="text" name="name" value="{{ $user->name }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all" placeholder="Nama lengkap...">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Username</label>
+                                            <div class="relative">
+                                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">@</span>
+                                                <input type="text" name="username" value="{{ $user->username }}" class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all" placeholder="username">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-8">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Bio Singkat</label>
+                                        <textarea name="bio" rows="4" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none" placeholder="Ceritakan sedikit tentang dirimu...">{{ $user->bio }}</textarea>
+                                    </div>
+
+                                    <div class="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Reading List Publik</h4>
+                                            <label class="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" name="is_public_reading_list" value="1" {{ $user->is_public_reading_list ? 'checked' : '' }} class="sr-only peer">
+                                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                            </label>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">Izinkan orang lain melihat daftar novel yang Anda bookmark.</p>
+                                    </div>
+
+                                    <div class="pt-2">
+                                        <button type="submit" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm active:scale-[0.98]">
+                                            Simpan Perubahan
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
 </div>
+
 @endsection
