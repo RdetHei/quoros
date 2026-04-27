@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Novel;
 use App\Models\ReadingHistory;
+use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -58,6 +59,11 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
+        $announcements = Announcement::where('is_active', true)
+            ->latest()
+            ->take(3)
+            ->get();
+
         return view('dashboard', compact(
             'user', 
             'totalReadingHours', 
@@ -67,7 +73,8 @@ class DashboardController extends Controller
             'writerStats',
             'bookmarks',
             'histories',
-            'recommendations'
+            'recommendations',
+            'announcements'
         ));
     }
 

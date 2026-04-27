@@ -140,6 +140,59 @@
 
         <!-- Main Content Area -->
         <div class="lg:col-span-9 space-y-12">
+            <!-- Announcement Board -->
+            @if($announcements->count() > 0)
+            <div x-data="{ current: 0, total: {{ $announcements->count() }} }" class="relative">
+                @foreach($announcements as $index => $announcement)
+                <section x-show="current === {{ $index }}" 
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 transform scale-95"
+                    x-transition:enter-end="opacity-100 transform scale-100"
+                    class="relative bg-indigo-600 dark:bg-indigo-700 rounded-3xl p-6 md:p-8 overflow-hidden shadow-lg shadow-indigo-500/20">
+                    
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-indigo-400/20 rounded-full -ml-12 -mb-12 blur-xl"></div>
+                    
+                    <div class="relative flex flex-col md:flex-row items-center gap-6">
+                        <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white shrink-0">
+                            @if($announcement->type === 'warning')
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            @elseif($announcement->type === 'success')
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
+                            @endif
+                        </div>
+                        <div class="text-center md:text-left flex-grow">
+                            <h3 class="text-xl font-bold text-white mb-1">{{ $announcement->title }}</h3>
+                            <p class="text-indigo-100 text-sm leading-relaxed">
+                                {{ $announcement->content }}
+                            </p>
+                        </div>
+                        @if($announcement->link)
+                        <div class="shrink-0">
+                            <a href="{{ $announcement->link }}" class="inline-flex px-5 py-2.5 bg-white text-indigo-600 font-bold rounded-xl text-sm hover:bg-indigo-50 transition-colors">
+                                Lihat Detail
+                            </a>
+                        </div>
+                        @endif
+                    </div>
+                </section>
+                @endforeach
+
+                @if($announcements->count() > 1)
+                <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                    <template x-for="i in total">
+                        <button @click="current = i-1" 
+                            class="w-2 h-2 rounded-full transition-all duration-300"
+                            :class="current === i-1 ? 'bg-indigo-600 w-4' : 'bg-slate-300 dark:bg-slate-700'">
+                        </button>
+                    </template>
+                </div>
+                @endif
+            </div>
+            @endif
+
             <!-- Hero: Continue Reading -->
             @if($lastRead)
             <section class="bg-slate-900 dark:bg-indigo-950 rounded-3xl overflow-hidden shadow-sm">

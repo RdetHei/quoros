@@ -20,6 +20,8 @@ class Novel extends Model
         'description', 
         'status', 
         'type', 
+        'region',
+        'language',
         'content_rating', 
         'view_count', 
         'rating_avg', 

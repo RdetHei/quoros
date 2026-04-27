@@ -29,6 +29,21 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
+                    <label for="region" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Region / Asal</label>
+                    <input type="text" name="region" id="region" 
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all" 
+                        value="{{ old('region') }}" placeholder="Contoh: Jepang, China, Indonesia">
+                </div>
+                <div>
+                    <label for="language" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Bahasa</label>
+                    <input type="text" name="language" id="language" 
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all" 
+                        value="{{ old('language') }}" placeholder="Contoh: Indonesia, English, Japanese">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
                     <label for="type" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Jenis Novel</label>
                     <select name="type" id="type" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all">
                         <option value="original" {{ old('type') == 'original' ? 'selected' : '' }}>Original Story</option>

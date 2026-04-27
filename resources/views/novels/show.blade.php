@@ -161,6 +161,22 @@
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Total Tayangan</p>
                     <p class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ number_format($novel->view_count) }} Views</p>
                 </div>
+                <div class="space-y-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Genre</p>
+                    <div class="flex flex-wrap gap-1">
+                        @foreach($novel->genres as $genre)
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $genre->name }}{{ !$loop->last ? ',' : '' }}</span>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Region</p>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $novel->region ?: 'Global' }}</p>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Bahasa</p>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $novel->language ?: 'Unknown' }}</p>
+                </div>
             </div>
         </div>
     </div>
@@ -229,17 +245,27 @@
             </h2>
 
             @auth
-                <form action="{{ route('reviews.store', $novel->id) }}" method="POST" class="mb-8 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                <form action="{{ route('reviews.store', $novel->id) }}" method="POST" class="mb-8 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700" x-data="{ rating: 0, hover: 0 }">
                     @csrf
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Rating</label>
-                        <select name="rating" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="5">⭐⭐⭐⭐⭐ (Sangat Bagus)</option>
-                            <option value="4">⭐⭐⭐⭐ (Bagus)</option>
-                            <option value="3">⭐⭐⭐ (Lumayan)</option>
-                            <option value="2">⭐⭐ (Kurang)</option>
-                            <option value="1">⭐ (Buruk)</option>
-                        </select>
+                        <div class="flex items-center gap-1">
+                            <input type="hidden" name="rating" :value="rating">
+                            <template x-for="i in 5">
+                                <button type="button" 
+                                    @click="rating = i" 
+                                    @mouseenter="hover = i" 
+                                    @mouseleave="hover = 0"
+                                    class="p-1 transition-transform hover:scale-110 outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 transition-colors duration-200" 
+                                        :class="(hover >= i || (!hover && rating >= i)) ? 'text-amber-400 fill-current' : 'text-slate-300 dark:text-slate-600'" 
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </button>
+                            </template>
+                            <span class="ml-2 text-xs font-bold text-slate-500" x-text="rating > 0 ? rating + ' / 5' : 'Pilih rating'"></span>
+                        </div>
                     </div>
                     <div class="mb-4">
                         <textarea name="content" rows="3" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-400" placeholder="Apa pendapatmu tentang novel ini?"></textarea>

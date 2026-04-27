@@ -170,6 +170,8 @@ class NovelController extends Controller
             'description' => 'nullable|string',
             'status' => 'required|in:ongoing,hiatus,complete',
             'type' => 'required|in:web_novel,light_novel,original',
+            'region' => 'nullable|string|max:255',
+            'language' => 'nullable|string|max:255',
             'content_rating' => 'required|in:everyone,teen,mature',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'genres' => 'required|array',
@@ -189,6 +191,8 @@ class NovelController extends Controller
         $novel->description = $request->description;
         $novel->status = $request->status;
         $novel->type = $request->type;
+        $novel->region = $request->region;
+        $novel->language = $request->language;
         $novel->content_rating = $request->content_rating;
         $novel->author_id = Auth::id();
 
@@ -270,6 +274,8 @@ class NovelController extends Controller
             'description' => 'nullable|string',
             'status' => 'required|in:ongoing,hiatus,complete',
             'type' => 'required|in:web_novel,light_novel,original',
+            'region' => 'nullable|string|max:255',
+            'language' => 'nullable|string|max:255',
             'content_rating' => 'required|in:everyone,teen,mature',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'genres' => 'required|array',
@@ -281,6 +287,8 @@ class NovelController extends Controller
         $novel->description = $request->description;
         $novel->status = $request->status;
         $novel->type = $request->type;
+        $novel->region = $request->region;
+        $novel->language = $request->language;
         $novel->content_rating = $request->content_rating;
 
         if ($request->hasFile('cover_image')) {
