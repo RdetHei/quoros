@@ -144,11 +144,7 @@
             @if($announcements->count() > 0)
             <div x-data="{ current: 0, total: {{ $announcements->count() }} }" class="relative">
                 @foreach($announcements as $index => $announcement)
-                <section x-show="current === {{ $index }}" 
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 transform scale-95"
-                    x-transition:enter-end="opacity-100 transform scale-100"
-                    class="relative bg-indigo-600 dark:bg-indigo-700 rounded-3xl p-6 md:p-8 overflow-hidden shadow-lg shadow-indigo-500/20">
+                <section x-show="current === {{ $index }}" class="relative bg-indigo-600 dark:bg-indigo-700 rounded-3xl p-6 md:p-8 overflow-hidden shadow-lg shadow-indigo-500/20">
                     
                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                     <div class="absolute bottom-0 left-0 w-24 h-24 bg-indigo-400/20 rounded-full -ml-12 -mb-12 blur-xl"></div>
@@ -219,11 +215,11 @@
                                 <span class="text-indigo-400 text-sm font-bold">{{ $lastRead->progress }}%</span>
                             </div>
                             <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                                <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000" style="width: {{ $lastRead->progress }}%"></div>
+                                <div class="h-full bg-indigo-500 rounded-full" style="width: {{ $lastRead->progress }}%"></div>
                             </div>
                         </div>
 
-                        <a href="{{ route('chapters.show', [$lastRead->novel->slug, $lastRead->chapter->slug]) }}" class="inline-flex items-center gap-3 px-8 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-indigo-50 transition-all active:scale-95">
+                        <a href="{{ route('chapters.show', [$lastRead->novel->slug, $lastRead->chapter->slug]) }}" class="inline-flex items-center gap-3 px-8 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-indigo-50 transition-colors">
                             Lanjutkan Membaca
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                         </a>
@@ -302,8 +298,8 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
                         @forelse($bookmarks as $bookmark)
                             <a href="{{ route('novels.show', $bookmark->novel->slug) }}" class="group block">
-                                <div class="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-sm transition-all duration-300 group-hover:shadow-md">
-                                    <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                <div class="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-sm transition-shadow group-hover:shadow-md">
+                                    <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" class="w-full h-full object-cover">
                                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80"></div>
                                     <div class="absolute inset-0 flex flex-col justify-end p-4">
                                         <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">{{ $bookmark->novel->author->name }}</p>

@@ -7,17 +7,12 @@
         activeSlide: 0, 
         slides: {{ $featuredNovels->count() }},
         next() { this.activeSlide = (this.activeSlide + 1) % this.slides },
-        prev() { this.activeSlide = (this.activeSlide - 1 + this.slides) % this.slides },
-        init() { setInterval(() => this.next(), 5000) }
+        prev() { this.activeSlide = (this.activeSlide - 1 + this.slides) % this.slides }
      }">
     
     <div class="relative h-[400px] md:h-[500px] overflow-hidden">
         @foreach($featuredNovels as $index => $novel)
-            <div x-show="activeSlide === {{ $index }}" 
-                 x-transition:enter="transition ease-out duration-500"
-                 x-transition:enter-start="opacity-0 transform scale-105"
-                 x-transition:enter-end="opacity-100 transform scale-100"
-                 class="absolute inset-0 w-full h-full">
+            <div x-show="activeSlide === {{ $index }}" class="absolute inset-0 w-full h-full">
                 
                 <!-- Background Image -->
                 <div class="absolute inset-0">
@@ -154,9 +149,9 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
             @forelse($novels as $novel)
                 <a href="{{ route('novels.show', $novel->slug) }}" class="group">
-                    <div class="relative aspect-[3/4] mb-3 rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl group-hover:shadow-indigo-500/20 transition-all duration-300 transform group-hover:-translate-y-2 group-hover:scale-[1.03]">
+                    <div class="relative aspect-[3/4] mb-3 rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl group-hover:shadow-indigo-500/20 transition-shadow">
                         @if($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-4">
                                 <span class="text-xs text-slate-400 font-bold text-center">{{ $novel->title }}</span>

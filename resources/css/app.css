@@ -9,3 +9,58 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer base {
+    :root {
+        color-scheme: dark;
+    }
+
+    body {
+        background-color: #020617;
+        color: #e2e8f0;
+    }
+
+    /* Keep UI calmer by default: avoid long and flashy motion. */
+    [class*="transition-all"] {
+        transition-property: color, background-color, border-color, opacity, box-shadow, transform !important;
+    }
+
+    [class*="duration-300"],
+    [class*="duration-500"],
+    [class*="duration-700"],
+    [class*="duration-1000"] {
+        transition-duration: 180ms !important;
+    }
+
+    .dark .bg-white {
+        background-color: #0f172a !important;
+    }
+
+    .dark .bg-slate-50 {
+        background-color: #111827 !important;
+    }
+
+    .dark .border-slate-100,
+    .dark .border-slate-200 {
+        border-color: #1f2937 !important;
+    }
+
+    .dark .text-slate-900 {
+        color: #e2e8f0 !important;
+    }
+
+    .dark .text-slate-800 {
+        color: #cbd5e1 !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

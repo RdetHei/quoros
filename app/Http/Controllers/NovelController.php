@@ -218,11 +218,21 @@ class NovelController extends Controller
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
 
         $novel->load(['author', 'genres', 'tags', 'reviews.user', 'chapters' => function($query) use ($isAuthorOrAdmin) {
+            $query->select('id', 'novel_id', 'title', 'slug', 'status', 'published_at', 'created_at');
             if (!$isAuthorOrAdmin) {
                 $query->published();
             }
-            $query->orderBy('created_at', 'asc');
+            $query->orderBy('created_at', 'asc')->orderBy('id', 'asc');
         }]);
+
+        $lastReading = null;
+        if (Auth::check()) {
+            $lastReading = ReadingHistory::where('user_id', Auth::id())
+                ->where('novel_id', $novel->id)
+                ->with('chapter')
+                ->latest()
+                ->first();
+        }
 
         // Personalized Recommendations: Novel Serupa berdasarkan Genre dan Tag
         $genreIds = $novel->genres->pluck('id');
@@ -248,7 +258,7 @@ class NovelController extends Controller
             ->take(6)
             ->get();
 
-        return view('novels.show', compact('novel', 'similarNovels'));
+        return view('novels.show', compact('novel', 'similarNovels', 'lastReading'));
     }
 
     public function edit(Novel $novel)
