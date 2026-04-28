@@ -7,6 +7,8 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Gate;
+
 class CommentController extends Controller
 {
     public function store(Request $request, Chapter $chapter)
@@ -26,9 +28,7 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment)
     {
-        if (Auth::user()->role !== 'admin' && $comment->user_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $comment);
 
         $comment->delete();
 

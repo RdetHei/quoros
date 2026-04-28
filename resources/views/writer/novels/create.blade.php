@@ -117,6 +117,18 @@
                 </div>
             </div>
 
+            <div class="pt-6 border-t border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Karakter Novel</label>
+                        <p class="text-xs text-slate-500 mt-1">Tambahkan card karakter yang akan tampil di halaman novel.</p>
+                    </div>
+                    <button type="button" id="add-character-btn" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition-all">+ Tambah Karakter</button>
+                </div>
+
+                <div id="characters-list" class="space-y-4"></div>
+            </div>
+
             <div class="flex flex-col sm:flex-row gap-4 pt-6">
                 <button type="submit" class="flex-grow py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 dark:shadow-none">Publikasikan Novel</button>
                 <a href="{{ route('writer.novels.index') }}" class="px-8 py-4 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-700 text-center hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">Batal</a>
@@ -125,3 +137,49 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const list = document.getElementById('characters-list');
+    const addButton = document.getElementById('add-character-btn');
+
+    function createCharacterCard() {
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 space-y-4';
+        card.innerHTML = `
+            <div class="flex items-center justify-between">
+                <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200">Karakter</h4>
+                <button type="button" class="remove-character text-xs font-bold text-rose-500 hover:text-rose-600">Hapus</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Nama Karakter</label>
+                    <input type="text" name="character_name[]" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm" placeholder="Contoh: Akiro">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Peran</label>
+                    <input type="text" name="character_role[]" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm" placeholder="Contoh: Protagonis">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Deskripsi Singkat</label>
+                <textarea name="character_description[]" rows="3" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm" placeholder="Deskripsi karakter..."></textarea>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Foto Karakter (Opsional)</label>
+                <input type="file" name="character_image[]" accept="image/jpeg,image/png,image/jpg,image/gif" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+            </div>
+        `;
+
+        card.querySelector('.remove-character').addEventListener('click', function () {
+            card.remove();
+        });
+
+        list.appendChild(card);
+    }
+
+    addButton.addEventListener('click', createCharacterCard);
+});
+</script>
+@endpush

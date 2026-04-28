@@ -44,6 +44,7 @@ Route::get('/tags', [NovelController::class, 'tags'])->name('tags.index');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::put('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/dashboard/become-writer', [DashboardController::class, 'becomeWriter'])->name('dashboard.become-writer');
 
     // Bookmark & History dedicated views
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');

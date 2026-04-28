@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Collection;
 
 class NovelController extends Controller
 {
@@ -176,6 +178,16 @@ class NovelController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'genres' => 'required|array',
             'tags' => 'nullable|array',
+            'character_name' => 'nullable|array',
+            'character_name.*' => 'nullable|string|max:255',
+            'character_role' => 'nullable|array',
+            'character_role.*' => 'nullable|string|max:255',
+            'character_description' => 'nullable|array',
+            'character_description.*' => 'nullable|string|max:1000',
+            'character_image' => 'nullable|array',
+            'character_image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'existing_character_image' => 'nullable|array',
+            'existing_character_image.*' => 'nullable|string',
         ]);
 
         $slug = Str::slug($request->title);
@@ -207,6 +219,7 @@ class NovelController extends Controller
         if ($request->tags) {
             $novel->tags()->sync($request->tags);
         }
+        $this->syncCharacters($novel, $request);
 
         return redirect()->route('writer.novels.index')->with('success', 'Novel created successfully!');
     }
@@ -217,7 +230,7 @@ class NovelController extends Controller
         
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
 
-        $novel->load(['author', 'genres', 'tags', 'reviews.user', 'chapters' => function($query) use ($isAuthorOrAdmin) {
+        $novel->load(['author', 'genres', 'tags', 'characters', 'reviews.user', 'chapters' => function($query) use ($isAuthorOrAdmin) {
             $query->select('id', 'novel_id', 'title', 'slug', 'status', 'published_at', 'created_at');
             if (!$isAuthorOrAdmin) {
                 $query->published();
@@ -263,9 +276,8 @@ class NovelController extends Controller
 
     public function edit(Novel $novel)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $novel);
+        $novel->load('characters');
 
         $genres = Genre::all();
         $tags = Tag::all();
@@ -274,9 +286,7 @@ class NovelController extends Controller
 
     public function update(Request $request, Novel $novel)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $novel);
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -290,6 +300,16 @@ class NovelController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'genres' => 'required|array',
             'tags' => 'nullable|array',
+            'character_name' => 'nullable|array',
+            'character_name.*' => 'nullable|string|max:255',
+            'character_role' => 'nullable|array',
+            'character_role.*' => 'nullable|string|max:255',
+            'character_description' => 'nullable|array',
+            'character_description.*' => 'nullable|string|max:1000',
+            'character_image' => 'nullable|array',
+            'character_image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'existing_character_image' => 'nullable|array',
+            'existing_character_image.*' => 'nullable|string',
         ]);
 
         $novel->title = $request->title;
@@ -313,22 +333,73 @@ class NovelController extends Controller
 
         $novel->genres()->sync($request->genres);
         $novel->tags()->sync($request->tags ?? []);
+        $this->syncCharacters($novel, $request);
 
         return redirect()->route('writer.novels.index')->with('success', 'Novel updated successfully!');
     }
 
     public function destroy(Novel $novel)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $novel);
 
         if ($novel->cover_image) {
             Storage::disk('public')->delete($novel->cover_image);
         }
 
+        foreach ($novel->characters as $character) {
+            if ($character->image) {
+                Storage::disk('public')->delete($character->image);
+            }
+        }
+
         $novel->delete();
 
         return redirect()->route('writer.novels.index')->with('success', 'Novel deleted successfully!');
+    }
+
+    private function syncCharacters(Novel $novel, Request $request): void
+    {
+        $oldImages = $novel->characters()->pluck('image')->filter()->values();
+        $novel->characters()->delete();
+
+        $names = collect($request->input('character_name', []));
+        $roles = collect($request->input('character_role', []));
+        $descriptions = collect($request->input('character_description', []));
+        /** @var Collection<int, \Illuminate\Http\UploadedFile|null> $images */
+        $images = collect($request->file('character_image', []));
+        $existingImages = collect($request->input('existing_character_image', []));
+        $newImages = collect();
+
+        $names->each(function ($name, $index) use ($novel, $roles, $descriptions, $images, $newImages): void {
+            $cleanName = trim((string) $name);
+            if ($cleanName === '') {
+                return;
+            }
+
+            $imagePath = null;
+            $uploadedImage = $images->get($index);
+            if ($uploadedImage) {
+                $imagePath = $uploadedImage->store('characters', 'public');
+                $newImages->push($imagePath);
+            } else {
+                $existingImage = $existingImages->get($index);
+                if (is_string($existingImage) && $existingImage !== '') {
+                    $imagePath = $existingImage;
+                    $newImages->push($imagePath);
+                }
+            }
+
+            $novel->characters()->create([
+                'name' => $cleanName,
+                'role' => trim((string) $roles->get($index, '')) ?: null,
+                'description' => trim((string) $descriptions->get($index, '')) ?: null,
+                'image' => $imagePath,
+                'sort_order' => $index,
+            ]);
+        });
+
+        $oldImages->diff($newImages)->each(function ($imagePath): void {
+            Storage::disk('public')->delete($imagePath);
+        });
     }
 }

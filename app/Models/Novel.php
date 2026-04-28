@@ -63,4 +63,9 @@ class Novel extends Model
     {
         return $this->hasMany(ReadingHistory::class);
     }
+
+    public function characters(): HasMany
+    {
+        return $this->hasMany(NovelCharacter::class)->orderBy('sort_order')->orderBy('id');
+    }
 }

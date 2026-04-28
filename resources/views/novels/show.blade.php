@@ -3,16 +3,16 @@
 @section('content')
 
 {{-- ===== BREADCRUMB ===== --}}
-<nav class="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500 mb-8 font-medium">
-    <a href="{{ route('home') }}" class="hover:text-indigo-500 transition-colors">Katalog</a>
-    <svg class="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" fill="currentColor" viewBox="0 0 20 20">
+<nav class="flex items-center gap-2 text-[10px] md:text-sm text-slate-400 dark:text-slate-500 mb-6 md:mb-8 font-medium overflow-hidden whitespace-nowrap">
+    <a href="{{ route('home') }}" class="hover:text-indigo-500 transition-colors flex-shrink-0">Katalog</a>
+    <svg class="w-3 h-3 md:w-3.5 md:h-3.5 text-slate-300 dark:text-slate-700 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
-    <span class="text-slate-700 dark:text-slate-200 truncate max-w-xs">{{ $novel->title }}</span>
+    <span class="text-slate-700 dark:text-slate-200 truncate">{{ $novel->title }}</span>
 </nav>
 
 {{-- ===== HERO SECTION ===== --}}
-<div class="relative mb-10 rounded-3xl overflow-hidden">
+<div class="relative mb-8 md:mb-10 rounded-2xl md:rounded-3xl overflow-hidden">
 
     {{-- Blurred BG --}}
     <div class="absolute inset-0 -z-0">
@@ -22,13 +22,13 @@
         <div class="absolute inset-0 bg-gradient-to-b from-white/80 via-white/95 to-white dark:from-slate-950/80 dark:via-slate-950/95 dark:to-slate-950"></div>
     </div>
 
-    <div class="relative z-10 p-6 md:p-10">
-        <div class="flex flex-col md:flex-row gap-8 md:gap-12">
+    <div class="relative z-10 p-5 md:p-10">
+        <div class="flex flex-col md:flex-row gap-6 md:gap-12">
 
             {{-- Cover --}}
             <div class="flex-shrink-0">
-                <div class="w-44 md:w-56 lg:w-64 mx-auto md:mx-0">
-                    <div class="aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/20 dark:shadow-black/40 ring-1 ring-slate-200 dark:ring-slate-700">
+                <div class="w-40 md:w-56 lg:w-64 mx-auto md:mx-0">
+                    <div class="aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/20 dark:shadow-black/40 ring-1 ring-slate-200 dark:ring-slate-700">
                         @if($novel->cover_image)
                             <img src="{{ asset('storage/' . $novel->cover_image) }}"
                                  class="w-full h-full object-cover"
@@ -40,7 +40,7 @@
                         @endif
                     </div>
 
-                    @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $novel->author_id))
+                    @can('update', $novel)
                     <div class="mt-4 flex flex-col gap-2">
                         <a href="{{ route('writer.novels.edit', $novel->id) }}"
                            class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-xl text-sm text-center transition-all shadow-lg shadow-amber-500/25">
@@ -51,7 +51,7 @@
                             + Chapter Baru
                         </a>
                     </div>
-                    @endif
+                    @endcan
                 </div>
             </div>
 
@@ -70,35 +70,39 @@
                 </div>
 
                 {{-- Title --}}
-                <h1 class="text-3xl md:text-4xl lg:text-[2.6rem] font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight mb-1.5">
+                <h1 class="text-2xl md:text-4xl lg:text-[2.6rem] font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight mb-2 md:mb-1.5 text-center md:text-left">
                     {{ $novel->title }}
                 </h1>
                 @if($novel->alternative_title)
-                <p class="text-base text-slate-400 dark:text-slate-500 italic mb-5">{{ $novel->alternative_title }}</p>
+                <p class="text-sm md:text-base text-slate-400 dark:text-slate-500 italic mb-5 text-center md:text-left">{{ $novel->alternative_title }}</p>
                 @endif
 
                 {{-- Meta row --}}
-                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-sm">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-x-4 md:gap-x-5 gap-y-2 mb-6 text-xs md:text-sm">
                     <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 font-black text-xs">
-                            {{ substr($novel->author->name, 0, 1) }}
+                        <div class="w-6 h-6 md:w-7 md:h-7 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 font-black text-[10px] md:text-xs">
+                            @if($novel->author->profile_photo)
+                                <img src="{{ asset('storage/' . $novel->author->profile_photo) }}" alt="{{ $novel->author->name }}" class="w-full h-full object-cover">
+                            @else
+                                {{ substr($novel->author->name, 0, 1) }}
+                            @endif
                         </div>
                         <span class="font-semibold text-slate-700 dark:text-slate-300">{{ $novel->author->name }}</span>
                     </div>
                     <div class="flex items-center gap-1.5 text-amber-500 font-bold">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 md:h-4 md:w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
                         {{ number_format($novel->rating_avg, 1) }}
                     </div>
                     <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
-                        {{ number_format($novel->view_count) }} Views
+                        {{ number_format($novel->view_count) }}
                     </div>
-                    <span class="text-slate-400 dark:text-slate-500">{{ $novel->chapters->count() }} Chapter</span>
+                    <span class="text-slate-400 dark:text-slate-500">{{ $novel->chapters->count() }} Ch.</span>
                 </div>
 
                 {{-- Status badges --}}
@@ -122,20 +126,20 @@
                     $t = $typeMap[$novel->type] ?? ['dot'=>'bg-slate-400','bg'=>'bg-slate-50 dark:bg-slate-800','text'=>'text-slate-600 dark:text-slate-400','border'=>'border-slate-200 dark:border-slate-700'];
                     $r = $ratingMap[$novel->content_rating] ?? ['dot'=>'bg-slate-400','bg'=>'bg-slate-50 dark:bg-slate-800','text'=>'text-slate-600 dark:text-slate-400','border'=>'border-slate-200 dark:border-slate-700'];
                 @endphp
-                <div class="flex flex-wrap gap-2 mb-6">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6">
                     <span class="status-badge {{ $s['dot'] }} {{ $s['bg'] }} {{ $s['text'] }} {{ $s['border'] }}">{{ $novel->status }}</span>
                     <span class="status-badge {{ $t['dot'] }} {{ $t['bg'] }} {{ $t['text'] }} {{ $t['border'] }}">{{ str_replace('_', ' ', $novel->type) }}</span>
                     <span class="status-badge {{ $r['dot'] }} {{ $r['bg'] }} {{ $r['text'] }} {{ $r['border'] }}">{{ $novel->content_rating }}</span>
                 </div>
 
                 {{-- Description --}}
-                <p class="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed mb-5 max-w-2xl">
+                <p class="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed mb-6 max-w-2xl text-center md:text-left">
                     {{ $novel->description ?: 'Belum ada deskripsi untuk novel ini.' }}
                 </p>
 
                 {{-- Tags --}}
                 @if($novel->tags->count())
-                <div class="flex flex-wrap gap-1.5 mb-7">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mb-7">
                     @foreach($novel->tags as $tag)
                     <span class="text-[11px] font-medium text-slate-400 dark:text-slate-500 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700/60">
                         #{{ $tag->name }}
@@ -145,7 +149,7 @@
                 @endif
 
                 {{-- CTA Buttons --}}
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
                     @if($novel->chapters->isNotEmpty())
                     <a href="{{ route('chapters.show', [$novel->slug, $novel->chapters->first()->slug]) }}"
                        class="inline-flex items-center gap-2 px-7 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-indigo-500/25 active:scale-95">
@@ -216,6 +220,55 @@
     </div>
 </div>
 
+@if($novel->characters->isNotEmpty())
+<div class="mb-16">
+    <div class="flex items-center gap-3 mb-7">
+        <div class="w-1 h-6 bg-indigo-500 rounded-full"></div>
+        <div>
+            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Karakter Novel</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Tokoh penting dalam cerita ini.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+        @foreach($novel->characters as $character)
+        <div class="group relative min-h-[350px] md:min-h-[400px] overflow-hidden rounded-3xl border border-white/20 dark:border-slate-700/50 shadow-lg shadow-slate-900/10 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500">
+            @if($character->image)
+                <img src="{{ asset('storage/' . $character->image) }}"
+                     alt="{{ $character->name }}"
+                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            @else
+                <div class="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 dark:from-slate-800 dark:via-slate-700 dark:to-slate-900"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-8xl font-black text-white/20 select-none">
+                    {{ substr($character->name, 0, 1) }}
+                </div>
+            @endif
+
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/15 via-transparent to-violet-500/10 opacity-70"></div>
+
+            <div class="relative h-full flex flex-col justify-end p-6">
+                <div class="mb-3 h-px w-16 bg-white/40"></div>
+                <h3 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
+                    {{ $character->name }}
+                </h3>
+
+                @if($character->role)
+                <span class="inline-flex w-fit mt-3 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wider border border-white/20">
+                    {{ $character->role }}
+                </span>
+                @endif
+
+                <p class="mt-4 text-sm leading-relaxed line-clamp-4 {{ !$character->description ? 'italic text-slate-200/80' : 'text-slate-100/95 drop-shadow-sm' }}">
+                    {{ $character->description ?: 'Deskripsi karakter belum ditambahkan.' }}
+                </p>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
 {{-- ===== CHAPTERS + REVIEWS ===== --}}
 <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 mb-16">
 
@@ -273,7 +326,7 @@
                         <p class="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 chapter-title">
                             {{ $chapter->title }}
                         </p>
-                        @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $novel->author_id))
+                        @can('update', $novel)
                             @if($chapter->status === 'draft')
                                 <span class="inline-block mt-0.5 text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-500 rounded">Draft</span>
                             @elseif($chapter->status === 'scheduled')
@@ -281,12 +334,12 @@
                                     Scheduled · {{ $chapter->published_at->format('d/m/y H:i') }}
                                 </span>
                             @endif
-                        @endif
+                        @endcan
                     </div>
                 </a>
 
                 <div class="flex items-center gap-1 ml-4 flex-shrink-0">
-                    @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $novel->author_id))
+                    @can('update', $chapter)
                         <a href="{{ route('writer.chapters.edit', [$novel->id, $chapter->id]) }}"
                            class="p-1.5 text-slate-300 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-all"
                            title="Edit">
@@ -309,7 +362,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                         </svg>
-                    @endif
+                    @endcan
                 </div>
             </div>
             @empty
@@ -387,8 +440,12 @@
                 <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/40">
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
-                                {{ substr($review->user->name, 0, 1) }}
+                            <div class="w-7 h-7 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                                @if($review->user->profile_photo)
+                                    <img src="{{ asset('storage/' . $review->user->profile_photo) }}" alt="{{ $review->user->name }}" class="w-full h-full object-cover">
+                                @else
+                                    {{ substr($review->user->name, 0, 1) }}
+                                @endif
                             </div>
                             <span class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ $review->user->name }}</span>
                         </div>
@@ -403,7 +460,7 @@
                     <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $review->content }}</p>
                     <div class="flex items-center justify-between mt-3">
                         <span class="text-[11px] text-slate-400">{{ $review->created_at->diffForHumans() }}</span>
-                        @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $review->user_id))
+                        @can('delete', $review)
                         <form action="{{ route('reviews.destroy', $review->id) }}" method="POST">
                             @csrf @method('DELETE')
                             <button type="submit"
@@ -412,7 +469,7 @@
                                 Hapus
                             </button>
                         </form>
-                        @endif
+                        @endcan
                     </div>
                 </div>
                 @empty
@@ -520,9 +577,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     try {
         // Data dasar novel
-        const novelSlug = @json($novel->slug);
+        const novelSlug = @js($novel->slug);
         const novelId = {{ $novel->id }};
-        const isAuthorOrAdmin = {{ Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->id == $novel->author_id) ? 'true' : 'false' }};
+        const isAuthorOrAdmin = @can('update', $novel) true @else false @endcan;
         
         // Data chapter (tanpa konten agar ringan)
         @php

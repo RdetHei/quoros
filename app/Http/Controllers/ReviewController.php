@@ -7,6 +7,8 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Gate;
+
 class ReviewController extends Controller
 {
     public function store(Request $request, Novel $novel)
@@ -32,9 +34,7 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
-        if (Auth::user()->role !== 'admin' && $review->user_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $review);
 
         $novel = $review->novel;
         $review->delete();

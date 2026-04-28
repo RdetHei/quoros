@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Mural') }} - Modern Reading Platform</title>
+    <title>{{ config('app.name', 'Quoros') }} - Where Story Lives</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,12 +35,18 @@
 <body class="font-sans antialiased bg-slate-950 text-slate-100">
     <div class="min-h-screen flex flex-col">
         <!-- Navbar -->
-        <nav id="navbar" class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+        <nav id="navbar" class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800" x-data="{ mobileMenuOpen: false }">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
-                    <div class="flex items-center gap-8 flex-1">
+                    <div class="flex items-center gap-4 md:gap-8 flex-1">
+                        <!-- Mobile Menu Button -->
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+                            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+
                         <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
-                            <span class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent group-hover:from-indigo-500 group-hover:to-violet-500 transition-all">Mural</span>
+                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 md:h-10 w-auto group-hover:opacity-80 transition-opacity">
                         </a>
                         
                         <div class="hidden lg:flex items-center gap-6">
@@ -52,7 +61,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 md:gap-4">
                         <!-- Search Bar (Desktop - Right Side) -->
                         <div class="hidden md:flex items-center w-64 lg:w-80">
                             <form action="{{ route('novels.search') }}" method="GET" class="relative w-full">
@@ -71,39 +80,53 @@
                             </button>
 
                             <!-- Mobile Search Overlay -->
-                        <div x-show="open" 
-                             @click.away="open = false"
-                             class="absolute left-0 right-0 top-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 shadow-xl z-50">
-                            <form action="{{ route('novels.search') }}" method="GET" class="relative">
-                                <input type="text" name="q" value="{{ request('q') }}" 
-                                    class="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
-                                    placeholder="Cari novel...">
-                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                                </div>
-                            </form>
+                            <div x-show="open" 
+                                 @click.away="open = false"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 -translate-y-4"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 class="absolute left-0 right-0 top-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 shadow-xl z-50">
+                                <form action="{{ route('novels.search') }}" method="GET" class="relative">
+                                    <input type="text" name="q" value="{{ request('q') }}" 
+                                        class="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+                                        placeholder="Cari novel...">
+                                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+                        <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
 
                         @guest
-                            <div class="flex items-center gap-2">
-                                <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Masuk</a>
-                                <a href="{{ route('register') }}" class="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm shadow-indigo-200 dark:shadow-none transition-all">Daftar</a>
+                            <div class="flex items-center gap-1 md:gap-2">
+                                <a href="{{ route('login') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Masuk</a>
+                                <a href="{{ route('register') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm shadow-indigo-200 dark:shadow-none transition-all">Daftar</a>
                             </div>
                         @else
-                            <div class="relative group">
-                                <button class="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                    <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                                        {{ substr(Auth::user()->name, 0, 1) }}
+                            <div x-data="{ open: false }" class="relative">
+                                <button @click="open = !open" class="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                    <div class="w-8 h-8 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
+                                        @if(Auth::user()->profile_photo)
+                                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover">
+                                        @else
+                                            {{ substr(Auth::user()->name, 0, 1) }}
+                                        @endif
                                     </div>
-                                    <span class="hidden sm:block text-sm font-medium">{{ Auth::user()->name }}</span>
+                                    <span class="hidden sm:block text-sm font-medium max-w-[100px] truncate">{{ Auth::user()->name }}</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                 </button>
-                                
-                                <!-- Dropdown -->
-                                <div class="absolute right-0 top-full mt-2 w-48 bg-slate-900 rounded-xl shadow-xl border border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150 z-50">
+
+                                <div x-show="open"
+                                     @click.away="open = false"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50">
                                     <div class="p-2 border-b border-slate-100 dark:border-slate-800">
                                         <p class="px-3 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
                                         <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Dashboard</a>
@@ -126,6 +149,83 @@
                                     </div>
                                 </div>
                             </div>
+                        @endguest
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Sidebar Overlay -->
+            <div x-show="mobileMenuOpen" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="-translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="-translate-x-full"
+                 class="fixed inset-0 z-[60] lg:hidden" style="display: none;">
+                <!-- Backdrop -->
+                <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="mobileMenuOpen = false"></div>
+                
+                <!-- Content -->
+                <div class="relative w-72 h-full bg-white dark:bg-slate-900 shadow-2xl flex flex-col">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto">
+                        <button @click="mobileMenuOpen = false" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                        <div class="space-y-1">
+                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Navigasi Utama</p>
+                            <a href="{{ route('home') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('home') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                                <span>Katalog</span>
+                            </a>
+                            <a href="{{ route('novels.updated') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('novels.updated') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <span>Updated</span>
+                            </a>
+                            <a href="{{ route('genres.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('genres.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                                <span>Genre</span>
+                            </a>
+                            <a href="{{ route('tags.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('tags.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>
+                                <span>Tag</span>
+                            </a>
+                        </div>
+
+                        @auth
+                        <div class="space-y-1">
+                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Akun Anda</p>
+                            <a href="{{ route('bookmarks.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('bookmarks.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                                <span>Bookmark</span>
+                            </a>
+                            <a href="{{ route('history.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('history.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <span>History</span>
+                            </a>
+                            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('dashboard') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                <span>Dashboard</span>
+                            </a>
+                        </div>
+                        @endauth
+                    </div>
+
+                    <div class="p-6 border-t border-slate-100 dark:border-slate-800">
+                        @guest
+                            <div class="grid grid-cols-2 gap-3">
+                                <a href="{{ route('login') }}" class="px-4 py-3 text-center text-sm font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 rounded-xl">Masuk</a>
+                                <a href="{{ route('register') }}" class="px-4 py-3 text-center text-sm font-bold text-white bg-indigo-600 rounded-xl">Daftar</a>
+                            </div>
+                        @else
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="w-full px-4 py-3 text-center text-sm font-bold text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl transition-colors">Keluar dari Akun</button>
+                            </form>
                         @endguest
                     </div>
                 </div>
@@ -157,7 +257,7 @@
         <footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-12 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                 <div class="flex flex-col items-center md:items-start gap-4">
-                    <span class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Mural</span>
+                    <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-10 w-auto">
                     <p class="text-slate-500 dark:text-slate-400 text-sm max-w-xs text-center md:text-left">Platform baca novel modern dengan pengalaman yang clean dan user-friendly.</p>
                 </div>
                 
@@ -169,7 +269,7 @@
                 </div>
 
                 <div class="text-slate-400 text-xs text-center md:text-right">
-                    &copy; {{ date('Y') }} Mural. All rights reserved.
+                    &copy; {{ date('Y') }} Quoros. All rights reserved.
                 </div>
             </div>
         </footer>

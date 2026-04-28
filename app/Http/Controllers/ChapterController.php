@@ -9,22 +9,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class ChapterController extends Controller
 {
     public function create(Novel $novel)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('manageChapters', $novel);
         return view('writer.chapters.create', compact('novel'));
     }
 
     public function store(Request $request, Novel $novel)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('manageChapters', $novel);
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -56,9 +53,7 @@ class ChapterController extends Controller
 
     public function bulkStore(Request $request, Novel $novel, EpubParserService $parser)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('manageChapters', $novel);
 
         $request->validate([
             'epub_file' => 'required|file|mimes:epub|max:51200', // 50MB max for EPUB
@@ -121,23 +116,36 @@ class ChapterController extends Controller
 
         $previousChapter = $chapter->previous(!$isAuthorOrAdmin);
         $nextChapter = $chapter->next(!$isAuthorOrAdmin);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'novel' => [
+                    'title' => $novel->title,
+                    'slug' => $novel->slug,
+                ],
+                'chapter' => [
+                    'id' => $chapter->id,
+                    'title' => $chapter->title,
+                    'slug' => $chapter->slug,
+                    'content' => nl2br(e($chapter->content)),
+                    'next_chapter_slug' => $nextChapter ? $nextChapter->slug : null,
+                    'comments_count' => $chapter->comments->count(),
+                ],
+            ]);
+        }
         
         return view('chapters.show', compact('novel', 'chapter', 'previousChapter', 'nextChapter'));
     }
 
     public function edit(Novel $novel, Chapter $chapter)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $chapter);
         return view('writer.chapters.edit', compact('novel', 'chapter'));
     }
 
     public function update(Request $request, Novel $novel, Chapter $chapter)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $chapter);
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -174,9 +182,7 @@ class ChapterController extends Controller
 
     public function destroy(Novel $novel, Chapter $chapter)
     {
-        if (Auth::user()->role !== 'admin' && $novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $chapter);
 
         if ($chapter->file_path) {
             Storage::disk('public')->delete($chapter->file_path);

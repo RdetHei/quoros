@@ -8,6 +8,7 @@ use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
@@ -83,17 +84,20 @@ class DashboardController extends Controller
         $user = Auth::user();
         
         $request->validate([
-            'username' => 'required|string|alpha_dash|max:255|unique:users,username,' . $user->id,
+            'name' => 'required|string|max:255',
+            'username' => ['nullable', 'string', 'alpha_dash', 'max:255', Rule::unique('users', 'username')->ignore($user->id)],
             'bio' => 'nullable|string|max:500',
-            'is_public_reading_list' => 'required|boolean',
+            'is_public_reading_list' => 'nullable|boolean',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only(['username', 'bio', 'is_public_reading_list']);
+        $data = $request->only(['name', 'bio']);
+        $data['username'] = $request->filled('username') ? $request->username : null;
+        $data['is_public_reading_list'] = $request->boolean('is_public_reading_list');
 
         if ($request->hasFile('profile_photo')) {
             if ($user->profile_photo) {
-                Storage::delete('public/' . $user->profile_photo);
+                Storage::disk('public')->delete($user->profile_photo);
             }
             $path = $request->file('profile_photo')->store('profiles', 'public');
             $data['profile_photo'] = $path;
@@ -101,6 +105,21 @@ class DashboardController extends Controller
 
         $user->update($data);
 
-        return back()->with('success', 'Profile updated successfully!');
+        return back()->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    public function becomeWriter(Request $request)
+    {
+        $user = Auth::user();
+        
+        if ($user->role !== 'user') {
+            return back()->with('error', 'Anda sudah memiliki akses kontributor.');
+        }
+
+        // Update role to writer
+        $user->role = 'writer';
+        $user->save();
+
+        return back()->with('success', 'Selamat! Akun Anda telah berhasil diubah menjadi Penulis. Anda sekarang dapat mulai membuat novel Anda sendiri.');
     }
 }
