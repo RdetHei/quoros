@@ -14,20 +14,20 @@
 
 <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full text-left border-collapse min-w-[980px]">
             <thead>
                 <tr class="bg-slate-50 dark:bg-slate-800/50">
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Novel</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Genre</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Chapter</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Stats</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                    <th class="px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">Novel</th>
+                    <th class="px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">Genre</th>
+                    <th class="px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Chapter</th>
+                    <th class="px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Stats</th>
+                    <th class="px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                 @forelse($novels as $novel)
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                        <td class="px-6 py-4">
+                        <td class="px-4 md:px-6 py-4">
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
                                     @if($novel->cover_image)
@@ -42,19 +42,19 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-4 md:px-6 py-4">
                             <div class="flex flex-wrap gap-1">
                                 @foreach($novel->genres->take(2) as $genre)
                                     <span class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-full border border-indigo-100 dark:border-indigo-800">{{ $genre->name }}</span>
                                 @endforeach
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-4 md:px-6 py-4 text-center">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-400">
                                 {{ $novel->chapters_count }}
                             </span>
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-4 md:px-6 py-4">
                             <div class="flex items-center justify-center gap-4">
                                 <div class="flex flex-col items-center">
                                     <span class="text-xs font-bold text-slate-900 dark:text-white">{{ number_format($novel->view_count) }}</span>
@@ -70,7 +70,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-right">
+                        <td class="px-4 md:px-6 py-4 text-right">
                             <div class="flex justify-end gap-2">
                                 <a href="{{ route('novels.show', $novel->slug) }}" class="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors" title="View">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
@@ -94,7 +94,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-12 text-center text-slate-500 italic">
+                        <td colspan="5" class="px-6 py-12 text-center text-slate-500 italic">
                             Kamu belum membuat novel apapun. Mulai menulis sekarang!
                         </td>
                     </tr>

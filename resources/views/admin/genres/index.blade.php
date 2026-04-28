@@ -26,7 +26,8 @@
     @endif
 
     <div class="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
-        <table class="w-full text-left border-collapse">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[520px]">
             <thead>
                 <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                     <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Nama Genre</th>
@@ -67,7 +68,8 @@
                     </tr>
                 @endforelse
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 </div>
 @endsection

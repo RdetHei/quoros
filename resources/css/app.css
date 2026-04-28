@@ -15,9 +15,32 @@
         color-scheme: dark;
     }
 
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     body {
         background-color: #020617;
         color: #e2e8f0;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Guard rails for long content on mobile (URLs, inline code, etc.) */
+    pre,
+    code,
+    .prose {
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 
     /* Keep UI calmer by default: avoid long and flashy motion. */

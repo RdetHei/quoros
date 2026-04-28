@@ -35,12 +35,38 @@
 <body class="font-sans antialiased bg-slate-950 text-slate-100">
     <div class="min-h-screen flex flex-col">
         <!-- Navbar -->
-        <nav id="navbar" class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800" x-data="{ mobileMenuOpen: false }">
+        <nav id="navbar" class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800"
+             x-data="{
+                mobileMenuOpen: false,
+                scrollY: 0,
+                openMobileMenu() {
+                    this.scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+                    document.body.style.position = 'fixed';
+                    document.body.style.top = `-${this.scrollY}px`;
+                    document.body.style.left = '0';
+                    document.body.style.right = '0';
+                    document.body.style.width = '100%';
+                    this.mobileMenuOpen = true;
+                },
+                closeMobileMenu() {
+                    this.mobileMenuOpen = false;
+                    const y = this.scrollY || 0;
+                    document.body.style.position = '';
+                    document.body.style.top = '';
+                    document.body.style.left = '';
+                    document.body.style.right = '';
+                    document.body.style.width = '';
+                    window.scrollTo(0, y);
+                }
+             }">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center gap-4 md:gap-8 flex-1">
                         <!-- Mobile Menu Button -->
-                        <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+                        <button @click="mobileMenuOpen ? closeMobileMenu() : openMobileMenu()"
+                                class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
+                                aria-label="Buka navigasi"
+                                :aria-expanded="mobileMenuOpen.toString()">
                             <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
                             <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
@@ -155,42 +181,86 @@
             </div>
 
             <!-- Mobile Sidebar Overlay -->
-            <div x-show="mobileMenuOpen" 
+            <div x-show="mobileMenuOpen"
+                 x-cloak
                  x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="-translate-x-full"
-                 x-transition:enter-end="translate-x-0"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
                  x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="translate-x-0"
-                 x-transition:leave-end="-translate-x-full"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @keydown.escape.window="closeMobileMenu()"
                  class="fixed inset-0 z-[60] lg:hidden" style="display: none;">
                 <!-- Backdrop -->
-                <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="mobileMenuOpen = false"></div>
+                <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+                     @click="closeMobileMenu()"
+                     @touchmove.prevent></div>
                 
                 <!-- Content -->
-                <div class="relative w-72 h-full bg-white dark:bg-slate-900 shadow-2xl flex flex-col">
-                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                        <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto">
-                        <button @click="mobileMenuOpen = false" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                <div x-show="mobileMenuOpen"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="-translate-x-full"
+                     x-transition:enter-end="translate-x-0"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="translate-x-0"
+                     x-transition:leave-end="-translate-x-full"
+                     class="relative w-[84vw] max-w-[340px] h-[100dvh] bg-white dark:bg-slate-900 shadow-2xl flex flex-col rounded-r-3xl overflow-hidden border-r border-slate-100 dark:border-slate-800"
+                     @click.stop>
+                    <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto">
+                            <div class="leading-tight">
+                                <p class="text-xs font-black uppercase tracking-widest text-slate-400">Menu</p>
+                                <p class="text-sm font-bold text-slate-900 dark:text-white">Navigasi</p>
+                            </div>
+                        </div>
+                        <button @click="closeMobileMenu()" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl transition-colors" aria-label="Tutup navigasi">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
                     
-                    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                    <div class="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-6 space-y-6" style="-webkit-overflow-scrolling: touch;">
+                        @auth
+                        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl overflow-hidden bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+                                    @if(Auth::user()->profile_photo)
+                                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover">
+                                    @else
+                                        {{ substr(Auth::user()->name, 0, 1) }}
+                                    @endif
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ Auth::user()->name }}</p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">{{ Auth::user()->role }}</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 mt-4">
+                                <a href="{{ route('dashboard') }}" class="px-4 py-2.5 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+                                    Dashboard
+                                </a>
+                                <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="px-4 py-2.5 text-center text-xs font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
+                                    Profil
+                                </a>
+                            </div>
+                        </div>
+                        @endauth
+
                         <div class="space-y-1">
                             <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Navigasi Utama</p>
-                            <a href="{{ route('home') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('home') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('home') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('home') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                                 <span>Katalog</span>
                             </a>
-                            <a href="{{ route('novels.updated') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('novels.updated') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('novels.updated') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('novels.updated') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <span>Updated</span>
                             </a>
-                            <a href="{{ route('genres.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('genres.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('genres.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('genres.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                                 <span>Genre</span>
                             </a>
-                            <a href="{{ route('tags.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('tags.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('tags.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('tags.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>
                                 <span>Tag</span>
                             </a>
@@ -198,18 +268,14 @@
 
                         @auth
                         <div class="space-y-1">
-                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Akun Anda</p>
-                            <a href="{{ route('bookmarks.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('bookmarks.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Aktivitas</p>
+                            <a href="{{ route('bookmarks.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('bookmarks.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                                 <span>Bookmark</span>
                             </a>
-                            <a href="{{ route('history.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('history.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('history.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('history.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <span>History</span>
-                            </a>
-                            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('dashboard') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                                <span>Dashboard</span>
                             </a>
                         </div>
                         @endauth

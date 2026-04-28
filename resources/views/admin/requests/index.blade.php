@@ -18,19 +18,19 @@
 
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse min-w-[820px]">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50">
-                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">User</th>
-                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Judul Novel</th>
-                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aksi</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">User</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Judul Novel</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
                     @forelse($requests as $request)
                         <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all">
-                            <td class="px-6 py-6">
+                            <td class="px-4 md:px-6 py-6">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xs font-bold">
                                         {{ substr($request->user->name, 0, 1) }}
@@ -38,11 +38,11 @@
                                     <div class="text-sm font-bold text-slate-900 dark:text-white">{{ $request->user->name }}</div>
                                 </div>
                             </td>
-                            <td class="px-6 py-6">
+                            <td class="px-4 md:px-6 py-6">
                                 <div class="text-sm font-bold text-slate-900 dark:text-white mb-1">{{ $request->title }}</div>
                                 <div class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 italic">{{ $request->description ?? 'Tidak ada deskripsi' }}</div>
                             </td>
-                            <td class="px-6 py-6">
+                            <td class="px-4 md:px-6 py-6">
                                 @php
                                     $statusClasses = [
                                         'pending' => 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800',
@@ -59,7 +59,7 @@
                                     {{ $statusLabels[$request->status] }}
                                 </span>
                             </td>
-                            <td class="px-6 py-6">
+                            <td class="px-4 md:px-6 py-6">
                                 <div class="flex items-center gap-2">
                                     @if($request->status === 'pending')
                                         <form action="{{ route('admin.requests.status', $request->id) }}" method="POST">
