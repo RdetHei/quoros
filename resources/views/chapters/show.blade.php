@@ -167,12 +167,18 @@
         <div class="space-y-8">
             @forelse($chapter->comments as $comment)
                 <div class="flex gap-3 md:gap-4 group">
-                    <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs md:text-sm">
-                        {{ substr($comment->user->name, 0, 1) }}
-                    </div>
+                    <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}"
+                       class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs md:text-sm hover:ring-2 hover:ring-indigo-500/40 transition-all"
+                       title="Lihat profil">
+                        @if($comment->user->profile_photo)
+                            <img src="{{ asset('storage/' . $comment->user->profile_photo) }}" alt="" class="w-full h-full object-cover rounded-full">
+                        @else
+                            {{ substr($comment->user->name, 0, 1) }}
+                        @endif
+                    </a>
                     <div class="flex-grow">
                         <div class="flex items-center justify-between mb-1">
-                            <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}" class="font-bold text-xs md:text-sm text-slate-900 dark:text-white hover:text-indigo-600 transition-colors">{{ $comment->user->name }}</a>
+                            <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}" class="font-bold text-xs md:text-sm text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{{ $comment->user->name }}</a>
                             <span class="text-[9px] md:text-[10px] font-medium text-slate-400 uppercase tracking-widest">{{ $comment->created_at->diffForHumans() }}</span>
                         </div>
                         <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $comment->content }}</p>

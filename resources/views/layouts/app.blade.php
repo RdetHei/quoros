@@ -21,6 +21,8 @@
 
     <!-- Styles & Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- <link rel="stylesheet" href="{{ asset('build/assets/app-CiwESEF6.css') }}">
+	<script type="module" src="{{ asset('build/assets/app-BFoTbDAf.js') }}"></script> -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
@@ -88,38 +90,30 @@
                     </div>
 
                     <div class="flex items-center gap-2 md:gap-4">
-                        <!-- Search Bar (Desktop - Right Side) -->
-                        <div class="hidden md:flex items-center w-64 lg:w-80">
-                            <form action="{{ route('novels.search') }}" method="GET" class="relative w-full">
-                                <input type="text" name="q" value="{{ request('q') }}" 
-                                    class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
-                                    placeholder="Cari novel...">
-                                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                                </div>
-                            </form>
-                        </div>
+                        <!-- Search Bar (Desktop - Live Search) -->
+                        @include('partials.live-search-partial', [
+                            'id'          => 'desktop-search',
+                            'placeholder' => 'Cari novel...',
+                            'classes'     => 'hidden md:block w-64 lg:w-80',
+                        ])
                         <!-- Search Toggle (Mobile) -->
                         <div x-data="{ open: false }" class="md:hidden">
                             <button @click="open = !open" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </button>
 
-                            <!-- Mobile Search Overlay -->
-                            <div x-show="open" 
-                                 @click.away="open = false"
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 -translate-y-4"
-                                 x-transition:enter-end="opacity-100 translate-y-0"
-                                 class="absolute left-0 right-0 top-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 shadow-xl z-50">
-                                <form action="{{ route('novels.search') }}" method="GET" class="relative">
-                                    <input type="text" name="q" value="{{ request('q') }}" 
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
-                                        placeholder="Cari novel...">
-                                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                                    </div>
-                                </form>
+                
+                            <!-- Mobile Search Overlay (Live Search) -->
+                            <div x-show="open"
+                                @click.away="open = false"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 -translate-y-4"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                class="absolute left-0 right-0 top-full bg-slate-900 border-b border-slate-800 p-4 shadow-xl z-50">
+                                @include('partials.live-search-partial', [
+                                    'id'          => 'mobile-search',
+                                    'placeholder' => 'Cari novel...',
+                                ])
                             </div>
                         </div>
 
@@ -386,7 +380,157 @@
             }
         });
         }
-    </script>
-    @stack('scripts')
+    
+document.addEventListener('DOMContentLoaded', function () {
+    const DEBOUNCE_MS  = 220;
+    const MIN_CHARS    = 2;
+    const API_ENDPOINT = '/api/live-search';
+
+    function buildResultCard(novel) {
+        const cover = novel.cover_image
+            ? `<img src="${novel.cover_image}" alt="${escHtml(novel.title)}" class="w-full h-full object-cover">`
+            : `<div class="w-full h-full bg-slate-800 flex items-center justify-center p-1">
+                   <span class="text-[8px] text-slate-500 font-bold text-center leading-tight">${escHtml(novel.title)}</span>
+               </div>`;
+
+        const genres = (novel.genres || [])
+            .map(g => `<span class="text-[8px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-900/40 px-1.5 py-0.5 rounded border border-indigo-800/50">${escHtml(g)}</span>`)
+            .join('');
+
+        const statusDot = { ongoing: 'bg-emerald-500', complete: 'bg-indigo-500', hiatus: 'bg-amber-500' }[novel.status] || 'bg-slate-500';
+
+        return `
+        <a href="${novel.url}"
+           class="live-search-result flex items-center gap-3 px-3 py-2.5 hover:bg-slate-800/70 transition-colors group outline-none focus:bg-slate-800/70 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500/30"
+           tabindex="0">
+            <div class="w-10 h-[3.35rem] flex-shrink-0 rounded-lg overflow-hidden bg-slate-800 ring-1 ring-slate-700/50 relative">
+                ${cover}
+                <span class="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-full ${statusDot} ring-1 ring-black/40"></span>
+            </div>
+            <div class="flex-grow min-w-0">
+                <p class="text-sm font-bold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-1">${escHtml(novel.title)}</p>
+                <p class="text-[10px] text-slate-500 mb-1 line-clamp-1">${escHtml(novel.author)}</p>
+                <div class="flex flex-wrap items-center gap-1">${genres}</div>
+            </div>
+            <div class="flex-shrink-0 flex items-center gap-1 text-amber-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <span class="text-[10px] font-bold text-slate-300 tabular-nums">${novel.rating_avg}</span>
+            </div>
+        </a>`;
+    }
+
+    function escHtml(str) {
+        return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function initLiveSearch(wrapper) {
+        const id       = wrapper.dataset.componentId;
+        const input    = document.getElementById(`${id}-input`);
+        const dropdown = document.getElementById(`${id}-dropdown`);
+        const loading  = document.getElementById(`${id}-loading`);
+        const results  = document.getElementById(`${id}-results`);
+        const footer   = document.getElementById(`${id}-footer`);
+        const empty    = document.getElementById(`${id}-empty`);
+        const seeAll   = document.getElementById(`${id}-see-all`);
+        const emptyLink= document.getElementById(`${id}-empty-link`);
+        const form     = wrapper.querySelector('.live-search-form');
+
+        if (!input || !dropdown) return;
+
+        let debounceTimer = null;
+        let lastQuery     = '';
+        let abortCtrl     = null;
+        let isOpen        = false;
+
+        function showDropdown() { dropdown.style.display = 'block'; isOpen = true; }
+        function hideDropdown() { dropdown.style.display = 'none';  isOpen = false; }
+        function setLoading(on) {
+            loading.classList.toggle('hidden', !on);
+            loading.classList.toggle('flex', on);
+        }
+        function updateSeeAllLink(query) {
+            const url = `${form.action}?q=${encodeURIComponent(query)}`;
+            if (seeAll)    seeAll.href    = url;
+            if (emptyLink) emptyLink.href = url;
+        }
+
+        async function fetchResults(query) {
+            if (abortCtrl) abortCtrl.abort();
+            abortCtrl = new AbortController();
+            setLoading(true);
+            results.innerHTML = '';
+            footer.classList.add('hidden');
+            empty.classList.add('hidden');
+
+            try {
+                const res  = await fetch(`${API_ENDPOINT}?q=${encodeURIComponent(query)}`, {
+                    signal: abortCtrl.signal,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                const data = await res.json();
+                setLoading(false);
+                if (!data || data.length === 0) {
+                    empty.classList.remove('hidden');
+                } else {
+                    results.innerHTML = data.map(buildResultCard).join('');
+                    footer.classList.remove('hidden');
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    setLoading(false);
+                    empty.classList.remove('hidden');
+                }
+            }
+        }
+
+        input.addEventListener('input', function () {
+            const q = this.value.trim();
+            updateSeeAllLink(q);
+            clearTimeout(debounceTimer);
+            if (q.length < MIN_CHARS) { hideDropdown(); lastQuery = ''; return; }
+            showDropdown();
+            if (q === lastQuery) return;
+            lastQuery = q;
+            debounceTimer = setTimeout(() => fetchResults(q), DEBOUNCE_MS);
+        });
+
+        input.addEventListener('focus', function () {
+            if (this.value.trim().length >= MIN_CHARS) showDropdown();
+        });
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            window.location.href = `${this.action}?q=${encodeURIComponent(input.value.trim())}`;
+        });
+
+        input.addEventListener('keydown', function (e) {
+            if (!isOpen) return;
+            const items = Array.from(dropdown.querySelectorAll('.live-search-result'));
+            const idx   = items.indexOf(document.activeElement);
+            if (e.key === 'ArrowDown') { e.preventDefault(); (items[idx + 1] || items[0])?.focus(); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); if (items[idx - 1]) items[idx - 1].focus(); else input.focus(); }
+            else if (e.key === 'Escape') { hideDropdown(); input.blur(); }
+            else if (e.key === 'Enter')  { e.preventDefault(); form.dispatchEvent(new Event('submit', { cancelable: true })); }
+        });
+
+        dropdown.addEventListener('keydown', function (e) {
+            const items = Array.from(dropdown.querySelectorAll('.live-search-result'));
+            const idx   = items.indexOf(document.activeElement);
+            if (e.key === 'ArrowDown') { e.preventDefault(); items[idx + 1]?.focus(); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); if (idx <= 0) input.focus(); else items[idx - 1].focus(); }
+            else if (e.key === 'Escape') { hideDropdown(); input.focus(); }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!wrapper.contains(e.target)) hideDropdown();
+        });
+    }
+
+    document.querySelectorAll('.live-search-wrapper').forEach(initLiveSearch);
+});
+</script>
+@stack('scripts')
 </body>
 </html>

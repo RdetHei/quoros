@@ -74,23 +74,64 @@ class NovelController extends Controller
         return view('novels.index', compact('novels', 'genres', 'recentlyUpdated', 'weeklyTop', 'monthlyTop', 'featuredNovels'));
     }
 
-    public function search(Request $request)
+ public function search(Request $request)
     {
         $search = $request->get('q');
-        
-        $novels = Novel::with(['author', 'genres'])
-            ->where(function($query) use ($search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('alternative_title', 'like', "%{$search}%")
-                    ->orWhereHas('author', function($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    });
-            })
-            ->latest()
-            ->paginate(18)
-            ->withQueryString();
-
-        return view('novels.search', compact('novels', 'search'));
+        $genre  = $request->get('genre');
+        $status = $request->get('status');
+        $type   = $request->get('type');
+        $sort   = $request->get('sort', 'latest');
+ 
+        $query = Novel::with(['author', 'genres']);
+ 
+        // Keyword search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('alternative_title', 'like', "%{$search}%")
+                  ->orWhereHas('author', function ($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+ 
+        // Genre filter
+        if ($genre) {
+            $query->whereHas('genres', function ($q) use ($genre) {
+                $q->where('slug', $genre);
+            });
+        }
+ 
+        // Status filter
+        if ($status) {
+            $query->where('status', $status);
+        }
+ 
+        // Type filter
+        if ($type) {
+            $query->where('type', $type);
+        }
+ 
+        // Sorting
+        switch ($sort) {
+            case 'rating':
+                $query->orderByDesc('rating_avg');
+                break;
+            case 'views':
+                $query->orderByDesc('view_count');
+                break;
+            case 'title':
+                $query->orderBy('title');
+                break;
+            default: // 'latest'
+                $query->latest();
+                break;
+        }
+ 
+        $novels = $query->paginate(24)->withQueryString();
+        $genres = \App\Models\Genre::orderBy('name')->get();
+ 
+        return view('novels.search', compact('novels', 'search', 'genres'));
     }
 
     public function updated()

@@ -20,6 +20,7 @@ Route::get('/', [NovelController::class, 'index'])->name('home');
 
 // API for Discord Bot
 Route::get('/api/latest-chapter', [ApiChapterController::class, 'latest']);
+Route::get('/api/live-search', [App\Http\Controllers\Api\LiveSearchController::class, 'search']);
 
 // Auth Routes
 Route::middleware('guest')->group(function () {

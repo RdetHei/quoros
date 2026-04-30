@@ -79,16 +79,17 @@
 
                 {{-- Meta row --}}
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-x-4 md:gap-x-5 gap-y-2 mb-6 text-xs md:text-sm">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 md:w-7 md:h-7 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 font-black text-[10px] md:text-xs">
+                    <a href="{{ route('profile.show', $novel->author->username ?? $novel->author->id) }}"
+                       class="flex items-center gap-2 rounded-lg -mx-1 px-1 py-0.5 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 transition-colors group/author">
+                        <div class="w-6 h-6 md:w-7 md:h-7 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 font-black text-[10px] md:text-xs ring-1 ring-slate-200/60 dark:ring-slate-600/40">
                             @if($novel->author->profile_photo)
                                 <img src="{{ asset('storage/' . $novel->author->profile_photo) }}" alt="{{ $novel->author->name }}" class="w-full h-full object-cover">
                             @else
                                 {{ substr($novel->author->name, 0, 1) }}
                             @endif
                         </div>
-                        <span class="font-semibold text-slate-700 dark:text-slate-300">{{ $novel->author->name }}</span>
-                    </div>
+                        <span class="font-semibold text-slate-700 dark:text-slate-300 group-hover/author:text-indigo-600 dark:group-hover/author:text-indigo-400">{{ $novel->author->name }}</span>
+                    </a>
                     <div class="flex items-center gap-1.5 text-amber-500 font-bold">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 md:h-4 md:w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -439,16 +440,17 @@
                 @forelse($novel->reviews as $review)
                 <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/40">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                        <a href="{{ route('profile.show', $review->user->username ?? $review->user->id) }}"
+                           class="flex items-center gap-2 min-w-0 rounded-lg -mx-1 px-1 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors group/rev">
+                            <div class="w-7 h-7 shrink-0 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
                                 @if($review->user->profile_photo)
                                     <img src="{{ asset('storage/' . $review->user->profile_photo) }}" alt="{{ $review->user->name }}" class="w-full h-full object-cover">
                                 @else
                                     {{ substr($review->user->name, 0, 1) }}
                                 @endif
                             </div>
-                            <span class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ $review->user->name }}</span>
-                        </div>
+                            <span class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate group-hover/rev:text-indigo-600 dark:group-hover/rev:text-indigo-400">{{ $review->user->name }}</span>
+                        </a>
                         <div class="flex items-center gap-0.5">
                             @for($i = 0; $i < 5; $i++)
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $i < $review->rating ? 'text-amber-400' : 'text-slate-200 dark:text-slate-700' }}" viewBox="0 0 20 20" fill="currentColor">
