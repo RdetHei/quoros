@@ -8,6 +8,12 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
+    <link rel="manifest" href="{{ route('pwa.manifest') }}">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="{{ asset('storage/logo/quorosLogo.png') }}">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,8 +27,9 @@
 
     <!-- Styles & Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <!-- <link rel="stylesheet" href="{{ asset('build/assets/app-CiwESEF6.css') }}">
-	<script type="module" src="{{ asset('build/assets/app-BFoTbDAf.js') }}"></script> -->
+    @stack('styles')
+    <!-- <link rel="stylesheet" href="{{ asset('build/assets/app-BZkzrl8j.css') }}">
+	<script type="module" src="{{ asset('build/assets/app-34mOoJaZ.js') }}"></script> -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>

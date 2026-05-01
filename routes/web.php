@@ -1,26 +1,47 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReactionController;
-use App\Http\Controllers\Admin\GenreController as AdminGenreController;
-use App\Http\Controllers\Admin\TagController as AdminTagController;
-use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
 use App\Http\Controllers\Admin\CarouselController as AdminCarouselController;
+use App\Http\Controllers\Admin\GenreController as AdminGenreController;
+use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
+use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Api\ChapterController as ApiChapterController;
+use App\Http\Controllers\Api\LiveSearchController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\NovelController;
-use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NovelController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [NovelController::class, 'index'])->name('home');
 
+Route::get('/site.webmanifest', function () {
+    $logo = asset('storage/logo/quorosLogo.png');
+
+    return response()->json([
+        'name' => config('app.name', 'Quoros'),
+        'short_name' => 'Quoros',
+        'description' => 'Baca novel — instal sebagai aplikasi; bab yang sudah dibuka dapat dibaca offline.',
+        'start_url' => '/',
+        'scope' => '/',
+        'display' => 'standalone',
+        'background_color' => '#020617',
+        'theme_color' => '#0f172a',
+        'lang' => 'id',
+        'icons' => [
+            ['src' => $logo, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => $logo, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any maskable'],
+        ],
+    ], 200, ['Content-Type' => 'application/manifest+json'], JSON_UNESCAPED_SLASHES);
+})->name('pwa.manifest');
+
 // API for Discord Bot
 Route::get('/api/latest-chapter', [ApiChapterController::class, 'latest']);
-Route::get('/api/live-search', [App\Http\Controllers\Api\LiveSearchController::class, 'search']);
+Route::get('/api/live-search', [LiveSearchController::class, 'search']);
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
@@ -36,7 +57,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/search', [NovelController::class, 'search'])->name('novels.search');
 Route::get('/novels/{novel:slug}', [NovelController::class, 'show'])->name('novels.show');
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
-Route::get('/novels/{novel:slug}/read/{chapterSlug}', [ChapterController::class, 'show'])->name('chapters.show');
+Route::get('/novels/{novel:slug}/read/{chapterSlug}', [ChapterController::class, 'show'])
+    ->middleware('throttle:chapter-read')
+    ->name('chapters.show');
 Route::get('/updated', [NovelController::class, 'updated'])->name('novels.updated');
 Route::get('/genres', [NovelController::class, 'genres'])->name('genres.index');
 Route::get('/tags', [NovelController::class, 'tags'])->name('tags.index');
@@ -50,7 +73,7 @@ Route::middleware('auth')->group(function () {
     // Bookmark & History dedicated views
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
     Route::get('/history', [NovelController::class, 'history'])->name('history.index');
-    
+
     // Request Novel
     Route::get('/requests', [NovelController::class, 'requests'])->name('requests.index');
     Route::post('/requests', [NovelController::class, 'storeRequest'])->name('requests.store');
@@ -88,7 +111,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/novels', [NovelController::class, 'index'])->name('admin.novels.index');
         Route::resource('/admin/genres', AdminGenreController::class, ['as' => 'admin']);
         Route::resource('/admin/tags', AdminTagController::class, ['as' => 'admin']);
-        
+
         // Novel Requests Management
         Route::get('/admin/requests', [AdminNovelRequestController::class, 'index'])->name('admin.requests.index');
         Route::patch('/admin/requests/{novelRequest}/status', [AdminNovelRequestController::class, 'updateStatus'])->name('admin.requests.status');

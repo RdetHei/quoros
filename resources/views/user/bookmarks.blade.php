@@ -54,8 +54,10 @@
         @endforelse
     </div>
 
-    <div class="mt-12">
-        {{ $bookmarks->links() }}
-    </div>
+    @if($bookmarks->hasPages())
+        <div class="mt-12 flex justify-center">
+            {{ $bookmarks->links() }}
+        </div>
+    @endif
 </div>
 @endsection

@@ -49,8 +49,10 @@
         @endforelse
     </div>
 
-    <div class="mt-8">
-        {{ $histories->links() }}
-    </div>
+    @if($histories->hasPages())
+        <div class="mt-8 flex justify-center">
+            {{ $histories->links() }}
+        </div>
+    @endif
 </div>
 @endsection

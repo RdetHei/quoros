@@ -7,11 +7,16 @@
     nextChapterSlug: '{{ $nextChapter ? $nextChapter->slug : '' }}',
     novelSlug: '{{ $novel->slug }}',
     novelTitle: @js($novel->title),
-    baseUrl: '{{ url('/') }}'
+    baseUrl: '{{ url('/') }}',
+    protectChapter: @js($protectContent ?? false)
 })" class="max-w-4xl mx-auto px-4 sm:px-0 pb-20">
     <!-- Reader Progress & Sticky Header (Mobile) -->
     <div class="fixed top-0 left-0 w-full h-1.5 bg-slate-200 dark:bg-slate-800 z-[60] md:hidden">
         <div class="h-full bg-indigo-600 transition-all duration-300 shadow-[0_0_10px_rgba(79,70,229,0.5)]" id="scroll-progress"></div>
+    </div>
+
+    <div id="pwa-offline-banner" class="hidden fixed top-14 md:top-20 left-1/2 -translate-x-1/2 z-[70] max-w-md w-[calc(100%-2rem)] px-4 py-2.5 rounded-xl bg-amber-950/95 border border-amber-700/50 text-amber-100 text-xs font-semibold text-center shadow-lg" role="status">
+        Mode offline — bab yang sudah pernah dibuka dari perangkat ini tetap bisa dibaca. Muat bab baru perlu koneksi internet.
     </div>
 
     <!-- Chapter Navigation (Top) -->
@@ -78,14 +83,20 @@
         </div>
     </div>
 
-    <!-- Reading Area Container -->
-    <div id="chapters-container">
+    <!-- Reading Area Container (anti-copy / watermark hanya di area ini, bukan komentar) -->
+    <div id="chapters-container" class="@if($protectContent ?? false) select-none @endif">
         <!-- Current Chapter -->
         <div data-slug="{{ $chapter->slug }}" data-title="{{ $chapter->title }}">
             <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mb-10">
+                @if($protectContent ?? false)
+                <div class="reader-chapter-shell" @contextmenu.prevent>
+                @endif
                 <article :class="[fontSize, fontFamily]" class="prose prose-slate dark:prose-invert max-w-none leading-relaxed md:leading-loose text-slate-800 dark:text-slate-200 transition-all duration-300">
-                    {!! nl2br(e($chapter->content)) !!}
+                    {!! $chapterBodyHtml !!}
                 </article>
+                @if($protectContent ?? false)
+                </div>
+                @endif
 
                 @if($chapter->file_path)
                     <div class="mt-12 p-6 md:p-8 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-center">
@@ -228,8 +239,29 @@
     </div>
 </div>
 
+    @push('styles')
+    <style>
+        .reader-chapter-shell article,
+        .reader-chapter-shell article * {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+    </style>
+    @endpush
+
     @push('scripts')
     <script>
+        (function () {
+            const el = document.getElementById('pwa-offline-banner');
+            if (!el) return;
+            function sync() {
+                el.classList.toggle('hidden', navigator.onLine);
+            }
+            sync();
+            window.addEventListener('online', sync);
+            window.addEventListener('offline', sync);
+        })();
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('reader', (config) => ({
                 fontSize: config.initialFontSize,
@@ -240,9 +272,18 @@
                 novelSlug: config.novelSlug,
                 novelTitle: config.novelTitle,
                 baseUrl: config.baseUrl,
+                protectChapter: config.protectChapter,
 
                 init() {
                     this.setupScrollObserver();
+                    if (this.protectChapter) {
+                        const zone = document.getElementById('chapters-container');
+                        if (zone) {
+                            ['copy', 'cut'].forEach((ev) => {
+                                zone.addEventListener(ev, (e) => e.preventDefault(), true);
+                            });
+                        }
+                    }
                     
                     window.addEventListener('scroll', () => {
                         const winScroll = window.pageYOffset || document.documentElement.scrollTop;
@@ -305,14 +346,19 @@
                         chapterDiv.dataset.slug = data.chapter.slug;
                         chapterDiv.dataset.title = data.chapter.title;
                         
+                        const shellOpen = this.protectChapter ? "<div class='reader-chapter-shell select-none' oncontextmenu='return false'>" : '';
+                        const shellClose = this.protectChapter ? '</div>' : '';
+
                         chapterDiv.innerHTML = `
                             <div class='mb-10 text-center'>
                                 <h2 class='text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1'>${data.novel.title}</h2>
                                 <h1 class='text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white'>${data.chapter.title}</h1>
                             </div>
                             <div class='bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800'>
+                                ${shellOpen}
                                 <article class='${this.fontSize} ${this.fontFamily} prose prose-slate dark:prose-invert max-w-none leading-relaxed md:leading-loose text-slate-800 dark:text-slate-200 transition-all duration-300 chapter-content-article'>
                                 </article>
+                                ${shellClose}
                                 <div class='mt-10 pt-10 border-t border-slate-100 dark:border-slate-800'>
                                     <a href='${url}' class='text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-2'>
                                         <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z' /></svg>

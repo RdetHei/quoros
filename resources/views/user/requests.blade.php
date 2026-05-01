@@ -44,10 +44,12 @@
                 <p class="text-slate-500 italic">Belum ada permintaan novel.</p>
             </div>
         @endforelse
-        
-        <div class="mt-4">
-            {{ $requests->links() }}
-        </div>
+
+        @if($requests->hasPages())
+            <div class="mt-4 flex justify-center">
+                {{ $requests->links() }}
+            </div>
+        @endif
     </div>
 
     @auth

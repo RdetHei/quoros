@@ -12,7 +12,7 @@
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         @foreach($genres as $genre)
-            <a href="{{ route('home', ['genre' => $genre->slug]) }}" class="group p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-indigo-600 hover:shadow-xl hover:shadow-indigo-500/5 transition-all text-center">
+            <a href="{{ route('novels.search', ['genre' => $genre->slug]) }}" class="group p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-indigo-600 hover:shadow-xl hover:shadow-indigo-500/5 transition-all text-center">
                 <h3 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 transition-colors mb-1 uppercase tracking-wider text-sm">{{ $genre->name }}</h3>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $genre->novels_count }} Novel</p>
             </a>

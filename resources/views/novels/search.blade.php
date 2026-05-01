@@ -37,7 +37,7 @@
                 </div>
 
                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2 md:mb-3 text-left">Filter</p>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                     <div class="relative">
                         <select name="genre" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/35 focus:border-indigo-500 transition-colors">
                             <option value="">Semua Genre</option>
@@ -70,6 +70,20 @@
                             <option value="original" {{ request('type') == 'original' ? 'selected' : '' }}>Original</option>
                             <option value="web_novel" {{ request('type') == 'web_novel' ? 'selected' : '' }}>Web Novel</option>
                             <option value="light_novel" {{ request('type') == 'light_novel' ? 'selected' : '' }}>Light Novel</option>
+                        </select>
+                        <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </span>
+                    </div>
+
+                    <div class="relative">
+                        <select name="tag" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/35 focus:border-indigo-500 transition-colors">
+                            <option value="">Semua Tag</option>
+                            @foreach($tags as $tag)
+                                <option value="{{ $tag->slug }}" {{ request('tag') == $tag->slug ? 'selected' : '' }}>
+                                    {{ $tag->name }}
+                                </option>
+                            @endforeach
                         </select>
                         <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
@@ -112,7 +126,7 @@
                 </div>
             </div>
 
-            @if(($search ?? false) || request('genre') || request('status') || request('type'))
+            @if(($search ?? false) || request('genre') || request('status') || request('type') || request('tag'))
                 <a href="{{ route('novels.search') }}" class="text-xs font-bold text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -187,9 +201,11 @@
             </div>
 
             {{-- Pagination --}}
-            <div class="mt-10 md:mt-14">
-                {{ $novels->appends(request()->query())->links() }}
-            </div>
+            @if($novels->hasPages())
+                <div class="mt-10 md:mt-14 flex justify-center">
+                    {{ $novels->links() }}
+                </div>
+            @endif
 
         @else
             <div class="py-20 md:py-32 text-center">

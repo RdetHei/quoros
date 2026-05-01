@@ -4,18 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Chapter;
 use App\Models\Novel;
+use App\Models\ReadingHistory;
 use App\Services\EpubParserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ChapterController extends Controller
 {
     public function create(Novel $novel)
     {
         Gate::authorize('manageChapters', $novel);
+
         return view('writer.chapters.create', compact('novel'));
     }
 
@@ -32,8 +34,8 @@ class ChapterController extends Controller
         ]);
 
         $slug = Str::slug($request->title);
-        
-        $chapter = new Chapter();
+
+        $chapter = new Chapter;
         $chapter->novel_id = $novel->id;
         $chapter->title = $request->title;
         $chapter->slug = $slug;
@@ -69,12 +71,12 @@ class ChapterController extends Controller
 
             foreach ($chapters as $index => $data) {
                 $slug = Str::slug($data['title']);
-                
+
                 // Pastikan slug unik dalam novel ini
                 $originalSlug = $slug;
                 $count = 1;
                 while (Chapter::where('novel_id', $novel->id)->where('slug', $slug)->exists()) {
-                    $slug = $originalSlug . '-' . $count++;
+                    $slug = $originalSlug.'-'.$count++;
                 }
 
                 Chapter::create([
@@ -86,9 +88,9 @@ class ChapterController extends Controller
             }
 
             return redirect()->route('novels.show', $novel->slug)
-                ->with('success', count($chapters) . ' chapter berhasil diimpor dari EPUB!');
+                ->with('success', count($chapters).' chapter berhasil diimpor dari EPUB!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal memproses EPUB: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memproses EPUB: '.$e->getMessage());
         }
     }
 
@@ -101,21 +103,28 @@ class ChapterController extends Controller
         // Check if user is author or admin to see non-published chapters
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
 
-        if (!$isAuthorOrAdmin && ($chapter->status !== 'published' || ($chapter->published_at && $chapter->published_at->isFuture()))) {
+        if (! $isAuthorOrAdmin && ($chapter->status !== 'published' || ($chapter->published_at && $chapter->published_at->isFuture()))) {
             abort(404);
         }
-            
+
         $chapter->load('comments.user');
 
         if (Auth::check()) {
-            \App\Models\ReadingHistory::updateOrCreate(
+            ReadingHistory::updateOrCreate(
                 ['user_id' => Auth::id(), 'novel_id' => $novel->id],
                 ['chapter_id' => $chapter->id]
             );
         }
 
-        $previousChapter = $chapter->previous(!$isAuthorOrAdmin);
-        $nextChapter = $chapter->next(!$isAuthorOrAdmin);
+        $previousChapter = $chapter->previous(! $isAuthorOrAdmin);
+        $nextChapter = $chapter->next(! $isAuthorOrAdmin);
+
+        $protectContent = ! $isAuthorOrAdmin;
+        $chapterBodyHtml = $this->formatChapterBodyForDisplay(
+            $chapter->content,
+            $this->readerWatermarkLabel(),
+            $protectContent,
+        );
 
         if (request()->ajax()) {
             return response()->json([
@@ -127,19 +136,65 @@ class ChapterController extends Controller
                     'id' => $chapter->id,
                     'title' => $chapter->title,
                     'slug' => $chapter->slug,
-                    'content' => nl2br(e($chapter->content)),
+                    'content' => $chapterBodyHtml,
                     'next_chapter_slug' => $nextChapter ? $nextChapter->slug : null,
                     'comments_count' => $chapter->comments->count(),
                 ],
             ]);
         }
-        
-        return view('chapters.show', compact('novel', 'chapter', 'previousChapter', 'nextChapter'));
+
+        return view('chapters.show', compact(
+            'novel',
+            'chapter',
+            'previousChapter',
+            'nextChapter',
+            'protectContent',
+            'chapterBodyHtml',
+        ));
+    }
+
+    private function readerWatermarkLabel(): string
+    {
+        if (Auth::check()) {
+            return Auth::user()->name.' · '.config('app.name', 'Quoros');
+        }
+
+        return (string) config('app.name', 'Quoros');
+    }
+
+    /**
+     * Sisipkan watermark tipis antar blok paragraf (pisah baris kosong). Tanpa watermark jika penulis/admin.
+     */
+    private function formatChapterBodyForDisplay(?string $content, string $watermarkLabel, bool $withWatermark): string
+    {
+        $raw = $content ?? '';
+        if (! $withWatermark) {
+            return nl2br(e($raw));
+        }
+
+        $normalized = str_replace(["\r\n", "\r"], "\n", $raw);
+        $paras = preg_split("/\n\s*\n/", $normalized, -1, PREG_SPLIT_NO_EMPTY);
+        $wm = '<span class="chapter-wm block text-center text-[10px] sm:text-xs my-5 text-slate-400/25 dark:text-slate-500/30 select-none pointer-events-none tracking-widest font-semibold" aria-hidden="true">'.e($watermarkLabel).'</span>';
+
+        if ($paras === false || count($paras) < 2) {
+            return nl2br(e($normalized)).$wm;
+        }
+
+        $parts = [];
+        foreach ($paras as $i => $p) {
+            $parts[] = nl2br(e(trim($p)));
+            if ($i < count($paras) - 1) {
+                $parts[] = $wm;
+            }
+        }
+
+        return implode('', $parts);
     }
 
     public function edit(Novel $novel, Chapter $chapter)
     {
         Gate::authorize('update', $chapter);
+
         return view('writer.chapters.edit', compact('novel', 'chapter'));
     }
 
@@ -158,10 +213,10 @@ class ChapterController extends Controller
         $chapter->title = $request->title;
         $chapter->content = $request->content;
         $chapter->status = $request->status;
-        
+
         if ($request->status === 'scheduled') {
             $chapter->published_at = $request->published_at;
-        } elseif ($request->status === 'published' && !$chapter->published_at) {
+        } elseif ($request->status === 'published' && ! $chapter->published_at) {
             $chapter->published_at = now();
         } elseif ($request->status === 'draft') {
             $chapter->published_at = null;

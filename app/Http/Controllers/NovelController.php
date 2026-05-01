@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Genre;
 use App\Models\Novel;
-use App\Models\Tag;
 use App\Models\NovelRequest;
 use App\Models\ReadingHistory;
+use App\Models\Tag;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class NovelController extends Controller
 {
@@ -27,17 +28,17 @@ class NovelController extends Controller
         }
 
         if ($request->search) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', '%'.$request->search.'%');
         }
 
         $novels = $query->latest()->paginate(12)->withQueryString();
-        
+
         // Featured Novels for Carousel (Selected by Admin)
         $featuredNovels = Novel::with(['author', 'genres'])
             ->where('is_featured', true)
             ->take(5)
             ->get();
-            
+
         // Fallback to top viewed if no featured novels selected
         if ($featuredNovels->isEmpty()) {
             $featuredNovels = Novel::with(['author', 'genres'])
@@ -74,44 +75,52 @@ class NovelController extends Controller
         return view('novels.index', compact('novels', 'genres', 'recentlyUpdated', 'weeklyTop', 'monthlyTop', 'featuredNovels'));
     }
 
- public function search(Request $request)
+    public function search(Request $request)
     {
         $search = $request->get('q');
-        $genre  = $request->get('genre');
+        $genre = $request->get('genre');
         $status = $request->get('status');
-        $type   = $request->get('type');
-        $sort   = $request->get('sort', 'latest');
- 
+        $type = $request->get('type');
+        $tag = $request->get('tag');
+        $sort = $request->get('sort', 'latest');
+
         $query = Novel::with(['author', 'genres']);
- 
+
         // Keyword search
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('alternative_title', 'like', "%{$search}%")
-                  ->orWhereHas('author', function ($q2) use ($search) {
-                      $q2->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('alternative_title', 'like', "%{$search}%")
+                    ->orWhereHas('author', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    });
             });
         }
- 
+
         // Genre filter
         if ($genre) {
             $query->whereHas('genres', function ($q) use ($genre) {
                 $q->where('slug', $genre);
             });
         }
- 
+
         // Status filter
         if ($status) {
             $query->where('status', $status);
         }
- 
+
         // Type filter
         if ($type) {
             $query->where('type', $type);
         }
- 
+
+        // Tag filter
+        if ($tag) {
+            $query->whereHas('tags', function ($q) use ($tag) {
+                $q->where('slug', $tag);
+            });
+        }
+
         // Sorting
         switch ($sort) {
             case 'rating':
@@ -127,11 +136,12 @@ class NovelController extends Controller
                 $query->latest();
                 break;
         }
- 
+
         $novels = $query->paginate(24)->withQueryString();
-        $genres = \App\Models\Genre::orderBy('name')->get();
- 
-        return view('novels.search', compact('novels', 'search', 'genres'));
+        $genres = Genre::orderBy('name')->get();
+        $tags = Tag::orderBy('name')->get();
+
+        return view('novels.search', compact('novels', 'search', 'genres', 'tags'));
     }
 
     public function updated()
@@ -139,8 +149,10 @@ class NovelController extends Controller
         $novels = Novel::with(['author', 'genres'])
             ->whereHas('chapters')
             ->withMax('chapters', 'created_at')
+            ->withCount('chapters')
             ->orderByDesc('chapters_max_created_at')
-            ->paginate(18);
+            ->paginate(18)
+            ->withQueryString();
 
         return view('novels.updated', compact('novels'));
     }
@@ -148,12 +160,14 @@ class NovelController extends Controller
     public function genres()
     {
         $genres = Genre::withCount('novels')->orderBy('name')->get();
+
         return view('novels.genres', compact('genres'));
     }
 
     public function tags()
     {
         $tags = Tag::withCount('novels')->orderBy('name')->get();
+
         return view('novels.tags', compact('tags'));
     }
 
@@ -162,14 +176,16 @@ class NovelController extends Controller
         $histories = ReadingHistory::where('user_id', Auth::id())
             ->with(['novel.author', 'chapter'])
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('user.history', compact('histories'));
     }
 
     public function requests()
     {
-        $requests = NovelRequest::with('user')->latest()->paginate(15);
+        $requests = NovelRequest::with('user')->latest()->paginate(15)->withQueryString();
+
         return view('user.requests', compact('requests'));
     }
 
@@ -195,6 +211,7 @@ class NovelController extends Controller
             ->withCount(['chapters', 'bookmarks'])
             ->latest()
             ->get();
+
         return view('writer.novels.index', compact('novels'));
     }
 
@@ -202,6 +219,7 @@ class NovelController extends Controller
     {
         $genres = Genre::all();
         $tags = Tag::all();
+
         return view('writer.novels.create', compact('genres', 'tags'));
     }
 
@@ -232,12 +250,12 @@ class NovelController extends Controller
         ]);
 
         $slug = Str::slug($request->title);
-        $count = Novel::where('slug', 'like', $slug . '%')->count();
+        $count = Novel::where('slug', 'like', $slug.'%')->count();
         if ($count > 0) {
-            $slug = $slug . '-' . ($count + 1);
+            $slug = $slug.'-'.($count + 1);
         }
 
-        $novel = new Novel();
+        $novel = new Novel;
         $novel->title = $request->title;
         $novel->alternative_title = $request->alternative_title;
         $novel->slug = $slug;
@@ -268,12 +286,12 @@ class NovelController extends Controller
     public function show(Novel $novel)
     {
         $novel->increment('view_count');
-        
+
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
 
-        $novel->load(['author', 'genres', 'tags', 'characters', 'reviews.user', 'chapters' => function($query) use ($isAuthorOrAdmin) {
+        $novel->load(['author', 'genres', 'tags', 'characters', 'reviews.user', 'chapters' => function ($query) use ($isAuthorOrAdmin) {
             $query->select('id', 'novel_id', 'title', 'slug', 'status', 'published_at', 'created_at');
-            if (!$isAuthorOrAdmin) {
+            if (! $isAuthorOrAdmin) {
                 $query->published();
             }
             $query->orderBy('created_at', 'asc')->orderBy('id', 'asc');
@@ -293,19 +311,19 @@ class NovelController extends Controller
         $tagIds = $novel->tags->pluck('id');
 
         $similarNovels = Novel::where('id', '!=', $novel->id)
-            ->where(function($query) use ($genreIds, $tagIds) {
-                $query->whereHas('genres', function($q) use ($genreIds) {
+            ->where(function ($query) use ($genreIds, $tagIds) {
+                $query->whereHas('genres', function ($q) use ($genreIds) {
                     $q->whereIn('genres.id', $genreIds);
                 })
-                ->orWhereHas('tags', function($q) use ($tagIds) {
-                    $q->whereIn('tags.id', $tagIds);
-                });
+                    ->orWhereHas('tags', function ($q) use ($tagIds) {
+                        $q->whereIn('tags.id', $tagIds);
+                    });
             })
             ->with(['author', 'genres'])
-            ->withCount(['genres as matched_genres_count' => function($query) use ($genreIds) {
+            ->withCount(['genres as matched_genres_count' => function ($query) use ($genreIds) {
                 $query->whereIn('genres.id', $genreIds);
             }])
-            ->withCount(['tags as matched_tags_count' => function($query) use ($tagIds) {
+            ->withCount(['tags as matched_tags_count' => function ($query) use ($tagIds) {
                 $query->whereIn('tags.id', $tagIds);
             }])
             ->orderByRaw('(matched_genres_count + matched_tags_count) DESC')
@@ -322,6 +340,7 @@ class NovelController extends Controller
 
         $genres = Genre::all();
         $tags = Tag::all();
+
         return view('writer.novels.edit', compact('novel', 'genres', 'tags'));
     }
 
@@ -406,7 +425,7 @@ class NovelController extends Controller
         $names = collect($request->input('character_name', []));
         $roles = collect($request->input('character_role', []));
         $descriptions = collect($request->input('character_description', []));
-        /** @var Collection<int, \Illuminate\Http\UploadedFile|null> $images */
+        /** @var Collection<int, UploadedFile|null> $images */
         $images = collect($request->file('character_image', []));
         $existingImages = collect($request->input('existing_character_image', []));
         $newImages = collect();

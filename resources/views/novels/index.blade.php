@@ -176,12 +176,12 @@
 <!-- Filters -->
 <div class="mb-8 -mx-6 px-6 overflow-x-auto no-scrollbar">
     <div class="flex items-center gap-2 min-w-max pb-2">
-        <a href="{{ route('home') }}" 
+        <a href="{{ route('novels.search') }}" 
            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap {{ !request('genre') ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-indigo-600 dark:hover:border-indigo-400' }} transition-all shadow-sm">
            Semua
         </a>
         @foreach($genres as $genre)
-            <a href="{{ route('home', ['genre' => $genre->slug]) }}" 
+            <a href="{{ route('novels.search', ['genre' => $genre->slug]) }}" 
                class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap {{ request('genre') == $genre->slug ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-indigo-600 dark:hover:border-indigo-400' }} transition-all shadow-sm">
                {{ $genre->name }}
             </a>
@@ -288,9 +288,11 @@
             @endforelse
         </div>
         
-        <div class="mt-8">
-            {{ $novels->links() }}
-        </div>
+        @if($novels->hasPages())
+            <div class="mt-8 flex justify-center">
+                {{ $novels->links() }}
+            </div>
+        @endif
     </div>
 
     <!-- Right Column: Leaderboard (1/4 width on desktop) -->

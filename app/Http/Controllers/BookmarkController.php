@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bookmark;
+use App\Models\Chapter;
 use App\Models\Novel;
-use Illuminate\Http\Request;
+use App\Models\ReadingHistory;
 use Illuminate\Support\Facades\Auth;
 
 class BookmarkController extends Controller
@@ -16,21 +17,22 @@ class BookmarkController extends Controller
             ->with(['novel.author', 'novel.genres'])
             ->withCount('novel as total_chapters')
             ->latest()
-            ->paginate(18);
+            ->paginate(18)
+            ->withQueryString();
 
         // Menambahkan progress membaca untuk setiap bookmark
         foreach ($bookmarks as $bookmark) {
-            $lastRead = \App\Models\ReadingHistory::where('user_id', $user->id)
+            $lastRead = ReadingHistory::where('user_id', $user->id)
                 ->where('novel_id', $bookmark->novel_id)
                 ->with('chapter')
                 ->latest()
                 ->first();
 
-            $totalChapters = \App\Models\Chapter::where('novel_id', $bookmark->novel_id)->count();
-            
+            $totalChapters = Chapter::where('novel_id', $bookmark->novel_id)->count();
+
             // Mencari urutan bab yang dibaca (berdasarkan ID atau urutan waktu)
             // Di sini kita asumsikan progress berdasarkan jumlah bab unik yang pernah dibaca oleh user untuk novel tersebut
-            $readChaptersCount = \App\Models\ReadingHistory::where('user_id', $user->id)
+            $readChaptersCount = ReadingHistory::where('user_id', $user->id)
                 ->where('novel_id', $bookmark->novel_id)
                 ->distinct('chapter_id')
                 ->count('chapter_id');
@@ -47,13 +49,14 @@ class BookmarkController extends Controller
     public function toggle(Novel $novel)
     {
         $user = Auth::user();
-        
+
         $bookmark = Bookmark::where('user_id', $user->id)
-                            ->where('novel_id', $novel->id)
-                            ->first();
+            ->where('novel_id', $novel->id)
+            ->first();
 
         if ($bookmark) {
             $bookmark->delete();
+
             return back()->with('success', 'Novel dihapus dari bookmark.');
         }
 
