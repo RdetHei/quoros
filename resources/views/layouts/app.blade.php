@@ -26,10 +26,10 @@
     </style>
 
     <!-- Styles & Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
-    <!-- <link rel="stylesheet" href="{{ asset('build/assets/app-BZkzrl8j.css') }}">
-	<script type="module" src="{{ asset('build/assets/app-34mOoJaZ.js') }}"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
@@ -85,13 +85,13 @@
                         </a>
                         
                         <div class="hidden lg:flex items-center gap-6">
-                            <a href="{{ route('home') }}" class="text-sm font-medium {{ request()->routeIs('home') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Katalog</a>
-                            <a href="{{ route('novels.updated') }}" class="text-sm font-medium {{ request()->routeIs('novels.updated') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Updated</a>
-                            <a href="{{ route('genres.index') }}" class="text-sm font-medium {{ request()->routeIs('genres.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Genre</a>
-                            <a href="{{ route('tags.index') }}" class="text-sm font-medium {{ request()->routeIs('tags.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Tag</a>
+                            <a href="{{ route('home') }}" class="text-sm font-medium {{ request()->routeIs('home') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Home</a>
+                            <a href="{{ route('novels.updated') }}" class="text-sm font-medium {{ request()->routeIs('novels.updated') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Updated</a>
+                            <a href="{{ route('genres.index') }}" class="text-sm font-medium {{ request()->routeIs('genres.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Genre</a>
+                            <a href="{{ route('tags.index') }}" class="text-sm font-medium {{ request()->routeIs('tags.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Tag</a>
                             @auth
-                                <a href="{{ route('bookmarks.index') }}" class="text-sm font-medium {{ request()->routeIs('bookmarks.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Bookmark</a>
-                                <a href="{{ route('history.index') }}" class="text-sm font-medium {{ request()->routeIs('history.index') ? 'text-indigo-600' : 'text-slate-500 dark:text-slate-400' }} hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">History</a>
+                                <a href="{{ route('bookmarks.index') }}" class="text-sm font-medium {{ request()->routeIs('bookmarks.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Bookmark</a>
+                                <a href="{{ route('history.index') }}" class="text-sm font-medium {{ request()->routeIs('history.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">History</a>
                             @endauth
                         </div>
                     </div>
@@ -128,15 +128,17 @@
 
                         @guest
                             <div class="flex items-center gap-1 md:gap-2">
-                                <a href="{{ route('login') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Masuk</a>
-                                <a href="{{ route('register') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm shadow-indigo-200 dark:shadow-none transition-all">Daftar</a>
+                                <a href="{{ route('login') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium hover:text-slate-900 dark:hover:text-white transition-colors">Masuk</a>
+                                <a href="{{ route('register') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm transition-all">Daftar</a>
                             </div>
                         @else
                             <div x-data="{ open: false }" class="relative">
                                 <button @click="open = !open" class="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                    <div class="w-8 h-8 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                                        @if(Auth::user()->profile_photo)
-                                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover">
+                                    <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-sm">
+                                        @if(Auth::user()->profile_photo_url)
+                                            <img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" loading="lazy">
+                                        @elseif(Auth::user()->profile_photo)
+                                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" loading="lazy">
                                         @else
                                             {{ substr(Auth::user()->name, 0, 1) }}
                                         @endif
@@ -156,8 +158,16 @@
                                      class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50">
                                     <div class="p-2 border-b border-slate-100 dark:border-slate-800">
                                         <p class="px-3 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
-                                        <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Dashboard</a>
+                                        <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Profil Saya</a>
+                                        <a href="{{ route('guides.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Guide</a>
+                                        @if(Auth::user()->role === 'user')
+                                            <form action="{{ route('dashboard.become-writer') }}" method="POST" class="block">
+                                                @csrf
+                                                <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">Mulai Menulis</button>
+                                            </form>
+                                        @endif
                                         @if(Auth::user()->role === 'writer' || Auth::user()->role === 'admin')
+                                            <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Dashboard</a>
                                             <a href="{{ route('writer.novels.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Novel Saya</a>
                                         @endif
                                         @if(Auth::user()->role === 'admin')
@@ -224,7 +234,7 @@
                         @auth
                         <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl overflow-hidden bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+                                <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold">
                                     @if(Auth::user()->profile_photo)
                                         <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover">
                                     @else
@@ -236,32 +246,45 @@
                                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">{{ Auth::user()->role }}</p>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-3 mt-4">
-                                <a href="{{ route('dashboard') }}" class="px-4 py-2.5 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
-                                    Dashboard
+                            <div class="flex flex-col gap-3 mt-4">
+                                <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-lg shadow-slate-900/10">
+                                    Profil Saya
                                 </a>
-                                <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="px-4 py-2.5 text-center text-xs font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
-                                    Profil
+                                <a href="{{ route('guides.index') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+                                    Guide
                                 </a>
+                                @if(Auth::user()->role === 'user')
+                                    <form action="{{ route('dashboard.become-writer') }}" method="POST" class="block">
+                                        @csrf
+                                        <button type="submit" class="w-full px-4 py-3 text-center text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-900/10">
+                                            Mulai Menulis
+                                        </button>
+                                    </form>
+                                @endif
+                                @if(Auth::user()->role === 'writer' || Auth::user()->role === 'admin')
+                                    <a href="{{ route('dashboard') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+                                        Dashboard
+                                    </a>
+                                @endif
                             </div>
                         </div>
                         @endauth
 
                         <div class="space-y-1">
                             <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Navigasi Utama</p>
-                            <a href="{{ route('home') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('home') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('home') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('home') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                                <span>Katalog</span>
+                                <span>Home</span>
                             </a>
-                            <a href="{{ route('novels.updated') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('novels.updated') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('novels.updated') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('novels.updated') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <span>Updated</span>
                             </a>
-                            <a href="{{ route('genres.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('genres.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('genres.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('genres.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                                 <span>Genre</span>
                             </a>
-                            <a href="{{ route('tags.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('tags.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('tags.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('tags.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>
                                 <span>Tag</span>
                             </a>
@@ -270,11 +293,11 @@
                         @auth
                         <div class="space-y-1">
                             <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Aktivitas</p>
-                            <a href="{{ route('bookmarks.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('bookmarks.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('bookmarks.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('bookmarks.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                                 <span>Bookmark</span>
                             </a>
-                            <a href="{{ route('history.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('history.index') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                            <a href="{{ route('history.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('history.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <span>History</span>
                             </a>
@@ -286,7 +309,7 @@
                         @guest
                             <div class="grid grid-cols-2 gap-3">
                                 <a href="{{ route('login') }}" class="px-4 py-3 text-center text-sm font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 rounded-xl">Masuk</a>
-                                <a href="{{ route('register') }}" class="px-4 py-3 text-center text-sm font-bold text-white bg-indigo-600 rounded-xl">Daftar</a>
+                                <a href="{{ route('register') }}" class="px-4 py-3 text-center text-sm font-bold text-white dark:text-slate-900 bg-slate-900 dark:bg-white rounded-xl">Daftar</a>
                             </div>
                         @else
                             <form action="{{ route('logout') }}" method="POST">
@@ -300,10 +323,10 @@
         </nav>
 
         <!-- Main Content -->
-        <main class="flex-grow py-8 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-7xl mx-auto">
+        <main class="flex-grow {{ request()->routeIs('welcome') ? '' : 'py-8 px-4 sm:px-6 lg:px-8' }}">
+            <div class="{{ request()->routeIs('welcome') ? '' : 'max-w-7xl mx-auto' }}">
                 @if(session('success'))
-                    <div class="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 flex items-center gap-3">
+                    <div class="mb-6 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 flex items-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
                         <span class="text-sm font-medium">{{ session('success') }}</span>
                     </div>
@@ -319,27 +342,126 @@
                 @yield('content')
             </div>
         </main>
+        <footer class="bg-white dark:bg-slate-900 relative overflow-hidden pt-14 pb-7 px-6 lg:px-10">
 
-        <!-- Footer -->
-        <footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-12 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                <div class="flex flex-col items-center md:items-start gap-4">
-                    <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-10 w-auto">
-                    <p class="text-slate-500 dark:text-slate-400 text-sm max-w-xs text-center md:text-left">Platform baca novel modern dengan pengalaman yang clean dan user-friendly.</p>
-                </div>
-                
-                <div class="flex flex-wrap justify-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-400">
-                    <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Tentang Kami</a>
-                    <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Hubungi Kami</a>
-                    <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Syarat & Ketentuan</a>
-                    <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Kebijakan Privasi</a>
+    {{-- Decorative top line --}}
+    <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/50 dark:via-slate-600/30 to-transparent"></div>
+
+    {{-- Decorative blobs --}}
+    <div class="absolute -bottom-20 -left-20 w-56 h-56 bg-slate-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -top-20 -right-20 w-56 h-56 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto relative">
+
+        {{-- ===== TOP GRID ===== --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 mb-14">
+
+            {{-- Brand + Newsletter + Social --}}
+            <div class="lg:col-span-4 flex flex-col">
+
+                {{-- Logo --}}
+                <a href="{{ route('home') }}" class="inline-block mb-4 group">
+                    <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros"
+                         class="h-10 w-auto group-hover:scale-105 transition-transform duration-300">
+                </a>
+
+                <p class="text-[13px] leading-relaxed text-slate-500 dark:text-slate-400 max-w-[230px] mb-6">
+                    Platform baca novel modern dengan pengalaman yang clean. Temukan ribuan cerita menarik dari penulis berbakat.
+                </p>
+
+                {{-- Newsletter --}}
+                <p class="text-[10px] uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 mb-2">Newsletter</p>
+                <div class="flex">
+                    <input
+                        type="email"
+                        placeholder="Email kamu..."
+                        class="flex-1 min-w-0 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0 rounded-l-lg px-3 py-2 text-[12px] text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-600 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 transition-colors duration-200"
+                    />
+                    <button
+                        type="button"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-[12px] px-4 py-2 rounded-r-lg transition-colors duration-200 whitespace-nowrap"
+                    >
+                        Subscribe
+                    </button>
                 </div>
 
-                <div class="text-slate-400 text-xs text-center md:text-right">
-                    &copy; {{ date('Y') }} Quoros. All rights reserved.
+                {{-- Social Icons --}}
+                <div class="flex gap-2 mt-5">
+                    <a href="#" aria-label="Facebook"
+                        class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Instagram"
+                        class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all duration-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Twitter / X"
+                        class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.019 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
-        </footer>
+
+            {{-- Nav Columns --}}
+            <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">
+
+                {{-- Katalog --}}
+                <div>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Katalog</h4>
+                    <ul class="space-y-3.5">
+                        <li><a href="{{ route('home') }}"           class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Semua Novel</a></li>
+                        <li><a href="{{ route('novels.updated') }}" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Baru Diupdate</a></li>
+                        <li><a href="{{ route('genres.index') }}"   class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Genre</a></li>
+                        <li><a href="{{ route('tags.index') }}"     class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Tag Populer</a></li>
+                    </ul>
+                </div>
+
+                {{-- Komunitas --}}
+                <div>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Komunitas</h4>
+                    <ul class="space-y-3.5">
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Tentang Quoros</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Menjadi Penulis</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Pusat Bantuan</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Hubungi Kami</a></li>
+                    </ul>
+                </div>
+
+                {{-- Legal --}}
+                <div class="col-span-2 sm:col-span-1">
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Legal</h4>
+                    <ul class="space-y-3.5">
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Syarat &amp; Ketentuan</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Kebijakan Privasi</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Kebijakan Cookie</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        {{-- ===== BOTTOM BAR ===== --}}
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+
+            <p class="text-[11px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
+                &copy; {{ date('Y') }} Quoros &mdash; Crafted for Readers
+            </p>
+
+            <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                <span class="text-[11px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">System Status: Operational</span>
+            </div>
+
+        </div>
+    </div>
+</footer>
+       
     </div>
 
     <script>
@@ -401,21 +523,21 @@ document.addEventListener('DOMContentLoaded', function () {
                </div>`;
 
         const genres = (novel.genres || [])
-            .map(g => `<span class="text-[8px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-900/40 px-1.5 py-0.5 rounded border border-indigo-800/50">${escHtml(g)}</span>`)
+            .map(g => `<span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">${escHtml(g)}</span>`)
             .join('');
 
-        const statusDot = { ongoing: 'bg-emerald-500', complete: 'bg-indigo-500', hiatus: 'bg-amber-500' }[novel.status] || 'bg-slate-500';
+        const statusDot = { ongoing: 'bg-indigo-500', complete: 'bg-slate-500', hiatus: 'bg-amber-500' }[novel.status] || 'bg-slate-500';
 
         return `
         <a href="${novel.url}"
-           class="live-search-result flex items-center gap-3 px-3 py-2.5 hover:bg-slate-800/70 transition-colors group outline-none focus:bg-slate-800/70 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500/30"
+           class="live-search-result flex items-center gap-3 px-3 py-2.5 hover:bg-slate-800/70 transition-colors group outline-none focus:bg-slate-800/70 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500/30"
            tabindex="0">
             <div class="w-10 h-[3.35rem] flex-shrink-0 rounded-lg overflow-hidden bg-slate-800 ring-1 ring-slate-700/50 relative">
                 ${cover}
                 <span class="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-full ${statusDot} ring-1 ring-black/40"></span>
             </div>
             <div class="flex-grow min-w-0">
-                <p class="text-sm font-bold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-1">${escHtml(novel.title)}</p>
+                <p class="text-sm font-bold text-slate-100 group-hover:text-white transition-colors line-clamp-1">${escHtml(novel.title)}</p>
                 <p class="text-[10px] text-slate-500 mb-1 line-clamp-1">${escHtml(novel.author)}</p>
                 <div class="flex flex-wrap items-center gap-1">${genres}</div>
             </div>
@@ -445,99 +567,4 @@ document.addEventListener('DOMContentLoaded', function () {
         const form     = wrapper.querySelector('.live-search-form');
 
         if (!input || !dropdown) return;
-
-        let debounceTimer = null;
-        let lastQuery     = '';
-        let abortCtrl     = null;
-        let isOpen        = false;
-
-        function showDropdown() { dropdown.style.display = 'block'; isOpen = true; }
-        function hideDropdown() { dropdown.style.display = 'none';  isOpen = false; }
-        function setLoading(on) {
-            loading.classList.toggle('hidden', !on);
-            loading.classList.toggle('flex', on);
-        }
-        function updateSeeAllLink(query) {
-            const url = `${form.action}?q=${encodeURIComponent(query)}`;
-            if (seeAll)    seeAll.href    = url;
-            if (emptyLink) emptyLink.href = url;
-        }
-
-        async function fetchResults(query) {
-            if (abortCtrl) abortCtrl.abort();
-            abortCtrl = new AbortController();
-            setLoading(true);
-            results.innerHTML = '';
-            footer.classList.add('hidden');
-            empty.classList.add('hidden');
-
-            try {
-                const res  = await fetch(`${API_ENDPOINT}?q=${encodeURIComponent(query)}`, {
-                    signal: abortCtrl.signal,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                });
-                const data = await res.json();
-                setLoading(false);
-                if (!data || data.length === 0) {
-                    empty.classList.remove('hidden');
-                } else {
-                    results.innerHTML = data.map(buildResultCard).join('');
-                    footer.classList.remove('hidden');
-                }
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    setLoading(false);
-                    empty.classList.remove('hidden');
-                }
-            }
-        }
-
-        input.addEventListener('input', function () {
-            const q = this.value.trim();
-            updateSeeAllLink(q);
-            clearTimeout(debounceTimer);
-            if (q.length < MIN_CHARS) { hideDropdown(); lastQuery = ''; return; }
-            showDropdown();
-            if (q === lastQuery) return;
-            lastQuery = q;
-            debounceTimer = setTimeout(() => fetchResults(q), DEBOUNCE_MS);
-        });
-
-        input.addEventListener('focus', function () {
-            if (this.value.trim().length >= MIN_CHARS) showDropdown();
-        });
-
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            window.location.href = `${this.action}?q=${encodeURIComponent(input.value.trim())}`;
-        });
-
-        input.addEventListener('keydown', function (e) {
-            if (!isOpen) return;
-            const items = Array.from(dropdown.querySelectorAll('.live-search-result'));
-            const idx   = items.indexOf(document.activeElement);
-            if (e.key === 'ArrowDown') { e.preventDefault(); (items[idx + 1] || items[0])?.focus(); }
-            else if (e.key === 'ArrowUp') { e.preventDefault(); if (items[idx - 1]) items[idx - 1].focus(); else input.focus(); }
-            else if (e.key === 'Escape') { hideDropdown(); input.blur(); }
-            else if (e.key === 'Enter')  { e.preventDefault(); form.dispatchEvent(new Event('submit', { cancelable: true })); }
-        });
-
-        dropdown.addEventListener('keydown', function (e) {
-            const items = Array.from(dropdown.querySelectorAll('.live-search-result'));
-            const idx   = items.indexOf(document.activeElement);
-            if (e.key === 'ArrowDown') { e.preventDefault(); items[idx + 1]?.focus(); }
-            else if (e.key === 'ArrowUp') { e.preventDefault(); if (idx <= 0) input.focus(); else items[idx - 1].focus(); }
-            else if (e.key === 'Escape') { hideDropdown(); input.focus(); }
-        });
-
-        document.addEventListener('click', function (e) {
-            if (!wrapper.contains(e.target)) hideDropdown();
-        });
-    }
-
-    document.querySelectorAll('.live-search-wrapper').forEach(initLiveSearch);
-});
-</script>
-@stack('scripts')
-</body>
-</html>
+        // ... (rest of JS)

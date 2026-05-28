@@ -12,7 +12,7 @@
 })" class="max-w-4xl mx-auto px-4 sm:px-0 pb-20">
     <!-- Reader Progress & Sticky Header (Mobile) -->
     <div class="fixed top-0 left-0 w-full h-1.5 bg-slate-200 dark:bg-slate-800 z-[60] md:hidden">
-        <div class="h-full bg-indigo-600 transition-all duration-300 shadow-[0_0_10px_rgba(79,70,229,0.5)]" id="scroll-progress"></div>
+        <div class="h-full bg-slate-800 dark:bg-slate-400 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.1)]" id="scroll-progress"></div>
     </div>
 
     <div id="pwa-offline-banner" class="hidden fixed top-14 md:top-20 left-1/2 -translate-x-1/2 z-[70] max-w-md w-[calc(100%-2rem)] px-4 py-2.5 rounded-xl bg-amber-950/95 border border-amber-700/50 text-amber-100 text-xs font-semibold text-center shadow-lg" role="status">
@@ -20,11 +20,11 @@
     </div>
 
     <!-- Chapter Navigation (Top) -->
-    <div class="flex items-center justify-between mb-6 p-3 md:p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+    <div class="flex items-center justify-between mb-6 p-2 md:p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
         <a href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}" 
-           class="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 text-sm font-bold rounded-xl transition-all {{ $previousChapter ? 'text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed' }}">
+           class="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 text-sm font-bold rounded-xl transition-all {{ $previousChapter ? 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-            <span class="hidden sm:block">Sebelumnya</span>
+            <span class="hidden sm:block uppercase tracking-wider">Previous</span>
         </a>
 
         <div class="text-center flex-1 mx-2 md:mx-4 min-w-0">
@@ -43,9 +43,9 @@
             </button>
 
             <a href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}" 
-               class="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 text-sm font-bold rounded-xl transition-all {{ $nextChapter ? 'text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed' }}">
-                <span class="hidden sm:block">Selanjutnya</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" transform="rotate(180 10 10)" /></svg>
+               class="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 text-sm font-bold rounded-xl transition-all {{ $nextChapter ? 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed' }}">
+                <span class="hidden sm:block uppercase tracking-wider">Next</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
             </a>
         </div>
     </div>
@@ -65,29 +65,29 @@
             <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Ukuran Font</label>
                 <div class="flex items-center gap-2">
-                    <button @click="updateFontSize('text-base')" :class="fontSize === 'text-base' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-bold transition-all">A</button>
-                    <button @click="updateFontSize('text-lg')" :class="fontSize === 'text-lg' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-base font-bold transition-all">A</button>
-                    <button @click="updateFontSize('text-xl')" :class="fontSize === 'text-xl' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-lg font-bold transition-all">A</button>
-                    <button @click="updateFontSize('text-2xl')" :class="fontSize === 'text-2xl' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-xl font-bold transition-all">A</button>
+                    <button @click="updateFontSize('text-base')" :class="fontSize === 'text-base' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-bold transition-all">A</button>
+                    <button @click="updateFontSize('text-lg')" :class="fontSize === 'text-lg' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-base font-bold transition-all">A</button>
+                    <button @click="updateFontSize('text-xl')" :class="fontSize === 'text-xl' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-lg font-bold transition-all">A</button>
+                    <button @click="updateFontSize('text-2xl')" :class="fontSize === 'text-2xl' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-xl font-bold transition-all">A</button>
                 </div>
             </div>
             <!-- Font Family -->
             <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Jenis Font</label>
                 <div class="flex items-center gap-2">
-                    <button @click="updateFontFamily('font-sans')" :class="fontFamily === 'font-sans' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-sans transition-all">Sans</button>
-                    <button @click="updateFontFamily('font-serif')" :class="fontFamily === 'font-serif' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-serif transition-all">Serif</button>
-                    <button @click="updateFontFamily('font-mono')" :class="fontFamily === 'font-mono' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-mono transition-all">Mono</button>
+                    <button @click="updateFontFamily('font-sans')" :class="fontFamily === 'font-sans' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-sans transition-all">Sans</button>
+                    <button @click="updateFontFamily('font-serif')" :class="fontFamily === 'font-serif' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-serif transition-all">Serif</button>
+                    <button @click="updateFontFamily('font-mono')" :class="fontFamily === 'font-mono' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-mono transition-all">Mono</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Reading Area Container (anti-copy / watermark hanya di area ini, bukan komentar) -->
-    <div id="chapters-container" class="@if($protectContent ?? false) select-none @endif">
+    <div id="chapters-container" class="@if($protectContent ?? false) select-none @endif -mx-4 sm:mx-0">
         <!-- Current Chapter -->
         <div data-slug="{{ $chapter->slug }}" data-title="{{ $chapter->title }}">
-            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mb-10">
+            <div class="bg-white dark:bg-slate-900 sm:rounded-3xl p-6 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-none border-y sm:border border-slate-100 dark:border-slate-800 mb-10">
                 @if($protectContent ?? false)
                 <div class="reader-chapter-shell" @contextmenu.prevent>
                 @endif
@@ -99,9 +99,9 @@
                 @endif
 
                 @if($chapter->file_path)
-                    <div class="mt-12 p-6 md:p-8 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-center">
-                        <p class="text-indigo-700 dark:text-indigo-400 font-medium mb-4 text-base md:text-lg">Tersedia dalam format file untuk dibaca offline:</p>
-                        <a href="{{ asset('storage/' . $chapter->file_path) }}" class="inline-flex items-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 dark:shadow-none w-full sm:w-auto justify-center" target="_blank">
+                    <div class="mt-12 p-6 md:p-8 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-2xl text-center">
+                        <p class="text-slate-700 dark:text-slate-300 font-medium mb-4 text-base md:text-lg">Tersedia dalam format file untuk dibaca offline:</p>
+                        <a href="{{ asset('storage/' . $chapter->file_path) }}" class="inline-flex items-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-xl shadow-slate-900/10 w-full sm:w-auto justify-center" target="_blank">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                             Download Chapter File
                         </a>
@@ -114,12 +114,12 @@
     <!-- Autoload Trigger -->
     <div id="autoload-trigger" class="h-40 flex items-center justify-center mb-10 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
         <template x-if="isLoading">
-            <div class="flex items-center gap-3 text-indigo-600">
+            <div class="flex items-center gap-3 text-slate-800 dark:text-white">
                 <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span class="font-bold text-sm uppercase tracking-widest">Memuat Chapter Selanjutnya...</span>
+                <span class="font-bold text-sm uppercase tracking-widest">Loading Next Chapter...</span>
             </div>
         </template>
         <template x-if="!isLoading && nextChapterSlug">
@@ -133,26 +133,26 @@
     <!-- Chapter Navigation (Bottom) -->
     <div class="flex items-center justify-between mb-16 gap-2 md:gap-4">
         <a href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}" 
-           class="flex-1 flex items-center justify-center gap-2 px-3 md:px-4 py-3 md:py-4 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-600 transition-all shadow-sm {{ !$previousChapter ? 'opacity-50 cursor-not-allowed' : '' }}">
+           class="flex-1 flex items-center justify-center gap-2 px-3 md:px-4 py-3 md:py-4 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-400 transition-all shadow-sm {{ !$previousChapter ? 'opacity-50 cursor-not-allowed' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-            <span class="hidden sm:inline">Sebelumnya</span>
+            <span class="hidden sm:inline uppercase tracking-wider">Previous</span>
         </a>
 
-        <a href="{{ route('novels.show', $novel->slug) }}" class="p-3 md:p-4 bg-white dark:bg-slate-900 text-slate-400 hover:text-indigo-600 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shadow-sm shrink-0">
+        <a href="{{ route('novels.show', $novel->slug) }}" class="p-3 md:p-4 bg-white dark:bg-slate-900 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shadow-sm shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
         </a>
 
         <a id="next-chapter-link" href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}" 
-           class="flex-1 flex items-center justify-center gap-2 px-3 md:px-4 py-3 md:py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 dark:shadow-none {{ !$nextChapter ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
-            <span class="hidden sm:inline">Selanjutnya</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" transform="rotate(180 10 10)" /></svg>
+           class="flex-1 flex items-center justify-center gap-2 px-3 md:px-4 py-3 md:py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-xl shadow-slate-900/10 {{ !$nextChapter ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
+            <span class="hidden sm:inline uppercase tracking-wider">Next</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
         </a>
     </div>
 
     <!-- Comments Section -->
     <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 border border-slate-100 dark:border-slate-800 shadow-sm">
         <h2 class="text-xl md:text-2xl font-bold mb-8 flex items-center gap-3 text-slate-900 dark:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
             Diskusi ({{ $chapter->comments->count() }})
         </h2>
 
@@ -161,17 +161,17 @@
                 @csrf
                 <div class="relative">
                     <textarea name="content" rows="3" 
-                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all placeholder-slate-400" 
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-white dark:focus:bg-slate-900 transition-all placeholder-slate-400" 
                         placeholder="Bagikan pemikiranmu tentang chapter ini..."></textarea>
                     <div class="mt-3 flex justify-end">
-                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none">Kirim Komentar</button>
+                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg shadow-slate-900/10">Kirim Komentar</button>
                     </div>
                 </div>
             </form>
         @else
             <div class="mb-10 p-6 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-center">
                 <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium text-sm">Ingin ikut berdiskusi?</p>
-                <a href="{{ route('login') }}" class="inline-block w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-indigo-200 dark:shadow-none">Login Sekarang</a>
+                <a href="{{ route('login') }}" class="inline-block w-full sm:w-auto px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm transition-all shadow-lg shadow-slate-900/10">Login Sekarang</a>
             </div>
         @endauth
 
@@ -179,7 +179,7 @@
             @forelse($chapter->comments as $comment)
                 <div class="flex gap-3 md:gap-4 group">
                     <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}"
-                       class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs md:text-sm hover:ring-2 hover:ring-indigo-500/40 transition-all"
+                       class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs md:text-sm hover:ring-2 hover:ring-slate-500/40 transition-all"
                        title="Lihat profil">
                         @if($comment->user->profile_photo)
                             <img src="{{ asset('storage/' . $comment->user->profile_photo) }}" alt="" class="w-full h-full object-cover rounded-full">
@@ -189,7 +189,7 @@
                     </a>
                     <div class="flex-grow">
                         <div class="flex items-center justify-between mb-1">
-                            <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}" class="font-bold text-xs md:text-sm text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{{ $comment->user->name }}</a>
+                            <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}" class="font-bold text-xs md:text-sm text-slate-900 dark:text-white hover:text-slate-900 dark:hover:text-white transition-colors">{{ $comment->user->name }}</a>
                             <span class="text-[9px] md:text-[10px] font-medium text-slate-400 uppercase tracking-widest">{{ $comment->created_at->diffForHumans() }}</span>
                         </div>
                         <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $comment->content }}</p>
@@ -200,7 +200,7 @@
                                 <form action="{{ route('reactions.toggle', ['type' => 'comment', 'id' => $comment->id]) }}" method="POST" class="inline">
                                     @csrf
                                     <input type="hidden" name="reaction_type" value="like">
-                                    <button type="submit" class="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all {{ $comment->likes->where('user_id', Auth::id())->first() ? 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30' : 'text-slate-500 hover:text-indigo-600' }}">
+                                    <button type="submit" class="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all {{ $comment->likes->where('user_id', Auth::id())->first() ? 'text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-700 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="{{ $comment->likes->where('user_id', Auth::id())->first() ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.757c1.246 0 2.256 1.01 2.256 2.256 0 .42-.116.83-.335 1.189l-2.723 4.856c-.466.83-1.34 1.343-2.285 1.343H10m4-9.644V7a3 3 0 00-3-3H9m1.5 14H7a3 3 0 01-3-3V10a3 3 0 013-3h2.5" />
                                         </svg>

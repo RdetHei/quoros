@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Novel;
 use App\Models\ReadingHistory;
 use App\Models\Announcement;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,13 @@ use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
+    protected $cloudinaryService;
+
+    public function __construct(CloudinaryService $cloudinaryService)
+    {
+        $this->cloudinaryService = $cloudinaryService;
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -96,11 +104,12 @@ class DashboardController extends Controller
         $data['is_public_reading_list'] = $request->boolean('is_public_reading_list');
 
         if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo) {
-                Storage::disk('public')->delete($user->profile_photo);
+            if ($user->profile_photo_public_id) {
+                $this->cloudinaryService->deleteImage($user->profile_photo_public_id);
             }
-            $path = $request->file('profile_photo')->store('profiles', 'public');
-            $data['profile_photo'] = $path;
+            $result = $this->cloudinaryService->uploadProfile($request->file('profile_photo'));
+            $data['profile_photo_url'] = $result['url'];
+            $data['profile_photo_public_id'] = $result['public_id'];
         }
 
         $user->update($data);

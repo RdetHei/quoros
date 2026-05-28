@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             GenreTagSeeder::class,
             UserSeeder::class,
             NovelSeeder::class,
+            AnnouncementSeeder::class,
+            GuideSeeder::class,
         ]);
     }
 }

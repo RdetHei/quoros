@@ -57,6 +57,13 @@ class BookmarkController extends Controller
         if ($bookmark) {
             $bookmark->delete();
 
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => 'removed',
+                    'message' => 'Novel dihapus dari bookmark.'
+                ]);
+            }
+
             return back()->with('success', 'Novel dihapus dari bookmark.');
         }
 
@@ -64,6 +71,13 @@ class BookmarkController extends Controller
             'user_id' => $user->id,
             'novel_id' => $novel->id,
         ]);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'status' => 'added',
+                'message' => 'Novel ditambahkan ke bookmark.'
+            ]);
+        }
 
         return back()->with('success', 'Novel ditambahkan ke bookmark.');
     }

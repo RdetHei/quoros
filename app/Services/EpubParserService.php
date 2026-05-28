@@ -55,7 +55,7 @@ class EpubParserService
         }
 
         // 3. Ekstrak konten dari setiap file di spine
-        $chapters = [];
+        $allChapters = [];
         foreach ($spine as $index => $href) {
             $fullPath = $baseDir . $href;
             $content = $zip->getFromName($fullPath);
@@ -68,14 +68,55 @@ class EpubParserService
                 continue;
             }
 
-            $chapters[] = [
-                'title' => $chapterData['title'] ?: "Chapter " . ($index + 1),
-                'content' => $chapterData['content']
-            ];
+            // Cek apakah di dalam satu file ini ada banyak bab (berdasarkan h1/h2 atau keyword)
+            $subChapters = $this->splitInternalChapters($chapterData);
+            foreach ($subChapters as $sub) {
+                $allChapters[] = $sub;
+            }
         }
 
         $zip->close();
-        return $chapters;
+        return $allChapters;
+    }
+
+    private function splitInternalChapters($chapterData)
+    {
+        $content = $chapterData['content'];
+        $title = $chapterData['title'];
+
+        // Pattern untuk mendeteksi pemisah bab di dalam HTML (h1, h2, atau teks tebal/besar yang mengandung keyword)
+        $pattern = '/<(h[1-2])>(.*?)<\/\1>|(?:\n|^|<p>)\s*(?:chapter|chp|eps|episode|bab|bagian|part)\s*\d+/i';
+        
+        if (preg_match_all($pattern, $content, $matches, PREG_OFFSET_CAPTURE)) {
+            // Jika ditemukan penanda bab, pecah berdasarkan itu
+            if (count($matches[0]) > 0) {
+                $parts = preg_split($pattern, $content);
+                $chapters = [];
+                
+                foreach ($matches[0] as $index => $match) {
+                    $matchText = $match[0];
+                    // Ambil judul dari match (bersihkan tag jika itu h1/h2)
+                    $cTitle = trim(strip_tags($matchText));
+                    $cContent = $parts[$index + 1] ?? '';
+                    
+                    if (!empty(trim(strip_tags($cContent)))) {
+                        $chapters[] = [
+                            'title' => $cTitle,
+                            'content' => trim($cContent)
+                        ];
+                    }
+                }
+
+                // Jika berhasil memecah, kembalikan. Jika tidak, fallback ke satu bab.
+                if (!empty($chapters)) return $chapters;
+            }
+        }
+
+        // Fallback: satu file = satu bab
+        return [[
+            'title' => $title ?: "Chapter",
+            'content' => $content
+        ]];
     }
 
     private function cleanChapterContent($html)

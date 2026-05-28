@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ImageUploadRequest;
+use App\Services\CloudinaryService;
 use App\Models\Genre;
 use App\Models\Novel;
 use App\Models\NovelRequest;
@@ -17,6 +19,28 @@ use Illuminate\Support\Str;
 
 class NovelController extends Controller
 {
+    protected $cloudinaryService;
+
+    public function __construct(CloudinaryService $cloudinaryService)
+    {
+        $this->cloudinaryService = $cloudinaryService;
+    }
+
+    public function landing()
+    {
+        // Recently Updated: Novels with the most recent chapters
+        $recentlyUpdated = Novel::with(['author', 'genres', 'chapters' => function($q) {
+                $q->published()->latest()->take(1);
+            }])
+            ->whereHas('chapters')
+            ->withMax('chapters', 'created_at')
+            ->orderByDesc('chapters_max_created_at')
+            ->take(8)
+            ->get();
+
+        return view('welcome', compact('recentlyUpdated'));
+    }
+
     public function index(Request $request)
     {
         $query = Novel::with(['author', 'genres']);
@@ -34,21 +58,36 @@ class NovelController extends Controller
         $novels = $query->latest()->paginate(12)->withQueryString();
 
         // Featured Novels for Carousel (Selected by Admin)
-        $featuredNovels = Novel::with(['author', 'genres'])
+        $featuredQuery = Novel::with(['author', 'genres'])
             ->where('is_featured', true)
-            ->take(5)
-            ->get();
+            ->take(5);
+
+        if (Auth::check()) {
+            $featuredQuery->withExists(['bookmarks as is_bookmarked' => function($q) {
+                $q->where('user_id', Auth::id());
+            }]);
+        }
+
+        $featuredNovels = $featuredQuery->get();
 
         // Fallback to top viewed if no featured novels selected
         if ($featuredNovels->isEmpty()) {
-            $featuredNovels = Novel::with(['author', 'genres'])
+            $fallbackQuery = Novel::with(['author', 'genres'])
                 ->orderByDesc('view_count')
-                ->take(5)
-                ->get();
+                ->take(5);
+
+            if (Auth::check()) {
+                $fallbackQuery->withExists(['bookmarks as is_bookmarked' => function($q) {
+                    $q->where('user_id', Auth::id());
+                }]);
+            }
+            $featuredNovels = $fallbackQuery->get();
         }
 
         // Recently Updated: Novels with the most recent chapters
-        $recentlyUpdated = Novel::with(['author', 'genres'])
+        $recentlyUpdated = Novel::with(['author', 'genres', 'chapters' => function($q) {
+                $q->published()->latest()->take(3);
+            }])
             ->whereHas('chapters')
             ->withMax('chapters', 'created_at')
             ->orderByDesc('chapters_max_created_at')
@@ -268,8 +307,9 @@ class NovelController extends Controller
         $novel->author_id = Auth::id();
 
         if ($request->hasFile('cover_image')) {
-            $path = $request->file('cover_image')->store('covers', 'public');
-            $novel->cover_image = $path;
+            $result = $this->cloudinaryService->uploadCover($request->file('cover_image'));
+            $novel->cover_image_url = $result['url'];
+            $novel->cover_public_id = $result['public_id'];
         }
 
         $novel->save();
@@ -382,11 +422,12 @@ class NovelController extends Controller
         $novel->content_rating = $request->content_rating;
 
         if ($request->hasFile('cover_image')) {
-            if ($novel->cover_image) {
-                Storage::disk('public')->delete($novel->cover_image);
+            if ($novel->cover_public_id) {
+                $this->cloudinaryService->deleteImage($novel->cover_public_id);
             }
-            $path = $request->file('cover_image')->store('covers', 'public');
-            $novel->cover_image = $path;
+            $result = $this->cloudinaryService->uploadCover($request->file('cover_image'));
+            $novel->cover_image_url = $result['url'];
+            $novel->cover_public_id = $result['public_id'];
         }
 
         $novel->save();
@@ -402,13 +443,13 @@ class NovelController extends Controller
     {
         Gate::authorize('delete', $novel);
 
-        if ($novel->cover_image) {
-            Storage::disk('public')->delete($novel->cover_image);
+        if ($novel->cover_public_id) {
+            $this->cloudinaryService->deleteImage($novel->cover_public_id);
         }
 
         foreach ($novel->characters as $character) {
-            if ($character->image) {
-                Storage::disk('public')->delete($character->image);
+            if ($character->image_public_id) {
+                $this->cloudinaryService->deleteImage($character->image_public_id);
             }
         }
 
@@ -419,7 +460,7 @@ class NovelController extends Controller
 
     private function syncCharacters(Novel $novel, Request $request): void
     {
-        $oldImages = $novel->characters()->pluck('image')->filter()->values();
+        $oldPublicIds = $novel->characters()->pluck('image_public_id')->filter()->values();
         $novel->characters()->delete();
 
         $names = collect($request->input('character_name', []));
@@ -428,24 +469,37 @@ class NovelController extends Controller
         /** @var Collection<int, UploadedFile|null> $images */
         $images = collect($request->file('character_image', []));
         $existingImages = collect($request->input('existing_character_image', []));
-        $newImages = collect();
+        $existingPublicIds = collect($request->input('existing_character_public_id', []));
+        $newPublicIds = collect();
 
-        $names->each(function ($name, $index) use ($novel, $roles, $descriptions, $images, $newImages): void {
+        $names->each(function ($name, $index) use ($novel, $roles, $descriptions, $images, $existingImages, $existingPublicIds, $newPublicIds): void {
             $cleanName = trim((string) $name);
             if ($cleanName === '') {
                 return;
             }
 
             $imagePath = null;
+            $localImage = null;
+            $publicId = null;
             $uploadedImage = $images->get($index);
+
             if ($uploadedImage) {
-                $imagePath = $uploadedImage->store('characters', 'public');
-                $newImages->push($imagePath);
+                $result = $this->cloudinaryService->uploadCharacter($uploadedImage);
+                $imagePath = $result['url'];
+                $publicId = $result['public_id'];
+                $newPublicIds->push($publicId);
             } else {
                 $existingImage = $existingImages->get($index);
+                $existingPublicId = $existingPublicIds->get($index);
+                
                 if (is_string($existingImage) && $existingImage !== '') {
-                    $imagePath = $existingImage;
-                    $newImages->push($imagePath);
+                    if (str_starts_with($existingImage, 'http')) {
+                        $imagePath = $existingImage;
+                        $publicId = $existingPublicId;
+                        $newPublicIds->push($publicId);
+                    } else {
+                        $localImage = $existingImage;
+                    }
                 }
             }
 
@@ -453,13 +507,15 @@ class NovelController extends Controller
                 'name' => $cleanName,
                 'role' => trim((string) $roles->get($index, '')) ?: null,
                 'description' => trim((string) $descriptions->get($index, '')) ?: null,
-                'image' => $imagePath,
+                'image_url' => $imagePath,
+                'image' => $localImage,
+                'image_public_id' => $publicId,
                 'sort_order' => $index,
             ]);
         });
 
-        $oldImages->diff($newImages)->each(function ($imagePath): void {
-            Storage::disk('public')->delete($imagePath);
+        $oldPublicIds->diff($newPublicIds)->each(function ($publicId): void {
+            $this->cloudinaryService->deleteImage($publicId);
         });
     }
 }

@@ -2,43 +2,34 @@
 
 @section('content')
 <style>[x-cloak]{display:none!important}</style>
-@php
-    $showWorksTab = in_array($user->role, ['writer', 'admin'], true);
-    $statusUi = function (?string $status): array {
-        return match ($status) {
-            'ongoing' => ['label' => 'Ongoing', 'class' => 'bg-emerald-500'],
-            'complete' => ['label' => 'Complete', 'class' => 'bg-indigo-500'],
-            'hiatus' => ['label' => 'Hiatus', 'class' => 'bg-amber-500'],
-            default => ['label' => $status ? ucfirst(str_replace('_', ' ', $status)) : '—', 'class' => 'bg-slate-500'],
-        };
-    };
-@endphp
 
 <div class="max-w-6xl mx-auto px-4 py-8 md:py-12"
      x-data="{ tab: 'reading' }">
 
     <!-- Profile Header -->
     <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mb-8 md:mb-10 relative overflow-hidden">
-        <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-48 md:w-64 h-48 md:h-64 bg-indigo-500/10 rounded-full blur-2xl md:blur-3xl pointer-events-none"></div>
+        <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-48 md:w-64 h-48 md:h-64 bg-slate-500/10 rounded-full blur-2xl md:blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-48 md:w-64 h-48 md:h-64 bg-emerald-500/10 rounded-full blur-2xl md:blur-3xl pointer-events-none"></div>
 
         <div class="relative flex flex-col md:flex-row items-center gap-6 md:gap-10">
             <div class="relative shrink-0">
-                <div class="w-28 h-28 md:w-44 md:h-44 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden bg-indigo-50 dark:bg-slate-800 flex items-center justify-center ring-2 ring-slate-200/80 dark:ring-slate-700/80">
-                    @if($user->profile_photo)
-                        <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="" class="w-full h-full object-cover">
+                <div class="w-28 h-28 md:w-44 md:h-44 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center ring-2 ring-slate-200/80 dark:ring-slate-700/80">
+                    @if($user->profile_photo_url)
+                        <img src="{{ $user->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy">
+                    @elseif($user->profile_photo)
+                        <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="" class="w-full h-full object-cover" loading="lazy">
                     @else
-                        <span class="text-4xl md:text-6xl font-black text-indigo-600/30 dark:text-indigo-400/20 uppercase">
+                        <span class="text-4xl md:text-6xl font-black text-slate-400/20 uppercase">
                             {{ substr($user->name, 0, 1) }}
                         </span>
                     @endif
                 </div>
                 @if($user->role === 'admin')
-                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] rounded-full shadow-lg shadow-indigo-900/40 ring-2 ring-slate-900 dark:ring-slate-900">
+                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] rounded-full shadow-lg shadow-slate-900/40 ring-2 ring-white dark:ring-slate-900">
                         Admin
                     </div>
                 @elseif($user->role === 'writer')
-                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] rounded-full shadow-lg shadow-emerald-900/30 ring-2 ring-slate-900 dark:ring-slate-900">
+                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-emerald-700 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] rounded-full shadow-lg shadow-emerald-900/30 ring-2 ring-white dark:ring-slate-900">
                         Writer
                     </div>
                 @endif
@@ -48,19 +39,19 @@
                 <div class="flex flex-col md:flex-row md:items-center md:flex-wrap gap-2 md:gap-3 justify-center md:justify-start mb-1">
                     <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ $user->name }}</h1>
                     @if($user->role === 'admin')
-                        <span class="inline-flex items-center gap-1.5 self-center md:self-auto px-3 py-1 rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                        <span class="inline-flex items-center gap-1.5 self-center md:self-auto px-3 py-1 rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                             Administrator
                         </span>
                     @elseif($user->role === 'writer')
-                        <span class="inline-flex items-center gap-1.5 self-center md:self-auto px-3 py-1 rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">
+                        <span class="inline-flex items-center gap-1.5 self-center md:self-auto px-3 py-1 rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             Writer
                         </span>
                     @endif
                 </div>
 
-                <p class="text-indigo-600 dark:text-indigo-400 font-bold mb-1 text-sm md:text-base">@<span>{{ $user->username ?? $user->id }}</span></p>
+                <p class="text-slate-600 dark:text-slate-400 font-bold mb-1 text-sm md:text-base">@<span>{{ $user->username ?? $user->id }}</span></p>
 
                 <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-4 md:mb-5">
                     <span class="inline-flex items-center gap-1.5">
@@ -76,6 +67,21 @@
                 @endif
 
                 <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                    @auth
+                        @if(auth()->id() === $user->id)
+                            <a href="{{ route('dashboard', ['tab' => 'settings']) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                Edit Profil
+                            </a>
+                            @if(auth()->user()->role === 'writer' || auth()->user()->role === 'admin')
+                                <a href="{{ route('writer.stats') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg shadow-slate-900/10">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 012 2h2a2 2 0 012-2" /></svg>
+                                    Dashboard Penulis
+                                </a>
+                            @endif
+                        @endif
+                    @endauth
+
                     <div class="px-4 md:px-5 py-2.5 md:py-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/80 min-w-[7rem]">
                         <span class="block text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Reviews</span>
                         <span class="text-sm md:text-base font-bold text-slate-900 dark:text-white tabular-nums">{{ $user->reviews_count }}</span>
@@ -84,12 +90,6 @@
                         <span class="block text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Bookmarks</span>
                         <span class="text-sm md:text-base font-bold text-slate-900 dark:text-white tabular-nums">{{ $user->bookmarks_count }}</span>
                     </div>
-                    @if($showWorksTab)
-                        <div class="px-4 md:px-5 py-2.5 md:py-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/80 min-w-[7rem]">
-                            <span class="block text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Karya</span>
-                            <span class="text-sm md:text-base font-bold text-slate-900 dark:text-white tabular-nums">{{ $works->count() }}</span>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -100,21 +100,13 @@
         <div class="flex flex-wrap gap-2 sm:gap-3 border-b border-slate-200 dark:border-slate-800 pb-px overflow-x-auto scrollbar-thin">
             <button type="button"
                     @click="tab = 'reading'"
-                    :class="tab === 'reading' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/80 dark:bg-indigo-950/40' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
+                    :class="tab === 'reading' ? 'border-slate-900 dark:border-white text-slate-900 dark:text-white bg-slate-100/80 dark:bg-slate-800' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
                     class="shrink-0 px-4 py-2.5 rounded-t-xl text-xs md:text-sm font-bold border-b-2 -mb-px transition-colors">
                 Reading list
             </button>
-            @if($showWorksTab)
-                <button type="button"
-                        @click="tab = 'works'"
-                        :class="tab === 'works' ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-950/30' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
-                        class="shrink-0 px-4 py-2.5 rounded-t-xl text-xs md:text-sm font-bold border-b-2 -mb-px transition-colors">
-                    Karya
-                </button>
-            @endif
             <button type="button"
                     @click="tab = 'reviews'"
-                    :class="tab === 'reviews' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/80 dark:bg-indigo-950/40' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
+                    :class="tab === 'reviews' ? 'border-slate-900 dark:border-white text-slate-900 dark:text-white bg-slate-100/80 dark:bg-slate-800' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
                     class="shrink-0 px-4 py-2.5 rounded-t-xl text-xs md:text-sm font-bold border-b-2 -mb-px transition-colors">
                 Ulasan
             </button>
@@ -144,7 +136,7 @@
                                 </div>
                             @endif
                         </div>
-                        <h3 class="font-bold text-xs md:text-sm text-slate-800 dark:text-slate-100 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $bookmark->novel->title }}</h3>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 dark:text-slate-100 line-clamp-2 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{{ $bookmark->novel->title }}</h3>
                         <p class="text-[10px] md:text-[11px] text-slate-500 line-clamp-1">{{ $bookmark->novel->author->name }}</p>
                     </a>
                 @endforeach
@@ -155,38 +147,6 @@
             </div>
         @endif
     </div>
-
-    @if($showWorksTab)
-        <!-- Tab: Works -->
-        <div x-show="tab === 'works'" x-cloak class="space-y-4">
-            @if($works->isEmpty())
-                <div class="bg-slate-50 dark:bg-slate-800/80 rounded-3xl p-10 md:p-14 text-center border border-slate-200 dark:border-slate-700">
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Belum ada novel yang dipublikasikan.</p>
-                </div>
-            @else
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
-                    @foreach($works as $novel)
-                        @php $st = $statusUi($novel->status); @endphp
-                        <a href="{{ route('novels.show', $novel->slug) }}" class="group block">
-                            <div class="relative aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden mb-2 md:mb-3 bg-slate-800 ring-1 ring-slate-700/50 group-hover:-translate-y-1 group-hover:shadow-lg group-hover:shadow-indigo-500/10 transition-all duration-300">
-                                @if($novel->cover_image)
-                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center p-3">
-                                        <span class="text-[9px] text-slate-500 font-bold text-center leading-snug">{{ $novel->title }}</span>
-                                    </div>
-                                @endif
-                                <div class="absolute top-2 left-2 flex items-center gap-1.5">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide text-white shadow-sm {{ $st['class'] }}">{{ $st['label'] }}</span>
-                                </div>
-                            </div>
-                            <h3 class="text-xs md:text-sm font-bold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-2 leading-snug">{{ $novel->title }}</h3>
-                        </a>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    @endif
 
     <!-- Tab: Reviews -->
     <div x-show="tab === 'reviews'" x-cloak class="space-y-4">
@@ -200,7 +160,7 @@
                     <article class="rounded-2xl md:rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 p-5 md:p-6 shadow-sm dark:shadow-none">
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
                             <div class="min-w-0">
-                                <a href="{{ route('novels.show', $review->novel->slug) }}" class="text-base md:text-lg font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors line-clamp-2">
+                                <a href="{{ route('novels.show', $review->novel->slug) }}" class="text-base md:text-lg font-bold text-slate-900 dark:text-white hover:text-slate-900 dark:hover:text-white transition-colors line-clamp-2">
                                     {{ $review->novel->title }}
                                 </a>
                                 <p class="text-xs text-slate-500 mt-1">{{ $review->created_at->diffForHumans() }}</p>
@@ -218,7 +178,7 @@
                             {{ \Illuminate\Support\Str::limit($review->content, 400) }}
                         </p>
                         @if(\Illuminate\Support\Str::length($review->content) > 400)
-                            <a href="{{ route('novels.show', $review->novel->slug) }}" class="inline-block mt-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Buka novel</a>
+                            <a href="{{ route('novels.show', $review->novel->slug) }}" class="inline-block mt-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:underline">Buka novel</a>
                         @endif
                     </article>
                 @endforeach

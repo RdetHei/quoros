@@ -2,31 +2,34 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="{
-    activeTab: 'bookmarks',
+    activeTab: '{{ request()->get('tab', ($user->role === 'user' ? 'bookmarks' : 'settings')) }}',
     profilePhotoPreview: null,
     updateProfilePhotoPreview(event) {
-        const file = event.target.files?.[0];
-
-        if (!file) {
-            this.profilePhotoPreview = null;
-            return;
+        const input = event.target;
+        if (input.files && input.files[0]) {
+            initCropper(input, 'profile-photo-img', { 
+                aspectRatio: 1, 
+                width: 400, 
+                height: 400 
+            });
+            // preview will be updated by saveCrop global function
         }
-
-        this.profilePhotoPreview = URL.createObjectURL(file);
     }
 }">
     <!-- Clean Header Section -->
     <div class="relative mb-6 md:mb-8 p-5 md:p-8 rounded-2xl md:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div class="absolute top-0 right-0 w-64 h-64 bg-slate-50 dark:bg-slate-900/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
         
         <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-8">
             <div class="flex items-center gap-4 md:gap-6">
                 <div class="relative">
                     <div class="w-16 h-16 md:w-24 md:h-24 rounded-2xl overflow-hidden ring-4 ring-slate-50 dark:ring-slate-800 shadow-md">
-                        @if($user->profile_photo)
-                            <img src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover">
+                        @if($user->profile_photo_url)
+                            <img src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover" loading="lazy">
+                        @elseif($user->profile_photo)
+                            <img src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover" loading="lazy">
                         @else
-                            <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl md:text-2xl font-bold text-indigo-600">
+                            <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
                                 {{ substr($user->name, 0, 1) }}
                             </div>
                         @endif
@@ -63,29 +66,39 @@
         <div class="lg:col-span-3 space-y-6 lg:sticky lg:top-24 self-start">
             <div class="bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl p-2 md:p-4 border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto no-scrollbar">
                 <nav class="flex lg:flex-col gap-1 min-w-max lg:min-w-0">
+                    <a href="{{ route('profile.show', $user->username ?? $user->id) }}" class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all duration-200 group whitespace-nowrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        <span>Profil Saya</span>
+                    </a>
+
+                    <div class="h-px bg-slate-100 dark:bg-slate-800 my-1 hidden lg:block"></div>
+
+                    @if($user->role === 'user')
                     <button @click="activeTab = 'bookmarks'" 
-                        :class="activeTab === 'bookmarks' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        :class="activeTab === 'bookmarks' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                         <span>Bookmark</span>
                     </button>
 
                     <button @click="activeTab = 'history'" 
-                        :class="activeTab === 'history' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        :class="activeTab === 'history' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span>Riwayat</span>
                     </button>
 
                     <button @click="activeTab = 'recommendations'" 
-                        :class="activeTab === 'recommendations' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        :class="activeTab === 'recommendations' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         <span>Rekomendasi</span>
                     </button>
 
+                    @endif
+
                     <button @click="activeTab = 'settings'" 
-                        :class="activeTab === 'settings' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        :class="activeTab === 'settings' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         <span>Pengaturan</span>
@@ -93,7 +106,7 @@
 
                     @if($user->role === 'user')
                     <button @click="activeTab = 'become_writer'" 
-                        :class="activeTab === 'become_writer' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
+                        :class="activeTab === 'become_writer' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         <span>Penulis</span>
@@ -111,6 +124,10 @@
                                 <span>Carousel</span>
                             </a>
                         @endif
+                        <a href="{{ route('writer.stats') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 012 2h2a2 2 0 012-2" /></svg>
+                            <span>Dashboard Penulis</span>
+                        </a>
                         <a href="{{ route('writer.novels.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                             <span>Karya Saya</span>
@@ -121,10 +138,11 @@
             </div>
 
             <!-- Daily Goal Card -->
+            @if($user->role === 'user')
             <div class="bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl p-5 md:p-6 border border-slate-200 dark:border-slate-800 shadow-sm hidden md:block">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                        <div class="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
                         <h3 class="text-sm font-bold text-slate-900 dark:text-white">Target Harian</h3>
@@ -145,7 +163,7 @@
 
                 <div class="space-y-4">
                     <div class="relative h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div class="absolute top-0 left-0 h-full bg-indigo-600 rounded-full transition-all duration-500" style="width: 75%"></div>
+                        <div class="absolute top-0 left-0 h-full bg-emerald-600 rounded-full transition-all duration-500" style="width: 75%"></div>
                     </div>
                     <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50">
                         <div class="flex items-center gap-3">
@@ -158,6 +176,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
 
         <!-- Main Content Area -->
@@ -166,10 +185,10 @@
             @if($announcements->count() > 0)
             <div x-data="{ current: 0, total: {{ $announcements->count() }} }" class="relative">
                 @foreach($announcements as $index => $announcement)
-                <section x-show="current === {{ $index }}" class="relative bg-indigo-600 dark:bg-indigo-700 rounded-2xl md:rounded-3xl p-5 md:p-8 overflow-hidden shadow-lg shadow-indigo-500/20">
+                <section x-show="current === {{ $index }}" class="relative bg-slate-900 dark:bg-slate-800 rounded-2xl md:rounded-3xl p-5 md:p-8 overflow-hidden shadow-lg shadow-black/20">
                     
                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-indigo-400/20 rounded-full -ml-12 -mb-12 blur-xl"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-slate-400/20 rounded-full -ml-12 -mb-12 blur-xl"></div>
                     
                     <div class="relative flex flex-col md:flex-row items-center gap-4 md:gap-6">
                         <div class="w-12 h-12 md:w-16 md:h-16 bg-white/20 backdrop-blur-md rounded-xl md:rounded-2xl flex items-center justify-center text-white shrink-0">
@@ -211,6 +230,7 @@
             </div>
             @endif
 
+            @if($user->role === 'user')
             <!-- Hero: Continue Reading -->
             @if($lastRead)
             <section class="bg-slate-900 dark:bg-indigo-950 rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
@@ -249,6 +269,7 @@
                 </div>
             </section>
             @endif
+            @endif
 
             <!-- Writer Insights (Only for Writers/Admins) -->
             @if($writerStats)
@@ -258,9 +279,15 @@
                         <h3 class="text-lg md:text-2xl font-bold text-slate-900 dark:text-white">Writer Insights</h3>
                         <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400">Statistik performa karya Anda bulan ini.</p>
                     </div>
-                    <a href="{{ route('writer.novels.index') }}" class="inline-flex w-full md:w-auto justify-center items-center px-5 md:px-6 py-2.5 md:py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-[10px] md:text-xs font-bold hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-colors">
-                        Kelola Semua Karya
-                    </a>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="{{ route('writer.stats') }}" class="inline-flex justify-center items-center px-5 md:px-6 py-2.5 md:py-3 bg-indigo-600 text-white rounded-xl text-[10px] md:text-xs font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 dark:shadow-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 012 2h2a2 2 0 012-2" /></svg>
+                            Lihat Statistik Detail
+                        </a>
+                        <a href="{{ route('writer.novels.index') }}" class="inline-flex justify-center items-center px-5 md:px-6 py-2.5 md:py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-[10px] md:text-xs font-bold hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-colors">
+                            Kelola Semua Karya
+                        </a>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
@@ -306,6 +333,7 @@
 
             <!-- Tab Contents -->
             <div class="min-h-[400px] md:min-h-[500px]">
+                @if($user->role === 'user')
                 <!-- Bookmark Tab -->
                 <div x-show="activeTab === 'bookmarks'" class="space-y-5 md:space-y-6">
                     <div class="flex items-center justify-between">
@@ -322,7 +350,15 @@
                         @forelse($bookmarks as $bookmark)
                             <a href="{{ route('novels.show', $bookmark->novel->slug) }}" class="group block">
                                 <div class="relative aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden shadow-sm transition-shadow group-hover:shadow-md">
-                                    <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" class="w-full h-full object-cover">
+                                    @if($bookmark->novel->cover_image_url)
+                                        <img src="{{ $bookmark->novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                                    @elseif($bookmark->novel->cover_image)
+                                        <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                                    @else
+                                        <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 text-center">
+                                            <span class="text-[10px] text-slate-400 font-bold">{{ $bookmark->novel->title }}</span>
+                                        </div>
+                                    @endif
                                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80"></div>
                                     <div class="absolute inset-0 flex flex-col justify-end p-3 md:p-4">
                                         <p class="text-[8px] md:text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-0.5 md:mb-1">{{ $bookmark->novel->author->name }}</p>
@@ -360,7 +396,15 @@
                         @forelse($histories as $history)
                             <div class="group bg-white dark:bg-slate-900 p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-row items-center gap-4 md:gap-6 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-sm">
                                 <div class="w-16 h-24 md:w-24 md:h-32 flex-shrink-0 rounded-lg md:rounded-xl overflow-hidden shadow-sm">
-                                    <img src="{{ asset('storage/' . $history->novel->cover_image) }}" class="w-full h-full object-cover">
+                                    @if($history->novel->cover_image_url)
+                                        <img src="{{ $history->novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                                    @elseif($history->novel->cover_image)
+                                        <img src="{{ asset('storage/' . $history->novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                                    @else
+                                        <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 text-center">
+                                            <span class="text-[10px] text-slate-400 font-bold">{{ $history->novel->title }}</span>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div class="flex-grow min-w-0">
@@ -409,7 +453,15 @@
                         @foreach($recommendations as $novel)
                             <a href="{{ route('novels.show', $novel->slug) }}" class="group bg-white dark:bg-slate-900 p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 flex gap-4 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-sm">
                                 <div class="w-16 h-24 md:w-20 md:h-28 flex-shrink-0 rounded-lg md:rounded-xl overflow-hidden shadow-sm">
-                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover">
+                                    @if($novel->cover_image_url)
+                                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                                    @elseif($novel->cover_image)
+                                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                                    @else
+                                        <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 text-center">
+                                            <span class="text-[10px] text-slate-400 font-bold">{{ $novel->title }}</span>
+                                        </div>
+                                    @endif
                                 </div>
                                 
                                 <div class="flex-grow flex flex-col justify-between py-0.5 md:py-1 min-w-0">
@@ -432,6 +484,8 @@
                         @endforeach
                     </div>
                 </div>
+
+                @endif
 
                 <!-- Become Writer Tab -->
                 @if($user->role === 'user')
@@ -523,13 +577,13 @@
                                         <div class="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
                                             <div class="relative">
                                                 <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-4 border-slate-50 dark:border-slate-800 shadow-sm">
-                                                    <template x-if="profilePhotoPreview">
-                                                        <img :src="profilePhotoPreview" class="w-full h-full object-cover" alt="Preview foto profil baru">
-                                                    </template>
-                                                    @if($user->profile_photo)
-                                                        <img x-show="!profilePhotoPreview" src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover">
+                                                    @if($user->profile_photo_url)
+                                                        <img id="profile-photo-img" src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover">
+                                                    @elseif($user->profile_photo)
+                                                        <img id="profile-photo-img" src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover">
                                                     @else
-                                                        <div x-show="!profilePhotoPreview" class="w-full h-full bg-indigo-600 flex items-center justify-center text-2xl md:text-3xl font-bold text-white uppercase">
+                                                        <img id="profile-photo-img" src="" class="w-full h-full object-cover hidden">
+                                                        <div id="profile-photo-placeholder" class="w-full h-full bg-indigo-600 flex items-center justify-center text-2xl md:text-3xl font-bold text-white uppercase">
                                                             {{ substr($user->name, 0, 1) }}
                                                         </div>
                                                     @endif
@@ -539,9 +593,9 @@
                                                 <label for="profile_photo" class="inline-flex w-full sm:w-auto justify-center items-center px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] md:text-xs font-bold rounded-lg cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-colors">
                                                     Ganti Foto
                                                 </label>
-                                                <input id="profile_photo" name="profile_photo" type="file" accept="image/jpeg,image/png,image/jpg,image/gif" class="hidden" @change="updateProfilePhotoPreview($event)" />
-                                                <p class="mt-2 text-[9px] md:text-[10px] text-slate-400">JPG, PNG, GIF (Maks. 2MB)</p>
-                                                <p x-show="profilePhotoPreview" class="mt-1 text-[9px] md:text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Preview aktif. Simpan perubahan untuk menerapkan foto baru.</p>
+                                                <input id="profile_photo" name="profile_photo" type="file" accept="image/*" class="hidden" @change="updateProfilePhotoPreview($event); if(document.getElementById('profile-photo-placeholder')) document.getElementById('profile-photo-placeholder').classList.add('hidden'); document.getElementById('profile-photo-img').classList.remove('hidden')" />
+                                                <p class="mt-2 text-[9px] md:text-[10px] text-slate-400">Pilih & Potong Foto (Maks. 2MB)</p>
+                                                <p class="mt-1 text-[9px] md:text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Simpan perubahan untuk menerapkan foto baru.</p>
                                                 @error('profile_photo')
                                                     <p class="mt-2 text-[10px] md:text-xs text-red-500 font-medium">{{ $message }}</p>
                                                 @enderror

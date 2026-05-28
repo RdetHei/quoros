@@ -3,15 +3,15 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
 
-    {{-- ===== SEARCH HERO (selaras navbar & katalog: slate + indigo) ===== --}}
+    {{-- ===== SEARCH HERO (selaras navbar & katalog: slate + emerald) ===== --}}
     <div class="relative mb-10 md:mb-14 rounded-2xl md:rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 p-6 md:p-10 lg:p-12">
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(99,102,241,0.12)_0%,_transparent_55%)] pointer-events-none"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(16,185,129,0.12)_0%,_transparent_55%)] pointer-events-none"></div>
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(16,185,129,0.06)_0%,_transparent_55%)] pointer-events-none"></div>
 
         <div class="relative z-10 max-w-3xl mx-auto text-center">
-            <p class="text-[10px] md:text-xs font-black uppercase tracking-[0.28em] text-indigo-400 mb-3 md:mb-4">Advanced Search</p>
+            <p class="text-[10px] md:text-xs font-black uppercase tracking-[0.28em] text-emerald-400 mb-3 md:mb-4">Advanced Search</p>
             <h1 class="text-2xl md:text-4xl font-extrabold text-white mb-6 md:mb-8 leading-tight">
-                Temukan Novel <span class="text-indigo-400">Favoritmu</span>
+                Temukan Novel <span class="text-emerald-400">Favoritmu</span>
             </h1>
 
             <form action="{{ route('novels.search') }}" method="GET" id="advanced-search-form" class="text-left">
@@ -30,8 +30,8 @@
                            class="w-full pl-12 md:pl-14 pr-[5.25rem] md:pr-28 py-4 md:py-5
                                   bg-slate-800/80 border border-slate-700 rounded-xl md:rounded-2xl
                                   text-sm md:text-base text-white placeholder-slate-500 shadow-inner shadow-black/20
-                                  focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-colors">
-                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-4 md:px-6 py-2 md:py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs md:text-sm transition-colors shadow-lg shadow-indigo-900/30">
+                                  focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-colors">
+                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-4 md:px-6 py-2 md:py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs md:text-sm transition-colors shadow-lg shadow-black/40">
                         Cari
                     </button>
                 </div>
@@ -39,7 +39,7 @@
                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2 md:mb-3 text-left">Filter</p>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                     <div class="relative">
-                        <select name="genre" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/35 focus:border-indigo-500 transition-colors">
+                        <select name="genre" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
                             <option value="">Semua Genre</option>
                             @foreach($genres as $genre)
                                 <option value="{{ $genre->slug }}" {{ (request('genre') == $genre->slug) ? 'selected' : '' }}>
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="relative">
-                        <select name="status" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/35 focus:border-indigo-500 transition-colors">
+                        <select name="status" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
                             <option value="">Semua Status</option>
                             <option value="ongoing" {{ request('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
                             <option value="complete" {{ request('status') == 'complete' ? 'selected' : '' }}>Complete</option>
@@ -65,7 +65,7 @@
                     </div>
 
                     <div class="relative">
-                        <select name="type" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/35 focus:border-indigo-500 transition-colors">
+                        <select name="type" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
                             <option value="">Semua Tipe</option>
                             <option value="original" {{ request('type') == 'original' ? 'selected' : '' }}>Original</option>
                             <option value="web_novel" {{ request('type') == 'web_novel' ? 'selected' : '' }}>Web Novel</option>
@@ -77,7 +77,7 @@
                     </div>
 
                     <div class="relative">
-                        <select name="tag" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/35 focus:border-indigo-500 transition-colors">
+                        <select name="tag" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
                             <option value="">Semua Tag</option>
                             @foreach($tags as $tag)
                                 <option value="{{ $tag->slug }}" {{ request('tag') == $tag->slug ? 'selected' : '' }}>
@@ -91,7 +91,7 @@
                     </div>
 
                     <div class="relative">
-                        <select name="sort" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/35 focus:border-indigo-500 transition-colors">
+                        <select name="sort" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
                             <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Terbaru</option>
                             <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Rating Tertinggi</option>
                             <option value="views" {{ request('sort') == 'views' ? 'selected' : '' }}>Paling Banyak Dilihat</option>
@@ -111,12 +111,12 @@
         {{-- Result Header --}}
         <div class="flex items-center justify-between mb-6 md:mb-8">
             <div class="flex items-center gap-3">
-                <div class="w-1 md:w-1.5 h-6 md:h-8 bg-indigo-600 rounded-full"></div>
+                <div class="w-1 md:w-1.5 h-6 md:h-8 bg-emerald-600 rounded-full"></div>
                 <div>
                     @if($search ?? false)
                         <h2 class="text-lg md:text-xl font-bold text-white">
                             Hasil untuk
-                            <span class="text-indigo-400">"{{ $search }}"</span>
+                            <span class="text-emerald-400">"{{ $search }}"</span>
                         </h2>
                         <p class="text-[10px] md:text-xs text-slate-500 mt-0.5">{{ $novels->total() }} novel ditemukan</p>
                     @else
@@ -127,7 +127,7 @@
             </div>
 
             @if(($search ?? false) || request('genre') || request('status') || request('type') || request('tag'))
-                <a href="{{ route('novels.search') }}" class="text-xs font-bold text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-1.5">
+                <a href="{{ route('novels.search') }}" class="text-xs font-bold text-slate-500 hover:text-emerald-400 transition-colors flex items-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -143,12 +143,18 @@
                     <a href="{{ route('novels.show', $novel->slug) }}" class="group block">
                         <div class="relative aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden mb-2.5 md:mb-3 bg-slate-800
                                     ring-1 ring-slate-700/50
-                                    group-hover:-translate-y-1.5 group-hover:shadow-xl group-hover:shadow-indigo-500/20
+                                    group-hover:-translate-y-1.5 group-hover:shadow-xl group-hover:shadow-emerald-500/10
                                     transition-all duration-300">
-                            @if($novel->cover_image)
+                            @if($novel->cover_image_url)
+                                <img src="{{ $novel->cover_image_url }}"
+                                     alt="{{ $novel->title }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     loading="lazy">
+                            @elseif($novel->cover_image)
                                 <img src="{{ asset('storage/' . $novel->cover_image) }}"
                                      alt="{{ $novel->title }}"
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     loading="lazy">
                             @else
                                 <div class="w-full h-full flex items-center justify-center p-3 bg-slate-800">
                                     <span class="text-[9px] text-slate-500 font-bold text-center leading-snug">{{ $novel->title }}</span>
@@ -167,7 +173,7 @@
                             @php
                                 $statusColor = match($novel->status) {
                                     'ongoing'  => 'bg-emerald-500',
-                                    'complete' => 'bg-indigo-500',
+                                    'complete' => 'bg-slate-900',
                                     'hiatus'   => 'bg-amber-500',
                                     default    => 'bg-slate-500',
                                 };
@@ -178,11 +184,11 @@
 
                             {{-- Hover overlay --}}
                             <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                                <span class="text-[10px] font-bold text-white bg-indigo-600 px-2 py-1 rounded-md">Lihat Detail</span>
+                                <span class="text-[10px] font-bold text-white bg-emerald-600 px-2 py-1 rounded-md">Lihat Detail</span>
                             </div>
                         </div>
 
-                        <h3 class="text-xs md:text-sm font-bold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-2 leading-snug mb-0.5">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-100 group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug mb-0.5">
                             {{ $novel->title }}
                         </h3>
                         <p class="text-[10px] md:text-[11px] text-slate-500 line-clamp-1">{{ $novel->author->name }}</p>
@@ -190,7 +196,7 @@
                         @if($novel->genres->count())
                             <div class="flex flex-wrap gap-1 mt-1.5">
                                 @foreach($novel->genres->take(2) as $genre)
-                                    <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-900/30 px-1.5 py-0.5 rounded border border-indigo-800/50">
+                                    <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-900/30 px-1.5 py-0.5 rounded border border-emerald-800/50">
                                         {{ $genre->name }}
                                     </span>
                                 @endforeach

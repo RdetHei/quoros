@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GuideController;
 use App\Http\Controllers\Admin\CarouselController as AdminCarouselController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
@@ -15,9 +16,11 @@ use App\Http\Controllers\NovelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Writer\StatsController as WriterStatsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [NovelController::class, 'index'])->name('home');
+Route::get('/welcome', [NovelController::class, 'landing'])->name('welcome');
 
 Route::get('/site.webmanifest', function () {
     $logo = asset('storage/logo/quorosLogo.png');
@@ -64,10 +67,16 @@ Route::get('/updated', [NovelController::class, 'updated'])->name('novels.update
 Route::get('/genres', [NovelController::class, 'genres'])->name('genres.index');
 Route::get('/tags', [NovelController::class, 'tags'])->name('tags.index');
 
+// Guide Routes
+Route::get('/guides', [GuideController::class, 'index'])->name('guides.index');
+Route::get('/guides/{category:slug}', [GuideController::class, 'category'])->name('guides.category');
+Route::get('/guides/{category:slug}/{article:slug}', [GuideController::class, 'show'])->name('guides.show');
+
 // Auth Required Routes
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::put('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/dashboard/profile/photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.photo.update');
     Route::post('/dashboard/become-writer', [DashboardController::class, 'becomeWriter'])->name('dashboard.become-writer');
 
     // Bookmark & History dedicated views
@@ -90,6 +99,11 @@ Route::middleware('auth')->group(function () {
 
     // Writer & Admin Routes
     Route::middleware('role:writer,admin')->group(function () {
+        Route::get('/writer/bulk-guide', function () {
+            return view('writer.bulk-guide');
+        })->name('writer.bulk-guide');
+
+        Route::get('/writer/stats', [WriterStatsController::class, 'index'])->name('writer.stats');
         Route::get('/writer/novels', [NovelController::class, 'writerIndex'])->name('writer.novels.index');
         Route::get('/writer/novels/create', [NovelController::class, 'create'])->name('writer.novels.create');
         Route::post('/writer/novels', [NovelController::class, 'store'])->name('writer.novels.store');
@@ -100,7 +114,8 @@ Route::middleware('auth')->group(function () {
         // Chapters Management
         Route::get('/writer/novels/{novel}/chapters/create', [ChapterController::class, 'create'])->name('writer.chapters.create');
         Route::post('/writer/novels/{novel}/chapters', [ChapterController::class, 'store'])->name('writer.chapters.store');
-        Route::post('/writer/novels/{novel}/chapters/bulk', [ChapterController::class, 'bulkStore'])->name('writer.chapters.bulk');
+        Route::post('/writer/novels/{novel}/chapters/bulk-parse', [ChapterController::class, 'parseDocument'])->name('writer.chapters.parse-epub');
+        Route::post('/writer/novels/{novel}/chapters/bulk-store', [ChapterController::class, 'storeBulkChapter'])->name('writer.chapters.store-bulk');
         Route::get('/writer/novels/{novel}/chapters/{chapter}/edit', [ChapterController::class, 'edit'])->name('writer.chapters.edit');
         Route::put('/writer/novels/{novel}/chapters/{chapter}', [ChapterController::class, 'update'])->name('writer.chapters.update');
         Route::delete('/writer/novels/{novel}/chapters/{chapter}', [ChapterController::class, 'destroy'])->name('writer.chapters.destroy');

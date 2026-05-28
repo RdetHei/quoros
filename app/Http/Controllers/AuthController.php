@@ -24,7 +24,11 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('dashboard');
+            if (Auth::user()->role === 'user') {
+                return redirect()->intended(route('home'));
+            }
+
+            return redirect()->intended(route('dashboard'));
         }
 
         return back()->withErrors([
@@ -54,7 +58,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect('/dashboard');
+        return redirect()->route('home');
     }
 
     public function logout(Request $request)

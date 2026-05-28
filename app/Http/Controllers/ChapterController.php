@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chapter;
 use App\Models\Novel;
 use App\Models\ReadingHistory;
-use App\Services\EpubParserService;
+use App\Services\NovelParserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -25,13 +25,19 @@ class ChapterController extends Controller
     {
         Gate::authorize('manageChapters', $novel);
 
-        $request->validate([
+        $rules = [
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
             'file' => 'nullable|file|mimes:pdf,epub,docx|max:10240', // 10MB max
             'status' => 'required|in:draft,published,scheduled',
-            'published_at' => 'nullable|required_if:status,scheduled|date|after:now',
-        ]);
+            'published_at' => 'nullable|required_if:status,scheduled|date',
+        ];
+
+        if ($request->status === 'scheduled') {
+            $rules['published_at'] .= '|after:now';
+        }
+
+        $request->validate($rules);
 
         $slug = Str::slug($request->title);
 
@@ -53,20 +59,21 @@ class ChapterController extends Controller
         return redirect()->route('novels.show', $novel->slug)->with('success', 'Chapter added successfully!');
     }
 
-    public function bulkStore(Request $request, Novel $novel, EpubParserService $parser)
+    public function bulkStore(Request $request, Novel $novel, NovelParserService $parser)
     {
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'epub_file' => 'required|file|mimes:epub|max:51200', // 50MB max for EPUB
+            'file' => 'required|file|mimes:epub,docx,pdf|max:51200', // 50MB max
         ]);
 
         try {
-            $path = $request->file('epub_file')->path();
-            $chapters = $parser->parse($path);
+            $file = $request->file('file');
+            $path = $file->path();
+            $chapters = $parser->parse($path, $file->getClientOriginalExtension());
 
             if (empty($chapters)) {
-                return back()->with('error', 'Tidak ada chapter yang ditemukan dalam file EPUB tersebut.');
+                return back()->with('error', 'Tidak ada chapter yang ditemukan dalam file tersebut.');
             }
 
             foreach ($chapters as $index => $data) {
@@ -88,10 +95,68 @@ class ChapterController extends Controller
             }
 
             return redirect()->route('novels.show', $novel->slug)
-                ->with('success', count($chapters).' chapter berhasil diimpor dari EPUB!');
+                ->with('success', count($chapters).' chapter berhasil diimpor!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal memproses EPUB: '.$e->getMessage());
+            return back()->with('error', 'Gagal memproses file: '.$e->getMessage());
         }
+    }
+
+    public function parseDocument(Request $request, Novel $novel, NovelParserService $parser)
+    {
+        Gate::authorize('manageChapters', $novel);
+
+        $request->validate([
+            'file' => 'required|file|mimes:epub,docx,pdf|max:51200',
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $path = $file->path();
+            $chapters = $parser->parse($path, $file->getClientOriginalExtension());
+
+            if (empty($chapters)) {
+                return response()->json(['error' => 'Tidak ada chapter yang ditemukan dalam file tersebut.'], 422);
+            }
+
+            return response()->json([
+                'chapters' => $chapters
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Gagal memproses file: '.$e->getMessage()], 500);
+        }
+    }
+
+    public function storeBulkChapter(Request $request, Novel $novel)
+    {
+        Gate::authorize('manageChapters', $novel);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        $slug = Str::slug($request->title);
+
+        // Pastikan slug unik dalam novel ini
+        $originalSlug = $slug;
+        $count = 1;
+        while (Chapter::where('novel_id', $novel->id)->where('slug', $slug)->exists()) {
+            $slug = $originalSlug.'-'.$count++;
+        }
+
+        $chapter = Chapter::create([
+            'novel_id' => $novel->id,
+            'title' => $request->title,
+            'slug' => $slug,
+            'content' => $request->content,
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'chapter' => $chapter
+        ]);
     }
 
     public function show(Novel $novel, $chapterSlug)
@@ -202,13 +267,38 @@ class ChapterController extends Controller
     {
         Gate::authorize('update', $chapter);
 
-        $request->validate([
+        $rules = [
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
             'file' => 'nullable|file|mimes:pdf,epub,docx|max:10240',
             'status' => 'required|in:draft,published,scheduled',
-            'published_at' => 'nullable|required_if:status,scheduled|date|after:now',
-        ]);
+            'published_at' => 'nullable|required_if:status,scheduled|date',
+        ];
+
+        // Hanya validasi after:now jika status diubah ke scheduled 
+        // ATAU jika waktu penjadwalan diubah dari nilai sebelumnya
+        if ($request->status === 'scheduled') {
+            $currentPublishedAt = $chapter->published_at ? $chapter->published_at->format('Y-m-d\TH:i') : null;
+            if ($chapter->status !== 'scheduled' || $request->published_at !== $currentPublishedAt) {
+                $rules['published_at'] .= '|after:now';
+            }
+        }
+
+        $request->validate($rules);
+
+        // Update slug jika judul berubah
+        if ($chapter->title !== $request->title) {
+            $slug = Str::slug($request->title);
+            $originalSlug = $slug;
+            $count = 1;
+            while (Chapter::where('novel_id', $novel->id)
+                ->where('slug', $slug)
+                ->where('id', '!=', $chapter->id)
+                ->exists()) {
+                $slug = $originalSlug . '-' . $count++;
+            }
+            $chapter->slug = $slug;
+        }
 
         $chapter->title = $request->title;
         $chapter->content = $request->content;
@@ -216,8 +306,11 @@ class ChapterController extends Controller
 
         if ($request->status === 'scheduled') {
             $chapter->published_at = $request->published_at;
-        } elseif ($request->status === 'published' && ! $chapter->published_at) {
-            $chapter->published_at = now();
+        } elseif ($request->status === 'published') {
+            // Jika sebelumnya draft atau dijadwalkan di masa depan, set ke sekarang
+            if (!$chapter->published_at || $chapter->published_at->isFuture()) {
+                $chapter->published_at = now();
+            }
         } elseif ($request->status === 'draft') {
             $chapter->published_at = null;
         }

@@ -81,21 +81,28 @@
             <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Cover Novel</label>
                 <div class="flex flex-col md:flex-row gap-6 items-start">
-                    <div class="w-32 h-44 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0 shadow-lg">
-                        @if($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover">
+                    <div id="cover-preview-container" class="w-32 h-44 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0 shadow-lg relative group">
+                        @if($novel->cover_image_url)
+                            <img id="cover-preview" src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                        @elseif($novel->cover_image)
+                            <img id="cover-preview" src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
                         @else
-                            <div class="w-full h-full flex items-center justify-center p-2 text-[10px] font-bold text-slate-400 text-center uppercase tracking-tighter leading-none">NO COVER</div>
+                            <img id="cover-preview" src="" class="w-full h-full object-cover hidden">
+                            <div id="no-cover-text" class="w-full h-full flex items-center justify-center p-2 text-[10px] font-bold text-slate-400 text-center uppercase tracking-tighter leading-none">NO COVER</div>
                         @endif
+                        <button type="button" onclick="document.getElementById('cover_image').click()" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="text-white font-bold text-[10px] uppercase">Ganti</span>
+                        </button>
                     </div>
                     <div class="flex-grow w-full">
                         <label for="cover_image" class="flex flex-col items-center justify-center w-full h-44 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded-3xl cursor-pointer bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center">
                                 <svg class="w-8 h-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4-4m4 4V4"></path></svg>
-                                <p class="mb-1 text-sm text-slate-500 dark:text-slate-400 font-bold">Ganti Cover</p>
-                                <p class="text-xs text-slate-400 px-4">Biarkan kosong jika tidak ingin mengubah</p>
+                                <p class="mb-1 text-sm text-slate-500 dark:text-slate-400 font-bold">Upload Cover Baru</p>
+                                <p class="text-xs text-slate-400 px-4">Rasio 3:4 (Contoh: 600x800)</p>
                             </div>
-                            <input id="cover_image" name="cover_image" type="file" class="hidden" />
+                            <input id="cover_image" name="cover_image" type="file" class="hidden" accept="image/*"
+                                onchange="initCropper(this, 'cover-preview', { aspectRatio: 3/4, width: 600, height: 800 }); if(document.getElementById('no-cover-text')) document.getElementById('no-cover-text').remove();" />
                         </label>
                     </div>
                 </div>
@@ -138,6 +145,7 @@
 
                 <div id="characters-list" class="space-y-4">
                     @foreach($novel->characters as $character)
+                        @php $id = 'char-' . $character->id; @endphp
                         <div class="character-card p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 space-y-4">
                             <div class="flex items-center justify-between">
                                 <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200">Karakter</h4>
@@ -157,15 +165,28 @@
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Deskripsi Singkat</label>
                                 <textarea name="character_description[]" rows="3" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm">{{ $character->description }}</textarea>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Foto Karakter (Opsional)</label>
-                                @if($character->image)
-                                    <div class="mb-3 w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
-                                        <img src="{{ asset('storage/' . $character->image) }}" class="w-full h-full object-cover">
-                                    </div>
-                                @endif
-                                <input type="hidden" name="existing_character_image[]" value="{{ $character->image }}">
-                                <input type="file" name="character_image[]" accept="image/jpeg,image/png,image/jpg,image/gif" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            <div class="flex flex-col sm:flex-row gap-4 items-start">
+                                <div class="w-20 h-20 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700 flex-shrink-0 relative group">
+                                    @if($character->image_url)
+                                        <img id="{{ $id }}-preview" src="{{ $character->image_url }}" class="w-full h-full object-cover">
+                                    @elseif($character->image)
+                                        <img id="{{ $id }}-preview" src="{{ asset('storage/' . $character->image) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <img id="{{ $id }}-preview" class="w-full h-full object-cover hidden">
+                                        <div id="{{ $id }}-no-img" class="w-full h-full flex items-center justify-center text-[8px] font-bold text-slate-400 uppercase">FOTO</div>
+                                    @endif
+                                    <button type="button" onclick="document.getElementById('{{ $id }}-input').click()" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span class="text-white font-bold text-[8px] uppercase">Ganti</span>
+                                    </button>
+                                </div>
+                                <div class="flex-grow w-full">
+                                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Foto Karakter (Opsional)</label>
+                                    <input type="hidden" name="existing_character_image[]" value="{{ $character->image_url ?: $character->image }}">
+                                    <input type="hidden" name="existing_character_public_id[]" value="{{ $character->image_public_id }}">
+                                    <input type="file" id="{{ $id }}-input" name="character_image[]" accept="image/*" class="hidden" 
+                                        onchange="initCropper(this, '{{ $id }}-preview', { aspectRatio: 1, width: 600, height: 600 }); if(document.getElementById('{{ $id }}-no-img')) document.getElementById('{{ $id }}-no-img').classList.add('hidden'); document.getElementById('{{ $id }}-preview').classList.remove('hidden')">
+                                    <button type="button" onclick="document.getElementById('{{ $id }}-input').click()" class="w-full py-2 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition-all text-left">Ganti & Potong Foto</button>
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -196,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function createCharacterCard() {
+        const id = 'char-' + Date.now();
         const card = document.createElement('div');
         card.className = 'character-card p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 space-y-4';
         card.innerHTML = `
@@ -217,10 +239,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Deskripsi Singkat</label>
                 <textarea name="character_description[]" rows="3" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm" placeholder="Deskripsi karakter..."></textarea>
             </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Foto Karakter (Opsional)</label>
-                <input type="hidden" name="existing_character_image[]" value="">
-                <input type="file" name="character_image[]" accept="image/jpeg,image/png,image/jpg,image/gif" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+            <div class="flex flex-col sm:flex-row gap-4 items-start">
+                <div class="w-20 h-20 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700 flex-shrink-0 relative group">
+                    <img id="${id}-preview" class="w-full h-full object-cover hidden">
+                    <div id="${id}-no-img" class="w-full h-full flex items-center justify-center text-[8px] font-bold text-slate-400 uppercase">FOTO</div>
+                    <button type="button" onclick="document.getElementById('${id}-input').click()" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span class="text-white font-bold text-[8px] uppercase">Ganti</span>
+                    </button>
+                </div>
+                <div class="flex-grow w-full">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Foto Karakter (Opsional)</label>
+                    <input type="hidden" name="existing_character_image[]" value="">
+                    <input type="hidden" name="existing_character_public_id[]" value="">
+                    <input type="file" id="${id}-input" name="character_image[]" accept="image/*" class="hidden" 
+                        onchange="initCropper(this, '${id}-preview', { aspectRatio: 1, width: 600, height: 600 }); document.getElementById('${id}-no-img').classList.add('hidden'); document.getElementById('${id}-preview').classList.remove('hidden')">
+                    <button type="button" onclick="document.getElementById('${id}-input').click()" class="w-full py-2 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition-all text-left">Pilih & Potong Foto</button>
+                </div>
             </div>
         `;
 

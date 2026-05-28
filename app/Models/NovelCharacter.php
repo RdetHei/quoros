@@ -14,6 +14,8 @@ class NovelCharacter extends Model
         'description',
         'image',
         'sort_order',
+        'image_url',
+        'image_public_id'
     ];
 
     public function novel(): BelongsTo
