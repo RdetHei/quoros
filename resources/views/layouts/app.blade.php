@@ -567,4 +567,59 @@ document.addEventListener('DOMContentLoaded', function () {
         const form     = wrapper.querySelector('.live-search-form');
 
         if (!input || !dropdown) return;
-        // ... (rest of JS)
+
+        let timeout = null;
+
+        input.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            
+            clearTimeout(timeout);
+            if (query.length < MIN_CHARS) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+
+            timeout = setTimeout(async () => {
+                loading.classList.remove('hidden');
+                results.innerHTML = '';
+                dropdown.classList.remove('hidden');
+                footer.classList.add('hidden');
+                empty.classList.add('hidden');
+
+                try {
+                    const res = await fetch(`${API_ENDPOINT}?q=${encodeURIComponent(query)}`);
+                    const data = await res.json();
+                    
+                    loading.classList.add('hidden');
+                    
+                    if (data.length > 0) {
+                        data.slice(0, 5).forEach(novel => {
+                            results.innerHTML += buildResultCard(novel);
+                        });
+                        footer.classList.remove('hidden');
+                        seeAll.href = `/novels/search?q=${encodeURIComponent(query)}`;
+                    } else {
+                        empty.classList.remove('hidden');
+                        emptyLink.href = `/novels/search?q=${encodeURIComponent(query)}`;
+                    }
+                } catch (err) {
+                    console.error('Live search error:', err);
+                    loading.classList.add('hidden');
+                }
+            }, DEBOUNCE_MS);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!wrapper.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    document.querySelectorAll('.live-search-wrapper').forEach(initLiveSearch);
+});
+</script>
+
+    @stack('scripts')
+</body>
+</html>

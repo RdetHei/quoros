@@ -686,7 +686,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Inisialisasi awal
-        renderChapters(filteredChapters.slice(0, 10));
+        if (filteredChapters.length > 0) {
+            renderChapters(filteredChapters.slice(0, 10));
+        } else {
+            chapterList.innerHTML = '<div class="py-16 text-center text-slate-400 text-sm">Belum ada chapter untuk novel ini.</div>';
+            if (loadMoreBtn) loadMoreBtn.parentElement.style.display = 'none';
+        }
 
         if (loadMoreBtn) {
                     loadMoreBtn.addEventListener('click', function() {

@@ -1,107 +1,319 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    /* Hide main navbar for immersive reading */
+    #navbar {
+        display: none !important;
+    }
+    
+    /* Reader Sidebar Styles */
+    .reader-sidebar {
+        position: fixed;
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 100;
+        width: 4.5rem;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.25rem 0.75rem;
+        gap: 1.25rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @media (max-width: 1024px) {
+        .reader-sidebar {
+            right: 1rem;
+            width: 4rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .reader-sidebar {
+            top: auto;
+            bottom: 1.5rem;
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+            width: auto;
+            flex-direction: row;
+            padding: 0.75rem 1.25rem;
+            border-radius: 2rem;
+            gap: 1rem;
+        }
+    }
+
+    .sidebar-btn {
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 1rem;
+        background: #334155;
+        color: #f1f5f9;
+        border: 1px solid transparent;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    @media (max-width: 640px) {
+        .sidebar-btn {
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 0.875rem;
+        }
+    }
+
+    .sidebar-btn:hover {
+        background: #475569;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .sidebar-btn.active {
+        background: #ffffff;
+        color: #0f172a;
+    }
+
+    .sidebar-btn.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .sidebar-divider {
+        width: 100%;
+        height: 1px;
+        background: #334155;
+    }
+
+    @media (max-width: 640px) {
+        .sidebar-divider {
+            width: 1px;
+            height: 1.5rem;
+        }
+    }
+
+    .sidebar-panel {
+        position: absolute;
+        right: 100%;
+        bottom: 0;
+        margin-right: 1.5rem;
+        width: 18rem;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        z-index: 110;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #0f172a;
+        border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+    }
+
+    @media (max-width: 640px) {
+        .sidebar-panel {
+            right: 50%;
+            bottom: 100%;
+            margin-right: 0;
+            margin-bottom: 1.5rem;
+            transform: translateX(50%);
+            width: 90vw;
+            max-width: 22rem;
+        }
+    }
+
+    /* Tighten line spacing in prose */
+    .prose {
+        line-height: 1.625 !important;
+    }
+
+    .reader-chapter-shell {
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+</style>
+@endpush
+
 @section('content')
-<div x-data="reader({
-    initialFontSize: localStorage.getItem('reader-font-size') || 'text-lg',
-    initialFontFamily: localStorage.getItem('reader-font-family') || 'font-sans',
-    nextChapterSlug: '{{ $nextChapter ? $nextChapter->slug : '' }}',
-    novelSlug: '{{ $novel->slug }}',
-    novelTitle: @js($novel->title),
-    baseUrl: '{{ url('/') }}',
-    protectChapter: @js($protectContent ?? false)
-})" class="max-w-4xl mx-auto px-4 sm:px-0 pb-20">
-    <!-- Reader Progress & Sticky Header (Mobile) -->
-    <div class="fixed top-0 left-0 w-full h-1.5 bg-slate-200 dark:bg-slate-800 z-[60] md:hidden">
-        <div class="h-full bg-slate-800 dark:bg-slate-400 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.1)]" id="scroll-progress"></div>
+<div x-data="reader(@js([
+    'nextChapterSlug' => $nextChapter ? $nextChapter->slug : '',
+    'prevChapterSlug' => $previousChapter ? $previousChapter->slug : '',
+    'currentChapterSlug' => $chapter->slug,
+    'allChapters' => $allChapters,
+    'novelSlug' => $novel->slug,
+    'novelTitle' => $novel->title,
+    'baseUrl' => url('/'),
+    'protectChapter' => $protectContent ?? false
+]))" class="max-w-4xl mx-auto px-4 sm:px-0 pb-20 pt-10">
+    <!-- Reader Progress -->
+    <div class="fixed top-0 left-0 w-full h-1.5 bg-slate-200 dark:bg-slate-800 z-[60]">
+        <div class="h-full bg-indigo-500 transition-all duration-300 shadow-[0_0_10px_rgba(99,102,241,0.5)]" id="scroll-progress"></div>
     </div>
 
-    <div id="pwa-offline-banner" class="hidden fixed top-14 md:top-20 left-1/2 -translate-x-1/2 z-[70] max-w-md w-[calc(100%-2rem)] px-4 py-2.5 rounded-xl bg-amber-950/95 border border-amber-700/50 text-amber-100 text-xs font-semibold text-center shadow-lg" role="status">
-        Mode offline — bab yang sudah pernah dibuka dari perangkat ini tetap bisa dibaca. Muat bab baru perlu koneksi internet.
-    </div>
-
-    <!-- Chapter Navigation (Top) -->
-    <div class="flex items-center justify-between mb-6 p-2 md:p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-        <a href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}" 
-           class="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 text-sm font-bold rounded-xl transition-all {{ $previousChapter ? 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-            <span class="hidden sm:block uppercase tracking-wider">Previous</span>
+    <!-- Reader Sidebar (Rectangular Design) -->
+    <div class="reader-sidebar" x-show="!isLoading">
+        <!-- Back to Novel -->
+        <a href="{{ route('novels.show', $novel->slug) }}" class="sidebar-btn" title="Kembali ke Novel">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
         </a>
 
-        <div class="text-center flex-1 mx-2 md:mx-4 min-w-0">
-            <h2 class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 truncate">{{ $novel->title }}</h2>
-            <h1 class="text-xs md:text-lg font-extrabold text-slate-900 dark:text-white truncate">{{ $chapter->title }}</h1>
-        </div>
+        <div class="sidebar-divider"></div>
 
-        <div class="flex items-center gap-0.5 md:gap-1">
-            <!-- Reader Settings Toggle -->
-            <button @click="showSettings = !showSettings" 
-                class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors relative"
-                title="Pengaturan Baca">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        <!-- Previous Chapter -->
+        <a id="sidebar-prev-link" 
+           href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}" 
+           class="sidebar-btn" 
+           :class="!prevChapterSlug ? 'disabled' : ''"
+           title="Bab Sebelumnya">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+
+        <!-- Chapter Selector Toggle -->
+        <button type="button" 
+                @click="showChapters = !showChapters; showSettings = false"
+                :class="showChapters ? 'active' : ''"
+                class="sidebar-btn" title="Pilih Chapter">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+
+        <!-- Next Chapter -->
+        <a id="sidebar-next-link" 
+           href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}" 
+           class="sidebar-btn"
+           :class="!nextChapterSlug ? 'disabled' : ''"
+           title="Bab Berikutnya">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- Settings Toggle -->
+        <button type="button"
+                @click="showSettings = !showSettings; showChapters = false" 
+                :class="showSettings ? 'active' : ''"
+                class="sidebar-btn" title="Pengaturan Baca">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+
+        <!-- Chapter Selector Panel -->
+        <div x-show="showChapters" 
+             @click.away="showChapters = false"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-x-4"
+             x-transition:enter-end="opacity-100 translate-x-0"
+             class="sidebar-panel" x-cloak>
+            <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                 </svg>
-            </button>
-
-            <a href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}" 
-               class="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 text-sm font-bold rounded-xl transition-all {{ $nextChapter ? 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed' }}">
-                <span class="hidden sm:block uppercase tracking-wider">Next</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
-            </a>
-        </div>
-    </div>
-
-    <!-- Reader Settings Panel -->
-    <div x-show="showSettings" 
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 -translate-y-4"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 -translate-y-4"
-         class="mb-6 p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl"
-         style="display: none;">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Font Size -->
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Ukuran Font</label>
-                <div class="flex items-center gap-2">
-                    <button @click="updateFontSize('text-base')" :class="fontSize === 'text-base' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-bold transition-all">A</button>
-                    <button @click="updateFontSize('text-lg')" :class="fontSize === 'text-lg' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-base font-bold transition-all">A</button>
-                    <button @click="updateFontSize('text-xl')" :class="fontSize === 'text-xl' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-lg font-bold transition-all">A</button>
-                    <button @click="updateFontSize('text-2xl')" :class="fontSize === 'text-2xl' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-xl font-bold transition-all">A</button>
-                </div>
-            </div>
-            <!-- Font Family -->
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Jenis Font</label>
-                <div class="flex items-center gap-2">
-                    <button @click="updateFontFamily('font-sans')" :class="fontFamily === 'font-sans' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-sans transition-all">Sans</button>
-                    <button @click="updateFontFamily('font-serif')" :class="fontFamily === 'font-serif' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-serif transition-all">Serif</button>
-                    <button @click="updateFontFamily('font-mono')" :class="fontFamily === 'font-mono' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'" class="flex-1 py-2 rounded-xl text-sm font-mono transition-all">Mono</button>
+                Pilih Chapter
+            </h3>
+            <div class="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div class="grid gap-2">
+                    <template x-for="ch in allChapters" :key="ch.slug">
+                        <a :href="'{{ url('/novels/' . $novel->slug) }}/' + ch.slug" 
+                           class="block p-3 rounded-xl text-sm transition-all"
+                           :class="currentChapterSlug === ch.slug ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'">
+                            <span x-text="ch.title"></span>
+                        </a>
+                    </template>
                 </div>
             </div>
         </div>
+
+        <!-- Settings Panel -->
+        <div x-show="showSettings" 
+             @click.away="showSettings = false"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-x-4"
+             x-transition:enter-end="opacity-100 translate-x-0"
+             class="sidebar-panel" x-cloak>
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Ukuran Font</label>
+                    <div class="flex items-center gap-1.5">
+                        <template x-for="size in ['text-base', 'text-lg', 'text-xl', 'text-2xl']">
+                            <button @click="updateFontSize(size)" 
+                                    :class="fontSize === size ? 'bg-white text-slate-950' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'"
+                                    class="flex-1 h-10 rounded-xl text-sm font-bold transition-all flex items-center justify-center"
+                                    x-text="size === 'text-base' ? 'A' : (size === 'text-lg' ? 'A+' : (size === 'text-xl' ? 'A++' : 'A+++'))"></button>
+                        </template>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Jenis Font</label>
+                    <div class="flex flex-col gap-1.5">
+                        <template x-for="family in [{id: 'font-sans', label: 'Sans Serif'}, {id: 'font-serif', label: 'Serif'}, {id: 'font-mono', label: 'Monospace'}]">
+                            <button @click="updateFontFamily(family.id)" 
+                                    :class="[fontFamily === family.id ? 'bg-white text-slate-950' : 'bg-slate-800 text-slate-400 hover:bg-slate-700', family.id]"
+                                    class="w-full h-10 rounded-xl text-xs font-bold transition-all px-4 text-left flex items-center justify-between"
+                                    x-text="family.label"></button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Reading Area Container (anti-copy / watermark hanya di area ini, bukan komentar) -->
-    <div id="chapters-container" class="@if($protectContent ?? false) select-none @endif -mx-4 sm:mx-0">
-        <!-- Current Chapter -->
-        <div data-slug="{{ $chapter->slug }}" data-title="{{ $chapter->title }}">
-            <div class="bg-white dark:bg-slate-900 sm:rounded-3xl p-6 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-none border-y sm:border border-slate-100 dark:border-slate-800 mb-10">
-                @if($protectContent ?? false)
-                <div class="reader-chapter-shell" @contextmenu.prevent>
-                @endif
-                <article :class="[fontSize, fontFamily]" class="prose prose-slate dark:prose-invert max-w-none leading-relaxed md:leading-loose text-slate-800 dark:text-slate-200 transition-all duration-300">
-                    {!! $chapterBodyHtml !!}
-                </article>
-                @if($protectContent ?? false)
+    <!-- Mobile Settings Panel (Removed redundant one, consolidated above) -->
+
+    <!-- Title Header -->
+    <div class="text-center mb-12">
+        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-3">{{ $novel->title }}</h2>
+        <h1 class="text-3xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">{{ $chapter->title }}</h1>
+    </div>
+
+    <!-- Reading Area -->
+    <div id="chapters-container" class="-mx-4 sm:mx-0">
+        <div data-slug="{{ $chapter->slug }}" data-title="{{ $chapter->title }}" data-prev-slug="{{ $previousChapter ? $previousChapter->slug : '' }}" data-next-slug="{{ $nextChapter ? $nextChapter->slug : '' }}">
+            <div class="bg-white dark:bg-slate-900 sm:rounded-[2.5rem] p-6 md:p-16 shadow-2xl shadow-slate-200/50 dark:shadow-none border-y sm:border border-slate-100 dark:border-slate-800 mb-10">
+                <div class="{{ ($protectContent ?? false) ? 'reader-chapter-shell' : '' }}" @if($protectContent ?? false) @contextmenu.prevent @endif>
+                    <article :class="[fontSize, fontFamily]" class="prose prose-slate dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 transition-all duration-300">
+                        {!! $chapterBodyHtml !!}
+                    </article>
                 </div>
-                @endif
 
                 @if($chapter->file_path)
-                    <div class="mt-12 p-6 md:p-8 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-2xl text-center">
-                        <p class="text-slate-700 dark:text-slate-300 font-medium mb-4 text-base md:text-lg">Tersedia dalam format file untuk dibaca offline:</p>
-                        <a href="{{ asset('storage/' . $chapter->file_path) }}" class="inline-flex items-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-xl shadow-slate-900/10 w-full sm:w-auto justify-center" target="_blank">
+                    <div class="mt-16 pt-10 border-t border-slate-100 dark:border-slate-800 text-center">
+                        <a href="{{ asset('storage/' . $chapter->file_path) }}" class="inline-flex items-center gap-3 px-8 py-4 bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-bold rounded-2xl hover:opacity-90 transition-all shadow-xl shadow-slate-950/10 w-full sm:w-auto justify-center" target="_blank">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                             Download Chapter File
                         </a>
@@ -112,41 +324,22 @@
     </div>
 
     <!-- Autoload Trigger -->
-    <div id="autoload-trigger" class="h-40 flex items-center justify-center mb-10 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
+    <div id="autoload-trigger" class="h-40 flex items-center justify-center mb-20 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem]">
         <template x-if="isLoading">
             <div class="flex items-center gap-3 text-slate-800 dark:text-white">
                 <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span class="font-bold text-sm uppercase tracking-widest">Loading Next Chapter...</span>
+                <span class="font-bold text-sm uppercase tracking-widest">Memuat Bab Selanjutnya...</span>
             </div>
         </template>
         <template x-if="!isLoading && nextChapterSlug">
-            <div class="text-slate-400 text-xs font-medium uppercase tracking-widest">Scroll untuk memuat chapter berikutnya</div>
+            <div class="text-slate-400 text-xs font-medium uppercase tracking-widest">Scroll untuk memuat bab berikutnya</div>
         </template>
         <template x-if="!nextChapterSlug">
-            <div class="text-slate-400 text-xs font-medium uppercase tracking-widest italic">Anda telah mencapai akhir novel</div>
+            <div class="text-slate-400 text-xs font-medium uppercase tracking-widest italic">Akhir dari Novel</div>
         </template>
-    </div>
-
-    <!-- Chapter Navigation (Bottom) -->
-    <div class="flex items-center justify-between mb-16 gap-2 md:gap-4">
-        <a href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}" 
-           class="flex-1 flex items-center justify-center gap-2 px-3 md:px-4 py-3 md:py-4 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-400 transition-all shadow-sm {{ !$previousChapter ? 'opacity-50 cursor-not-allowed' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-            <span class="hidden sm:inline uppercase tracking-wider">Previous</span>
-        </a>
-
-        <a href="{{ route('novels.show', $novel->slug) }}" class="p-3 md:p-4 bg-white dark:bg-slate-900 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shadow-sm shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-        </a>
-
-        <a id="next-chapter-link" href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}" 
-           class="flex-1 flex items-center justify-center gap-2 px-3 md:px-4 py-3 md:py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-xl shadow-slate-900/10 {{ !$nextChapter ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
-            <span class="hidden sm:inline uppercase tracking-wider">Next</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
-        </a>
     </div>
 
     <!-- Comments Section -->
@@ -195,7 +388,6 @@
                         <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $comment->content }}</p>
                         
                         <div class="mt-3 flex items-center gap-4">
-                            <!-- Reaction Buttons -->
                             <div class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-lg p-1 border border-slate-100 dark:border-slate-700">
                                 <form action="{{ route('reactions.toggle', ['type' => 'comment', 'id' => $comment->id]) }}" method="POST" class="inline">
                                     @csrf
@@ -238,184 +430,244 @@
         </div>
     </div>
 </div>
+@endsection
 
-    @push('styles')
-    <style>
-        .reader-chapter-shell article,
-        .reader-chapter-shell article * {
-            -webkit-user-select: none;
-            user-select: none;
+@push('scripts')
+<script>
+    (function () {
+        const el = document.getElementById('pwa-offline-banner');
+        if (!el) return;
+        function sync() {
+            el.classList.toggle('hidden', navigator.onLine);
         }
-    </style>
-    @endpush
+        sync();
+        window.addEventListener('online', sync);
+        window.addEventListener('offline', sync);
+    })();
 
-    @push('scripts')
-    <script>
-        (function () {
-            const el = document.getElementById('pwa-offline-banner');
-            if (!el) return;
-            function sync() {
-                el.classList.toggle('hidden', navigator.onLine);
-            }
-            sync();
-            window.addEventListener('online', sync);
-            window.addEventListener('offline', sync);
-        })();
+    // Reader Component Function (Global scope for Alpine.js)
+    window.reader = function(config = {}) {
+        // Safe localStorage access
+        let initialFontSize = 'text-lg';
+        let initialFontFamily = 'font-sans';
+        
+        try {
+            initialFontSize = localStorage.getItem('reader-font-size') || 'text-lg';
+            initialFontFamily = localStorage.getItem('reader-font-family') || 'font-sans';
+        } catch (e) {
+            console.warn('LocalStorage access failed:', e);
+        }
 
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('reader', (config) => ({
-                fontSize: config.initialFontSize,
-                fontFamily: config.initialFontFamily,
-                showSettings: false,
-                nextChapterSlug: config.nextChapterSlug,
-                isLoading: false,
-                novelSlug: config.novelSlug,
-                novelTitle: config.novelTitle,
-                baseUrl: config.baseUrl,
-                protectChapter: config.protectChapter,
+        return {
+            fontSize: initialFontSize,
+            fontFamily: initialFontFamily,
+            showSettings: false,
+            showChapters: false,
+            nextChapterSlug: config.nextChapterSlug || '',
+            prevChapterSlug: config.prevChapterSlug || '',
+            currentChapterSlug: config.currentChapterSlug || '',
+            allChapters: config.allChapters || [],
+            isLoading: false,
+            novelSlug: config.novelSlug || '',
+            novelTitle: config.novelTitle || '',
+            baseUrl: config.baseUrl || '',
+            protectChapter: config.protectChapter || false,
+            scrollObserver: null,
 
-                init() {
-                    this.setupScrollObserver();
-                    if (this.protectChapter) {
-                        const zone = document.getElementById('chapters-container');
-                        if (zone) {
-                            ['copy', 'cut'].forEach((ev) => {
-                                zone.addEventListener(ev, (e) => e.preventDefault(), true);
-                            });
-                        }
+            init() {
+                // Clean baseUrl to avoid double slashes
+                this.baseUrl = (this.baseUrl || '').replace(/\/$/, '');
+
+                // Sincronize view with current state
+                this.$watch('fontSize', () => this.updateAllChapters());
+                this.$watch('fontFamily', () => this.updateAllChapters());
+                
+                this.updateAllChapters();
+                this.setupScrollObserver();
+                this.setupAutoloadObserver();
+                
+                if (this.protectChapter) {
+                    const zone = document.getElementById('chapters-container');
+                    if (zone) {
+                        ['copy', 'cut', 'contextmenu'].forEach((ev) => {
+                            zone.addEventListener(ev, (e) => {
+                                if (this.protectChapter) e.preventDefault();
+                            }, true);
+                        });
                     }
+                }
+                
+                window.addEventListener('scroll', () => {
+                    const winScroll = window.pageYOffset || document.documentElement.scrollTop;
+                    const scrollHeight = document.documentElement.scrollHeight;
+                    const clientHeight = document.documentElement.clientHeight;
+                    const height = scrollHeight - clientHeight;
                     
-                    window.addEventListener('scroll', () => {
-                        const winScroll = window.pageYOffset || document.documentElement.scrollTop;
-                        const scrollHeight = document.documentElement.scrollHeight;
-                        const clientHeight = document.documentElement.clientHeight;
-                        const height = scrollHeight - clientHeight;
+                    if (height > 0) {
                         const scrolled = (winScroll / height) * 100;
-                        
                         const progressBar = document.getElementById('scroll-progress');
                         if (progressBar) {
                             progressBar.style.width = scrolled + '%';
                         }
+                    }
+                }, { passive: true });
+            },
 
-                        const distanceFromBottom = scrollHeight - (winScroll + clientHeight);
-                        if (distanceFromBottom < 1000 && !this.isLoading && this.nextChapterSlug) {
-                            this.loadNextChapter();
-                        }
-                    });
-                },
+            setupAutoloadObserver() {
+                const trigger = document.getElementById('autoload-trigger');
+                if (!trigger) return;
 
-                updateFontSize(size) {
-                    this.fontSize = size;
+                const observer = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting && !this.isLoading && this.nextChapterSlug) {
+                        this.loadNextChapter();
+                    }
+                }, { rootMargin: '400px' }); // Trigger when 400px from viewport
+
+                observer.observe(trigger);
+            },
+
+            updateFontSize(size) {
+                this.fontSize = size;
+                try {
                     localStorage.setItem('reader-font-size', size);
-                    this.updateAllChapters();
-                },
+                } catch (e) {}
+            },
 
-                updateFontFamily(family) {
-                    this.fontFamily = family;
+            updateFontFamily(family) {
+                this.fontFamily = family;
+                try {
                     localStorage.setItem('reader-font-family', family);
-                    this.updateAllChapters();
-                },
+                } catch (e) {}
+            },
 
-                updateAllChapters() {
+            updateAllChapters() {
+                // Wait for Alpine to update the DOM
+                this.$nextTick(() => {
                     document.querySelectorAll('#chapters-container article').forEach(el => {
                         el.classList.remove('text-base', 'text-lg', 'text-xl', 'text-2xl', 'font-sans', 'font-serif', 'font-mono');
                         el.classList.add(this.fontSize, this.fontFamily);
                     });
-                },
+                });
+            },
 
-                async loadNextChapter() {
-                    if (!this.nextChapterSlug || this.isLoading) return;
+            async loadNextChapter() {
+                if (!this.nextChapterSlug || this.isLoading) return;
+                
+                this.isLoading = true;
+                try {
+                    const url = `${this.baseUrl}/novels/${this.novelSlug}/read/${this.nextChapterSlug}`;
                     
-                    this.isLoading = true;
-                    try {
-                        const url = `${this.baseUrl}/novels/${this.novelSlug}/read/${this.nextChapterSlug}`;
-                        
-                        const response = await fetch(url, {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json'
-                            }
-                        });
-                        
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        
-                        const data = await response.json();
-                        
-                        const chapterDiv = document.createElement('div');
-                        chapterDiv.className = 'mt-20 pt-20 border-t border-slate-100 dark:border-slate-800 chapter-section';
-                        chapterDiv.dataset.slug = data.chapter.slug;
-                        chapterDiv.dataset.title = data.chapter.title;
-                        
-                        const shellOpen = this.protectChapter ? "<div class='reader-chapter-shell select-none' oncontextmenu='return false'>" : '';
-                        const shellClose = this.protectChapter ? '</div>' : '';
-
-                        chapterDiv.innerHTML = `
-                            <div class='mb-10 text-center'>
-                                <h2 class='text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1'>${data.novel.title}</h2>
-                                <h1 class='text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white'>${data.chapter.title}</h1>
-                            </div>
-                            <div class='bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800'>
-                                ${shellOpen}
-                                <article class='${this.fontSize} ${this.fontFamily} prose prose-slate dark:prose-invert max-w-none leading-relaxed md:leading-loose text-slate-800 dark:text-slate-200 transition-all duration-300 chapter-content-article'>
-                                </article>
-                                ${shellClose}
-                                <div class='mt-10 pt-10 border-t border-slate-100 dark:border-slate-800'>
-                                    <a href='${url}' class='text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-2'>
-                                        <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z' /></svg>
-                                        Diskusi (${data.chapter.comments_count})
-                                    </a>
-                                </div>
-                            </div>
-                        `;
-                        
-                        // Set content safely to avoid breaking template literals
-                        chapterDiv.querySelector('.chapter-content-article').innerHTML = data.chapter.content;
-                        
-                        document.getElementById('chapters-container').appendChild(chapterDiv);
-                        this.nextChapterSlug = data.chapter.next_chapter_slug;
-                        
-                        this.scrollObserver.observe(chapterDiv);
-
-                        const nextLink = document.getElementById('next-chapter-link');
-                        if (nextLink) {
-                            if (this.nextChapterSlug) {
-                                nextLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${this.nextChapterSlug}`;
-                                nextLink.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                            } else {
-                                nextLink.href = '#';
-                                nextLink.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                            }
+                    const response = await fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
                         }
-
-                    } catch (error) {
-                        console.error('Failed to load next chapter:', error);
-                    } finally {
-                        this.isLoading = false;
+                    });
+                    
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            this.nextChapterSlug = null; // No more chapters
+                        }
+                        throw new Error('Network response was not ok');
                     }
-                },
+                    
+                    const data = await response.json();
+                    
+                    if (!data.chapter || !data.chapter.content) {
+                        this.nextChapterSlug = null;
+                        return;
+                    }
+                    
+                    const chapterDiv = document.createElement('div');
+                    chapterDiv.className = 'mt-20 pt-20 border-t border-slate-100 dark:border-slate-800 chapter-section';
+                    chapterDiv.dataset.slug = data.chapter.slug;
+                    chapterDiv.dataset.title = data.chapter.title;
+                    chapterDiv.dataset.prevSlug = data.chapter.prev_chapter_slug || '';
+                    chapterDiv.dataset.nextSlug = data.chapter.next_chapter_slug || '';
+                    
+                    const shellOpen = this.protectChapter ? "<div class='reader-chapter-shell'>" : '<div>';
+                    const shellClose = '</div>';
 
-                setupScrollObserver() {
-                    this.scrollObserver = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
-                                const slug = entry.target.dataset.slug;
-                                const title = entry.target.dataset.title;
-                                
-                                if (slug && window.location.pathname.indexOf(slug) === -1) {
-                                    const newUrl = `${this.baseUrl}/novels/${this.novelSlug}/read/${slug}`;
-                                    window.history.pushState({ slug }, '', newUrl);
-                                    document.title = `${this.novelTitle} - ${title} | {{ config('app.name') }}`;
+                    chapterDiv.innerHTML = `
+                        <div class='mb-12 text-center'>
+                            <h2 class='text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-3'>${data.novel.title}</h2>
+                            <h1 class='text-3xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight tracking-tight'>${data.chapter.title}</h1>
+                        </div>
+                        <div class='bg-white dark:bg-slate-900 sm:rounded-[2.5rem] p-6 md:p-16 shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800'>
+                            ${shellOpen}
+                            <article class='${this.fontSize} ${this.fontFamily} prose prose-slate dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 transition-all duration-300 chapter-content-article'>
+                            </article>
+                            ${shellClose}
+                            <div class='mt-10 pt-10 border-t border-slate-100 dark:border-slate-800'>
+                                <a href='${url}' class='text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-2'>
+                                    <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z' /></svg>
+                                    Diskusi (${data.chapter.comments_count})
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    
+                    chapterDiv.querySelector('.chapter-content-article').innerHTML = data.chapter.content;
+                    document.getElementById('chapters-container').appendChild(chapterDiv);
+                    
+                    // Update states from response
+                    this.nextChapterSlug = data.chapter.next_chapter_slug;
+                    if (data.all_chapters) {
+                        this.allChapters = data.all_chapters;
+                    }
+                    
+                    // Re-observe new content
+                    if (this.scrollObserver) {
+                        this.scrollObserver.observe(chapterDiv);
+                    }
+
+                } catch (error) {
+                    console.error('Failed to load next chapter:', error);
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            setupScrollObserver() {
+                this.scrollObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
+                            const slug = entry.target.dataset.slug;
+                            const title = entry.target.dataset.title;
+                            const prevSlug = entry.target.dataset.prevSlug;
+                            const nextSlug = entry.target.dataset.nextSlug;
+                            
+                            if (slug && window.location.pathname.indexOf(slug) === -1) {
+                                const newUrl = `${this.baseUrl}/novels/${this.novelSlug}/read/${slug}`;
+                                window.history.pushState({ slug }, '', newUrl);
+                                document.title = `${this.novelTitle} - ${title} | {{ config('app.name') }}`;
+
+                                // Update Alpine state for sidebar reactivity
+                                this.currentChapterSlug = slug;
+                                this.prevChapterSlug = prevSlug;
+                                this.nextChapterSlug = nextSlug;
+
+                                // Update Sidebar Hrefs manually for standard anchor tags if needed, 
+                                // but Alpine :href should handle it if we use it correctly.
+                                const prevLink = document.getElementById('sidebar-prev-link');
+                                const nextLink = document.getElementById('sidebar-next-link');
+
+                                if (prevLink && prevSlug) {
+                                    prevLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${prevSlug}`;
+                                }
+                                if (nextLink && nextSlug) {
+                                    nextLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${nextSlug}`;
                                 }
                             }
-                        });
-                    }, { threshold: [0.1, 0.5] });
-
-                    document.querySelectorAll('#chapters-container > div').forEach(div => {
-                        this.scrollObserver.observe(div);
+                        }
                     });
-                }
-            }));
-        });
-    </script>
-    @endpush
-@endsection
+                }, { threshold: [0.1, 0.5] });
+
+                document.querySelectorAll('#chapters-container > div, .chapter-section').forEach(div => {
+                    this.scrollObserver.observe(div);
+                });
+            }
+        };
+    };
+</script>
+@endpush

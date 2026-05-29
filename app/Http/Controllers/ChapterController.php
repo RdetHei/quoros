@@ -184,10 +184,20 @@ class ChapterController extends Controller
         $previousChapter = $chapter->previous(! $isAuthorOrAdmin);
         $nextChapter = $chapter->next(! $isAuthorOrAdmin);
 
+        $allChapters = $novel->chapters()
+            ->when(! $isAuthorOrAdmin, function ($query) {
+                return $query->where('status', 'published')
+                    ->where(function ($q) {
+                        $q->whereNull('published_at')
+                            ->orWhere('published_at', '<=', now());
+                    });
+            })
+            ->orderBy('created_at', 'asc') // or however they are ordered
+            ->get(['title', 'slug']);
+
         $protectContent = ! $isAuthorOrAdmin;
         $chapterBodyHtml = $this->formatChapterBodyForDisplay(
             $chapter->content,
-            $this->readerWatermarkLabel(),
             $protectContent,
         );
 
@@ -202,9 +212,11 @@ class ChapterController extends Controller
                     'title' => $chapter->title,
                     'slug' => $chapter->slug,
                     'content' => $chapterBodyHtml,
+                    'prev_chapter_slug' => $previousChapter ? $previousChapter->slug : null,
                     'next_chapter_slug' => $nextChapter ? $nextChapter->slug : null,
                     'comments_count' => $chapter->comments->count(),
                 ],
+                'all_chapters' => $allChapters,
             ]);
         }
 
@@ -213,44 +225,33 @@ class ChapterController extends Controller
             'chapter',
             'previousChapter',
             'nextChapter',
+            'allChapters',
             'protectContent',
             'chapterBodyHtml',
         ));
     }
 
-    private function readerWatermarkLabel(): string
-    {
-        if (Auth::check()) {
-            return Auth::user()->name.' · '.config('app.name', 'Quoros');
-        }
-
-        return (string) config('app.name', 'Quoros');
-    }
-
     /**
      * Sisipkan watermark tipis antar blok paragraf (pisah baris kosong). Tanpa watermark jika penulis/admin.
      */
-    private function formatChapterBodyForDisplay(?string $content, string $watermarkLabel, bool $withWatermark): string
+    private function formatChapterBodyForDisplay(?string $content, bool $withWatermark): string
     {
         $raw = $content ?? '';
-        if (! $withWatermark) {
-            return nl2br(e($raw));
-        }
-
+        
+        // Bersihkan konten dari spasi berlebih
         $normalized = str_replace(["\r\n", "\r"], "\n", $raw);
-        $paras = preg_split("/\n\s*\n/", $normalized, -1, PREG_SPLIT_NO_EMPTY);
-        $wm = '<span class="chapter-wm block text-center text-[10px] sm:text-xs my-5 text-slate-400/25 dark:text-slate-500/30 select-none pointer-events-none tracking-widest font-semibold" aria-hidden="true">'.e($watermarkLabel).'</span>';
+        $normalized = trim($normalized);
 
-        if ($paras === false || count($paras) < 2) {
-            return nl2br(e($normalized)).$wm;
+        // Pecah berdasarkan paragraf (double newline)
+        $paras = preg_split("/\n\s*\n/", $normalized, -1, PREG_SPLIT_NO_EMPTY);
+        
+        if (empty($paras)) {
+            return '<p>' . nl2br(e($normalized)) . '</p>';
         }
 
         $parts = [];
         foreach ($paras as $i => $p) {
-            $parts[] = nl2br(e(trim($p)));
-            if ($i < count($paras) - 1) {
-                $parts[] = $wm;
-            }
+            $parts[] = '<p class="mb-5">' . nl2br(e(trim($p))) . '</p>';
         }
 
         return implode('', $parts);
