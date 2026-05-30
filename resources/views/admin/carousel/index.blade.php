@@ -31,7 +31,7 @@
                 @foreach($featuredNovels as $novel)
                     <div class="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all">
                         <div class="aspect-[16/9] overflow-hidden">
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='/error.png'">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
                         </div>
                         
@@ -72,7 +72,7 @@
                 <div class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all group">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                         </div>
                         <div>
                             <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</h4>

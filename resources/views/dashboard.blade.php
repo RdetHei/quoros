@@ -25,9 +25,9 @@
                 <div class="relative">
                     <div class="w-16 h-16 md:w-24 md:h-24 rounded-2xl overflow-hidden ring-4 ring-slate-50 dark:ring-slate-800 shadow-md">
                         @if($user->profile_photo_url)
-                            <img src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover" loading="lazy">
+                            <img src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($user->profile_photo)
-                            <img src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover" loading="lazy">
+                            <img src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @else
                             <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
                                 {{ substr($user->name, 0, 1) }}
@@ -236,7 +236,7 @@
             <section class="bg-slate-900 dark:bg-indigo-950 rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
                 <div class="flex flex-col md:flex-row items-center gap-5 md:gap-8 p-5 md:p-10">
                     <div class="w-24 md:w-40 flex-shrink-0 rounded-xl md:rounded-2xl overflow-hidden shadow-lg">
-                        <img src="{{ asset('storage/' . $lastRead->novel->cover_image) }}" class="w-full h-full object-cover aspect-[3/4]">
+                        <img src="{{ asset('storage/' . $lastRead->novel->cover_image) }}" class="w-full h-full object-cover aspect-[3/4]" onerror="this.onerror=null; this.src='/error.png'">
                     </div>
                     
                     <div class="flex-grow space-y-4 md:space-y-6 text-center md:text-left w-full">
@@ -351,9 +351,9 @@
                             <a href="{{ route('novels.show', $bookmark->novel->slug) }}" class="group block">
                                 <div class="relative aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden shadow-sm transition-shadow group-hover:shadow-md">
                                     @if($bookmark->novel->cover_image_url)
-                                        <img src="{{ $bookmark->novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                                        <img src="{{ $bookmark->novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                     @elseif($bookmark->novel->cover_image)
-                                        <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                                        <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                     @else
                                         <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 text-center">
                                             <span class="text-[10px] text-slate-400 font-bold">{{ $bookmark->novel->title }}</span>
@@ -397,9 +397,9 @@
                             <div class="group bg-white dark:bg-slate-900 p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-row items-center gap-4 md:gap-6 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-sm">
                                 <div class="w-16 h-24 md:w-24 md:h-32 flex-shrink-0 rounded-lg md:rounded-xl overflow-hidden shadow-sm">
                                     @if($history->novel->cover_image_url)
-                                        <img src="{{ $history->novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                                        <img src="{{ $history->novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                     @elseif($history->novel->cover_image)
-                                        <img src="{{ asset('storage/' . $history->novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                                        <img src="{{ asset('storage/' . $history->novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                     @else
                                         <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 text-center">
                                             <span class="text-[10px] text-slate-400 font-bold">{{ $history->novel->title }}</span>
@@ -454,9 +454,9 @@
                             <a href="{{ route('novels.show', $novel->slug) }}" class="group bg-white dark:bg-slate-900 p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 flex gap-4 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-sm">
                                 <div class="w-16 h-24 md:w-20 md:h-28 flex-shrink-0 rounded-lg md:rounded-xl overflow-hidden shadow-sm">
                                     @if($novel->cover_image_url)
-                                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                     @elseif($novel->cover_image)
-                                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                     @else
                                         <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 text-center">
                                             <span class="text-[10px] text-slate-400 font-bold">{{ $novel->title }}</span>
@@ -578,11 +578,11 @@
                                             <div class="relative">
                                                 <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-4 border-slate-50 dark:border-slate-800 shadow-sm">
                                                     @if($user->profile_photo_url)
-                                                        <img id="profile-photo-img" src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover">
+                                                        <img id="profile-photo-img" src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                                                     @elseif($user->profile_photo)
-                                                        <img id="profile-photo-img" src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover">
+                                                        <img id="profile-photo-img" src="{{ asset('storage/' . $user->profile_photo) }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                                                     @else
-                                                        <img id="profile-photo-img" src="" class="w-full h-full object-cover hidden">
+                                                        <img id="profile-photo-img" src="" class="w-full h-full object-cover hidden" onerror="this.onerror=null; this.src='/error.png'">
                                                         <div id="profile-photo-placeholder" class="w-full h-full bg-indigo-600 flex items-center justify-center text-2xl md:text-3xl font-bold text-white uppercase">
                                                             {{ substr($user->name, 0, 1) }}
                                                         </div>

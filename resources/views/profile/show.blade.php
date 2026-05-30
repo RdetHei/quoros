@@ -15,9 +15,9 @@
             <div class="relative shrink-0">
                 <div class="w-28 h-28 md:w-44 md:h-44 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center ring-2 ring-slate-200/80 dark:ring-slate-700/80">
                     @if($user->profile_photo_url)
-                        <img src="{{ $user->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy">
+                        <img src="{{ $user->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @elseif($user->profile_photo)
-                        <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="" class="w-full h-full object-cover" loading="lazy">
+                        <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @else
                         <span class="text-4xl md:text-6xl font-black text-slate-400/20 uppercase">
                             {{ substr($user->name, 0, 1) }}
@@ -129,7 +129,7 @@
                     <a href="{{ route('novels.show', $bookmark->novel->slug) }}" class="group block">
                         <div class="relative aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden mb-2 md:mb-3 bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200/80 dark:ring-slate-700/50 group-hover:-translate-y-1 transition-transform duration-300">
                             @if($bookmark->novel->cover_image)
-                                <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='/error.png';">
                             @else
                                 <div class="w-full h-full flex items-center justify-center p-3">
                                     <span class="text-[10px] text-slate-400 font-bold text-center leading-snug">{{ $bookmark->novel->title }}</span>

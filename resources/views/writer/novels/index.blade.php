@@ -38,9 +38,9 @@
                                 <div class="flex items-center gap-5">
                                     <div class="relative w-16 h-22 flex-shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-md group-hover:shadow-lg transition-shadow duration-300">
                                         @if($novel->cover_image_url)
-                                            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                                            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                         @elseif($novel->cover_image)
-                                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center p-2 text-[8px] font-black text-slate-400 text-center uppercase">No Cover</div>
                                         @endif
@@ -144,6 +144,13 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination -->
+        @if ($novels->hasPages())
+            <div class="px-8 py-6 border-t border-slate-100 dark:border-slate-800">
+                {{ $novels->links('vendor.pagination.tailwind') }}
+            </div>
+        @endif
     </div>
 </div>
 @endsection

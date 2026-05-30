@@ -173,7 +173,7 @@
                         </button>
 
                         <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
-                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 md:h-10 w-auto group-hover:opacity-80 transition-opacity">
+                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 md:h-10 w-auto group-hover:opacity-80 transition-opacity" onerror="this.onerror=null; this.src='/error.png'">
                         </a>
                         
                         <div class="hidden lg:flex items-center gap-6">
@@ -228,9 +228,9 @@
                                 <button @click="open = !open" class="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                     <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-sm">
                                         @if(Auth::user()->profile_photo_url)
-                                            <img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" loading="lazy">
+                                            <img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                         @elseif(Auth::user()->profile_photo)
-                                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" loading="lazy">
+                                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                         @else
                                             {{ substr(Auth::user()->name, 0, 1) }}
                                         @endif
@@ -311,7 +311,7 @@
                      @click.stop>
                     <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto">
+                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto" onerror="this.onerror=null; this.src='/error.png'">
                             <div class="leading-tight">
                                 <p class="text-xs font-black uppercase tracking-widest text-slate-400">Menu</p>
                                 <p class="text-sm font-bold text-slate-900 dark:text-white">Navigasi</p>
@@ -328,7 +328,7 @@
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold">
                                     @if(Auth::user()->profile_photo)
-                                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover">
+                                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                                     @else
                                         {{ substr(Auth::user()->name, 0, 1) }}
                                     @endif
@@ -454,7 +454,7 @@
                 {{-- Logo --}}
                 <a href="{{ route('home') }}" class="inline-block mb-4 group">
                     <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros"
-                         class="h-10 w-auto group-hover:scale-105 transition-transform duration-300">
+                         class="h-10 w-auto group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='/error.png'">
                 </a>
 
                 <p class="text-[13px] leading-relaxed text-slate-500 dark:text-slate-400 max-w-[230px] mb-6">
@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function buildResultCard(novel) {
         const cover = novel.cover_image
-            ? `<img src="${novel.cover_image}" alt="${escHtml(novel.title)}" class="w-full h-full object-cover">`
+            ? `<img src="${novel.cover_image}" alt="${escHtml(novel.title)}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">`
             : `<div class="w-full h-full bg-slate-800 flex items-center justify-center p-1">
                    <span class="text-[8px] text-slate-500 font-bold text-center leading-tight">${escHtml(novel.title)}</span>
                </div>`;
@@ -724,7 +724,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             <div class="flex-grow overflow-hidden bg-slate-100 dark:bg-slate-950 p-4">
                 <div class="w-full h-full min-h-[300px] flex items-center justify-center">
-                    <img id="cropping-image" src="" class="max-w-full max-h-full">
+                    <img id="cropping-image" src="" class="max-w-full max-h-full" onerror="this.onerror=null; this.src='/error.png'">
                 </div>
             </div>
             <div class="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">

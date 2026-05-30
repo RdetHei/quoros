@@ -42,9 +42,9 @@
                 <!-- Background Layer -->
                 <div class="absolute inset-0 overflow-hidden">
                     @if($novel->cover_image_url)
-                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover blur-md opacity-30 scale-110 object-center" loading="lazy">
+                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover blur-md opacity-30 scale-110 object-center" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                     @elseif($novel->cover_image)
-                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover blur-md opacity-30 scale-110 object-center" loading="lazy">
+                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover blur-md opacity-30 scale-110 object-center" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                     @endif
                     <!-- Dynamic Gradients -->
                     <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
@@ -191,9 +191,9 @@
                              x-transition:enter-end="opacity-100 translate-x-0 scale-100">
                             <div class="relative z-10 w-64 h-[380px] mx-auto rounded-[2rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] border-4 border-white/10 hover:scale-105 transition-transform duration-700">
                                 @if($novel->cover_image_url)
-                                    <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                                    <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                 @elseif($novel->cover_image)
-                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                 @endif
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                             </div>
@@ -230,9 +230,9 @@
                 <!-- Cover -->
                 <a href="{{ route('novels.show', $novel->slug) }}" class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
                     @if($novel->cover_image_url)
-                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                     @elseif($novel->cover_image)
-                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                     @else
                         <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2">
                             <span class="text-[7px] text-slate-400 font-bold text-center uppercase leading-tight">{{ $novel->title }}</span>
@@ -284,9 +284,9 @@
                 <a href="{{ route('novels.show', $novel->slug) }}" class="group block">
                     <div class="relative aspect-[2/3] mb-2 rounded-xl overflow-hidden shadow-sm group-hover:shadow-lg group-hover:shadow-slate-500/20 transition-all">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @else
                             <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2">
                                 <span class="text-[8px] text-slate-400 font-bold text-center uppercase">{{ $novel->title }}</span>
@@ -354,9 +354,9 @@
                     </div>
                     <div class="w-12 h-16 flex-shrink-0 rounded-lg overflow-hidden">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @else
                             <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                                 <span class="text-[8px] text-slate-400">No Image</span>
@@ -385,9 +385,9 @@
                     </div>
                     <div class="w-12 h-16 flex-shrink-0 rounded-lg overflow-hidden">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @else
                             <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                                 <span class="text-[8px] text-slate-400">No Image</span>
@@ -421,9 +421,9 @@
         <a href="{{ route('novels.show', $novel->slug) }}" class="flex gap-4 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition-all group">
             <div class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden shadow-sm">
                 @if($novel->cover_image_url)
-                    <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy">
+                    <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                 @elseif($novel->cover_image)
-                    <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy">
+                    <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                 @else
                     <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2">
                         <span class="text-[10px] text-slate-400 font-bold text-center">{{ $novel->title }}</span>

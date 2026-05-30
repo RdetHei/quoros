@@ -496,7 +496,7 @@
             @php
                 $heroImage = $featuredNovels->first()?->cover_image_url ?? $recentlyUpdated->first()?->cover_image_url ?? 'https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?auto=format&fit=crop&w=2000&q=80';
             @endphp
-            <img src="{{ $heroImage }}" alt="Background Hero">
+            <img src="{{ $heroImage }}" alt="Background Hero" onerror="this.onerror=null; this.src='/error.png';">
         </div>
         <div class="qr-hero-overlay"></div>
 
@@ -634,9 +634,9 @@
 
                         <div class="qr-ncover">
                             @if($novel->cover_image_url)
-                                <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}">
+                                <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" onerror="this.onerror=null; this.src='/error.png';">
                             @elseif($novel->cover_image)
-                                <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}">
+                                <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" onerror="this.onerror=null; this.src='/error.png';">
                             @else
                                 <div style="width:100%;height:100%;background:linear-gradient(160deg,#1a2240,#0f1628);display:flex;align-items:center;justify-content:center;">
                                     <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#334155" aria-hidden="true">

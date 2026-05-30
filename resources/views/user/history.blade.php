@@ -15,9 +15,9 @@
             <div class="group flex flex-col sm:flex-row gap-6 p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-emerald-600 hover:shadow-xl transition-all relative overflow-hidden">
                 <div class="w-full sm:w-24 h-32 flex-shrink-0 rounded-2xl overflow-hidden shadow-md">
                     @if($history->novel->cover_image_url)
-                        <img src="{{ $history->novel->cover_image_url }}" class="w-full h-full object-cover">
+                        <img src="{{ $history->novel->cover_image_url }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png';">
                     @elseif($history->novel->cover_image)
-                        <img src="{{ asset('storage/' . $history->novel->cover_image) }}" class="w-full h-full object-cover">
+                        <img src="{{ asset('storage/' . $history->novel->cover_image) }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png';">
                     @else
                         <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 text-center">
                             <span class="text-[10px] text-slate-400 font-bold uppercase">{{ $history->novel->title }}</span>

@@ -15,9 +15,9 @@
             <a href="{{ route('novels.show', $novel->slug) }}" class="flex gap-4 p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group">
                 <div class="relative w-24 h-32 flex-shrink-0 rounded-2xl overflow-hidden shadow-md">
                     @if($novel->cover_image_url)
-                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                        <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @elseif($novel->cover_image)
-                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                        <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @else
                         <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 text-center">
                             <span class="text-[10px] text-slate-400 font-bold">{{ $novel->title }}</span>

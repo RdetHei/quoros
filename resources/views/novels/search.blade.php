@@ -149,12 +149,14 @@
                                 <img src="{{ $novel->cover_image_url }}"
                                      alt="{{ $novel->title }}"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                     loading="lazy">
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='/error.png'">
                             @elseif($novel->cover_image)
                                 <img src="{{ asset('storage/' . $novel->cover_image) }}"
                                      alt="{{ $novel->title }}"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                     loading="lazy">
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='/error.png'">
                             @else
                                 <div class="w-full h-full flex items-center justify-center p-3 bg-slate-800">
                                     <span class="text-[9px] text-slate-500 font-bold text-center leading-snug">{{ $novel->title }}</span>

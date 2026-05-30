@@ -229,7 +229,7 @@
         
         <!-- Mobile Header (Visible only on mobile) -->
         <div class="flex items-center gap-3 mb-4 md:hidden">
-            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto">
+            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto" onerror="this.onerror=null; this.src='/error.png'">
             <div class="leading-tight">
                 <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Navigasi</p>
                 <p class="text-sm font-bold text-white">Menu Baca</p>
@@ -454,7 +454,7 @@
                        class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs md:text-sm hover:ring-2 hover:ring-slate-500/40 transition-all"
                        title="Lihat profil">
                         @if($comment->user->profile_photo)
-                            <img src="{{ asset('storage/' . $comment->user->profile_photo) }}" alt="" class="w-full h-full object-cover rounded-full">
+                            <img src="{{ asset('storage/' . $comment->user->profile_photo) }}" alt="" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='/error.png'">
                         @else
                             {{ substr($comment->user->name, 0, 1) }}
                         @endif
