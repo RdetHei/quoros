@@ -249,7 +249,8 @@ class NovelController extends Controller
         $novels = Novel::where('author_id', Auth::id())
             ->withCount(['chapters', 'bookmarks'])
             ->latest()
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return view('writer.novels.index', compact('novels'));
     }
