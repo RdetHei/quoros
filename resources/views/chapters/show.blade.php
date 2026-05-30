@@ -36,16 +36,28 @@
 
     @media (max-width: 640px) {
         .reader-sidebar {
-            top: auto;
-            bottom: 1.5rem;
-            left: 50%;
-            right: auto;
-            transform: translateX(-50%);
-            width: auto;
-            flex-direction: row;
-            padding: 0.75rem 1.25rem;
-            border-radius: 2rem;
-            gap: 1rem;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: auto;
+            transform: none;
+            width: 80vw;
+            max-width: 300px;
+            height: 100dvh;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            border-radius: 2rem 0 0 2rem;
+            gap: 1.5rem;
+            border-right: none;
+            overflow-y: auto;
+        }
+
+        .reader-sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 90;
         }
     }
 
@@ -61,20 +73,40 @@
         border: 1px solid transparent;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
+        flex-shrink: 0;
     }
 
     @media (max-width: 640px) {
         .sidebar-btn {
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 0.875rem;
+            width: 100%;
+            height: 3.5rem;
+            justify-content: flex-start;
+            padding: 0 1.25rem;
+            gap: 1rem;
+            border-radius: 1.25rem;
         }
+
+        .sidebar-btn span {
+            display: inline !important;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+    }
+
+    .sidebar-btn span {
+        display: none;
     }
 
     .sidebar-btn:hover {
         background: #475569;
         color: #ffffff;
         transform: translateY(-2px);
+    }
+
+    @media (max-width: 640px) {
+        .sidebar-btn:hover {
+            transform: translateX(-4px);
+        }
     }
 
     .sidebar-btn.active {
@@ -92,13 +124,7 @@
         width: 100%;
         height: 1px;
         background: #334155;
-    }
-
-    @media (max-width: 640px) {
-        .sidebar-divider {
-            width: 1px;
-            height: 1.5rem;
-        }
+        flex-shrink: 0;
     }
 
     .sidebar-panel {
@@ -135,13 +161,14 @@
 
     @media (max-width: 640px) {
         .sidebar-panel {
-            right: 50%;
-            bottom: 100%;
-            margin-right: 0;
-            margin-bottom: 1.5rem;
-            transform: translateX(50%);
-            width: 90vw;
-            max-width: 22rem;
+            position: fixed;
+            inset: auto 1rem 1rem 1rem;
+            width: auto;
+            margin: 0;
+            bottom: 1rem;
+            right: 1rem;
+            left: 1rem;
+            z-index: 120;
         }
     }
 
@@ -177,13 +204,44 @@
         <div class="h-full bg-indigo-500 transition-all duration-300 shadow-[0_0_10px_rgba(99,102,241,0.5)]" id="scroll-progress"></div>
     </div>
 
+    <!-- Reader Sidebar Overlay (Mobile) -->
+    <div class="reader-sidebar-overlay md:hidden" 
+         x-show="sidebarOpen" 
+         @click="sidebarOpen = false; showSettings = false; showChapters = false"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         x-cloak></div>
+
     <!-- Reader Sidebar (Rectangular Design) -->
-    <div class="reader-sidebar" x-show="!isLoading">
+    <div class="reader-sidebar" 
+         x-show="!isLoading && (!isMobile || sidebarOpen)"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-10 sm:translate-y-0 sm:translate-x-10"
+         x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 sm:translate-x-0"
+         x-transition:leave-end="opacity-0 translate-y-10 sm:translate-y-0 sm:translate-x-10"
+         x-cloak>
+        
+        <!-- Mobile Header (Visible only on mobile) -->
+        <div class="flex items-center gap-3 mb-4 md:hidden">
+            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto">
+            <div class="leading-tight">
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Navigasi</p>
+                <p class="text-sm font-bold text-white">Menu Baca</p>
+            </div>
+        </div>
+
         <!-- Back to Novel -->
         <a href="{{ route('novels.show', $novel->slug) }}" class="sidebar-btn" title="Kembali ke Novel">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
+            <span>Kembali ke Novel</span>
         </a>
 
         <div class="sidebar-divider"></div>
@@ -197,6 +255,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
+            <span>Bab Sebelumnya</span>
         </a>
 
         <!-- Chapter Selector Toggle -->
@@ -207,6 +266,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
+            <span>Pilih Chapter</span>
         </button>
 
         <!-- Next Chapter -->
@@ -218,6 +278,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
+            <span>Bab Berikutnya</span>
         </a>
 
         <div class="sidebar-divider"></div>
@@ -231,6 +292,13 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
+            <span>Pengaturan Baca</span>
+        </button>
+
+        <!-- Mobile Close (Visible only on mobile) -->
+        <button type="button" @click="sidebarOpen = false" class="mt-auto sidebar-btn bg-slate-800 md:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <span>Tutup Menu</span>
         </button>
 
         <!-- Chapter Selector Panel -->
@@ -240,13 +308,18 @@
              x-transition:enter-start="opacity-0 translate-x-4"
              x-transition:enter-end="opacity-100 translate-x-0"
              class="sidebar-panel" x-cloak>
-            <h3 class="text-white font-bold mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-                </svg>
-                Pilih Chapter
+            <h3 class="text-white font-bold mb-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                    </svg>
+                    Pilih Chapter
+                </div>
+                <button @click="showChapters = false" class="md:hidden p-1 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
             </h3>
-            <div class="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+            <div class="max-h-[50vh] md:max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                 <div class="grid gap-2">
                     <template x-for="ch in allChapters" :key="ch.slug">
                         <a :href="'{{ url('/novels/' . $novel->slug) }}/' + ch.slug" 
@@ -266,6 +339,12 @@
              x-transition:enter-start="opacity-0 translate-x-4"
              x-transition:enter-end="opacity-100 translate-x-0"
              class="sidebar-panel" x-cloak>
+            <div class="flex items-center justify-between mb-4 md:hidden">
+                <h3 class="text-white font-bold">Pengaturan Baca</h3>
+                <button @click="showSettings = false" class="p-1 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
             <div class="space-y-6">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Ukuran Font</label>
@@ -463,11 +542,13 @@
             fontFamily: initialFontFamily,
             showSettings: false,
             showChapters: false,
+            sidebarOpen: false,
             nextChapterSlug: config.nextChapterSlug || '',
             prevChapterSlug: config.prevChapterSlug || '',
             currentChapterSlug: config.currentChapterSlug || '',
             allChapters: config.allChapters || [],
             isLoading: false,
+            isMobile: window.innerWidth <= 640,
             novelSlug: config.novelSlug || '',
             novelTitle: config.novelTitle || '',
             baseUrl: config.baseUrl || '',
@@ -482,9 +563,15 @@
                 this.$watch('fontSize', () => this.updateAllChapters());
                 this.$watch('fontFamily', () => this.updateAllChapters());
                 
+                // Reactive screen width
+                window.addEventListener('resize', () => {
+                    this.isMobile = window.innerWidth <= 640;
+                });
+                
                 this.updateAllChapters();
                 this.setupScrollObserver();
                 this.setupAutoloadObserver();
+                this.setupTouchGestures();
                 
                 if (this.protectChapter) {
                     const zone = document.getElementById('chapters-container');
@@ -524,6 +611,39 @@
                 }, { rootMargin: '400px' }); // Trigger when 400px from viewport
 
                 observer.observe(trigger);
+            },
+
+            setupTouchGestures() {
+                // Hanya aktifkan di layar mobile
+                if (window.innerWidth > 640) return;
+
+                let touchStartX = 0;
+                let touchEndX = 0;
+
+                window.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
+                window.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const swipeDistance = touchStartX - touchEndX;
+                    const minSwipeDistance = 50;
+
+                    // Swipe dari kanan ke kiri (Buka sidebar)
+                    if (swipeDistance > minSwipeDistance) {
+                        if (!this.sidebarOpen) {
+                            this.sidebarOpen = true;
+                        }
+                    } 
+                    // Swipe dari kiri ke kanan (Tutup sidebar)
+                    else if (swipeDistance < -minSwipeDistance) {
+                        if (this.sidebarOpen) {
+                            this.sidebarOpen = false;
+                            this.showSettings = false;
+                            this.showChapters = false;
+                        }
+                    }
+                }, { passive: true });
             },
 
             updateFontSize(size) {
