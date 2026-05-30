@@ -6,13 +6,18 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         $this->call([
-            MassiveDummyNovelSeeder::class,
+            UserSeeder::class,
+            GenreSeeder::class,
+            TagSeeder::class,
+            NovelSeeder::class,
+            ChapterSeeder::class,
+            NovelCharacterSeeder::class,
+            ReviewSeeder::class,
+            BookmarkSeeder::class,
+            ReadingHistorySeeder::class,
             AnnouncementSeeder::class,
             GuideSeeder::class,
         ]);
