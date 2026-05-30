@@ -33,6 +33,98 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
+        // Global Cropper Functions
+        let currentCropper = null;
+        let currentPreviewId = null;
+        let currentInput = null;
+        let currentCropOptions = {};
+
+        window.initCropper = function(input, previewId, options) {
+            if (input.files && input.files[0]) {
+                currentInput = input;
+                currentPreviewId = previewId;
+                currentCropOptions = options || {};
+                
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const modal = document.getElementById('cropping-modal');
+                    const image = document.getElementById('cropping-image');
+                    image.src = e.target.result;
+                    
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    
+                    if (currentCropper) {
+                        currentCropper.destroy();
+                    }
+                    
+                    // Delay init slightly to ensure image is loaded and modal is visible
+                    setTimeout(() => {
+                        currentCropper = new Cropper(image, {
+                            aspectRatio: currentCropOptions.aspectRatio || 1,
+                            viewMode: 1,
+                            dragMode: 'move',
+                            autoCropArea: 0.8,
+                            restore: false,
+                            guides: true,
+                            center: true,
+                            highlight: false,
+                            cropBoxMovable: true,
+                            cropBoxResizable: true,
+                            toggleDragModeOnDblclick: false,
+                        });
+                    }, 100);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+
+        window.saveCrop = function() {
+            if (!currentCropper) return;
+            
+            const canvas = currentCropper.getCroppedCanvas({
+                width: currentCropOptions.width || 400,
+                height: currentCropOptions.height || 400,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+            
+            canvas.toBlob((blob) => {
+                // Show preview
+                const preview = document.getElementById(currentPreviewId);
+                if (preview) {
+                    preview.src = URL.createObjectURL(blob);
+                    preview.classList.remove('hidden');
+                    
+                    // Special case for profile photo placeholder in dashboard
+                    const placeholder = document.getElementById('profile-photo-placeholder');
+                    if (placeholder) placeholder.classList.add('hidden');
+                }
+                
+                // Replace file in input using DataTransfer
+                const file = new File([blob], 'cropped_image.jpg', { type: 'image/jpeg' });
+                const container = new DataTransfer();
+                container.items.add(file);
+                currentInput.files = container.files;
+                
+                window.closeCropModal();
+            }, 'image/jpeg', 0.9);
+        };
+
+        window.closeCropModal = function() {
+            const modal = document.getElementById('cropping-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            if (currentCropper) {
+                currentCropper.destroy();
+                currentCropper = null;
+            }
+            // Reset input if cancelled to allow re-selecting same file
+            if (currentInput && !currentCropper) {
+                // currentInput.value = ''; // Don't reset if we might have already saved a crop
+            }
+        };
+
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
         if (localStorage.getItem('color-theme') === 'dark' || !('color-theme' in localStorage) || window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
@@ -619,6 +711,28 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.live-search-wrapper').forEach(initLiveSearch);
 });
 </script>
+
+    <!-- Global Cropping Modal -->
+    <div id="cropping-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 sm:p-6 md:p-10">
+        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeCropModal()"></div>
+        <div class="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
+            <div class="p-4 md:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Potong Foto</h3>
+                <button onclick="closeCropModal()" class="text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="flex-grow overflow-hidden bg-slate-100 dark:bg-slate-950 p-4">
+                <div class="w-full h-full min-h-[300px] flex items-center justify-center">
+                    <img id="cropping-image" src="" class="max-w-full max-h-full">
+                </div>
+            </div>
+            <div class="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
+                <button onclick="closeCropModal()" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">Batal</button>
+                <button onclick="saveCrop()" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all">Potong & Simpan</button>
+            </div>
+        </div>
+    </div>
 
     @stack('scripts')
 </body>

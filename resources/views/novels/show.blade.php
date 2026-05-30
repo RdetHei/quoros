@@ -493,7 +493,11 @@
                         ring-1 ring-slate-200 dark:ring-slate-700
                         group-hover:-translate-y-1.5 group-hover:shadow-xl group-hover:shadow-slate-500/10 dark:group-hover:shadow-black/30
                         transition-all duration-300">
-                @if($similar->cover_image)
+                @if($similar->cover_image_url)
+                    <img src="{{ $similar->cover_image_url }}"
+                         alt="{{ $similar->title }}"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                @elseif($similar->cover_image)
                     <img src="{{ asset('storage/' . $similar->cover_image) }}"
                          alt="{{ $similar->title }}"
                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">

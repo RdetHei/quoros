@@ -493,7 +493,10 @@
     <section class="qr-hero">
         {{-- Background Banner --}}
         <div class="qr-hero-bg">
-            <img src="{{ asset('storage/banners/landingBanner.png') }}" alt="">
+            @php
+                $heroImage = $featuredNovels->first()?->cover_image_url ?? $recentlyUpdated->first()?->cover_image_url ?? 'https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?auto=format&fit=crop&w=2000&q=80';
+            @endphp
+            <img src="{{ $heroImage }}" alt="Background Hero">
         </div>
         <div class="qr-hero-overlay"></div>
 

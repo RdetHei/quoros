@@ -36,7 +36,7 @@ class GuideSeeder extends Seeder
                         <li><strong>Akses Dashboard:</strong> Setelah berhasil, menu "Dashboard" akan muncul di profil Anda.</li>
                         <li><strong>Mulai Menulis:</strong> Masuk ke Dashboard dan klik "Buat Novel Baru" untuk mulai mengunggah karya pertama Anda.</li>
                     </ol>
-                    <p><img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&q=80&w=1000" alt="Writing Image"></p>
+                    <p><img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&q=80&w=800" alt="Writing Image"></p>
                     <h3>Tips untuk Penulis Baru</h3>
                     <ul>
                         <li>Gunakan sampul novel yang menarik.</li>
@@ -67,7 +67,7 @@ class GuideSeeder extends Seeder
                 'content' => '
                     <h2>Apa itu Bulk Upload?</h2>
                     <p>Fitur Bulk Upload memungkinkan Anda untuk mengunggah banyak bab sekaligus menggunakan file dokumen (DOCX, EPUB, PDF). Ini sangat menghemat waktu jika Anda sudah memiliki naskah yang lengkap.</p>
-                    <p><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000" alt="Data Upload"></p>
+                    <p><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800" alt="Data Upload"></p>
                     <h3>Cara Menggunakannya:</h3>
                     <ol>
                         <li>Buka menu <strong>Novel Saya</strong> di Dashboard Writer.</li>
