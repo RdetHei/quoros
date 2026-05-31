@@ -136,7 +136,7 @@
 <body class="font-sans antialiased bg-slate-950 text-slate-100">
     <div class="min-h-screen flex flex-col">
         <!-- Navbar -->
-        <nav id="navbar" class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800"
+        <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800"
              x-data="{
                 mobileMenuOpen: false,
                 scrollY: 0,
@@ -419,7 +419,7 @@
         </nav>
 
         <!-- Main Content -->
-        <main class="flex-grow {{ request()->routeIs('welcome') ? '' : 'py-8 px-4 sm:px-6 lg:px-8' }}">
+        <main class="flex-grow {{ request()->routeIs('welcome') ? 'pt-16' : 'pt-24 px-4 sm:px-6 lg:px-8 pb-8' }}">
             <div class="{{ request()->routeIs('welcome') ? '' : 'max-w-7xl mx-auto' }}">
                 @if(session('success'))
                     <div class="mb-6 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 flex items-center gap-3">
