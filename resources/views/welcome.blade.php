@@ -16,13 +16,27 @@
     }
 
     /* ── Utilities ────────────────────────────────────── */
+    .qr-text-gradient {
+        background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
     .qr-eyebrow {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 800;
-        letter-spacing: .2em;
+        letter-spacing: .25em;
         text-transform: uppercase;
         color: #818cf8;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .qr-eyebrow::before {
+        content: '';
+        width: 12px;
+        height: 1px;
+        background: currentColor;
     }
     .qr-sec-title {
         font-size: 28px;
@@ -104,11 +118,10 @@
     /* ── HERO ─────────────────────────────────────────── */
     .qr-hero {
         position: relative;
-        padding: 9rem 1rem 8rem;
+        height: 700px;
         overflow: hidden;
         display: flex;
         align-items: center;
-        justify-content: center;
         background-color: #020617;
     }
     .qr-hero-bg {
@@ -120,109 +133,256 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        opacity: 0.6;
-        filter: brightness(0.8) saturate(1.1);
-        transform: scale(1);
+        opacity: 0.4;
+        filter: brightness(0.6) contrast(1.1) saturate(1.2);
+        animation: slowZoom 30s infinite alternate;
+    }
+    @keyframes slowZoom {
+        from { transform: scale(1); }
+        to { transform: scale(1.15); }
     }
     .qr-hero-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(to bottom, rgba(2, 6, 23, 0.3) 0%, rgba(2, 6, 23, 0.6) 50%, #080b17 100%);
+        background: radial-gradient(circle at 20% 50%, rgba(2, 6, 23, 0.8) 0%, rgba(2, 6, 23, 0.4) 50%, rgba(2, 6, 23, 0.95) 100%);
         z-index: 1;
     }
-    .qr-hero-grid {
-        position: relative;
-        z-index: 2;
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
     .qr-hero-content {
-        max-width: 900px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        position: relative;
+        z-index: 10;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 4rem;
+        width: 100%;
+    }
+    .qr-hero-inner {
+        max-width: 700px;
     }
     .qr-hero h1 {
-        font-size: 68px;
-        font-weight: 900;
-        line-height: 1.05;
-        letter-spacing: -2.5px;
+        font-size: 84px;
+        font-weight: 950;
+        line-height: 0.95;
+        letter-spacing: -4px;
         color: #ffffff;
-        margin-bottom: 1.75rem;
-        text-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 100px rgba(99,102,241,0.2);
+        margin-bottom: 2rem;
     }
-    .qr-hero h1 .gold  { 
-        color: #fbbf24; 
-        background: linear-gradient(to bottom, #fde68a, #fbbf24);
+    .qr-hero h1 span.gold {
+        color: #fbbf24;
+        background: linear-gradient(to right, #fde68a, #fbbf24);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 20px rgba(251,191,36,0.3));
-    }
-    .qr-hero h1 .purple { 
-        color: #818cf8;
-        background: linear-gradient(to bottom, #c7d2fe, #818cf8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 20px rgba(129,140,248,0.3));
     }
     .qr-hero-p {
-        font-size: 18px;
-        line-height: 1.75;
-        color: #e2e8f0;
-        margin-bottom: 3rem;
-        max-width: 680px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #94a3b8;
+        margin-bottom: 2.5rem;
         font-weight: 500;
-        text-shadow: 0 4px 12px rgba(0,0,0,0.6);
     }
-    .qr-cta-row { display: flex; gap: 16px; justify-content: center; }
 
-    /* ── STATS ────────────────────────────────────────── */
-    .qr-stats {
-        background: #050814;
-        border-top: 1px solid rgba(255,255,255,.08);
-        border-bottom: 1px solid rgba(255,255,255,.08);
-        padding: 3rem 1rem;
-    }
-    .qr-stats-row {
-        max-width: 1100px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-around;
-        gap: 3rem;
-    }
-    .qr-stat {
-        flex: 1;
-        text-align: center;
-        position: relative;
-    }
-    .qr-stat:not(:last-child)::after {
-        content: '';
+    /* ── CAROUSEL OVERLAY ────────────────────────────── */
+    .qr-hero-carousel-container {
         position: absolute;
-        right: -1.5rem;
-        top: 20%;
-        bottom: 20%;
-        width: 1px;
-        background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
+        right: 5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 440px;
+        z-index: 20;
     }
-    .qr-stat-n {
-        display: block;
-        font-size: 42px;
+    .qr-carousel-card {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(30px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 40px;
+        padding: 2.5rem;
+        box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255,255,255,0.02);
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .qr-carousel-card:hover {
+        border-color: rgba(99, 102, 241, 0.3);
+        background: rgba(15, 23, 42, 0.5);
+    }
+    .qr-carousel-img {
+        width: 100%;
+        aspect-ratio: 1/1.4;
+        border-radius: 24px;
+        object-fit: cover;
+        margin-bottom: 2rem;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+    .qr-carousel-title {
+        font-size: 26px;
+        font-weight: 950;
+        color: #fff;
+        margin-bottom: 0.75rem;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+    }
+    .qr-carousel-desc {
+        font-size: 15px;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        height: 4.8rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    /* ── BUTTONS ───────────────────────────────────────── */
+    .qr-btn-primary {
+        background: #4f46e5;
+        color: #fff;
         font-weight: 900;
-        color: #ffffff;
-        letter-spacing: -1px;
+        border-radius: 18px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 14px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .qr-btn-primary:hover {
+        background: #6366f1;
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.5);
+    }
+    .qr-btn-ghost {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-weight: 900;
+        border-radius: 18px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .qr-btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px);
+    }
+
+    /* ── NOVEL CARDS ───────────────────────────────────── */
+    .qr-novel-card {
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .qr-novel-card:hover {
+        transform: translateY(-12px);
+    }
+    .qr-novel-card .qr-img-wrapper {
+        position: relative;
+        aspect-ratio: 1/1.45;
+        border-radius: 28px;
+        overflow: hidden;
+        background: #0f172a;
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: all 0.5s ease;
+    }
+    .qr-novel-card:hover .qr-img-wrapper {
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 30px 60px -12px rgba(99, 102, 241, 0.2);
+    }
+    .qr-novel-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .qr-novel-card:hover img {
+        transform: scale(1.1);
+    }
+    .qr-novel-card .qr-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(2, 6, 23, 0.9) 0%, rgba(2, 6, 23, 0.4) 40%, transparent 100%);
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+    }
+    .qr-novel-card:hover .qr-overlay { opacity: 1; }
+
+    @media (max-width: 1024px) {
+        .qr-hero { height: auto; padding: 6rem 0; }
+        .qr-hero h1 { font-size: 48px; }
+        .qr-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding: 2rem; }
+    }
+    @media (max-width: 640px) {
+        .qr-hero h1 { font-size: 36px; letter-spacing: -1.5px; }
+        .qr-hero-p { font-size: 16px; }
+        .qr-stats-grid { grid-template-columns: 1fr; margin-top: -40px; }
+        .qr-stat-val { font-size: 32px; }
+    }
+    .qr-stats {
+        position: relative;
+        z-index: 10;
+        margin-top: -100px;
+        padding-bottom: 6rem;
+    }
+    .qr-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+        padding: 0;
+        border-radius: 40px;
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+    }
+    .qr-stat-item {
+        text-align: center;
+        padding: 3.5rem 2rem;
+        border-right: 1px solid rgba(255,255,255,0.08);
+        transition: all 0.3s ease;
+    }
+    .qr-stat-item:last-child { border-right: none; }
+    .qr-stat-item:hover { background: rgba(255,255,255,0.03); }
+    .qr-stat-val {
+        font-size: 48px;
+        font-weight: 950;
+        color: #fff;
+        letter-spacing: -2px;
         line-height: 1;
         margin-bottom: 0.5rem;
     }
-    .qr-stat-l {
+    .qr-stat-lbl {
         font-size: 11px;
         font-weight: 800;
+        color: #94a3b8;
         text-transform: uppercase;
-        letter-spacing: 0.2em;
+        letter-spacing: 2.5px;
+    }
+
+    /* ── SECTION HEADERS ───────────────────────────────── */
+    .qr-section-header {
+        margin-bottom: 4rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    .qr-section-title {
+        font-size: 36px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -1.5px;
+    }
+    .qr-section-subtitle {
         color: #64748b;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 0.75rem;
+        display: block;
     }
 
     /* ── APA ITU QUOROS ───────────────────────────────── */
@@ -485,11 +645,16 @@
         .qr-cta-btns { flex-direction: column; width: 100%; }
         .qr-btn-primary, .qr-btn-ghost, .qr-btn-gold { width: 100%; text-align: center; }
     }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    
 </style>
 
 <div class="qr-page">
 
-    {{-- ===================== HERO CAROUSEL ===================== --}}
+    {{-- ===================== HERO SECTION ===================== --}}
     @php
         $featuredCarouselData = $featuredNovels->map(fn ($n) => [
             'id' => $n->id,
@@ -502,271 +667,340 @@
         ])->values();
     @endphp
 
-    <section class="qr-hero" 
-             x-data="{
-                activeSlide: 0,
-                slideCount: {{ $featuredNovels->count() }},
-                novels: @json($featuredCarouselData),
-                paused: false,
-                timer: null,
-                bookmarkLoading: false,
-                get current() { return this.novels[this.activeSlide] ?? {}; },
-                get isBookmarked() { return !!this.current.is_bookmarked; },
-                next() { this.activeSlide = (this.activeSlide + 1) % this.slideCount; },
-                prev() { this.activeSlide = (this.activeSlide - 1 + this.slideCount) % this.slideCount; },
-                init() { if (this.slideCount > 1) this.startTimer(); },
-                startTimer() { this.timer = setInterval(() => { if (!this.paused) this.next(); }, 6000); },
-                resetTimer() { clearInterval(this.timer); this.startTimer(); },
-                toggleBookmark() {
-                    @auth
-                        if (this.bookmarkLoading) return;
-                        this.bookmarkLoading = true;
-                        const id = this.current.id;
-                        fetch(`/novels/${id}/bookmark`, {
-                            method: 'POST',
-                            headers: { 
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
-                                'Accept': 'application/json', 
-                                'X-Requested-With': 'XMLHttpRequest' 
-                            }
-                        }).then(r => r.json()).then(d => {
-                            const i = this.activeSlide;
-                            if (this.novels[i]) {
-                                this.novels[i] = { ...this.novels[i], is_bookmarked: d.status === 'added' };
-                            }
-                            this.bookmarkLoading = false;
-                        }).catch(() => { this.bookmarkLoading = false; });
-                    @else
-                        window.location.href = '{{ route('login') }}';
-                    @endauth
-                }
-             }"
-             @mouseenter="paused = true"
-             @mouseleave="paused = false">
-
-        {{-- Dynamic Background --}}
+    <section class="qr-hero" x-data="heroCarousel(@js($featuredCarouselData))">
+        {{-- Fixed Banner Background from Storage --}}
         <div class="qr-hero-bg">
-            <template x-for="(novel, index) in novels" :key="novel.id">
-                <div x-show="activeSlide === index"
-                     x-transition:enter="transition ease-out duration-1000"
-                     x-transition:enter-start="opacity-0 scale-110"
-                     x-transition:enter-end="opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-800"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="absolute inset-0 w-full h-full">
-                    <img :src="novel.cover" :alt="novel.title" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png';">
-                </div>
-            </template>
+            <img src="{{ asset('storage/banners/landingBanner.png') }}" alt="Landing Banner" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?auto=format&fit=crop&w=2000&q=80';">
         </div>
         <div class="qr-hero-overlay"></div>
 
-        <div class="qr-hero-grid">
-            <div class="qr-hero-content">
+        <div class="qr-hero-content">
+            <div class="qr-hero-inner" 
+                 x-transition:enter="transition ease-out duration-1000"
+                 x-transition:enter-start="opacity-0 -translate-x-10"
+                 x-transition:enter-end="opacity-100 translate-x-0">
                 <div class="qr-badge">
                     <div class="qr-badge-dot"></div>
-                    Featured Novels
+                    Premium Novel Translation
                 </div>
-                
-                <div class="relative w-full min-h-[300px] flex flex-col items-center">
-                    <template x-for="(novel, index) in novels" :key="novel.id">
-                        <div x-show="activeSlide === index"
-                             x-transition:enter="transition ease-out duration-500 delay-200"
-                             x-transition:enter-start="opacity-0 translate-y-8"
-                             x-transition:enter-end="opacity-100 translate-y-0"
-                             x-transition:leave="transition ease-in duration-300"
-                             x-transition:leave-start="opacity-100 translate-y-0"
-                             x-transition:leave-end="opacity-0 -translate-y-8"
-                             class="absolute inset-0 flex flex-col items-center">
-                            <h1 class="text-center">
-                                <span class="gold" x-text="novel.title"></span>
-                            </h1>
-                            <p class="qr-hero-p line-clamp-3" x-text="novel.description"></p>
-                        </div>
-                    </template>
-                </div>
-
-                <div class="qr-cta-row z-20">
-                    <a :href="current.url" class="qr-btn-primary px-10 py-4 text-base flex items-center gap-2 shadow-xl shadow-indigo-600/20">
-                        Baca Sekarang
+                <h1>
+                    Novel Platform<br>
+                    <span class="gold">Quoros Translation Team</span>
+                </h1>
+                <p class="qr-hero-p">
+                    Experience seamless reading with high-quality translations. 
+                    From epic cultivation journeys to modern system-based adventures, 
+                    Quoros brings the best webnovels right to your fingertips.
+                </p>
+                <div class="flex gap-4">
+                    <a href="{{ route('home') }}" class="qr-btn-primary px-10 py-4 text-base flex items-center gap-2 shadow-2xl shadow-indigo-600/40">
+                        Start Reading
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                     </a>
-                    
-                    <button @click="toggleBookmark()" 
-                            class="qr-btn-ghost w-14 h-14 p-0 flex items-center justify-center rounded-2xl transition-all"
-                            :class="isBookmarked ? 'bg-rose-500/20 text-rose-500 border-rose-500/30' : 'bg-white/5 text-white border-white/10'">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :class="isBookmarked ? 'fill-current' : 'fill-none'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                    </button>
+                    @guest
+                    <a href="{{ route('register') }}" class="qr-btn-ghost px-10 py-4 text-base">
+                        Join Community
+                    </a>
+                    @endguest
                 </div>
+            </div>
+        </div>
 
-                {{-- Carousel Indicators --}}
-                <div class="mt-12 flex gap-3 z-20">
+        {{-- Carousel Overlay Card --}}
+        <div class="qr-hero-carousel-container hidden xl:block"
+             @mouseenter="paused = true"
+             @mouseleave="paused = false">
+            <div class="qr-carousel-card">
+                <div class="relative overflow-hidden mb-6 group">
                     <template x-for="(novel, index) in novels" :key="novel.id">
-                        <button @click="activeSlide = index; resetTimer()" 
-                                class="h-1.5 rounded-full transition-all duration-500"
-                                :class="activeSlide === index ? 'w-10 bg-indigo-500' : 'w-2 bg-white/20 hover:bg-white/40'"></button>
+                        <img x-show="activeSlide === index"
+                             :src="novel.cover" 
+                             x-transition:enter="transition ease-out duration-500"
+                             x-transition:enter-start="opacity-0 scale-110"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             class="qr-carousel-img"
+                             alt="Featured Novel">
                     </template>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- ===================== STATS ===================== --}}
-    <div class="qr-stats">
-        <div class="qr-stats-row">
-            <div class="qr-stat">
-                <div class="qr-stat-n">1.200<span>+</span></div>
-                <div class="qr-stat-l">Novel</div>
-            </div>
-            <div class="qr-stat">
-                <div class="qr-stat-n">48K<span>+</span></div>
-                <div class="qr-stat-l">Pembaca Aktif</div>
-            </div>
-            <div class="qr-stat">
-                <div class="qr-stat-n">320<span>+</span></div>
-                <div class="qr-stat-l">Penerjemah</div>
-            </div>
-        </div>
-    </div>
-
-    {{-- ===================== APA ITU QUOROS ===================== --}}
-    <section class="qr-about">
-        <div class="qr-about-inner">
-            <div class="qr-eyebrow">Tentang Kami</div>
-            <div class="qr-sec-title">Apa itu Quoros?</div>
-
-            <div class="qr-about-grid">
-
-                {{-- Kiri: deskripsi --}}
-                <div class="qr-about-text">
-                    <p>
-                        Quoros Translation adalah platform terjemahan novel online yang berdedikasi menghadirkan
-                        karya-karya terbaik dari berbagai penulis Asia — khususnya Tiongkok, Korea, dan Jepang —
-                        ke dalam Bahasa Indonesia yang natural dan mudah dipahami.
-                    </p>
-                    <p>
-                        Kami percaya bahwa setiap cerita layak untuk dinikmati tanpa hambatan bahasa.
-                        Dengan tim penerjemah berpengalaman dan sistem editorial yang ketat, setiap bab yang
-                        terbit di Quoros telah melewati proses quality check untuk menjaga konsistensi istilah
-                        dan alur narasi.
-                    </p>
-                    <div class="qr-about-quote">
-                        <p>
-                            "Bukan sekadar terjemahan kata per kata — kami menerjemahkan rasa,
-                            suasana, dan jiwa dari setiap cerita."
-                        </p>
-                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
 
-                {{-- Kanan: kartu poin --}}
-                <div class="qr-about-cards">
-                    <div class="qr-acard">
-                        <div class="qr-acard-icon" style="background:rgba(99,102,241,.12);color:#818cf8">
-                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h5>Terjemahan Berkualitas</h5>
-                            <p>Setiap bab diterjemahkan oleh tim yang memahami konteks budaya dan nuansa bahasa sumber aslinya.</p>
-                        </div>
-                    </div>
-                    <div class="qr-acard">
-                        <div class="qr-acard-icon" style="background:rgba(201,168,76,.1);color:#c9a84c">
-                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h5>Editorial Ketat</h5>
-                            <p>Setiap rilis melewati proses review untuk menjaga konsistensi istilah, nama karakter, dan alur cerita.</p>
-                        </div>
-                    </div>
-                    <div class="qr-acard">
-                        <div class="qr-acard-icon" style="background:rgba(34,197,94,.08);color:#4ade80">
-                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h5>Komunitas Aktif</h5>
-                            <p>Bergabung dengan ribuan pembaca yang aktif berdiskusi dan mendukung para penerjemah kesayangan mereka.</p>
-                        </div>
-                    </div>
+                <div class="min-h-[140px]">
+                    <h3 class="qr-carousel-title" x-text="current.title"></h3>
+                    <p class="qr-carousel-desc" x-text="current.description"></p>
                 </div>
 
-            </div>
-        </div>
-    </section>
-
-    {{-- ===================== UPDATE TERBARU ===================== --}}
-    <section class="qr-updates">
-        <div class="qr-updates-inner">
-
-            <div class="qr-hdr-row">
-                <div>
-                    <div class="qr-eyebrow">Terkini</div>
-                    <div class="qr-sec-title">Update Terbaru</div>
-                    <div class="qr-sec-sub">Novel yang baru saja merilis bab baru.</div>
-                </div>
-                <a href="{{ route('novels.updated') }}" class="qr-see-all">Lihat Semua →</a>
-            </div>
-
-            <div class="qr-novel-grid">
-                @foreach($recentlyUpdated as $novel)
-                <div class="qr-ncard">
-                    <a href="{{ route('novels.show', $novel->slug) }}" style="text-decoration:none">
-
-                        <div class="qr-ncover">
-                            @if($novel->cover_image_url)
-                                <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" onerror="this.onerror=null; this.src='/error.png';">
-                            @elseif($novel->cover_image)
-                                <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" onerror="this.onerror=null; this.src='/error.png';">
-                            @else
-                                <div style="width:100%;height:100%;background:linear-gradient(160deg,#1a2240,#0f1628);display:flex;align-items:center;justify-content:center;">
-                                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#334155" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                    </svg>
-                                </div>
-                            @endif
-                            <div class="qr-ncover-gradient"></div>
-                            <div class="qr-nbadge">
-                                <div class="qr-ntag">Baru Rilis</div>
-                                <div class="qr-nchap">{{ $novel->chapters->first()->title ?? 'Chapter Baru' }}</div>
-                            </div>
-                        </div>
-
-                        <div class="qr-ntitle">{{ $novel->title }}</div>
-                        <div class="qr-nmeta">
-                            <span>{{ $novel->author->name }}</span>
-                            <span class="qr-ndot"></span>
-                            <span>{{ \Carbon\Carbon::parse($novel->chapters_max_created_at)->diffForHumans() }}</span>
-                        </div>
-
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex gap-2">
+                        <template x-for="(novel, index) in novels" :key="novel.id">
+                            <button @click="activeSlide = index; resetTimer()" 
+                                    class="h-1.5 rounded-full transition-all duration-300"
+                                    :class="activeSlide === index ? 'w-8 bg-indigo-500' : 'w-1.5 bg-white/20 hover:bg-white/40'"></button>
+                        </template>
+                    </div>
+                    <a :href="current.url" class="text-xs font-black text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors uppercase tracking-widest">
+                        Details
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
                     </a>
                 </div>
-                @endforeach
             </div>
-
         </div>
     </section>
 
-    {{-- ===================== CTA BANNER ===================== --}}
-    <section class="qr-cta-sec">
-        <div class="qr-cta-box">
-            <div class="qr-cta-left">
-                <div class="qr-cta-ey">Mulai Sekarang</div>
-                <div class="qr-cta-t">Siap Memulai<br>Petualanganmu?</div>
-                <div class="qr-cta-d">
-                    Bergabunglah dengan komunitas pembaca Quoros dan nikmati terjemahan novel terbaik.
+    {{-- ===================== STATS SECTION ===================== --}}
+    <section class="qr-stats">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="qr-stats-grid">
+                <div class="qr-stat-item">
+                    <span class="qr-stat-val">500+</span>
+                    <span class="qr-stat-lbl">Premium Novels</span>
+                </div>
+                <div class="qr-stat-item">
+                    <span class="qr-stat-val">2.5M</span>
+                    <span class="qr-stat-lbl">Active Readers</span>
+                </div>
+                <div class="qr-stat-item">
+                    <span class="qr-stat-val">99%</span>
+                    <span class="qr-stat-lbl">Accuracy Rate</span>
+                </div>
+                <div class="qr-stat-item">
+                    <span class="qr-stat-val">24/7</span>
+                    <span class="qr-stat-lbl">Daily Updates</span>
                 </div>
             </div>
-            <div class="qr-cta-btns">
-                <a href="{{ route('register') }}" class="qr-btn-gold">Daftar Gratis</a>
-                <a href="{{ route('home') }}" class="qr-btn-ghost" style="text-align:center">Jelajahi Dulu</a>
+        </div>
+    </section>
+
+    {{-- ===================== TRENDING SECTION ===================== --}}
+    @if($featuredNovels->count() > 0)
+    <section class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="qr-section-header items-center">
+                <div>
+                    <span class="qr-section-subtitle">What's Hot</span>
+                    <h2 class="qr-section-title">Trending Now</h2>
+                </div>
+                <div class="flex gap-4">
+                    <button class="w-12 h-12 rounded-full border border-slate-800 flex items-center justify-center text-slate-400 hover:border-indigo-500 hover:text-white transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <button class="w-12 h-12 rounded-full border border-slate-800 flex items-center justify-center text-slate-400 hover:border-indigo-500 hover:text-white transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex gap-8 overflow-x-auto pb-8 no-scrollbar">
+                @foreach($featuredNovels as $novel)
+                    <div class="flex-shrink-0 w-[400px] group">
+                        <a href="{{ route('novels.show', $novel->slug) }}" class="flex gap-6 p-6 bg-slate-900/50 border border-slate-800 rounded-[2.5rem] group-hover:border-indigo-500/30 transition-all duration-500">
+                            <div class="w-32 aspect-[3/4] rounded-2xl overflow-hidden flex-shrink-0 shadow-2xl">
+                                @if($novel->cover_image_url)
+                                    <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $novel->title }}">
+                                @elseif($novel->cover_image)
+                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $novel->title }}">
+                                @endif
+                            </div>
+                            <div class="flex flex-col justify-center overflow-hidden">
+                                <span class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">{{ $novel->genres->first()?->name ?? 'Fantasy' }}</span>
+                                <h3 class="text-xl font-black text-white mb-2 line-clamp-1 group-hover:text-indigo-400 transition-colors">{{ $novel->title }}</h3>
+                                <p class="text-sm text-slate-500 line-clamp-2 mb-4 leading-relaxed">{{ $novel->description }}</p>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-1.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                        <span class="text-xs font-black text-slate-300">4.9</span>
+                                    </div>
+                                    <span class="w-1 h-1 bg-slate-700 rounded-full"></span>
+                                    <span class="text-xs font-bold text-slate-500">{{ $novel->chapters->count() }} Chapters</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>
+    @endif
+
+    {{-- ===================== UPDATES SECTION ===================== --}}
+    <section class="py-24">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="qr-section-header">
+                <div>
+                    <span class="qr-section-subtitle">Stay Up to Date</span>
+                    <h2 class="qr-section-title">Latest Updates</h2>
+                </div>
+                <a href="{{ route('home') }}" class="group flex items-center gap-2 text-sm font-black text-slate-400 hover:text-white transition-colors">
+                    View All Releases
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+                @foreach ($recentlyUpdated as $novel)
+                    <div class="qr-novel-card group">
+                        <a href="{{ route('novels.show', $novel->slug) }}" class="block mb-6">
+                            <div class="qr-img-wrapper">
+                                @if($novel->cover_image_url)
+                                    <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}">
+                                @elseif($novel->cover_image)
+                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-slate-900">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-800" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    </div>
+                                @endif
+                                <div class="qr-overlay"></div>
+                                
+                                {{-- Chapter Badge --}}
+                                <div class="absolute bottom-6 left-6 right-6 z-10">
+                                    <span class="inline-flex items-center px-4 py-2 bg-indigo-600/90 backdrop-blur-md text-[10px] font-black text-white uppercase tracking-[0.2em] rounded-xl shadow-lg">
+                                        {{ $novel->chapters->first()?->title ?? 'New Release' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <div class="px-2">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.25em]">
+                                    {{ $novel->genres->first()?->name ?? 'Fantasy' }}
+                                </span>
+                                <span class="w-1.5 h-1.5 bg-slate-800 rounded-full"></span>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{ $novel->region }}</span>
+                            </div>
+                            <h3 class="text-xl font-black text-white group-hover:text-indigo-400 transition-colors line-clamp-1 mb-2 tracking-tight">{{ $novel->title }}</h3>
+                            <div class="flex items-center justify-between">
+                                <p class="text-[11px] font-bold text-slate-500 flex items-center gap-1.5 uppercase tracking-wider">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
+                                    {{ $novel->updated_at->diffForHumans() }}
+                                </p>
+                                <div class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                    <span class="text-[11px] font-black text-slate-300">4.9</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    {{-- ===================== FEATURES SECTION ===================== --}}
+    <section class="py-32 bg-[#020617] relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-20">
+                <span class="qr-eyebrow justify-center mb-4">Why Quoros?</span>
+                <h2 class="text-5xl font-black text-white mb-6 tracking-tight">The Ultimate Reading Experience</h2>
+                <p class="text-slate-500 font-medium text-lg leading-relaxed">We combine cutting-edge technology with passionate translation teams to bring you the stories you love, exactly how they were meant to be read.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="group p-12 bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-indigo-500/40 rounded-[3rem] transition-all duration-500">
+                    <div class="w-20 h-20 bg-indigo-600/10 text-indigo-500 rounded-3xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500 shadow-xl shadow-indigo-600/5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-4 tracking-tight">Immersive Fidelity</h3>
+                    <p class="text-slate-500 font-medium leading-relaxed text-base">Expert translations that preserve cultural nuances, metaphors, and the unique voice of every author.</p>
+                </div>
+
+                <div class="group p-12 bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-emerald-500/40 rounded-[3rem] transition-all duration-500">
+                    <div class="w-20 h-20 bg-emerald-600/10 text-emerald-500 rounded-3xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-xl shadow-emerald-600/5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-4 tracking-tight">Lightning Updates</h3>
+                    <p class="text-slate-500 font-medium leading-relaxed text-base">Direct sync with original publishers ensures you get new chapters within hours of their official release.</p>
+                </div>
+
+                <div class="group p-12 bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-amber-500/40 rounded-[3rem] transition-all duration-500">
+                    <div class="w-20 h-20 bg-amber-600/10 text-amber-500 rounded-3xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition-all duration-500 shadow-xl shadow-amber-600/5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-4 tracking-tight">Active Community</h3>
+                    <p class="text-slate-500 font-medium leading-relaxed text-base">Connect with millions of readers, share theories, and participate in exclusive fan events and discussions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function heroCarousel(initialNovels) {
+        return {
+            activeSlide: 0,
+            slideCount: initialNovels.length,
+            novels: initialNovels,
+            paused: false,
+            timer: null,
+            bookmarkLoading: false,
+            
+            get current() { 
+                return this.novels[this.activeSlide] || {}; 
+            },
+            
+            get isBookmarked() { 
+                return !!this.current.is_bookmarked; 
+            },
+            
+            next() { 
+                this.activeSlide = (this.activeSlide + 1) % this.slideCount; 
+            },
+            
+            prev() { 
+                this.activeSlide = (this.activeSlide - 1 + this.slideCount) % this.slideCount; 
+            },
+            
+            init() { 
+                if (this.slideCount > 1) this.startTimer(); 
+            },
+            
+            startTimer() { 
+                this.timer = setInterval(() => { 
+                    if (!this.paused) this.next(); 
+                }, 6000); 
+            },
+            
+            resetTimer() { 
+                clearInterval(this.timer); 
+                this.startTimer(); 
+            },
+            
+            toggleBookmark() {
+                @auth
+                    if (this.bookmarkLoading) return;
+                    this.bookmarkLoading = true;
+                    const id = this.current.id;
+                    
+                    fetch(`/novels/${id}/bookmark`, {
+                        method: 'POST',
+                        headers: { 
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                            'Accept': 'application/json', 
+                            'X-Requested-With': 'XMLHttpRequest' 
+                        }
+                    })
+                    .then(r => r.json())
+                    .then(d => {
+                        const i = this.activeSlide;
+                        if (this.novels[i]) {
+                            // Reaktif update untuk Alpine
+                            this.novels[i].is_bookmarked = d.status === 'added';
+                        }
+                        this.bookmarkLoading = false;
+                    })
+                    .catch(() => { 
+                        this.bookmarkLoading = false; 
+                    });
+                @else
+                    window.location.href = '{{ route('login') }}';
+                @endauth
+            }
+        }
+    }
+</script>
+@endpush
