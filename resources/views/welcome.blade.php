@@ -489,38 +489,123 @@
 
 <div class="qr-page">
 
-    {{-- ===================== HERO ===================== --}}
-    <section class="qr-hero">
-        {{-- Background Banner --}}
+    {{-- ===================== HERO CAROUSEL ===================== --}}
+    @php
+        $featuredCarouselData = $featuredNovels->map(fn ($n) => [
+            'id' => $n->id,
+            'slug' => $n->slug,
+            'url' => route('novels.show', $n->slug),
+            'title' => $n->title,
+            'description' => $n->description,
+            'cover' => $n->cover_image_url ?: ($n->cover_image ? asset('storage/' . $n->cover_image) : 'https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?auto=format&fit=crop&w=2000&q=80'),
+            'is_bookmarked' => (bool) ($n->is_bookmarked ?? false),
+        ])->values();
+    @endphp
+
+    <section class="qr-hero" 
+             x-data="{
+                activeSlide: 0,
+                slideCount: {{ $featuredNovels->count() }},
+                novels: @json($featuredCarouselData),
+                paused: false,
+                timer: null,
+                bookmarkLoading: false,
+                get current() { return this.novels[this.activeSlide] ?? {}; },
+                get isBookmarked() { return !!this.current.is_bookmarked; },
+                next() { this.activeSlide = (this.activeSlide + 1) % this.slideCount; },
+                prev() { this.activeSlide = (this.activeSlide - 1 + this.slideCount) % this.slideCount; },
+                init() { if (this.slideCount > 1) this.startTimer(); },
+                startTimer() { this.timer = setInterval(() => { if (!this.paused) this.next(); }, 6000); },
+                resetTimer() { clearInterval(this.timer); this.startTimer(); },
+                toggleBookmark() {
+                    @auth
+                        if (this.bookmarkLoading) return;
+                        this.bookmarkLoading = true;
+                        const id = this.current.id;
+                        fetch(`/novels/${id}/bookmark`, {
+                            method: 'POST',
+                            headers: { 
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                                'Accept': 'application/json', 
+                                'X-Requested-With': 'XMLHttpRequest' 
+                            }
+                        }).then(r => r.json()).then(d => {
+                            const i = this.activeSlide;
+                            if (this.novels[i]) {
+                                this.novels[i] = { ...this.novels[i], is_bookmarked: d.status === 'added' };
+                            }
+                            this.bookmarkLoading = false;
+                        }).catch(() => { this.bookmarkLoading = false; });
+                    @else
+                        window.location.href = '{{ route('login') }}';
+                    @endauth
+                }
+             }"
+             @mouseenter="paused = true"
+             @mouseleave="paused = false">
+
+        {{-- Dynamic Background --}}
         <div class="qr-hero-bg">
-            @php
-                $heroImage = $featuredNovels->first()?->cover_image_url ?? $recentlyUpdated->first()?->cover_image_url ?? 'https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?auto=format&fit=crop&w=2000&q=80';
-            @endphp
-            <img src="{{ $heroImage }}" alt="Background Hero" onerror="this.onerror=null; this.src='/error.png';">
+            <template x-for="(novel, index) in novels" :key="novel.id">
+                <div x-show="activeSlide === index"
+                     x-transition:enter="transition ease-out duration-1000"
+                     x-transition:enter-start="opacity-0 scale-110"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-800"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="absolute inset-0 w-full h-full">
+                    <img :src="novel.cover" :alt="novel.title" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png';">
+                </div>
+            </template>
         </div>
         <div class="qr-hero-overlay"></div>
 
         <div class="qr-hero-grid">
-            {{-- Center: copy --}}
             <div class="qr-hero-content">
                 <div class="qr-badge">
                     <div class="qr-badge-dot"></div>
-                    Welcome to Quoros Translation
+                    Featured Novels
                 </div>
-                <h1>
-                    NOVEL PLATFORM<br>
-                    <span class="gold">QUOROS</span>
-                    <span class="purple">TRANSLATION</span><br>
-                </h1>
-                <p class="qr-hero-p">
-                    Platform novel modern yang menghadirkan terjemahan berkualitas tinggi.
-                    Nikmati pengalaman membaca yang mulus, bersih, dan mendukung akses offline.
-                </p>
-                <div class="qr-cta-row">
-                    <a href="{{ route('home') }}" class="qr-btn-primary">Jelajahi Katalog</a>
-                    @guest
-                    <a href="{{ route('register') }}" class="qr-btn-ghost">Daftar Gratis →</a>
-                    @endguest
+                
+                <div class="relative w-full min-h-[300px] flex flex-col items-center">
+                    <template x-for="(novel, index) in novels" :key="novel.id">
+                        <div x-show="activeSlide === index"
+                             x-transition:enter="transition ease-out duration-500 delay-200"
+                             x-transition:enter-start="opacity-0 translate-y-8"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-300"
+                             x-transition:leave-start="opacity-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 -translate-y-8"
+                             class="absolute inset-0 flex flex-col items-center">
+                            <h1 class="text-center">
+                                <span class="gold" x-text="novel.title"></span>
+                            </h1>
+                            <p class="qr-hero-p line-clamp-3" x-text="novel.description"></p>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="qr-cta-row z-20">
+                    <a :href="current.url" class="qr-btn-primary px-10 py-4 text-base flex items-center gap-2 shadow-xl shadow-indigo-600/20">
+                        Baca Sekarang
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </a>
+                    
+                    <button @click="toggleBookmark()" 
+                            class="qr-btn-ghost w-14 h-14 p-0 flex items-center justify-center rounded-2xl transition-all"
+                            :class="isBookmarked ? 'bg-rose-500/20 text-rose-500 border-rose-500/30' : 'bg-white/5 text-white border-white/10'">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :class="isBookmarked ? 'fill-current' : 'fill-none'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                    </button>
+                </div>
+
+                {{-- Carousel Indicators --}}
+                <div class="mt-12 flex gap-3 z-20">
+                    <template x-for="(novel, index) in novels" :key="novel.id">
+                        <button @click="activeSlide = index; resetTimer()" 
+                                class="h-1.5 rounded-full transition-all duration-500"
+                                :class="activeSlide === index ? 'w-10 bg-indigo-500' : 'w-2 bg-white/20 hover:bg-white/40'"></button>
+                    </template>
                 </div>
             </div>
         </div>

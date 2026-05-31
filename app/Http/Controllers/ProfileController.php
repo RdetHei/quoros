@@ -28,11 +28,24 @@ class ProfileController extends Controller
 
         $reviews = $user->reviews()->with('novel')->latest()->get();
 
+        $writerStats = null;
+        if (in_array($user->role, ['writer', 'admin'], true)) {
+            $myNovels = $user->novels()->with(['chapters.comments'])->get();
+            $writerStats = [
+                'total_views' => $myNovels->sum('view_count'),
+                'total_comments' => $myNovels->sum(fn ($n) => $n->chapters->sum(fn ($c) => $c->comments->count())),
+                'avg_rating' => $myNovels->avg('rating_avg') ?? 0,
+                'novel_count' => $myNovels->count(),
+            ];
+        }
+
         return view('profile.show', compact(
             'user',
             'readingList',
             'reviews',
-            'canViewReadingList'
+            'canViewReadingList',
+            'writerStats',
+            'isOwner'
         ));
     }
 

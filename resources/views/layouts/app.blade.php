@@ -251,6 +251,7 @@
                                     <div class="p-2 border-b border-slate-100 dark:border-slate-800">
                                         <p class="px-3 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
                                         <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Profil Saya</a>
+                                        <a href="{{ route('settings') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Pengaturan</a>
                                         <a href="{{ route('guides.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Guide</a>
                                         @if(Auth::user()->role === 'user')
                                             <form action="{{ route('dashboard.become-writer') }}" method="POST" class="block">
@@ -341,6 +342,9 @@
                             <div class="flex flex-col gap-3 mt-4">
                                 <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-lg shadow-slate-900/10">
                                     Profil Saya
+                                </a>
+                                <a href="{{ route('settings') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+                                    Pengaturan
                                 </a>
                                 <a href="{{ route('guides.index') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
                                     Guide

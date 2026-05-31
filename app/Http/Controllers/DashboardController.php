@@ -8,7 +8,6 @@ use App\Models\Announcement;
 use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
@@ -20,8 +19,12 @@ class DashboardController extends Controller
         $this->cloudinaryService = $cloudinaryService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->get('tab') === 'settings') {
+            return redirect()->route('settings');
+        }
+
         $user = Auth::user();
 
         // 1. Stats Ringkas
@@ -48,17 +51,7 @@ class DashboardController extends Controller
             $lastRead->total_chapters = $totalChapters;
         }
 
-        // 3. Statistik Penulis (Jika Role Writer/Admin)
-        $writerStats = null;
-        if ($user->role === 'writer' || $user->role === 'admin') {
-            $myNovels = $user->novels;
-            $writerStats = [
-                'total_views' => $myNovels->sum('view_count'),
-                'total_comments' => $myNovels->map(fn($n) => $n->chapters->sum(fn($c) => $c->comments->count()))->sum(),
-                'avg_rating' => $myNovels->avg('rating_avg') ?? 0,
-                'novel_count' => $myNovels->count()
-            ];
-        }
+        // 3. Statistik Penulis dipindah ke halaman profil
 
         // 4. Tabbed Content
         $bookmarks = $user->bookmarks()->with('novel.author')->latest()->get();
@@ -79,12 +72,16 @@ class DashboardController extends Controller
             'favoriteNovel', 
             'userPoints',
             'lastRead',
-            'writerStats',
             'bookmarks',
             'histories',
             'recommendations',
             'announcements'
         ));
+    }
+
+    public function settings()
+    {
+        return view('settings.index', ['user' => Auth::user()]);
     }
 
     public function updateProfile(Request $request)

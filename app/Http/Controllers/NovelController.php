@@ -28,6 +28,33 @@ class NovelController extends Controller
 
     public function landing()
     {
+        // Featured Novels for Carousel
+        $featuredQuery = Novel::with(['author', 'genres'])
+            ->where('is_featured', true)
+            ->take(5);
+
+        if (Auth::check()) {
+            $featuredQuery->withExists(['bookmarks as is_bookmarked' => function($q) {
+                $q->where('user_id', Auth::id());
+            }]);
+        }
+
+        $featuredNovels = $featuredQuery->get();
+
+        // Fallback to top viewed if no featured novels selected
+        if ($featuredNovels->isEmpty()) {
+            $fallbackQuery = Novel::with(['author', 'genres'])
+                ->orderByDesc('view_count')
+                ->take(5);
+
+            if (Auth::check()) {
+                $fallbackQuery->withExists(['bookmarks as is_bookmarked' => function($q) {
+                    $q->where('user_id', Auth::id());
+                }]);
+            }
+            $featuredNovels = $fallbackQuery->get();
+        }
+
         // Recently Updated: Novels with the most recent chapters
         $recentlyUpdated = Novel::with(['author', 'genres', 'chapters' => function($q) {
                 $q->published()->latest()->take(1);
@@ -38,7 +65,7 @@ class NovelController extends Controller
             ->take(8)
             ->get();
 
-        return view('welcome', compact('recentlyUpdated'));
+        return view('welcome', compact('recentlyUpdated', 'featuredNovels'));
     }
 
     public function index(Request $request)
@@ -246,13 +273,23 @@ class NovelController extends Controller
 
     public function writerIndex()
     {
-        $novels = Novel::where('author_id', Auth::id())
+        $userId = Auth::id();
+
+        $novels = Novel::where('author_id', $userId)
+            ->with('genres')
             ->withCount(['chapters', 'bookmarks'])
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('writer.novels.index', compact('novels'));
+        $summary = [
+            'novel_count' => Novel::where('author_id', $userId)->count(),
+            'chapter_count' => Novel::where('author_id', $userId)->withCount('chapters')->get()->sum('chapters_count'),
+            'total_views' => Novel::where('author_id', $userId)->sum('view_count'),
+            'total_bookmarks' => Novel::where('author_id', $userId)->withCount('bookmarks')->get()->sum('bookmarks_count'),
+        ];
+
+        return view('writer.novels.index', compact('novels', 'summary'));
     }
 
     public function create()

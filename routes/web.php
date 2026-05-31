@@ -75,6 +75,7 @@ Route::get('/guides/{category:slug}/{article:slug}', [GuideController::class, 's
 // Auth Required Routes
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
     Route::put('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
     Route::post('/dashboard/profile/photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.photo.update');
     Route::post('/dashboard/become-writer', [DashboardController::class, 'becomeWriter'])->name('dashboard.become-writer');
