@@ -61,9 +61,9 @@ class NovelViewService
     public function periodLabel(int $days): string
     {
         return match ($days) {
-            7 => '7 hari terakhir',
-            30 => '30 hari terakhir',
-            default => "{$days} hari terakhir",
+            7 => 'last 7 days',
+            30 => 'last 30 days',
+            default => "last {$days} days",
         };
     }
 }

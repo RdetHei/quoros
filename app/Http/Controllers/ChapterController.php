@@ -73,7 +73,7 @@ class ChapterController extends Controller
             $chapters = $parser->parse($path, $file->getClientOriginalExtension());
 
             if (empty($chapters)) {
-                return back()->with('error', 'Tidak ada chapter yang ditemukan dalam file tersebut.');
+                return back()->with('error', 'No chapters found in the file.');
             }
 
             foreach ($chapters as $index => $data) {
@@ -95,9 +95,9 @@ class ChapterController extends Controller
             }
 
             return redirect()->route('novels.show', $novel->slug)
-                ->with('success', count($chapters).' chapter berhasil diimpor!');
+                ->with('success', count($chapters).' chapters successfully imported!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal memproses file: '.$e->getMessage());
+            return back()->with('error', 'Failed to process file: '.$e->getMessage());
         }
     }
 

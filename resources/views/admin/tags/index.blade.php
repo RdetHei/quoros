@@ -4,12 +4,12 @@
 <div class="max-w-4xl mx-auto my-12">
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Kelola Tag</h1>
-            <p class="text-slate-500 dark:text-slate-400">Tambahkan atau edit tag untuk detail elemen novel.</p>
+            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Manage Tags</h1>
+            <p class="text-slate-500 dark:text-slate-400">Add or edit tags for novel element details.</p>
         </div>
         <a href="{{ route('admin.tags.create') }}" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 dark:shadow-none flex items-center gap-2 text-sm">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tambah Tag
+            Add Tag
         </a>
     </div>
 
@@ -30,9 +30,9 @@
             <table class="w-full text-left border-collapse min-w-[520px]">
             <thead>
                 <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Nama Tag</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Jumlah Novel</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Tag Name</th>
+                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Novel Count</th>
+                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -50,7 +50,7 @@
                                 <a href="{{ route('admin.tags.edit', $tag->id) }}" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 </a>
-                                <form action="{{ route('admin.tags.destroy', $tag->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tag ini?')">
+                                <form action="{{ route('admin.tags.destroy', $tag->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this tag?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all">
@@ -63,7 +63,7 @@
                 @empty
                     <tr>
                         <td colspan="3" class="px-6 py-12 text-center">
-                            <p class="text-slate-500 italic text-sm">Belum ada tag yang ditambahkan.</p>
+                            <p class="text-slate-500 italic text-sm">No tags added yet.</p>
                         </td>
                     </tr>
                 @endforelse

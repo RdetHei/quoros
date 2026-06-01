@@ -44,7 +44,7 @@ class CommentController extends Controller
             $this->notifications->notifyCommentReply($comment);
         }
 
-        return back()->with('success', $parentId ? 'Balasan dikirim.' : 'Komentar ditambahkan.');
+        return back()->with('success', $parentId ? 'Reply sent.' : 'Comment added.');
     }
 
     public function destroy(Comment $comment)
@@ -53,6 +53,6 @@ class CommentController extends Controller
 
         $comment->delete();
 
-        return back()->with('success', 'Komentar dihapus.');
+        return back()->with('success', 'Comment deleted.');
     }
 }

@@ -127,13 +127,13 @@
             <header class="flex items-center justify-between px-5 py-4 lg:px-12 lg:py-6 border-b border-slate-800/80 lg:border-none">
                 <a href="{{ route('home') }}" class="lg:hidden inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    Beranda
+                    Home
                 </a>
                 <div class="lg:hidden">
                     <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros" class="h-6 w-auto max-w-[100px] object-contain" onerror="this.onerror=null; this.src='/error.png'">
                 </div>
                 <a href="{{ route('home') }}" class="hidden lg:inline-flex text-sm font-medium text-slate-400 hover:text-white transition-colors">
-                    ← Kembali ke beranda
+                    ← Back to home
                 </a>
             </header>
 
@@ -151,7 +151,7 @@
                     @endif
 
                     <div class="mb-8 lg:mb-10">
-                        <p class="text-[10px] font-black uppercase tracking-[0.28em] text-amber-500/90 mb-2">@yield('eyebrow', 'Selamat datang')</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.28em] text-amber-500/90 mb-2">@yield('eyebrow', 'Welcome')</p>
                         <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">@yield('heading')</h1>
                         <p class="mt-2 text-sm text-slate-400 leading-relaxed">@yield('subheading')</p>
                     </div>

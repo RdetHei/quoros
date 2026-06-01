@@ -43,7 +43,7 @@
                 <form action="{{ route('comments.destroy', $comment->id) }}" method="POST" class="inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="text-slate-400 hover:text-red-500 text-[9px] font-bold uppercase tracking-widest" onclick="return confirm('Hapus komentar ini?')">Hapus</button>
+                    <button type="submit" class="text-slate-400 hover:text-red-500 text-[9px] font-bold uppercase tracking-widest" onclick="return confirm('Are you sure you want to delete this comment?')">Delete</button>
                 </form>
             @endcan
 
@@ -52,14 +52,14 @@
                     <button type="button"
                             @click="$dispatch('open-reply', { parentId: {{ $comment->id }}, name: @js($comment->user->name) })"
                             class="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-indigo-500 transition-colors">
-                        Balas
+                        Reply
                     </button>
                 @endif
                 @if($comment->user && $comment->user_id !== Auth::id())
                     @include('partials.report-trigger', [
                         'type' => 'comment',
                         'id' => $comment->id,
-                        'label' => 'Komentar oleh '.$comment->user->name,
+                        'label' => 'Comment by '.$comment->user->name,
                     ])
                 @endif
             @endauth

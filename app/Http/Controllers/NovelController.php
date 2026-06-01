@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ImageUploadRequest;
 use App\Services\CloudinaryService;
 use App\Services\NovelViewService;
+use App\Models\Chapter;
 use App\Models\Genre;
 use App\Models\Novel;
 use App\Models\NovelRequest;
@@ -72,7 +73,16 @@ class NovelController extends Controller
             ->take(8)
             ->get();
 
-        return view('welcome', compact('recentlyUpdated', 'featuredNovels'));
+        $stats = [
+            'novels' => Novel::count(),
+            'chapters' => Chapter::published()->count(),
+            'genres' => Genre::count(),
+            'updates_week' => Chapter::published()
+                ->where('created_at', '>=', now()->subDays(7))
+                ->count(),
+        ];
+
+        return view('welcome', compact('recentlyUpdated', 'featuredNovels', 'stats'));
     }
 
     public function index(Request $request)
@@ -298,7 +308,7 @@ class NovelController extends Controller
             'description' => $request->description,
         ]);
 
-        return back()->with('success', 'Permintaan novel berhasil dikirim!');
+        return back()->with('success', 'Novel request submitted successfully!');
     }
 
     public function writerIndex()

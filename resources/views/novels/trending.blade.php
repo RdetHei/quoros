@@ -47,8 +47,8 @@
                     </a>
                 @empty
                     <div class="py-16 px-6 text-center text-slate-500 dark:text-slate-400">
-                        <p class="font-medium">Belum ada data tayangan untuk periode ini.</p>
-                        <p class="text-sm mt-2">Buka halaman novel untuk mulai mengumpulkan statistik harian.</p>
+                        <p class="font-medium">No view data for this period yet.</p>
+                        <p class="text-sm mt-2">Open a novel page to start collecting daily statistics.</p>
                     </div>
                 @endforelse
             </div>
@@ -59,7 +59,7 @@
 
         <aside class="lg:col-span-4">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sticky top-24">
-                <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Top 5 Minggu Ini</h2>
+                <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Top 5 This Week</h2>
                 <div class="space-y-2">
                     @foreach($weeklyTop as $index => $novel)
                         <a href="{{ route('novels.show', $novel->slug) }}" class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">

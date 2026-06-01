@@ -4,7 +4,7 @@
 
 {{-- ===== BREADCRUMB ===== --}}
 <nav class="flex items-center gap-2 text-[10px] md:text-sm text-slate-400 dark:text-slate-500 mb-6 md:mb-8 font-medium overflow-x-auto no-scrollbar">
-    <a href="{{ route('home') }}" class="hover:text-slate-900 dark:hover:text-white transition-colors flex-shrink-0">Katalog</a>
+    <a href="{{ route('home') }}" class="hover:text-slate-900 dark:hover:text-white transition-colors flex-shrink-0">Catalog</a>
     <svg class="w-3 h-3 md:w-3.5 md:h-3.5 text-slate-300 dark:text-slate-700 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
@@ -26,12 +26,12 @@
         <div class="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-950 via-white/10 dark:via-slate-950/10 to-transparent"></div>
     </div>
 
-    <div class="relative z-10 p-6 md:p-12 lg:p-16">
-        <div class="flex flex-col md:flex-row gap-8 md:gap-14 lg:gap-20">
+    <div class="relative z-10 p-5 sm:p-8 md:p-12 lg:p-16">
+        <div class="flex flex-col md:flex-row gap-6 md:gap-14 lg:gap-20">
 
             {{-- Cover --}}
             <div class="flex-shrink-0">
-                <div class="w-40 md:w-56 lg:w-64 mx-auto md:mx-0">
+                <div class="w-36 sm:w-44 md:w-56 lg:w-64 mx-auto md:mx-0">
                     <div class="aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/20 dark:shadow-black/40 ring-1 ring-slate-200 dark:ring-slate-700">
                         @if($novel->cover_image_url)
                             <img src="{{ $novel->cover_image_url }}"
@@ -60,7 +60,7 @@
                         </a>
                         <a href="{{ route('writer.chapters.create', $novel->id) }}"
                            class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-sm text-center transition-all shadow-lg shadow-emerald-700/10">
-                            + Chapter Baru
+                            + New Chapter
                         </a>
                     </div>
                     @endcan
@@ -82,11 +82,11 @@
                 </div>
 
                 {{-- Title --}}
-                <h1 class="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-tight tracking-tight mb-3 text-center md:text-left drop-shadow-sm">
+                <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-tight tracking-tight mb-3 text-center md:text-left drop-shadow-sm">
                     {{ $novel->title }}
                 </h1>
                 @if($novel->alternative_title)
-                <p class="text-base md:text-lg text-slate-600 dark:text-slate-400 font-medium italic mb-6 text-center md:text-left opacity-80">{{ $novel->alternative_title }}</p>
+                <p class="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-400 font-medium italic mb-6 text-center md:text-left opacity-80 leading-relaxed">{{ $novel->alternative_title }}</p>
                 @endif
 
                 {{-- Meta row --}}
@@ -156,7 +156,7 @@
                 {{-- Description --}}
                 <div class="relative group/desc">
                     <p class="text-base md:text-lg text-slate-700 dark:text-slate-300 leading-relaxed mb-8 max-w-3xl text-center md:text-left font-medium line-clamp-4 group-hover/desc:line-clamp-none transition-all duration-500">
-                        {{ $novel->description ?: 'Belum ada deskripsi untuk novel ini.' }}
+                        {{ $novel->description ?: 'No description available for this novel.' }}
                     </p>
                 </div>
 
@@ -172,43 +172,43 @@
                 @endif
 
                 {{-- CTA Buttons --}}
-                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3">
                     @if($novel->chapters->isNotEmpty())
                     <a href="{{ route('chapters.show', [$novel->slug, $novel->chapters->first()->slug]) }}"
-                       class="inline-flex items-center gap-2 px-7 py-3 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold rounded-xl text-sm transition-all shadow-lg shadow-slate-900/20 dark:shadow-none active:scale-95">
+                       class="flex-grow sm:flex-grow-0 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold rounded-xl text-sm transition-all shadow-lg shadow-slate-900/20 dark:shadow-none active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
                         </svg>
-                        Mulai Membaca
+                        Start Reading
                     </a>
                     @else
-                    <button disabled class="inline-flex items-center gap-2 px-7 py-3 bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold rounded-xl text-sm cursor-not-allowed">
-                        Belum Ada Chapter
+                    <button disabled class="flex-grow sm:flex-grow-0 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold rounded-xl text-sm cursor-not-allowed">
+                        No Chapters Available
                     </button>
                     @endif
 
                     @auth
                         @php $isBookmarked = Auth::user()->bookmarks()->where('novel_id', $novel->id)->exists(); @endphp
-                        <form action="{{ route('bookmarks.toggle', $novel->id) }}" method="POST">
+                        <form action="{{ route('bookmarks.toggle', $novel->id) }}" method="POST" class="flex-grow sm:flex-grow-0">
                             @csrf
                             <button type="submit"
-                                    class="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all border
+                                    class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-sm font-bold transition-all border
                                            {{ $isBookmarked
                                               ? 'bg-rose-700 hover:bg-rose-800 text-white border-rose-700 shadow-lg shadow-rose-700/10'
                                               : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:text-rose-500' }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="{{ $isBookmarked ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                                 </svg>
-                                {{ $isBookmarked ? 'Tersimpan' : 'Simpan' }}
+                                <span>{{ $isBookmarked ? 'Bookmarked' : 'Bookmark' }}</span>
                             </button>
                         </form>
                     @else
                         <a href="{{ route('login') }}"
-                           class="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:text-rose-500 transition-all">
+                           class="flex-grow sm:flex-grow-0 inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-sm font-bold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:text-rose-500 transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                             </svg>
-                            Simpan
+                            Bookmark
                         </a>
                     @endauth
 
@@ -235,7 +235,7 @@
                         </form>
                     @else
                         <a href="{{ route('lists.create') }}" class="inline-flex items-center px-4 py-3 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 text-slate-500 hover:border-violet-400 hover:text-violet-500 transition-all">
-                            Buat List
+                            Create List
                         </a>
                     @endif
                     @endauth
@@ -245,26 +245,26 @@
 
         {{-- Detail Info Grid --}}
         <div class="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800/70">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-5">Informasi Detail</p>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-5 gap-x-6">
+            <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] mb-5">Detailed Information</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-6">
                 @foreach([
-                    ['label' => 'Judul Alternatif', 'value' => $novel->alternative_title ?: '-', 'italic' => true],
-                    ['label' => 'Jenis Novel',       'value' => strtoupper(str_replace('_', ' ', $novel->type))],
-                    ['label' => 'Rating Konten',     'value' => strtoupper($novel->content_rating)],
-                    ['label' => 'Total Tayangan',    'value' => number_format($novel->view_count) . ' Views'],
-                    ['label' => 'Region',            'value' => $novel->region ?: 'Global'],
-                    ['label' => 'Bahasa',            'value' => $novel->language ?: 'Unknown'],
+                    ['label' => 'Origin Region',       'value' => $novel->region ?: 'Global'],
+                    ['label' => 'Original Language',      'value' => $novel->language ?: 'English'],
+                    ['label' => 'Novel Type',       'value' => strtoupper(str_replace('_', ' ', $novel->type))],
+                    ['label' => 'Age Rating',     'value' => strtoupper($novel->content_rating)],
                 ] as $info)
                 <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{{ $info['label'] }}</p>
-                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-300 {{ isset($info['italic']) ? 'italic' : '' }}">{{ $info['value'] }}</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{{ $info['label'] }}</p>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $info['value'] }}</p>
                 </div>
                 @endforeach
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Genre</p>
-                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                        {{ $novel->genres->pluck('name')->implode(', ') }}
-                    </p>
+                <div class="col-span-2 sm:col-span-4">
+                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Main Genres</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach($novel->genres as $genre)
+                            <span class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">{{ $genre->name }}{{ !$loop->last ? ',' : '' }}</span>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
@@ -276,8 +276,8 @@
     <div class="flex items-center gap-3 mb-7">
         <div class="w-1 h-6 bg-slate-400 rounded-full"></div>
         <div>
-            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Karakter Novel</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Tokoh penting dalam cerita ini.</p>
+            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Novel Characters</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Key figures in this story.</p>
         </div>
     </div>
 
@@ -315,7 +315,7 @@
                 @endif
 
                 <p class="mt-4 text-sm leading-relaxed line-clamp-4 {{ !$character->description ? 'italic text-slate-200/80' : 'text-slate-100/95 drop-shadow-sm' }}">
-                    {{ $character->description ?: 'Deskripsi karakter belum ditambahkan.' }}
+                    {{ $character->description ?: 'Character description not yet added.' }}
                 </p>
             </div>
         </div>
@@ -332,19 +332,19 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                 </svg>
-                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Daftar Chapter</h2>
+                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Chapter List</h2>
                 <span class="text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-full chapter-count">
                     {{ $novel->chapters->count() }}
                 </span>
             </div>
             <div class="flex items-center gap-3">
-                <input type="text" id="chapterSearch" placeholder="Cari Chapter..." 
+                <input type="text" id="chapterSearch" placeholder="Search Chapters..." 
                        class="hidden sm:block w-36 lg:w-44 text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:text-slate-200">
                 <button id="orderToggle" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
                     </svg>
-                    <span id="orderLabel">Terlama</span>
+                    <span id="orderLabel">Oldest</span>
                 </button>
             </div>
         </div>
@@ -357,7 +357,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
                 <div>
-                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Lanjutkan Membaca</p>
+                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Continue Reading</p>
                     <p class="text-sm font-bold">{{ $lastReading->chapter->title }}</p>
                 </div>
             </div>
@@ -374,7 +374,7 @@
         @if($novel->chapters->count() > 10)
         <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800">
             <button id="loadMoreChapters" class="w-full py-3 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors">
-                Lihat {{ $novel->chapters->count() - 10 }} Chapter Lainnya
+                View {{ $novel->chapters->count() - 10 }} More Chapters
             </button>
         </div>
         @endif
@@ -388,7 +388,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
             </svg>
-            <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Ulasan Pengguna</h2>
+            <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">User Reviews</h2>
             <span class="text-xs font-bold text-rose-500 bg-rose-50 dark:bg-rose-900/30 px-2 py-0.5 rounded-full">
                 {{ $novel->reviews->count() }}
             </span>
@@ -403,7 +403,7 @@
                           class="p-5 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-700/50"
                           x-data="{ rating: 0, hover: 0 }">
                         @csrf
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-4">Berikan Ulasan</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-4">Give a Review</p>
                         <div class="mb-4 flex items-center gap-1.5">
                             <input type="hidden" name="rating" :value="rating">
                             <template x-for="i in 5">
@@ -422,18 +422,18 @@
                         </div>
                         <textarea name="content" rows="4" required
                                   class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 placeholder-slate-400 text-slate-700 dark:text-slate-300 resize-none mb-4 shadow-sm"
-                                  placeholder="Tuliskan pendapatmu tentang novel ini…"></textarea>
+                                  placeholder="Share your thoughts on this novel…"></textarea>
                         <button type="submit"
                                 class="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-slate-900/10 active:scale-95">
-                            Kirim Ulasan
+                            Submit Review
                         </button>
                     </form>
                     @else
                     <div class="p-6 bg-slate-50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-700/40 rounded-2xl text-center">
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Masuk untuk memberikan ulasan dan rating pada novel ini.</p>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Login to give a review and rating for this novel.</p>
                         <a href="{{ route('login') }}"
                            class="inline-block w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-xs uppercase tracking-wider transition-all">
-                            Login Sekarang
+                            Login Now
                         </a>
                     </div>
                     @endauth
@@ -487,9 +487,9 @@
                                 <form action="{{ route('reviews.destroy', $review->id) }}" method="POST">
                                     @csrf @method('DELETE')
                                     <button type="submit"
-                                            onclick="return confirm('Hapus ulasan ini?')"
+                                            onclick="return confirm('Delete this review?')"
                                             class="text-[10px] font-black text-rose-500/50 hover:text-rose-500 transition-colors uppercase tracking-widest">
-                                        Hapus
+                                        Delete
                                     </button>
                                 </form>
                             </div>
@@ -500,7 +500,7 @@
                             <div class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.049 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                             </div>
-                            <p class="text-sm text-slate-400 font-medium italic">Belum ada ulasan untuk novel ini.</p>
+                            <p class="text-sm text-slate-400 font-medium italic">No reviews for this novel yet.</p>
                         </div>
                         @endforelse
                     </div>
@@ -509,7 +509,7 @@
                     <div class="mt-8 text-center">
                         <button @click="showAll = !showAll" 
                                 class="inline-flex items-center gap-2 px-8 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
-                            <span x-text="showAll ? 'Sembunyikan' : 'Lihat Lebih Banyak (' + ({{ $novel->reviews->count() }} - 3) + ')'"></span>
+                            <span x-text="showAll ? 'Hide' : 'View More (' + ({{ $novel->reviews->count() }} - 3) + ')'"></span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" :class="showAll ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -528,8 +528,8 @@
     <div class="flex items-center gap-3 mb-7">
         <div class="w-1 h-6 bg-slate-400 rounded-full"></div>
         <div>
-            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Novel Serupa</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Berdasarkan kesamaan genre dan tag</p>
+            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Similar Novels</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Based on similar genres and tags</p>
         </div>
     </div>
 
@@ -572,7 +572,7 @@
     <a href="{{ route('chapters.show', [$novel->slug, $lastReading->chapter->slug]) }}" 
        class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl shadow-2xl shadow-slate-900/40 transition-all hover:-translate-y-1 group md:hidden">
         <div class="flex flex-col">
-            <span class="text-[10px] font-black uppercase tracking-widest opacity-70 leading-none mb-1">Lanjutkan</span>
+            <span class="text-[10px] font-black uppercase tracking-widest opacity-70 leading-none mb-1">Continue</span>
             <span class="text-sm font-bold truncate max-w-[150px]">{{ $lastReading->chapter->title }}</span>
         </div>
         <div class="w-8 h-8 rounded-full bg-white/20 dark:bg-slate-900/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">

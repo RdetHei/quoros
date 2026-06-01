@@ -45,7 +45,7 @@ class ReportController extends Controller
             ->exists();
 
         if ($duplicate) {
-            return back()->with('error', 'Anda sudah memiliki laporan yang sedang ditinjau untuk konten ini.');
+            return back()->with('error', 'You already have a pending report for this content.');
         }
 
         Report::create([
@@ -57,7 +57,7 @@ class ReportController extends Controller
             'status' => ReportStatus::Pending,
         ]);
 
-        return back()->with('success', 'Laporan berhasil dikirim. Tim moderasi akan meninjaunya.');
+        return back()->with('success', 'Report submitted successfully. The moderation team will review it.');
     }
 
     private function assertCanReport(Novel|Comment|User $reportable): void
@@ -66,11 +66,11 @@ class ReportController extends Controller
 
         if ($reportable instanceof User) {
             if ($reportable->id === $userId) {
-                abort(403, 'Anda tidak dapat melaporkan diri sendiri.');
+                abort(403, 'You cannot report yourself.');
             }
 
             if ($reportable->role === 'admin') {
-                abort(403, 'Konten ini tidak dapat dilaporkan.');
+                abort(403, 'This content cannot be reported.');
             }
 
             return;
@@ -78,14 +78,14 @@ class ReportController extends Controller
 
         if ($reportable instanceof Novel) {
             if ($reportable->author_id === $userId) {
-                abort(403, 'Anda tidak dapat melaporkan novel sendiri.');
+                abort(403, 'You cannot report your own novel.');
             }
 
             return;
         }
 
         if ($reportable instanceof Comment && $reportable->user_id === $userId) {
-            abort(403, 'Anda tidak dapat melaporkan komentar sendiri.');
+            abort(403, 'You cannot report your own comment.');
         }
     }
 }

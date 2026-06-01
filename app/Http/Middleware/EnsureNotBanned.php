@@ -19,12 +19,12 @@ class EnsureNotBanned
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            $message = 'Akun Anda ditangguhkan.';
+            $message = 'Your account has been suspended.';
             if ($user->ban_reason) {
-                $message .= ' Alasan: '.$user->ban_reason;
+                $message .= ' Reason: '.$user->ban_reason;
             }
             if ($user->banned_until && $user->banned_until->isFuture()) {
-                $message .= ' Berlaku hingga '.$user->banned_until->format('d M Y H:i');
+                $message .= ' Valid until '.$user->banned_until->format('d M Y H:i');
             }
 
             return redirect()->route('login')->with('error', $message);

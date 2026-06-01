@@ -40,12 +40,12 @@ class NovelRequestController extends Controller
             }
         }
 
-        return back()->with('success', 'Status permintaan berhasil diperbarui!');
+        return back()->with('success', 'Request status updated successfully!');
     }
 
     public function destroy(NovelRequest $novelRequest)
     {
         $novelRequest->delete();
-        return back()->with('success', 'Permintaan berhasil dihapus!');
+        return back()->with('success', 'Request deleted successfully!');
     }
 }

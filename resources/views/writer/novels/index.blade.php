@@ -11,13 +11,13 @@
                 <div class="flex items-center gap-4">
                     <div class="w-1.5 h-10 bg-indigo-600 rounded-full shrink-0"></div>
                     <div>
-                        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Novel Saya</h1>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Kelola dan pantau semua karya yang telah dipublikasikan.</p>
+                        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">My Novels</h1>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage and monitor all your published works.</p>
                     </div>
                 </div>
                 <a href="{{ route('writer.novels.create') }}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                    Buat Novel
+                    Create Novel
                 </a>
             </div>
 
@@ -31,11 +31,11 @@
             {{-- Summary stats --}}
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
-                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Total Novel</p>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Total Novels</p>
                     <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($summary['novel_count']) }}</p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
-                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Total Chapter</p>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Total Chapters</p>
                     <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($summary['chapter_count']) }}</p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
@@ -43,7 +43,7 @@
                     <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($summary['total_views']) }}</p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
-                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Total Bookmark</p>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Total Bookmarks</p>
                     <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($summary['total_bookmarks']) }}</p>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                                 <div class="flex items-center gap-2 mb-1">
                                     <a href="{{ route('novels.show', $novel->slug) }}" class="text-base font-semibold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate">{{ $novel->title }}</a>
                                     @php
-                                        $statusLabels = ['ongoing' => 'Ongoing', 'complete' => 'Selesai', 'hiatus' => 'Hiatus'];
+                                        $statusLabels = ['ongoing' => 'Ongoing', 'complete' => 'Completed', 'hiatus' => 'Hiatus'];
                                         $statusColors = [
                                             'ongoing' => 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
                                             'complete' => 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
@@ -81,11 +81,11 @@
                                         {{ $statusLabels[$novel->status] ?? $novel->status }}
                                     </span>
                                 </div>
-                                <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-1 mb-2">{{ $novel->description ?: 'Belum ada deskripsi.' }}</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-1 mb-2">{{ $novel->description ?: 'No description yet.' }}</p>
                                 <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-                                    <span>{{ $novel->chapters_count }} chapter</span>
+                                    <span>{{ $novel->chapters_count }} chapters</span>
                                     <span>{{ number_format($novel->view_count) }} views</span>
-                                    <span>{{ $novel->bookmarks_count }} bookmark</span>
+                                    <span>{{ $novel->bookmarks_count }} bookmarks</span>
                                     <span class="flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                                         {{ number_format($novel->rating_avg, 1) }}
@@ -97,11 +97,11 @@
                             </div>
 
                             <div class="shrink-0 flex items-center gap-2">
-                                <a href="{{ route('novels.show', $novel->slug) }}" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors" title="Lihat">
+                                <a href="{{ route('novels.show', $novel->slug) }}" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors" title="View">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                 </a>
                                 @can('update', $novel)
-                                <a href="{{ route('writer.chapters.create', $novel->id) }}" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors" title="Tambah Chapter">
+                                <a href="{{ route('writer.chapters.create', $novel->id) }}" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors" title="Add Chapter">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
                                 </a>
                                 <a href="{{ route('writer.novels.edit', $novel->id) }}" class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors" title="Edit">
@@ -112,7 +112,7 @@
                                 <form action="{{ route('writer.novels.destroy', $novel->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors" title="Hapus" onclick="return confirm('Hapus novel ini selamanya?')">
+                                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors" title="Delete" onclick="return confirm('Delete this novel permanently?')">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                 </form>

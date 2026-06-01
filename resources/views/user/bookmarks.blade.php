@@ -5,8 +5,8 @@
     <div class="flex items-center gap-4 mb-8">
         <div class="w-1 h-10 bg-rose-600 rounded-full shrink-0"></div>
         <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Bookmark Saya</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Koleksi novel yang kamu simpan untuk dibaca nanti.</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">My Bookmarks</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Collection of novels you saved to read later.</p>
         </div>
     </div>
 
@@ -56,10 +56,10 @@
                 <div class="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-4 text-slate-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
                 </div>
-                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-1">Belum ada bookmark</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Simpan novel favoritmu untuk dibaca nanti.</p>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-1">No bookmarks yet</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Save your favorite novels to read later.</p>
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-rose-600 text-white text-sm font-semibold rounded-xl hover:bg-rose-700 transition-colors">
-                    Jelajahi Novel
+                    Explore Novels
                 </a>
             </div>
         @endforelse

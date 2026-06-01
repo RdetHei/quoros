@@ -5,8 +5,8 @@
     <div class="flex items-center gap-4 mb-8">
         <div class="w-2 h-10 bg-indigo-600 rounded-full"></div>
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Manajemen Request Novel</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium">Kelola permintaan novel dari para pembaca.</p>
+            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Novel Request Management</h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium">Manage novel requests from readers.</p>
         </div>
     </div>
 
@@ -22,9 +22,9 @@
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50">
                         <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">User</th>
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Judul Novel</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Novel Title</th>
                         <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aksi</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
@@ -40,7 +40,7 @@
                             </td>
                             <td class="px-4 md:px-6 py-6">
                                 <div class="text-sm font-bold text-slate-900 dark:text-white mb-1">{{ $request->title }}</div>
-                                <div class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 italic">{{ $request->description ?? 'Tidak ada deskripsi' }}</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 italic">{{ $request->description ?? 'No description' }}</div>
                             </td>
                             <td class="px-4 md:px-6 py-6">
                                 @php
@@ -83,7 +83,7 @@
                                         </form>
                                     @endif
                                     
-                                    <form action="{{ route('admin.requests.destroy', $request->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus request ini?')">
+                                    <form action="{{ route('admin.requests.destroy', $request->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this request?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 transition-colors">

@@ -55,7 +55,7 @@
                                  x-transition:leave-end="opacity-0"
                                  class="absolute inset-0 flex flex-col justify-end">
                                 <div class="flex flex-wrap gap-2 mb-4 min-h-[28px]">
-                                    <span class="px-2.5 py-0.5 bg-indigo-600 text-white text-[10px] font-semibold uppercase tracking-wide rounded-md">Unggulan</span>
+                                    <span class="px-2.5 py-0.5 bg-indigo-600 text-white text-[10px] font-semibold uppercase tracking-wide rounded-md">Featured</span>
                                     @foreach($novel->genres->take(2) as $genre)
                                         <span class="px-2.5 py-0.5 bg-white/10 text-white/90 text-[10px] font-medium rounded-md border border-white/10">{{ $genre->name }}</span>
                                     @endforeach
@@ -65,7 +65,7 @@
                                 </h2>
                                 <p class="text-sm text-slate-400 mb-2 min-h-[1.25rem]">{{ $novel->author->name }}</p>
                                 <p class="text-sm text-slate-500 leading-relaxed line-clamp-2 max-w-xl min-h-[2.75rem]">
-                                    {{ $novel->description ?? 'Temukan cerita menarik dari penulis ini.' }}
+                                    {{ $novel->description ?? 'Discover interesting stories from this author.' }}
                                 </p>
                             </div>
                         @endforeach
@@ -75,7 +75,7 @@
                     <div class="flex flex-wrap items-center gap-3 shrink-0 h-11">
                         <a :href="current.url"
                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors">
-                            Baca Sekarang
+                            Read Now
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                         </a>
 
@@ -90,7 +90,7 @@
 
                         @if($featuredNovels->count() > 1)
                         <div class="flex items-center gap-1 p-1 bg-white/10 rounded-xl border border-white/10 ml-auto">
-                            <button type="button" @click="prev(); resetTimer()" class="p-2 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition-colors" aria-label="Sebelumnya">
+                            <button type="button" @click="prev(); resetTimer()" class="p-2 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition-colors" aria-label="Previous">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
                             </button>
                             @foreach($featuredNovels as $dotIndex => $dotNovel)
@@ -98,7 +98,7 @@
                                     class="h-1.5 rounded-full transition-all"
                                     :class="activeSlide === {{ $dotIndex }} ? 'w-5 bg-indigo-500' : 'w-1.5 bg-white/30'"></button>
                             @endforeach
-                            <button type="button" @click="next(); resetTimer()" class="p-2 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition-colors" aria-label="Berikutnya">
+                            <button type="button" @click="next(); resetTimer()" class="p-2 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition-colors" aria-label="Next">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                             </button>
                         </div>
@@ -129,11 +129,11 @@
 </div>
 @endif
 
-{{-- Baru diupdate --}}
+{{-- Recently updated --}}
 <section class="mb-12">
     @include('partials.section-header', [
-        'title' => 'Baru Diupdate',
-        'description' => 'Chapter terbaru dari novel favorit pembaca.',
+        'title' => 'Recently Updated',
+        'description' => "The latest chapters from readers' favorite novels.",
         'accent' => 'emerald',
         'href' => route('novels.updated'),
     ])
@@ -169,17 +169,17 @@
     </div>
 </section>
 
-{{-- Genre & Tag — di bawah Baru Diupdate --}}
+{{-- Genre & Tag --}}
 <section class="mb-12 scroll-mt-24">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div id="genres" class="scroll-mt-28">
             <div class="h-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
                 @include('partials.section-header', [
-                    'title' => 'Jelajahi Genre',
-                    'description' => 'Pilih kategori cerita favoritmu.',
+                    'title' => 'Explore Genres',
+                    'description' => 'Choose your favorite story category.',
                     'accent' => 'emerald',
                     'href' => route('genres.index'),
-                    'linkText' => 'Semua genre',
+                    'linkText' => 'All genres',
                 ])
 
                 <div class="flex flex-wrap gap-2 max-h-[220px] sm:max-h-[280px] overflow-y-auto pr-1">
@@ -190,7 +190,7 @@
                             <span class="text-[10px] font-bold text-slate-400 tabular-nums">{{ $genre->novels_count }}</span>
                         </a>
                     @empty
-                        <p class="text-sm text-slate-500 py-4">Belum ada genre.</p>
+                        <p class="text-sm text-slate-500 py-4">No genres yet.</p>
                     @endforelse
                 </div>
             </div>
@@ -199,11 +199,11 @@
         <div id="tags" class="scroll-mt-28">
             <div class="h-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
                 @include('partials.section-header', [
-                    'title' => 'Tag Populer',
-                    'description' => 'Filter cerita dengan elemen spesifik.',
+                    'title' => 'Popular Tags',
+                    'description' => 'Filter stories by specific elements.',
                     'accent' => 'indigo',
                     'href' => route('tags.index'),
-                    'linkText' => 'Semua tag',
+                    'linkText' => 'All tags',
                 ])
 
                 <div class="flex flex-wrap gap-2 max-h-[220px] sm:max-h-[280px] overflow-y-auto pr-1">
@@ -215,7 +215,7 @@
                             <span class="text-[10px] font-bold text-slate-400 tabular-nums">{{ $tag->novels_count }}</span>
                         </a>
                     @empty
-                        <p class="text-sm text-slate-500 py-4">Belum ada tag.</p>
+                        <p class="text-sm text-slate-500 py-4">No tags yet.</p>
                     @endforelse
                 </div>
             </div>
@@ -223,12 +223,12 @@
     </div>
 </section>
 
-{{-- Novel terbaru + leaderboard --}}
+{{-- Newest novels + leaderboard --}}
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
     <section class="lg:col-span-8 xl:col-span-9">
         @include('partials.section-header', [
-            'title' => 'Novel Terbaru',
-            'description' => 'Karya terbaru yang baru ditambahkan ke katalog.',
+            'title' => 'Newest Novels',
+            'description' => 'The latest works recently added to the catalog.',
             'accent' => 'slate',
         ])
 
@@ -256,7 +256,7 @@
                     <p class="text-[10px] text-slate-500 mt-0.5 truncate">{{ $novel->author->name }}</p>
                 </a>
             @empty
-                <div class="col-span-full py-12 text-center text-sm text-slate-500">Belum ada novel.</div>
+                <div class="col-span-full py-12 text-center text-sm text-slate-500">No novels yet.</div>
             @endforelse
         </div>
 
@@ -268,14 +268,14 @@
     <aside class="lg:col-span-4 xl:col-span-3" x-data="{ tab: 'weekly' }">
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-24">
             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-                <h2 class="text-base font-semibold text-slate-900 dark:text-white">Top Novel</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Berdasarkan tayangan harian</p>
-                <a href="{{ route('novels.trending') }}" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-1 inline-block">Lihat semua →</a>
+                <h2 class="text-base font-semibold text-slate-900 dark:text-white">Top Novels</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Based on daily views</p>
+                <a href="{{ route('novels.trending') }}" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-1 inline-block">View all →</a>
             </div>
 
             <div class="flex p-2 gap-1 border-b border-slate-100 dark:border-slate-800">
-                <button @click="tab = 'weekly'" :class="tab === 'weekly' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'" class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors">Mingguan</button>
-                <button @click="tab = 'monthly'" :class="tab === 'monthly' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'" class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors">Bulanan</button>
+                <button @click="tab = 'weekly'" :class="tab === 'weekly' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'" class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors">Weekly</button>
+                <button @click="tab = 'monthly'" :class="tab === 'monthly' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'" class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors">Monthly</button>
             </div>
 
             <div class="p-2 max-h-[480px] overflow-y-auto">
@@ -292,11 +292,11 @@
                             </div>
                             <div class="min-w-0 flex-grow">
                                 <p class="text-xs font-semibold text-slate-900 dark:text-white line-clamp-1">{{ $novel->title }}</p>
-                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->period_views ?? 0) }} views (7h)</p>
+                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->period_views ?? 0) }} views (7d)</p>
                             </div>
                         </a>
                     @empty
-                        <p class="text-center py-6 text-xs text-slate-400">Belum ada data.</p>
+                        <p class="text-center py-6 text-xs text-slate-400">No data yet.</p>
                     @endforelse
                 </div>
                 <div x-show="tab === 'monthly'" x-cloak>
@@ -312,11 +312,11 @@
                             </div>
                             <div class="min-w-0 flex-grow">
                                 <p class="text-xs font-semibold text-slate-900 dark:text-white line-clamp-1">{{ $novel->title }}</p>
-                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->period_views ?? 0) }} views (30h)</p>
+                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->period_views ?? 0) }} views (30d)</p>
                             </div>
                         </a>
                     @empty
-                        <p class="text-center py-6 text-xs text-slate-400">Belum ada data.</p>
+                        <p class="text-center py-6 text-xs text-slate-400">No data yet.</p>
                     @endforelse
                 </div>
             </div>
@@ -327,8 +327,8 @@
 {{-- Populer --}}
 <section class="mb-8">
     @include('partials.section-header', [
-        'title' => 'Populer',
-        'description' => 'Novel dengan rating dan engagement tertinggi.',
+        'title' => 'Popular',
+        'description' => 'Novels with the highest rating and engagement.',
         'accent' => 'rose',
     ])
 

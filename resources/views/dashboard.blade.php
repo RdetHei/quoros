@@ -25,21 +25,21 @@
 
                 <div class="min-w-0">
                     <h1 class="text-xl md:text-3xl font-bold text-slate-900 dark:text-white mb-0.5 md:mb-1 truncate">
-                        Hai, {{ $user->name }}
+                        Hi, {{ $user->name }}
                     </h1>
-                    <p class="text-slate-500 dark:text-slate-400 text-[11px] md:text-sm font-medium truncate">
-                        {{ $user->role === 'admin' ? 'Administrator' : ($user->role === 'writer' ? 'Penulis' : 'Pembaca') }} • Sejak {{ $user->created_at->format('M Y') }}
+                    <p class="text-slate-50 dark:text-slate-400 text-[11px] md:text-sm font-medium truncate">
+                        {{ $user->role === 'admin' ? 'Administrator' : ($user->role === 'writer' ? 'Writer' : 'Reader') }} • Since {{ $user->created_at->format('M Y') }}
                     </p>
                 </div>
             </div>
 
             <div class="flex gap-3 md:gap-4">
                 <div class="flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl md:rounded-2xl border border-slate-100 dark:border-slate-700/50 text-center md:text-left">
-                    <p class="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5 md:mb-1">Jam Baca</p>
+                    <p class="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5 md:mb-1">Reading Hours</p>
                     <p class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">{{ $totalReadingHours }}<span class="text-xs ml-0.5 text-slate-400 font-medium">h</span></p>
                 </div>
                 <div class="flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl md:rounded-2xl border border-slate-100 dark:border-slate-700/50 text-center md:text-left">
-                    <p class="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5 md:mb-1">Koin</p>
+                    <p class="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5 md:mb-1">Points</p>
                     <p class="text-lg md:text-xl font-bold text-amber-500">{{ $userPoints }}</p>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                 <nav class="flex lg:flex-col gap-1 min-w-max lg:min-w-0">
                     <a href="{{ route('profile.show', $user->username ?? $user->id) }}" class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                        <span>Profil Saya</span>
+                        <span>My Profile</span>
                     </a>
 
                     <div class="h-px bg-slate-100 dark:bg-slate-800 my-1 hidden lg:block"></div>
@@ -63,27 +63,27 @@
                         :class="activeTab === 'bookmarks' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                        <span>Bookmark</span>
+                        <span>Bookmarks</span>
                     </button>
 
                     <button @click="activeTab = 'history'" 
                         :class="activeTab === 'history' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span>Riwayat</span>
+                        <span>History</span>
                     </button>
 
                     <button @click="activeTab = 'recommendations'" 
                         :class="activeTab === 'recommendations' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        <span>Rekomendasi</span>
+                        <span>Recommendations</span>
                     </button>
 
                     <a href="{{ route('settings') }}"
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <span>Pengaturan</span>
+                        <span>Settings</span>
                     </a>
 
                     @if($user->role === 'user')
@@ -91,14 +91,14 @@
                         :class="activeTab === 'become_writer' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'" 
                         class="flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 group whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        <span>Penulis</span>
+                        <span>Writer</span>
                     </button>
                     @endif
                 </nav>
 
                 @if($user->role === 'admin' || $user->role === 'writer')
                 <div class="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-slate-100 dark:border-slate-800 hidden lg:block">
-                    <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Kontributor</p>
+                    <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Contributor</p>
                     <div class="space-y-1">
                         @if($user->role === 'admin')
                             <a href="{{ route('admin.carousel.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all">
@@ -108,11 +108,11 @@
                         @endif
                         <a href="{{ route('writer.stats') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 012 2h2a2 2 0 012-2" /></svg>
-                            <span>Dashboard Penulis</span>
+                            <span>Writer Dashboard</span>
                         </a>
                         <a href="{{ route('writer.novels.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                            <span>Novel Saya</span>
+                            <span>My Novels</span>
                         </a>
                     </div>
                 </div>
@@ -127,7 +127,7 @@
                         <div class="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
-                        <h3 class="text-sm font-bold text-slate-900 dark:text-white">Target Harian</h3>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white">Daily Goal</h3>
                     </div>
                     <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 rounded-full">
                         <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
@@ -140,7 +140,7 @@
                         <span class="text-4xl font-bold text-slate-900 dark:text-white">45</span>
                         <span class="text-sm font-medium text-slate-400">/ 60 min</span>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">15 menit lagi untuk mencapai target!</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">15 more minutes to reach your goal!</p>
                 </div>
 
                 <div class="space-y-4">
@@ -151,8 +151,8 @@
                         <div class="flex items-center gap-3">
                             <div class="text-xl">🔥</div>
                             <div>
-                                <p class="text-xs font-bold text-slate-900 dark:text-white">5 Hari Beruntun!</p>
-                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Jangan biarkan apinya padam.</p>
+                                <p class="text-xs font-bold text-slate-900 dark:text-white">5 Day Streak!</p>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Don't let the fire go out.</p>
                             </div>
                         </div>
                     </div>
@@ -191,7 +191,7 @@
                         @if($announcement->link)
                         <div class="shrink-0 w-full md:w-auto">
                             <a href="{{ $announcement->link }}" class="inline-flex w-full md:w-auto justify-center px-5 py-2 md:py-2.5 bg-white text-indigo-600 font-bold rounded-xl text-xs md:text-sm hover:bg-indigo-50 transition-colors">
-                                Lihat Detail
+                                View Details
                             </a>
                         </div>
                         @endif
@@ -223,11 +223,11 @@
                         <div>
                             <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-indigo-500/20 rounded-full text-indigo-300 text-[9px] md:text-[10px] font-bold uppercase tracking-wider mb-2 md:mb-4">
                                 <span class="flex h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-indigo-500"></span>
-                                Sedang Dibaca
+                                Currently Reading
                             </div>
                             <h2 class="text-lg md:text-4xl font-bold text-white mb-1 md:mb-2 line-clamp-1 md:line-clamp-2">{{ $lastRead->novel->title }}</h2>
                             <p class="text-slate-400 text-[10px] md:text-sm font-medium">
-                                Terakhir: <span class="text-white font-bold">{{ $lastRead->chapter->title }}</span>
+                                Last: <span class="text-white font-bold">{{ $lastRead->chapter->title }}</span>
                             </p>
                         </div>
 
@@ -242,7 +242,7 @@
                         </div>
 
                         <a href="{{ route('chapters.show', [$lastRead->novel->slug, $lastRead->chapter->slug]) }}" class="inline-flex w-full md:w-auto justify-center items-center gap-2 md:gap-3 px-6 md:px-8 py-2.5 md:py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-indigo-50 transition-colors text-xs md:text-base">
-                            Lanjutkan Membaca
+                            Continue Reading
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                         </a>
                     </div>
@@ -256,11 +256,11 @@
                 <div x-show="activeTab === 'bookmarks'" class="space-y-5 md:space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Bookmark Saya</h3>
-                            <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400">Kumpulan novel yang Anda ikuti.</p>
+                            <h3 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">My Bookmarks</h3>
+                            <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400">Collection of novels you follow.</p>
                         </div>
                         <span class="px-2.5 md:px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[9px] md:text-xs font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                            {{ count($bookmarks) }} Novel
+                            {{ count($bookmarks) }} Novels
                         </span>
                     </div>
 
@@ -289,10 +289,10 @@
                                 <div class="w-12 h-12 md:w-16 md:h-16 bg-white dark:bg-slate-800 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto text-slate-300 dark:text-slate-600 mb-3 md:mb-4 shadow-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                                 </div>
-                                <h4 class="text-base md:text-lg font-bold text-slate-900 dark:text-white mb-1">Belum Ada Bookmark</h4>
-                                <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-5 md:mb-6">Mulai jelajahi novel menarik dan simpan di sini!</p>
+                                <h4 class="text-base md:text-lg font-bold text-slate-900 dark:text-white mb-1">No Bookmarks Yet</h4>
+                                <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-5 md:mb-6">Start exploring interesting novels and save them here!</p>
                                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 bg-indigo-600 text-white text-xs md:text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-sm">
-                                    Cari Novel
+                                    Search Novels
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 md:h-4 md:w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                 </a>
                             </div>
@@ -304,10 +304,10 @@
                 <div x-show="activeTab === 'history'" class="space-y-5 md:space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Riwayat Baca</h3>
-                            <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400">Lanjutkan petualangan yang sempat tertunda.</p>
+                            <h3 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Reading History</h3>
+                            <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400">Continue your interrupted adventure.</p>
                         </div>
-                        <span class="text-[9px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Terakhir Dibaca</span>
+                        <span class="text-[9px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Last Read</span>
                     </div>
 
                     <div class="space-y-3 md:space-y-4">
@@ -340,7 +340,7 @@
                                 </div>
 
                                 <a href="{{ route('chapters.show', [$history->novel->slug, $history->chapter->slug]) }}" class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] md:text-xs font-bold rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all text-center">
-                                    Lanjutkan
+                                    Continue
                                 </a>
                             </div>
                         @empty
@@ -348,10 +348,10 @@
                                 <div class="w-12 h-12 md:w-16 md:h-16 bg-white dark:bg-slate-800 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto text-slate-300 dark:text-slate-600 mb-3 md:mb-4 shadow-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 </div>
-                                <h4 class="text-base md:text-lg font-bold text-slate-900 dark:text-white mb-1">Belum Ada Riwayat</h4>
-                                <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-5 md:mb-6">Sepertinya Anda belum mulai membaca novel apa pun.</p>
+                                <h4 class="text-base md:text-lg font-bold text-slate-900 dark:text-white mb-1">No History Yet</h4>
+                                <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-5 md:mb-6">It looks like you haven't started reading any novels yet.</p>
                                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 bg-indigo-600 text-white text-xs md:text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-sm">
-                                    Jelajahi Novel
+                                    Explore Novels
                                 </a>
                             </div>
                         @endforelse
@@ -362,8 +362,8 @@
                 <div x-show="activeTab === 'recommendations'" class="space-y-5 md:space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Pilihan Untuk Anda</h3>
-                            <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400">Berdasarkan novel yang Anda sukai.</p>
+                            <h3 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Picked For You</h3>
+                            <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400">Based on novels you like.</p>
                         </div>
                     </div>
 
@@ -405,58 +405,43 @@
 
                 <!-- Become Writer Tab -->
                 @if($user->role === 'user')
-                <div x-show="activeTab === 'become_writer'" class="space-y-5 md:space-y-6">
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <div class="relative h-40 md:h-48 bg-indigo-600 overflow-hidden">
-                            <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600 opacity-90"></div>
-                            <div class="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-white/10 rounded-full -mr-24 md:-mr-32 -mt-24 md:-mt-32 blur-2xl md:blur-3xl"></div>
-                            <div class="absolute bottom-0 left-0 w-32 md:w-48 h-32 md:h-48 bg-white/10 rounded-full -ml-16 md:-ml-24 -mb-16 md:-mb-24 blur-xl md:blur-2xl"></div>
-                            
-                            <div class="relative h-full flex flex-col items-center justify-center text-center px-6">
-                                <h3 class="text-xl md:text-3xl font-bold text-white mb-1.5 md:mb-2">Mulai Perjalanan Menulismu</h3>
-                                <p class="text-indigo-100 text-[10px] md:text-base max-w-lg">Bagikan imajinasimu kepada ribuan pembaca di Mural.</p>
-                            </div>
+                <div x-show="activeTab === 'become_writer'" class="space-y-6 md:space-y-8">
+                    <div class="text-center max-w-2xl mx-auto py-6 md:py-10">
+                        <div class="w-16 h-16 md:w-24 md:h-24 bg-emerald-50 dark:bg-emerald-900/20 rounded-[2rem] flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 mb-6 md:mb-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-12 md:w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </div>
+                        <h2 class="text-2xl md:text-4xl font-black text-slate-900 dark:text-white mb-3 md:mb-4">Start Your Writing Journey</h2>
+                        <p class="text-sm md:text-lg text-slate-500 dark:text-slate-400 leading-relaxed">Share your imagination with thousands of readers on Quoros.</p>
+                    </div>
 
-                        <div class="p-6 md:p-10">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8 md:mb-12">
-                                <div class="text-center">
-                                    <div class="w-12 h-12 md:w-16 md:h-16 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl md:rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto mb-3 md:mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                    </div>
-                                    <h4 class="text-sm md:text-base font-bold text-slate-900 dark:text-white mb-1 md:mb-2">Kebebasan Berkreasi</h4>
-                                    <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Tulis genre apa pun yang kamu suka tanpa batasan.</p>
-                                </div>
-                                <div class="text-center">
-                                    <div class="w-12 h-12 md:w-16 md:h-16 bg-violet-50 dark:bg-violet-900/30 rounded-xl md:rounded-2xl flex items-center justify-center text-violet-600 dark:text-violet-400 mx-auto mb-3 md:mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                    </div>
-                                    <h4 class="text-sm md:text-base font-bold text-slate-900 dark:text-white mb-1 md:mb-2">Bangun Komunitas</h4>
-                                    <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Dapatkan penggemar setia dan interaksi langsung dengan pembaca.</p>
-                                </div>
-                                <div class="text-center">
-                                    <div class="w-12 h-12 md:w-16 md:h-16 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl md:rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                                    </div>
-                                    <h4 class="text-sm md:text-base font-bold text-slate-900 dark:text-white mb-1 md:mb-2">Pantau Statistik</h4>
-                                    <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Analisis performa karyamu dengan dashboard penulis yang lengkap.</p>
-                                </div>
+                    <div class="grid md:grid-cols-3 gap-4 md:gap-6">
+                        @foreach([
+                            ['title' => 'Creative Freedom', 'desc' => 'Write any genre you like without limitations.', 'icon' => 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'],
+                            ['title' => 'Build a Community', 'desc' => 'Get loyal fans and direct interaction with readers.', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'],
+                            ['title' => 'Track Statistics', 'desc' => "Analyze your work's performance with a complete writer dashboard.", 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 012 2h2a2 2 0 012-2'],
+                        ] as $f)
+                        <div class="p-6 md:p-8 bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl border border-slate-100 dark:border-slate-800 transition-all hover:border-emerald-500/30">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-5 md:mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $f['icon'] }}" /></svg>
                             </div>
-
-                            <div class="max-w-xl mx-auto p-5 md:p-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl md:rounded-3xl border border-slate-100 dark:border-slate-700/50 text-center">
-                                <h4 class="text-sm md:text-lg font-bold text-slate-900 dark:text-white mb-1 md:mb-2">Siap untuk memulai?</h4>
-                                <p class="text-[10px] md:text-sm text-slate-500 dark:text-slate-400 mb-6 md:mb-8">Dengan menekan tombol di bawah, akun Anda akan langsung memiliki akses ke fitur-fitur Penulis.</p>
-                                
-                                <form action="{{ route('dashboard.become-writer') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="inline-flex w-full md:w-auto justify-center items-center gap-2 md:gap-3 px-8 md:px-10 py-3.5 md:py-4 bg-indigo-600 text-white font-bold rounded-xl md:rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-[0.98] text-xs md:text-base">
-                                        <span>Daftar Sebagai Penulis</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                                    </button>
-                                </form>
-                            </div>
+                            <h3 class="text-base md:text-lg font-bold text-slate-900 dark:text-white mb-2">{{ $f['title'] }}</h3>
+                            <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{{ $f['desc'] }}</p>
                         </div>
+                        @endforeach
+                    </div>
 
+                    <div class="mt-8 md:mt-12 p-6 md:p-10 bg-emerald-600 rounded-[2rem] md:rounded-[3rem] text-white text-center relative overflow-hidden shadow-xl shadow-emerald-600/20">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_50%)]"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-xl md:text-2xl font-bold mb-2 md:mb-3">Ready to start?</h3>
+                            <p class="text-emerald-50 text-xs md:text-sm mb-6 md:mb-8 max-w-lg mx-auto opacity-90">By clicking the button below, your account will immediately have access to Writer features.</p>
+                            <form action="{{ route('become-writer') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-8 md:px-12 py-3 md:py-4 bg-white text-emerald-600 font-black rounded-xl md:rounded-2xl hover:bg-emerald-50 transition-all shadow-lg text-xs md:text-sm uppercase tracking-widest">
+                                    Register as Writer
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 @endif

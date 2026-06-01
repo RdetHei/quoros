@@ -6,14 +6,14 @@
         <div class="flex items-center gap-4">
             <div class="w-2 h-10 bg-violet-600 rounded-full"></div>
             <div>
-                <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Request Novel</h1>
-                <p class="text-slate-500 dark:text-slate-400 font-medium">Punya judul favorit yang belum ada? Beritahu kami!</p>
-            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Novel Request</h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium">Have a favorite title that's not here yet? Let us know!</p>
         </div>
-        
-        @auth
-            <button onclick="document.getElementById('request-form').scrollIntoView({behavior: 'smooth'})" class="px-8 py-3 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 transition-all">Buat Permintaan</button>
-        @endauth
+    </div>
+    
+    @auth
+        <button onclick="document.getElementById('request-form').scrollIntoView({behavior: 'smooth'})" class="px-8 py-3 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 transition-all">Create Request</button>
+    @endauth
     </div>
 
     <div class="grid grid-cols-1 gap-6 mb-16">
@@ -30,18 +30,18 @@
                             {{ $request->status === 'fulfilled' ? 'Accepted' : ($request->status === 'rejected' ? 'Declined' : 'Pending') }}
                         </span>
                     </div>
-                    <p class="text-sm text-slate-500 mb-3 italic line-clamp-2">"{{ $request->description ?: 'Tidak ada deskripsi.' }}"</p>
+                    <p class="text-sm text-slate-500 mb-3 italic line-clamp-2">"{{ $request->description ?: 'No description.' }}"</p>
                     <div class="flex items-center gap-2">
                         <div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-indigo-500">
                             {{ substr($request->user->name, 0, 1) }}
                         </div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Diminta oleh {{ $request->user->name }} • {{ $request->created_at->diffForHumans() }}</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Requested by {{ $request->user->name }} • {{ $request->created_at->diffForHumans() }}</span>
                     </div>
                 </div>
             </div>
         @empty
             <div class="py-20 text-center bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
-                <p class="text-slate-500 italic">Belum ada permintaan novel.</p>
+                <p class="text-slate-500 italic">No novel requests yet.</p>
             </div>
         @endforelse
 
@@ -59,32 +59,32 @@
             </div>
             
             <div class="relative z-10 max-w-xl">
-                <h2 class="text-3xl font-black mb-4">Ingin Baca Sesuatu?</h2>
-                <p class="text-indigo-100 mb-10 font-medium">Tuliskan judul novel atau penulis yang kamu inginkan, tim kami akan berusaha mencarinya!</p>
+                <h2 class="text-3xl font-black mb-4">Want to Read Something?</h2>
+                <p class="text-indigo-100 mb-10 font-medium">Write down the novel title or author you want, our team will try to find it!</p>
                 
                 <form action="{{ route('requests.store') }}" method="POST" class="space-y-6">
                     @csrf
                     <div>
-                        <label for="title" class="block text-xs font-bold text-indigo-200 uppercase tracking-widest mb-3">Judul Novel / Penulis</label>
+                        <label for="title" class="block text-xs font-bold text-indigo-200 uppercase tracking-widest mb-3">Novel Title / Author</label>
                         <input type="text" name="title" id="title" required
                             class="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-sm text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all" 
-                            placeholder="Contoh: Lord of the Mysteries">
+                            placeholder="Example: Lord of the Mysteries">
                     </div>
                     <div>
-                        <label for="description" class="block text-xs font-bold text-indigo-200 uppercase tracking-widest mb-3">Catatan Tambahan (Opsional)</label>
+                        <label for="description" class="block text-xs font-bold text-indigo-200 uppercase tracking-widest mb-3">Additional Notes (Optional)</label>
                         <textarea name="description" id="description" rows="4"
                             class="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-sm text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all" 
-                            placeholder="Kenapa kamu merekomendasikan novel ini?"></textarea>
+                            placeholder="Why do you recommend this novel?"></textarea>
                     </div>
-                    <button type="submit" class="w-full py-4 bg-white text-indigo-600 font-bold rounded-2xl shadow-xl hover:bg-indigo-50 transition-all transform hover:-translate-y-1">Kirim Permintaan</button>
+                    <button type="submit" class="w-full py-4 bg-white text-indigo-600 font-bold rounded-2xl shadow-xl hover:bg-indigo-50 transition-all transform hover:-translate-y-1">Submit Request</button>
                 </form>
             </div>
         </div>
     @else
         <div class="bg-slate-900 rounded-[3rem] p-12 text-center text-white">
-            <h2 class="text-2xl font-bold mb-4">Ingin Request Novel?</h2>
-            <p class="text-slate-400 mb-8">Kamu harus masuk ke akun kamu terlebih dahulu untuk membuat permintaan.</p>
-            <a href="{{ route('login') }}" class="inline-block px-10 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all">Login Sekarang</a>
+            <h2 class="text-2xl font-bold mb-4">Want to Request a Novel?</h2>
+            <p class="text-slate-400 mb-8">You must log in to your account first to make a request.</p>
+            <a href="{{ route('login') }}" class="inline-block px-10 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all">Login Now</a>
         </div>
     @endauth
 </div>

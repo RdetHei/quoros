@@ -74,10 +74,10 @@ class TagController extends Controller
     public function destroy(Tag $tag)
     {
         if ($tag->novels()->count() > 0) {
-            return back()->with('error', 'Tag tidak bisa dihapus karena masih memiliki novel!');
+            return back()->with('error', 'Tag cannot be deleted because it still has novels!');
         }
 
         $tag->delete();
-        return redirect()->route('admin.tags.index')->with('success', 'Tag berhasil dihapus!');
+        return redirect()->route('admin.tags.index')->with('success', 'Tag deleted successfully!');
     }
 }

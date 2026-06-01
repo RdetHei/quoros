@@ -4,8 +4,8 @@
 <div class="max-w-5xl mx-auto my-8 space-y-6">
     <!-- Page Header -->
     <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Buat Novel Baru</h1>
-        <p class="text-slate-500 dark:text-slate-400">Isi informasi novel kamu dengan jelas agar pembaca tertarik untuk membaca!</p>
+        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Create New Novel</h1>
+        <p class="text-slate-500 dark:text-slate-400">Fill in your novel information clearly to attract readers!</p>
     </div>
 
     <form action="{{ route('writer.novels.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
@@ -20,18 +20,18 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Informasi Dasar</h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Judul, deskripsi, dan detail dasar novel</p>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Basic Information</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Title, description, and basic novel details</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 gap-6">
                 <!-- Title -->
                 <div>
-                    <label for="title" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Judul Novel <span class="text-rose-500">*</span></label>
+                    <label for="title" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Novel Title <span class="text-rose-500">*</span></label>
                     <input type="text" name="title" id="title"
                            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all @error('title') border-rose-500 @enderror"
-                           value="{{ old('title') }}" required placeholder="Masukkan judul novel kamu...">
+                           value="{{ old('title') }}" required placeholder="Enter your novel title...">
                     @error('title')
                         <p class="mt-2 text-xs text-rose-500 font-medium">{{ $message }}</p>
                     @enderror
@@ -39,41 +39,41 @@
 
                 <!-- Alternative Title -->
                 <div>
-                    <label for="alternative_title" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Judul Alternatif (Opsional)</label>
+                    <label for="alternative_title" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Alternative Title (Optional)</label>
                     <input type="text" name="alternative_title" id="alternative_title"
                            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all"
-                           value="{{ old('alternative_title') }}" placeholder="Contoh: The Sorcerer's Adventure">
+                           value="{{ old('alternative_title') }}" placeholder="Example: The Sorcerer's Adventure">
                 </div>
 
                 <!-- Description -->
                 <div>
-                    <label for="description" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Deskripsi / Sinopsis <span class="text-rose-500">*</span></label>
+                    <label for="description" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Description / Synopsis <span class="text-rose-500">*</span></label>
                     <textarea name="description" id="description" rows="5"
                               class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all"
-                              placeholder="Ceritakan sedikit tentang alur ceritamu, buat pembaca penasaran!">{{ old('description') }}</textarea>
+                              placeholder="Tell a bit about your story, make readers curious!">{{ old('description') }}</textarea>
                 </div>
 
                 <!-- Grid for Region, Language, Type, Rating, Status -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     <!-- Region -->
                     <div>
-                        <label for="region" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Region / Asal</label>
+                        <label for="region" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Region / Origin</label>
                         <input type="text" name="region" id="region"
                                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all"
-                               value="{{ old('region') }}" placeholder="Contoh: Jepang">
+                               value="{{ old('region') }}" placeholder="Example: Japan">
                     </div>
 
                     <!-- Language -->
                     <div>
-                        <label for="language" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bahasa</label>
+                        <label for="language" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Language</label>
                         <input type="text" name="language" id="language"
                                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all"
-                               value="{{ old('language') }}" placeholder="Contoh: Indonesia">
+                               value="{{ old('language') }}" placeholder="Example: Indonesian">
                     </div>
 
                     <!-- Type -->
                     <div>
-                        <label for="type" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Jenis Novel</label>
+                        <label for="type" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Novel Type</label>
                         <select name="type" id="type" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all">
                             <option value="original" {{ old('type') == 'original' ? 'selected' : '' }}>Original Story</option>
                             <option value="web_novel" {{ old('type') == 'web_novel' ? 'selected' : '' }}>Web Novel</option>
@@ -83,17 +83,17 @@
 
                     <!-- Content Rating -->
                     <div>
-                        <label for="content_rating" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Rating Usia</label>
+                        <label for="content_rating" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Age Rating</label>
                         <select name="content_rating" id="content_rating" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all">
-                            <option value="everyone" {{ old('content_rating') == 'everyone' ? 'selected' : '' }}>Everyone (Semua Umur)</option>
-                            <option value="teen" {{ old('content_rating') == 'teen' ? 'selected' : '' }}>Teen (Remaja)</option>
-                            <option value="mature" {{ old('content_rating') == 'mature' ? 'selected' : '' }}>Mature (Dewasa)</option>
+                            <option value="everyone" {{ old('content_rating') == 'everyone' ? 'selected' : '' }}>Everyone</option>
+                            <option value="teen" {{ old('content_rating') == 'teen' ? 'selected' : '' }}>Teen</option>
+                            <option value="mature" {{ old('content_rating') == 'mature' ? 'selected' : '' }}>Mature</option>
                         </select>
                     </div>
 
                     <!-- Status -->
                     <div>
-                        <label for="status" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Status Novel</label>
+                        <label for="status" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Novel Status</label>
                         <select name="status" id="status" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:bg-white dark:focus:bg-slate-900 transition-all">
                             <option value="ongoing" {{ old('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
                             <option value="hiatus" {{ old('status') == 'hiatus' ? 'selected' : '' }}>Hiatus</option>

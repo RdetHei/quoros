@@ -29,7 +29,7 @@ class ReviewController extends Controller
         $novel->rating_avg = $novel->reviews()->avg('rating') ?: 0;
         $novel->save();
 
-        return back()->with('success', 'Ulasan berhasil dikirim!');
+        return back()->with('success', 'Review submitted successfully!');
     }
 
     public function destroy(Review $review)
@@ -43,6 +43,6 @@ class ReviewController extends Controller
         $novel->rating_avg = $novel->reviews()->avg('rating') ?: 0;
         $novel->save();
 
-        return back()->with('success', 'Ulasan berhasil dihapus!');
+        return back()->with('success', 'Review deleted successfully!');
     }
 }

@@ -29,7 +29,7 @@ class CarouselController extends Controller
         $novel->is_featured = !$novel->is_featured;
         $novel->save();
 
-        $status = $novel->is_featured ? 'ditambahkan ke' : 'dihapus dari';
-        return back()->with('success', "Novel \"{$novel->title}\" berhasil {$status} banner carousel.");
+        $status = $novel->is_featured ? 'added to' : 'removed from';
+        return back()->with('success', "Novel \"{$novel->title}\" successfully {$status} carousel banner.");
     }
 }

@@ -124,7 +124,7 @@ class DashboardController extends Controller
 
         $user->update($data);
 
-        return back()->with('success', 'Profil berhasil diperbarui!');
+        return back()->with('success', 'Profile updated successfully!');
     }
 
     public function becomeWriter(Request $request)
@@ -132,13 +132,13 @@ class DashboardController extends Controller
         $user = Auth::user();
         
         if ($user->role !== 'user') {
-            return back()->with('error', 'Anda sudah memiliki akses kontributor.');
+            return back()->with('error', 'You already have contributor access.');
         }
 
         // Update role to writer
         $user->role = 'writer';
         $user->save();
 
-        return back()->with('success', 'Selamat! Akun Anda telah berhasil diubah menjadi Penulis. Anda sekarang dapat mulai membuat novel Anda sendiri.');
+        return back()->with('success', 'Congratulations! Your account has been successfully changed to Writer. You can now start creating your own novels.');
     }
 }

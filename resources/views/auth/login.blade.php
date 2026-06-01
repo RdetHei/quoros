@@ -1,10 +1,10 @@
 @extends('layouts.auth')
 
-@section('title', 'Masuk')
+@section('title', 'Login')
 
-@section('eyebrow', 'Akun pembaca')
-@section('heading', 'Masuk ke Quoros')
-@section('subheading', 'Lanjutkan membaca, kelola bookmark, dan sinkronkan riwayat di semua perangkat.')
+@section('eyebrow', 'Reader account')
+@section('heading', 'Login to Quoros')
+@section('subheading', 'Continue reading, manage bookmarks, and sync history across all devices.')
 
 @section('content')
 <form action="{{ route('login') }}" method="POST" class="space-y-5">
@@ -42,12 +42,12 @@
     </div>
 
     <button type="submit" class="auth-btn-primary w-full">
-        Masuk
+        Login
     </button>
 
     <p class="text-center text-sm text-slate-400 pt-2">
-        Belum punya akun?
-        <a href="{{ route('register') }}" class="font-semibold text-amber-500 hover:text-amber-400 transition-colors">Daftar gratis</a>
+        Don't have an account?
+        <a href="{{ route('register') }}" class="font-semibold text-amber-500 hover:text-amber-400 transition-colors">Register for free</a>
     </p>
 </form>
 @endsection

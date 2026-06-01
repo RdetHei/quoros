@@ -26,7 +26,7 @@ class AuthorFollowController extends Controller
         if ($existing) {
             $existing->delete();
 
-            return back()->with('success', 'Berhenti mengikuti '.$user->name.'.');
+            return back()->with('success', 'Stopped following '.$user->name.'.');
         }
 
         AuthorFollow::create([
@@ -34,6 +34,6 @@ class AuthorFollowController extends Controller
             'author_id' => $user->id,
         ]);
 
-        return back()->with('success', 'Anda sekarang mengikuti '.$user->name.'.');
+        return back()->with('success', 'You are now following '.$user->name.'.');
     }
 }

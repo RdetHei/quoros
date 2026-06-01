@@ -81,6 +81,6 @@ class ProfileController extends Controller
             'profile_photo_public_id' => $result['public_id'],
         ]);
 
-        return back()->with('success', 'Foto profil berhasil diperbarui!');
+        return back()->with('success', 'Profile photo updated successfully!');
     }
 }

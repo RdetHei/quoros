@@ -61,11 +61,11 @@ class BookmarkController extends Controller
             if (request()->ajax()) {
                 return response()->json([
                     'status' => 'removed',
-                    'message' => 'Novel dihapus dari bookmark.'
+                    'message' => 'Novel removed from bookmarks.'
                 ]);
             }
 
-            return back()->with('success', 'Novel dihapus dari bookmark.');
+            return back()->with('success', 'Novel removed from bookmarks.');
         }
 
         Bookmark::create([
@@ -76,10 +76,10 @@ class BookmarkController extends Controller
         if (request()->ajax()) {
             return response()->json([
                 'status' => 'added',
-                'message' => 'Novel ditambahkan ke bookmark.'
+                'message' => 'Novel added to bookmarks.'
             ]);
         }
 
-        return back()->with('success', 'Novel ditambahkan ke bookmark.');
+        return back()->with('success', 'Novel added to bookmarks.');
     }
 }

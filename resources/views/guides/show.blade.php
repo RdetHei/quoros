@@ -29,9 +29,9 @@
                 <div class="flex items-center gap-4 text-slate-400">
                     <span class="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        Terakhir diperbarui {{ $article->updated_at->diffForHumans() }}
+                        Last updated {{ $article->updated_at->diffForHumans() }}
                     </span>
                 </div>
             </header>
@@ -58,11 +58,11 @@
 
             <footer class="mt-16 pt-8 border-t border-slate-800">
                 <div class="bg-slate-900/50 rounded-3xl p-8 text-center">
-                    <h3 class="text-xl font-bold text-white mb-2">Apakah panduan ini membantu?</h3>
-                    <p class="text-slate-400 mb-6">Masukan Anda membantu kami meningkatkan panduan kami.</p>
+                    <h3 class="text-xl font-bold text-white mb-2">Was this guide helpful?</h3>
+                    <p class="text-slate-400 mb-6">Your feedback helps us improve our guides.</p>
                     <div class="flex justify-center gap-4">
-                        <button class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-colors">Ya, membantu</button>
-                        <button class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-colors">Tidak membantu</button>
+                        <button class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-colors">Yes, it was</button>
+                        <button class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-colors">No, it wasn't</button>
                     </div>
                 </div>
             </footer>
@@ -71,7 +71,7 @@
         <aside class="w-full lg:w-80 shrink-0">
             <div class="sticky top-24 space-y-8">
                 <div class="bg-slate-900/50 border border-slate-800 rounded-3xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-6">Dalam Kategori Ini</h3>
+                    <h3 class="text-lg font-bold text-white mb-6">In This Category</h3>
                     <div class="space-y-2">
                         @foreach($category->articles as $sibling)
                             <a href="{{ route('guides.show', [$category->slug, $sibling->slug]) }}" 
@@ -83,9 +83,9 @@
                 </div>
 
                 <div class="bg-gradient-to-br from-purple-600 to-blue-600 rounded-3xl p-8 text-white">
-                    <h3 class="text-xl font-bold mb-4">Butuh bantuan lain?</h3>
-                    <p class="text-purple-100 mb-6 text-sm">Tim kami siap membantu Anda kapan saja.</p>
-                    <a href="mailto:support@quoros.id" class="inline-block w-full py-3 bg-white text-purple-600 font-bold rounded-xl text-center hover:bg-purple-50 transition-colors">Hubungi Support</a>
+                    <h3 class="text-xl font-bold mb-4">Need more help?</h3>
+                    <p class="text-purple-100 mb-6 text-sm">Our team is ready to help you anytime.</p>
+                    <a href="mailto:support@quoros.id" class="inline-block w-full py-3 bg-white text-purple-600 font-bold rounded-xl text-center hover:bg-purple-50 transition-colors">Contact Support</a>
                 </div>
             </div>
         </aside>

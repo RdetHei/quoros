@@ -10,13 +10,13 @@
     <div class="flex items-center gap-4 mb-8">
         <div class="w-2 h-10 bg-rose-600 rounded-full"></div>
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Moderasi & Laporan</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium">Tinjau laporan dari pengguna dan kelola blokir akun.</p>
+            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Moderation & Reports</h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium">Review user reports and manage account bans.</p>
         </div>
     </div>
 
     <div class="flex flex-wrap gap-2 mb-6">
-        @foreach(['pending' => 'Menunggu', 'reviewed' => 'Ditinjau', 'dismissed' => 'Ditolak', 'all' => 'Semua'] as $key => $label)
+        @foreach(['pending' => 'Pending', 'reviewed' => 'Reviewed', 'dismissed' => 'Dismissed', 'all' => 'All'] as $key => $label)
             <a href="{{ route('admin.reports.index', ['status' => $key]) }}"
                class="px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-xl border transition-all
                       {{ $status === $key
@@ -35,11 +35,11 @@
             <table class="w-full text-left border-collapse min-w-[900px]">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50">
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pelapor</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Reporter</th>
                         <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Target</th>
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Alasan</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Reason</th>
                         <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aksi</th>
+                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
@@ -63,7 +63,7 @@
                                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 italic line-clamp-3">&ldquo;{{ $report->details }}&rdquo;</p>
                                 @endif
                                 @if($subject)
-                                    <p class="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-bold">Subjek: {{ $subject->name }}</p>
+                                    <p class="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-bold">Subject: {{ $subject->name }}</p>
                                 @endif
                             </td>
                             <td class="px-4 md:px-6 py-6">
@@ -81,13 +81,13 @@
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="reviewed">
-                                            <button type="submit" class="w-full px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">Tandai ditinjau</button>
+                                            <button type="submit" class="w-full px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">Mark as reviewed</button>
                                         </form>
                                         <form action="{{ route('admin.reports.update', $report) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="dismissed">
-                                            <button type="submit" class="w-full px-3 py-1.5 bg-slate-500 hover:bg-slate-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">Tolak laporan</button>
+                                            <button type="submit" class="w-full px-3 py-1.5 bg-slate-500 hover:bg-slate-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">Dismiss report</button>
                                         </form>
                                     @endif
 
@@ -95,17 +95,17 @@
                                         @if($subject->isCurrentlyBanned())
                                             <form action="{{ route('admin.users.unban', $subject) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="w-full px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">Cabut blokir</button>
+                                                <button type="submit" class="w-full px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">Unban user</button>
                                             </form>
                                         @else
                                             <details class="group">
-                                                <summary class="cursor-pointer px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg text-center list-none">Blokir pengguna</summary>
+                                                <summary class="cursor-pointer px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg text-center list-none">Ban user</summary>
                                                 <form action="{{ route('admin.users.ban', $subject) }}" method="POST" class="mt-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 space-y-2">
                                                     @csrf
-                                                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Blokir sampai (kosongkan = permanen)</label>
+                                                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Ban until (empty = permanent)</label>
                                                     <input type="datetime-local" name="banned_until" class="w-full text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1.5">
-                                                    <textarea name="ban_reason" rows="2" placeholder="Alasan blokir..." class="w-full text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1.5 resize-none"></textarea>
-                                                    <button type="submit" class="w-full px-3 py-1.5 bg-rose-600 text-white text-[10px] font-black uppercase rounded-lg">Konfirmasi blokir</button>
+                                                    <textarea name="ban_reason" rows="2" placeholder="Ban reason..." class="w-full text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1.5 resize-none"></textarea>
+                                                    <button type="submit" class="w-full px-3 py-1.5 bg-rose-600 text-white text-[10px] font-black uppercase rounded-lg">Confirm ban</button>
                                                 </form>
                                             </details>
                                         @endif
@@ -115,7 +115,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">Tidak ada laporan.</td>
+                            <td colspan="5" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">No reports found.</td>
                         </tr>
                     @endforelse
                 </tbody>

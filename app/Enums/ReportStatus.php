@@ -11,9 +11,9 @@ enum ReportStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending => 'Menunggu',
-            self::Reviewed => 'Ditinjau',
-            self::Dismissed => 'Ditolak',
+            self::Pending => 'Pending',
+            self::Reviewed => 'Reviewed',
+            self::Dismissed => 'Dismissed',
         };
     }
 }

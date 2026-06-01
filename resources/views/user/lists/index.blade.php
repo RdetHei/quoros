@@ -6,12 +6,12 @@
         <div class="flex items-center gap-4">
             <div class="w-1 h-10 bg-violet-600 rounded-full shrink-0"></div>
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">List Saya</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Koleksi novel kustom yang bisa dibagikan.</p>
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">My Lists</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Custom novel collections that can be shared.</p>
             </div>
         </div>
         <a href="{{ route('lists.create') }}" class="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold rounded-xl hover:opacity-90 transition-opacity text-center">
-            Buat List Baru
+            Create New List
         </a>
     </div>
 
@@ -24,14 +24,14 @@
                         @if($list->description)
                             <p class="text-sm text-slate-500 mt-1 line-clamp-2">{{ $list->description }}</p>
                         @endif
-                        <p class="text-xs text-slate-400 mt-2">{{ $list->items_count }} novel · {{ $list->is_public ? 'Publik' : 'Privat' }}</p>
+                        <p class="text-xs text-slate-400 mt-2">{{ $list->items_count }} novels · {{ $list->is_public ? 'Public' : 'Private' }}</p>
                     </div>
                     <span class="text-slate-400">→</span>
                 </div>
             </a>
         @empty
             <div class="py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
-                <p class="text-slate-500">Belum ada list. Buat list pertama untuk mengelompokkan novel favoritmu.</p>
+                <p class="text-slate-500">No lists yet. Create your first list to group your favorite novels.</p>
             </div>
         @endforelse
     </div>

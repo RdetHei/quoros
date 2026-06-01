@@ -166,7 +166,7 @@
                         <!-- Mobile Menu Button -->
                         <button @click="mobileMenuOpen ? closeMobileMenu() : openMobileMenu()"
                                 class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
-                                aria-label="Buka navigasi"
+                                aria-label="Open navigation"
                                 :aria-expanded="mobileMenuOpen.toString()">
                             <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
                             <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -181,8 +181,8 @@
                             <a href="{{ route('novels.updated') }}" class="text-sm font-medium {{ request()->routeIs('novels.updated') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Updated</a>
                             <a href="{{ route('novels.trending') }}" class="text-sm font-medium {{ request()->routeIs('novels.trending') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Trending</a>
                             @auth
-                                <a href="{{ route('bookmarks.index') }}" class="text-sm font-medium {{ request()->routeIs('bookmarks.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Bookmark</a>
-                                <a href="{{ route('lists.index') }}" class="text-sm font-medium {{ request()->routeIs('lists.*') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">List</a>
+                                <a href="{{ route('bookmarks.index') }}" class="text-sm font-medium {{ request()->routeIs('bookmarks.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Bookmarks</a>
+                                <a href="{{ route('lists.index') }}" class="text-sm font-medium {{ request()->routeIs('lists.*') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">My Lists</a>
                                 <a href="{{ route('history.index') }}" class="text-sm font-medium {{ request()->routeIs('history.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">History</a>
                             @endauth
                         </div>
@@ -192,7 +192,7 @@
                         <!-- Search Bar (Desktop - Live Search) -->
                         @include('partials.live-search-partial', [
                             'id'          => 'desktop-search',
-                            'placeholder' => 'Cari novel...',
+                            'placeholder' => 'Search novels...',
                             'classes'     => 'hidden md:block w-64 lg:w-80',
                         ])
                         <!-- Search Toggle (Mobile) -->
@@ -211,7 +211,7 @@
                                 class="absolute left-0 right-0 top-full bg-slate-900 border-b border-slate-800 p-4 shadow-xl z-50">
                                 @include('partials.live-search-partial', [
                                     'id'          => 'mobile-search',
-                                    'placeholder' => 'Cari novel...',
+                                    'placeholder' => 'Search novels...',
                                 ])
                             </div>
                         </div>
@@ -222,8 +222,8 @@
 
                         @guest
                             <div class="flex items-center gap-1 md:gap-2">
-                                <a href="{{ route('login') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium hover:text-slate-900 dark:hover:text-white transition-colors">Masuk</a>
-                                <a href="{{ route('register') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm transition-all">Daftar</a>
+                                <a href="{{ route('login') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium hover:text-slate-900 dark:hover:text-white transition-colors">Login</a>
+                                <a href="{{ route('register') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm transition-all">Sign Up</a>
                             </div>
                         @else
                             <div x-data="{ open: false }" class="relative">
@@ -252,33 +252,33 @@
                                      class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50">
                                     <div class="p-2 border-b border-slate-100 dark:border-slate-800">
                                         <p class="px-3 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
-                                        <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Profil Saya</a>
-                                        <a href="{{ route('notifications.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Notifikasi</a>
-                                        <a href="{{ route('settings') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Pengaturan</a>
+                                        <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">My Profile</a>
+                                        <a href="{{ route('notifications.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Notifications</a>
+                                        <a href="{{ route('settings') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Settings</a>
                                         <a href="{{ route('guides.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Guide</a>
                                         @if(Auth::user()->role === 'user')
                                             <form action="{{ route('dashboard.become-writer') }}" method="POST" class="block">
                                                 @csrf
-                                                <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">Mulai Menulis</button>
+                                                <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">Start Writing</button>
                                             </form>
                                         @endif
                                         @if(Auth::user()->role === 'writer' || Auth::user()->role === 'admin')
                                             <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Dashboard</a>
-                                            <a href="{{ route('writer.novels.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Novel Saya</a>
+                                            <a href="{{ route('writer.novels.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">My Novels</a>
                                         @endif
                                         @if(Auth::user()->role === 'admin')
                                             <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                                                 <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin</p>
-                                                <a href="{{ route('admin.genres.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Kelola Genre</a>
-                                                <a href="{{ route('admin.tags.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Kelola Tag</a>
-                                                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Laporan & Moderasi</a>
+                                                <a href="{{ route('admin.genres.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Manage Genres</a>
+                                                <a href="{{ route('admin.tags.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Manage Tags</a>
+                                                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Reports & Moderation</a>
                                             </div>
                                         @endif
                                     </div>
                                     <div class="p-2">
                                         <form action="{{ route('logout') }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Keluar</button>
+                                            <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Logout</button>
                                         </form>
                                     </div>
                                 </div>
@@ -319,10 +319,10 @@
                             <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto" onerror="this.onerror=null; this.src='/error.png'">
                             <div class="leading-tight">
                                 <p class="text-xs font-black uppercase tracking-widest text-slate-400">Menu</p>
-                                <p class="text-sm font-bold text-slate-900 dark:text-white">Navigasi</p>
+                                <p class="text-sm font-bold text-slate-900 dark:text-white">Navigation</p>
                             </div>
                         </div>
-                        <button @click="closeMobileMenu()" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl transition-colors" aria-label="Tutup navigasi">
+                        <button @click="closeMobileMenu()" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl transition-colors" aria-label="Close navigation">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
@@ -345,10 +345,10 @@
                             </div>
                             <div class="flex flex-col gap-3 mt-4">
                                 <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-lg shadow-slate-900/10">
-                                    Profil Saya
+                                    My Profile
                                 </a>
                                 <a href="{{ route('settings') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
-                                    Pengaturan
+                                    Settings
                                 </a>
                                 <a href="{{ route('guides.index') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
                                     Guide
@@ -357,7 +357,7 @@
                                     <form action="{{ route('dashboard.become-writer') }}" method="POST" class="block">
                                         @csrf
                                         <button type="submit" class="w-full px-4 py-3 text-center text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-900/10">
-                                            Mulai Menulis
+                                            Start Writing
                                         </button>
                                     </form>
                                 @endif
@@ -371,7 +371,7 @@
                         @endauth
 
                         <div class="space-y-1">
-                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Navigasi Utama</p>
+                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Main Navigation</p>
                             <a href="{{ route('home') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('home') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                                 <span>Home</span>
@@ -388,14 +388,14 @@
 
                         @auth
                         <div class="space-y-1">
-                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Aktivitas</p>
+                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Activity</p>
                             <a href="{{ route('bookmarks.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('bookmarks.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                                 <span>Bookmark</span>
                             </a>
                             <a href="{{ route('lists.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('lists.*') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-                                <span>List Novel</span>
+                                <span>Novel List</span>
                             </a>
                             <a href="{{ route('history.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('history.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -403,7 +403,7 @@
                             </a>
                             <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('notifications.*') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                                <span>Notifikasi</span>
+                                <span>Notifications</span>
                             </a>
                         </div>
                         @endauth
@@ -412,13 +412,13 @@
                     <div class="p-6 border-t border-slate-100 dark:border-slate-800">
                         @guest
                             <div class="grid grid-cols-2 gap-3">
-                                <a href="{{ route('login') }}" class="px-4 py-3 text-center text-sm font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 rounded-xl">Masuk</a>
-                                <a href="{{ route('register') }}" class="px-4 py-3 text-center text-sm font-bold text-white dark:text-slate-900 bg-slate-900 dark:bg-white rounded-xl">Daftar</a>
+                                <a href="{{ route('login') }}" class="px-4 py-3 text-center text-sm font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 rounded-xl">Login</a>
+                                <a href="{{ route('register') }}" class="px-4 py-3 text-center text-sm font-bold text-white dark:text-slate-900 bg-slate-900 dark:bg-white rounded-xl">Sign Up</a>
                             </div>
                         @else
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="w-full px-4 py-3 text-center text-sm font-bold text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl transition-colors">Keluar dari Akun</button>
+                                <button type="submit" class="w-full px-4 py-3 text-center text-sm font-bold text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl transition-colors">Logout from Account</button>
                             </form>
                         @endguest
                     </div>
@@ -470,7 +470,7 @@
                 </a>
 
                 <p class="text-[13px] leading-relaxed text-slate-500 dark:text-slate-400 max-w-[230px] mb-6">
-                    Platform baca novel modern dengan pengalaman yang clean. Temukan ribuan cerita menarik dari penulis berbakat.
+                    Modern novel reading platform with a clean experience. Discover thousands of interesting stories from talented authors.
                 </p>
 
                 {{-- Newsletter --}}
@@ -515,26 +515,26 @@
             {{-- Nav Columns --}}
             <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">
 
-                {{-- Katalog --}}
+                {{-- Catalog --}}
                 <div>
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Katalog</h4>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Catalog</h4>
                     <ul class="space-y-3.5">
-                        <li><a href="{{ route('home') }}"           class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Semua Novel</a></li>
-                        <li><a href="{{ route('novels.updated') }}" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Baru Diupdate</a></li>
+                        <li><a href="{{ route('home') }}"           class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">All Novels</a></li>
+                        <li><a href="{{ route('novels.updated') }}" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Recently Updated</a></li>
                         <li><a href="{{ route('novels.trending') }}" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Trending</a></li>
-                        <li><a href="{{ route('home') }}#genres" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Genre</a></li>
-                        <li><a href="{{ route('home') }}#tags" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Tag Populer</a></li>
+                        <li><a href="{{ route('home') }}#genres" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Genres</a></li>
+                        <li><a href="{{ route('home') }}#tags" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Popular Tags</a></li>
                     </ul>
                 </div>
 
-                {{-- Komunitas --}}
+                {{-- Community --}}
                 <div>
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Komunitas</h4>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Community</h4>
                     <ul class="space-y-3.5">
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Tentang Quoros</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Menjadi Penulis</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Pusat Bantuan</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Hubungi Kami</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">About Quoros</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Become a Writer</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Help Center</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Contact Us</a></li>
                     </ul>
                 </div>
 
@@ -542,9 +542,9 @@
                 <div class="col-span-2 sm:col-span-1">
                     <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Legal</h4>
                     <ul class="space-y-3.5">
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Syarat &amp; Ketentuan</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Kebijakan Privasi</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Kebijakan Cookie</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Terms &amp; Conditions</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Privacy Policy</a></li>
+                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Cookie Policy</a></li>
                     </ul>
                 </div>
 
@@ -730,7 +730,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeCropModal()"></div>
         <div class="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
             <div class="p-4 md:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Potong Foto</h3>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Crop Photo</h3>
                 <button onclick="closeCropModal()" class="text-slate-400 hover:text-slate-900 dark:hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -741,8 +741,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>
             <div class="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
-                <button onclick="closeCropModal()" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">Batal</button>
-                <button onclick="saveCrop()" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all">Potong & Simpan</button>
+                <button onclick="closeCropModal()" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">Cancel</button>
+                <button onclick="saveCrop()" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all">Crop & Save</button>
             </div>
         </div>
     </div>

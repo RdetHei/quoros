@@ -231,17 +231,17 @@
         <div class="flex items-center gap-3 mb-4 md:hidden">
             <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto" onerror="this.onerror=null; this.src='/error.png'">
             <div class="leading-tight">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Navigasi</p>
-                <p class="text-sm font-bold text-white">Menu Baca</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Navigation</p>
+                <p class="text-sm font-bold text-white">Reader Menu</p>
             </div>
         </div>
 
         <!-- Back to Novel -->
-        <a href="{{ route('novels.show', $novel->slug) }}" class="sidebar-btn" title="Kembali ke Novel">
+        <a href="{{ route('novels.show', $novel->slug) }}" class="sidebar-btn" title="Back to Novel">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span>Kembali ke Novel</span>
+            <span>Back to Novel</span>
         </a>
 
         <div class="sidebar-divider"></div>
@@ -251,22 +251,22 @@
            href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}" 
            class="sidebar-btn" 
            :class="!prevChapterSlug ? 'disabled' : ''"
-           title="Bab Sebelumnya">
+           title="Previous Chapter">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Bab Sebelumnya</span>
+            <span>Previous Chapter</span>
         </a>
 
         <!-- Chapter Selector Toggle -->
         <button type="button" 
                 @click="showChapters = !showChapters; showSettings = false"
                 :class="showChapters ? 'active' : ''"
-                class="sidebar-btn" title="Pilih Chapter">
+                class="sidebar-btn" title="Select Chapter">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            <span>Pilih Chapter</span>
+            <span>Select Chapter</span>
         </button>
 
         <!-- Next Chapter -->
@@ -274,11 +274,11 @@
            href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}" 
            class="sidebar-btn"
            :class="!nextChapterSlug ? 'disabled' : ''"
-           title="Bab Berikutnya">
+           title="Next Chapter">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
-            <span>Bab Berikutnya</span>
+            <span>Next Chapter</span>
         </a>
 
         <div class="sidebar-divider"></div>
@@ -287,18 +287,18 @@
         <button type="button"
                 @click="showSettings = !showSettings; showChapters = false" 
                 :class="showSettings ? 'active' : ''"
-                class="sidebar-btn" title="Pengaturan Baca">
+                class="sidebar-btn" title="Reader Settings">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>Pengaturan Baca</span>
+            <span>Reader Settings</span>
         </button>
 
         <!-- Mobile Close (Visible only on mobile) -->
         <button type="button" @click="sidebarOpen = false" class="mt-auto sidebar-btn bg-slate-800 md:hidden">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            <span>Tutup Menu</span>
+            <span>Close Menu</span>
         </button>
 
         <!-- Chapter Selector Panel -->
@@ -313,7 +313,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                     </svg>
-                    Pilih Chapter
+                    Select Chapter
                 </div>
                 <button @click="showChapters = false" class="md:hidden p-1 text-slate-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -340,14 +340,14 @@
              x-transition:enter-end="opacity-100 translate-x-0"
              class="sidebar-panel" x-cloak>
             <div class="flex items-center justify-between mb-4 md:hidden">
-                <h3 class="text-white font-bold">Pengaturan Baca</h3>
+                <h3 class="text-white font-bold">Reader Settings</h3>
                 <button @click="showSettings = false" class="p-1 text-slate-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
             <div class="space-y-6">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Ukuran Font</label>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Font Size</label>
                     <div class="flex items-center gap-1.5">
                         <template x-for="size in ['text-base', 'text-lg', 'text-xl', 'text-2xl']">
                             <button @click="updateFontSize(size)" 
@@ -358,7 +358,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Jenis Font</label>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Font Family</label>
                     <div class="flex flex-col gap-1.5">
                         <template x-for="family in [{id: 'font-sans', label: 'Sans Serif'}, {id: 'font-serif', label: 'Serif'}, {id: 'font-mono', label: 'Monospace'}]">
                             <button @click="updateFontFamily(family.id)" 
@@ -410,14 +410,14 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span class="font-bold text-sm uppercase tracking-widest">Memuat Bab Selanjutnya...</span>
+                <span class="font-bold text-sm uppercase tracking-widest">Loading Next Chapter...</span>
             </div>
         </template>
         <template x-if="!isLoading && nextChapterSlug">
-            <div class="text-slate-400 text-xs font-medium uppercase tracking-widest">Scroll untuk memuat bab berikutnya</div>
+            <div class="text-slate-400 text-xs font-medium uppercase tracking-widest">Scroll to load next chapter</div>
         </template>
         <template x-if="!nextChapterSlug">
-            <div class="text-slate-400 text-xs font-medium uppercase tracking-widest italic">Akhir dari Novel</div>
+            <div class="text-slate-400 text-xs font-medium uppercase tracking-widest italic">End of Novel</div>
         </template>
     </div>
 
@@ -425,7 +425,7 @@
     <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 border border-slate-100 dark:border-slate-800 shadow-sm">
         <h2 class="text-xl md:text-2xl font-bold mb-8 flex items-center gap-3 text-slate-900 dark:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
-            Diskusi ({{ $commentsCount ?? $chapter->comments->count() }})
+            Discussion ({{ $commentsCount ?? $chapter->comments->count() }})
         </h2>
 
         <div x-data="{ replyParentId: null, replyName: '' }" @open-reply.window="replyParentId = $event.detail.parentId; replyName = $event.detail.name">
@@ -433,11 +433,11 @@
             <form x-show="replyParentId" x-cloak action="{{ route('comments.store', $chapter->id) }}" method="POST" class="mb-6 p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30">
                 @csrf
                 <input type="hidden" name="parent_id" x-model="replyParentId">
-                <p class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-2">Membalas <span x-text="replyName"></span></p>
-                <textarea name="content" rows="2" required class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tulis balasan..."></textarea>
+                <p class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-2">Replying to <span x-text="replyName"></span></p>
+                <textarea name="content" rows="2" required class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Write a reply..."></textarea>
                 <div class="mt-2 flex gap-2 justify-end">
-                    <button type="button" @click="replyParentId = null" class="px-4 py-2 text-xs font-bold text-slate-500">Batal</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-indigo-600 text-white rounded-lg">Kirim Balasan</button>
+                    <button type="button" @click="replyParentId = null" class="px-4 py-2 text-xs font-bold text-slate-500">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-indigo-600 text-white rounded-lg">Submit Reply</button>
                 </div>
             </form>
 
@@ -446,16 +446,16 @@
                 <div class="relative">
                     <textarea name="content" rows="3" 
                         class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-white dark:focus:bg-slate-900 transition-all placeholder-slate-400" 
-                        placeholder="Bagikan pemikiranmu tentang chapter ini..."></textarea>
+                        placeholder="Share your thoughts on this chapter..."></textarea>
                     <div class="mt-3 flex justify-end">
-                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg shadow-slate-900/10">Kirim Komentar</button>
+                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg shadow-slate-900/10">Submit Comment</button>
                     </div>
                 </div>
             </form>
         @else
             <div class="mb-10 p-6 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-center">
-                <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium text-sm">Ingin ikut berdiskusi?</p>
-                <a href="{{ route('login') }}" class="inline-block w-full sm:w-auto px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm transition-all shadow-lg shadow-slate-900/10">Login Sekarang</a>
+                <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium text-sm">Want to join the discussion?</p>
+                <a href="{{ route('login') }}" class="inline-block w-full sm:w-auto px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm transition-all shadow-lg shadow-slate-900/10">Login Now</a>
             </div>
         @endauth
 
@@ -464,7 +464,7 @@
                 @include('partials.comment-item', ['comment' => $comment, 'chapter' => $chapter])
             @empty
                 <div class="py-12 text-center text-slate-500 italic text-sm">
-                    Belum ada komentar. Jadilah yang pertama berkomentar!
+                    No comments yet. Be the first to comment!
                 </div>
             @endforelse
         </div>

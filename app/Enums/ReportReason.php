@@ -14,10 +14,10 @@ enum ReportReason: string
     {
         return match ($this) {
             self::Spam => 'Spam',
-            self::Harassment => 'Pelecehan / intimidasi',
-            self::Copyright => 'Pelanggaran hak cipta',
-            self::Inappropriate => 'Konten tidak pantas',
-            self::Other => 'Lainnya',
+            self::Harassment => 'Harassment / Intimidation',
+            self::Copyright => 'Copyright Infringement',
+            self::Inappropriate => 'Inappropriate Content',
+            self::Other => 'Other',
         };
     }
 }

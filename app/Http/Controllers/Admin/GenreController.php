@@ -40,7 +40,7 @@ class GenreController extends Controller
             'slug' => Str::slug($request->name),
         ]);
 
-        return redirect()->route('admin.genres.index')->with('success', 'Genre berhasil ditambahkan!');
+        return redirect()->route('admin.genres.index')->with('success', 'Genre added successfully!');
     }
 
     /**
@@ -74,10 +74,10 @@ class GenreController extends Controller
     public function destroy(Genre $genre)
     {
         if ($genre->novels()->count() > 0) {
-            return back()->with('error', 'Genre tidak bisa dihapus karena masih memiliki novel!');
+            return back()->with('error', 'Genre cannot be deleted because it still has novels!');
         }
 
         $genre->delete();
-        return redirect()->route('admin.genres.index')->with('success', 'Genre berhasil dihapus!');
+        return redirect()->route('admin.genres.index')->with('success', 'Genre deleted successfully!');
     }
 }

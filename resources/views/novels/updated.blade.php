@@ -5,8 +5,8 @@
     <div class="flex items-center gap-4 mb-8">
         <div class="w-1 h-10 bg-emerald-600 rounded-full shrink-0"></div>
         <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Baru Diupdate</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Novel dengan pembaruan chapter terbaru, diurutkan berdasarkan aktivitas.</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Recently Updated</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Novels with the latest chapter updates, sorted by activity.</p>
         </div>
     </div>
 
@@ -36,7 +36,7 @@
                         </div>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mb-2">{{ $novel->author->name }}</p>
                         <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-                            <span>{{ $novel->chapters_count }} chapter</span>
+                            <span>{{ $novel->chapters_count }} chapters</span>
                             <span>{{ number_format($novel->view_count) }} views</span>
                             @foreach($novel->genres->take(2) as $genre)
                                 <span class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-medium">{{ $genre->name }}</span>
@@ -45,7 +45,7 @@
                     </div>
 
                     <div class="shrink-0 text-right">
-                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Terakhir update</p>
+                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">Last update</p>
                         <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
                             {{ $novel->chapters_max_created_at ? \Illuminate\Support\Carbon::parse($novel->chapters_max_created_at)->diffForHumans() : '—' }}
                         </p>
@@ -75,8 +75,8 @@
                 <div class="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-4 text-slate-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
-                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-1">Belum ada pembaruan</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400">Novel yang baru diupdate akan muncul di sini.</p>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-1">No updates yet</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Recently updated novels will appear here.</p>
             </div>
         @endforelse
     </div>

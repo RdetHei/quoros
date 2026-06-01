@@ -11,7 +11,7 @@
         <div class="relative z-10 max-w-3xl mx-auto text-center">
             <p class="text-[10px] md:text-xs font-black uppercase tracking-[0.28em] text-emerald-400 mb-3 md:mb-4">Advanced Search</p>
             <h1 class="text-2xl md:text-4xl font-extrabold text-white mb-6 md:mb-8 leading-tight">
-                Temukan Novel <span class="text-emerald-400">Favoritmu</span>
+                Find Your <span class="text-emerald-400">Favorite Novel</span>
             </h1>
 
             <form action="{{ route('novels.search') }}" method="GET" id="advanced-search-form" class="text-left">
@@ -26,13 +26,13 @@
                            id="adv-search-input"
                            value="{{ $search ?? '' }}"
                            autocomplete="off"
-                           placeholder="Judul novel, judul alternatif, atau nama penulis..."
+                           placeholder="Novel title, alternative title, or author name..."
                            class="w-full pl-12 md:pl-14 pr-[5.25rem] md:pr-28 py-4 md:py-5
                                   bg-slate-800/80 border border-slate-700 rounded-xl md:rounded-2xl
                                   text-sm md:text-base text-white placeholder-slate-500 shadow-inner shadow-black/20
                                   focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-colors">
                     <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-4 md:px-6 py-2 md:py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs md:text-sm transition-colors shadow-lg shadow-black/40">
-                        Cari
+                        Search
                     </button>
                 </div>
 
@@ -40,7 +40,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
                     <div class="relative">
                         <select name="genre" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
-                            <option value="">Semua Genre</option>
+                            <option value="">All Genres</option>
                             @foreach($genres as $genre)
                                 <option value="{{ $genre->slug }}" {{ (request('genre') == $genre->slug) ? 'selected' : '' }}>
                                     {{ $genre->name }}
@@ -54,7 +54,7 @@
 
                     <div class="relative">
                         <select name="status" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
-                            <option value="">Semua Status</option>
+                            <option value="">All Status</option>
                             <option value="ongoing" {{ request('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
                             <option value="complete" {{ request('status') == 'complete' ? 'selected' : '' }}>Complete</option>
                             <option value="hiatus" {{ request('status') == 'hiatus' ? 'selected' : '' }}>Hiatus</option>
@@ -66,7 +66,7 @@
 
                     <div class="relative">
                         <select name="type" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
-                            <option value="">Semua Tipe</option>
+                            <option value="">All Types</option>
                             <option value="original" {{ request('type') == 'original' ? 'selected' : '' }}>Original</option>
                             <option value="web_novel" {{ request('type') == 'web_novel' ? 'selected' : '' }}>Web Novel</option>
                             <option value="light_novel" {{ request('type') == 'light_novel' ? 'selected' : '' }}>Light Novel</option>
@@ -78,7 +78,7 @@
 
                     <div class="relative">
                         <select name="tag" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
-                            <option value="">Semua Tag</option>
+                            <option value="">All Tags</option>
                             @foreach($tags as $tag)
                                 <option value="{{ $tag->slug }}" {{ request('tag') == $tag->slug ? 'selected' : '' }}>
                                     {{ $tag->name }}
@@ -104,11 +104,11 @@
 
                     <div class="relative">
                         <select name="sort" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
-                            <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Terbaru</option>
-                            <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Rating Tertinggi</option>
-                            <option value="views" {{ request('sort') == 'views' ? 'selected' : '' }}>Paling Banyak Dilihat (Total)</option>
-                            <option value="trending" {{ request('sort') == 'trending' ? 'selected' : '' }}>Trending (7 Hari)</option>
-                            <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Judul A–Z</option>
+                            <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Newest</option>
+                            <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Highest Rating</option>
+                            <option value="views" {{ request('sort') == 'views' ? 'selected' : '' }}>Most Viewed (Total)</option>
+                            <option value="trending" {{ request('sort') == 'trending' ? 'selected' : '' }}>Trending (7 Days)</option>
+                            <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Title A–Z</option>
                         </select>
                         <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
@@ -128,13 +128,13 @@
                 <div>
                     @if($search ?? false)
                         <h2 class="text-lg md:text-xl font-bold text-white">
-                            Hasil untuk
+                            Results for
                             <span class="text-emerald-400">"{{ $search }}"</span>
                         </h2>
-                        <p class="text-[10px] md:text-xs text-slate-500 mt-0.5">{{ $novels->total() }} novel ditemukan</p>
+                        <p class="text-[10px] md:text-xs text-slate-500 mt-0.5">{{ $novels->total() }} novels found</p>
                     @else
-                        <h2 class="text-lg md:text-xl font-bold text-white">Semua Novel</h2>
-                        <p class="text-[10px] md:text-xs text-slate-500 mt-0.5">{{ $novels->total() }} novel tersedia</p>
+                        <h2 class="text-lg md:text-xl font-bold text-white">All Novels</h2>
+                        <p class="text-[10px] md:text-xs text-slate-500 mt-0.5">{{ $novels->total() }} novels available</p>
                     @endif
                 </div>
             </div>
@@ -235,16 +235,16 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </div>
-                <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Tidak ada hasil ditemukan</h3>
+                <h3 class="text-xl md:text-2xl font-bold text-white mb-2">No results found</h3>
                 <p class="text-sm text-slate-500 mb-8 max-w-sm mx-auto">
-                    Coba kata kunci yang berbeda, atau hapus beberapa filter untuk mendapatkan lebih banyak hasil.
+                    Try different keywords, or remove some filters to get more results.
                 </p>
                 <a href="{{ route('novels.search') }}"
                    class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
-                    Hapus Semua Filter
+                    Clear All Filters
                 </a>
             </div>
         @endif

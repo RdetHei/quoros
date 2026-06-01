@@ -100,7 +100,7 @@ class UserListController extends Controller
             'is_public' => $request->boolean('is_public'),
         ]);
 
-        return redirect()->route('lists.show', $list)->with('success', 'List diperbarui.');
+        return redirect()->route('lists.show', $list)->with('success', 'List updated.');
     }
 
     public function destroy(UserList $list)
@@ -108,16 +108,24 @@ class UserListController extends Controller
         $this->authorizeOwner($list);
         $list->delete();
 
-        return redirect()->route('lists.index')->with('success', 'List dihapus.');
+        return redirect()->route('lists.index')->with('success', 'List deleted successfully.');
     }
 
-    public function addNovel(Request $request, UserList $list, Novel $novel)
+    public function addNovel(Request $request, UserList $list)
     {
         $this->authorizeOwner($list);
 
-        $list->novels()->syncWithoutDetaching([$novel->id]);
+        $validated = $request->validate([
+            'novel_id' => ['required', 'exists:novels,id'],
+        ]);
 
-        return back()->with('success', 'Novel ditambahkan ke list.');
+        if ($list->novels()->where('novel_id', $validated['novel_id'])->exists()) {
+            return back()->with('error', 'Novel is already in this list.');
+        }
+
+        $list->novels()->attach($validated['novel_id']);
+
+        return back()->with('success', 'Novel added to list.');
     }
 
     public function removeNovel(UserList $list, Novel $novel)
@@ -125,7 +133,7 @@ class UserListController extends Controller
         $this->authorizeOwner($list);
         $list->novels()->detach($novel->id);
 
-        return back()->with('success', 'Novel dihapus dari list.');
+        return back()->with('success', 'Novel removed from list.');
     }
 
     private function authorizeOwner(UserList $list): void
