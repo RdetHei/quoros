@@ -29,6 +29,19 @@ class Chapter extends Model
             });
     }
 
+    public function isPubliclyPublished(): bool
+    {
+        if ($this->status !== 'published') {
+            return false;
+        }
+
+        if ($this->published_at && $this->published_at->isFuture()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function novel(): BelongsTo
     {
         return $this->belongsTo(Novel::class);

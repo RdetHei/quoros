@@ -6,6 +6,9 @@ use App\Models\Chapter;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Reserved for post-production Discord integration. Not wired into the app yet.
+ */
 class DiscordNotifierService
 {
     /**

@@ -14,6 +14,7 @@ class BookmarkController extends Controller
     {
         $user = Auth::user();
         $bookmarks = $user->bookmarks()
+            ->whereHas('novel')
             ->with(['novel.author', 'novel.genres'])
             ->withCount('novel as total_chapters')
             ->latest()

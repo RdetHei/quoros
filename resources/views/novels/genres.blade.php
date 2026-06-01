@@ -10,11 +10,11 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+    <div class="flex flex-wrap gap-3">
         @foreach($genres as $genre)
-            <a href="{{ route('novels.search', ['genre' => $genre->slug]) }}" class="group p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-emerald-600 hover:shadow-xl hover:shadow-emerald-500/5 transition-all text-center">
-                <h3 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 transition-colors mb-1 uppercase tracking-wider text-sm">{{ $genre->name }}</h3>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $genre->novels_count }} Novel</p>
+            <a href="{{ route('novels.search', ['genre' => $genre->slug]) }}" class="px-6 py-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all flex items-center gap-2">
+                <span class="font-bold text-slate-700 dark:text-slate-300 text-sm uppercase tracking-wide">{{ $genre->name }}</span>
+                <span class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md text-[10px] text-slate-400 font-black">{{ $genre->novels_count }}</span>
             </a>
         @endforeach
     </div>

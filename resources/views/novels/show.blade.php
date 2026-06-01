@@ -91,6 +91,7 @@
 
                 {{-- Meta row --}}
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-3 mb-8 text-sm md:text-base">
+                    @if($novel->author)
                     <a href="{{ route('profile.show', $novel->author->username ?? $novel->author->id) }}"
                        class="flex items-center gap-2.5 rounded-xl -mx-2 px-2 py-1.5 hover:bg-white/40 dark:hover:bg-slate-800/40 backdrop-blur-sm transition-all group/author border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
                         <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 font-black text-xs ring-2 ring-white dark:ring-slate-800 shadow-sm">
@@ -104,6 +105,12 @@
                         </div>
                         <span class="font-bold text-slate-800 dark:text-slate-200 group-hover/author:text-slate-900 dark:group-hover/author:text-white transition-colors">{{ $novel->author->name }}</span>
                     </a>
+                    @else
+                    <div class="flex items-center gap-2.5 py-1.5">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-400 font-black text-xs">?</div>
+                        <span class="font-bold text-slate-400 italic">Unknown Author</span>
+                    </div>
+                    @endif
                     <div class="flex items-center gap-2 text-amber-500 font-black bg-white/50 dark:bg-slate-900/50 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-sm border border-white/20">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -203,6 +210,34 @@
                             </svg>
                             Simpan
                         </a>
+                    @endauth
+
+                    @include('partials.report-trigger', [
+                        'type' => 'novel',
+                        'id' => $novel->id,
+                        'label' => $novel->title,
+                        'class' => 'inline-flex items-center gap-1.5 px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:text-rose-500 transition-all',
+                    ])
+
+                    @auth
+                    @if($userLists->isNotEmpty())
+                        <form id="add-to-list-form" action="{{ route('lists.novels.add', ['list' => $userLists->first()->slug, 'novel' => $novel]) }}" method="POST" class="inline-flex items-center gap-2">
+                            @csrf
+                            <select class="text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 max-w-[140px]"
+                                    onchange="document.getElementById('add-to-list-form').action = '{{ url('/lists') }}/' + this.value + '/novels/{{ $novel->id }}'">
+                                @foreach($userLists as $list)
+                                    <option value="{{ $list->slug }}">{{ $list->title }}</option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="px-4 py-3 rounded-xl text-sm font-semibold border border-violet-200 dark:border-violet-800 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all">
+                                + List
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('lists.create') }}" class="inline-flex items-center px-4 py-3 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 text-slate-500 hover:border-violet-400 hover:text-violet-500 transition-all">
+                            Buat List
+                        </a>
+                    @endif
                     @endauth
                 </div>
             </div>
@@ -411,6 +446,7 @@
                         <div class="p-5 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-700/40 transition-all hover:border-slate-300 dark:hover:border-slate-600"
                              x-show="showAll || {{ $loop->index }} < 3">
                             <div class="flex items-center justify-between mb-3">
+                                @if($review->user)
                                 <a href="{{ route('profile.show', $review->user->username ?? $review->user->id) }}"
                                    class="flex items-center gap-3 min-w-0 group/rev">
                                     <div class="w-9 h-9 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black text-slate-600 dark:text-slate-400 ring-1 ring-slate-200 dark:ring-slate-700">
@@ -427,6 +463,15 @@
                                         <p class="text-[10px] text-slate-400">{{ $review->created_at->diffForHumans() }}</p>
                                     </div>
                                 </a>
+                                @else
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-9 h-9 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">?</div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-bold text-slate-400 italic">Deleted User</p>
+                                        <p class="text-[10px] text-slate-400">{{ $review->created_at->diffForHumans() }}</p>
+                                    </div>
+                                </div>
+                                @endif
                                 <div class="flex items-center gap-0.5 px-2.5 py-1 bg-white dark:bg-slate-900 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">
                                     @for($i = 0; $i < 5; $i++)
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $i < $review->rating ? 'text-amber-400' : 'text-slate-200 dark:text-slate-700' }}" viewBox="0 0 20 20" fill="currentColor">
@@ -515,7 +560,7 @@
             <h3 class="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-slate-900 dark:group-hover:text-white transition-colors line-clamp-2 leading-snug mb-0.5">
                 {{ $similar->title }}
             </h3>
-            <p class="text-[11px] text-slate-400 line-clamp-1">{{ $similar->author->name }}</p>
+            <p class="text-[11px] text-slate-400 line-clamp-1">{{ $similar->author->name ?? 'Unknown Author' }}</p>
         </a>
         @endforeach
     </div>

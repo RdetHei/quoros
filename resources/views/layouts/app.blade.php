@@ -179,10 +179,10 @@
                         <div class="hidden lg:flex items-center gap-6">
                             <a href="{{ route('home') }}" class="text-sm font-medium {{ request()->routeIs('home') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Home</a>
                             <a href="{{ route('novels.updated') }}" class="text-sm font-medium {{ request()->routeIs('novels.updated') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Updated</a>
-                            <a href="{{ route('genres.index') }}" class="text-sm font-medium {{ request()->routeIs('genres.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Genre</a>
-                            <a href="{{ route('tags.index') }}" class="text-sm font-medium {{ request()->routeIs('tags.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Tag</a>
+                            <a href="{{ route('novels.trending') }}" class="text-sm font-medium {{ request()->routeIs('novels.trending') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Trending</a>
                             @auth
                                 <a href="{{ route('bookmarks.index') }}" class="text-sm font-medium {{ request()->routeIs('bookmarks.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Bookmark</a>
+                                <a href="{{ route('lists.index') }}" class="text-sm font-medium {{ request()->routeIs('lists.*') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">List</a>
                                 <a href="{{ route('history.index') }}" class="text-sm font-medium {{ request()->routeIs('history.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">History</a>
                             @endauth
                         </div>
@@ -218,6 +218,8 @@
 
                         <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
 
+                        @include('partials.notification-bell')
+
                         @guest
                             <div class="flex items-center gap-1 md:gap-2">
                                 <a href="{{ route('login') }}" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium hover:text-slate-900 dark:hover:text-white transition-colors">Masuk</a>
@@ -251,6 +253,7 @@
                                     <div class="p-2 border-b border-slate-100 dark:border-slate-800">
                                         <p class="px-3 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
                                         <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Profil Saya</a>
+                                        <a href="{{ route('notifications.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Notifikasi</a>
                                         <a href="{{ route('settings') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Pengaturan</a>
                                         <a href="{{ route('guides.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Guide</a>
                                         @if(Auth::user()->role === 'user')
@@ -268,6 +271,7 @@
                                                 <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin</p>
                                                 <a href="{{ route('admin.genres.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Kelola Genre</a>
                                                 <a href="{{ route('admin.tags.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Kelola Tag</a>
+                                                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Laporan & Moderasi</a>
                                             </div>
                                         @endif
                                     </div>
@@ -376,13 +380,9 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <span>Updated</span>
                             </a>
-                            <a href="{{ route('genres.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('genres.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
-                                <span>Genre</span>
-                            </a>
-                            <a href="{{ route('tags.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('tags.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>
-                                <span>Tag</span>
+                            <a href="{{ route('novels.trending') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('novels.trending') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                <span>Trending</span>
                             </a>
                         </div>
 
@@ -393,9 +393,17 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                                 <span>Bookmark</span>
                             </a>
+                            <a href="{{ route('lists.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('lists.*') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                                <span>List Novel</span>
+                            </a>
                             <a href="{{ route('history.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('history.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <span>History</span>
+                            </a>
+                            <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold {{ request()->routeIs('notifications.*') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                                <span>Notifikasi</span>
                             </a>
                         </div>
                         @endauth
@@ -513,8 +521,9 @@
                     <ul class="space-y-3.5">
                         <li><a href="{{ route('home') }}"           class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Semua Novel</a></li>
                         <li><a href="{{ route('novels.updated') }}" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Baru Diupdate</a></li>
-                        <li><a href="{{ route('genres.index') }}"   class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Genre</a></li>
-                        <li><a href="{{ route('tags.index') }}"     class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Tag Populer</a></li>
+                        <li><a href="{{ route('novels.trending') }}" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Trending</a></li>
+                        <li><a href="{{ route('home') }}#genres" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Genre</a></li>
+                        <li><a href="{{ route('home') }}#tags" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Tag Populer</a></li>
                     </ul>
                 </div>
 
@@ -737,6 +746,10 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         </div>
     </div>
+
+    @auth
+        @include('partials.report-modal')
+    @endauth
 
     @stack('scripts')
 </body>

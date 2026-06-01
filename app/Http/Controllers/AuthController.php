@@ -22,6 +22,18 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+            if (Auth::user()->isCurrentlyBanned()) {
+                Auth::logout();
+
+                $user = User::where('email', $credentials['email'])->first();
+                $message = 'Akun Anda ditangguhkan.';
+                if ($user?->ban_reason) {
+                    $message .= ' Alasan: '.$user->ban_reason;
+                }
+
+                return back()->withErrors(['email' => $message])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             if (Auth::user()->role === 'user') {

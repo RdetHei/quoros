@@ -70,4 +70,9 @@ class Novel extends Model
     {
         return $this->hasMany(NovelCharacter::class)->orderBy('sort_order')->orderBy('id');
     }
+
+    public function viewLogs(): HasMany
+    {
+        return $this->hasMany(NovelViewLog::class);
+    }
 }

@@ -4,14 +4,19 @@ use App\Http\Controllers\GuideController;
 use App\Http\Controllers\Admin\CarouselController as AdminCarouselController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Api\ChapterController as ApiChapterController;
 use App\Http\Controllers\Api\LiveSearchController;
+use App\Http\Controllers\AuthorFollowController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserListController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NovelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReactionController;
@@ -42,7 +47,7 @@ Route::get('/site.webmanifest', function () {
     ], 200, ['Content-Type' => 'application/manifest+json'], JSON_UNESCAPED_SLASHES);
 })->name('pwa.manifest');
 
-// API for Discord Bot
+// Public API (Discord bot integration can use this after production deploy)
 Route::get('/api/latest-chapter', [ApiChapterController::class, 'latest']);
 Route::get('/api/live-search', [LiveSearchController::class, 'search']);
 
@@ -60,10 +65,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/search', [NovelController::class, 'search'])->name('novels.search');
 Route::get('/novels/{novel:slug}', [NovelController::class, 'show'])->name('novels.show');
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
+Route::get('/profile/{username}/lists/{list:slug}', [UserListController::class, 'showPublic'])->name('lists.public');
 Route::get('/novels/{novel:slug}/read/{chapterSlug}', [ChapterController::class, 'show'])
     ->middleware('throttle:chapter-read')
     ->name('chapters.show');
 Route::get('/updated', [NovelController::class, 'updated'])->name('novels.updated');
+Route::get('/trending', [NovelController::class, 'trending'])->name('novels.trending');
 Route::get('/genres', [NovelController::class, 'genres'])->name('genres.index');
 Route::get('/tags', [NovelController::class, 'tags'])->name('tags.index');
 
@@ -73,7 +80,7 @@ Route::get('/guides/{category:slug}', [GuideController::class, 'category'])->nam
 Route::get('/guides/{category:slug}/{article:slug}', [GuideController::class, 'show'])->name('guides.show');
 
 // Auth Required Routes
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'not_banned'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
     Route::put('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
@@ -91,12 +98,31 @@ Route::middleware('auth')->group(function () {
     // Bookmark
     Route::post('/novels/{novel}/bookmark', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
 
+    // In-app notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+
     // Reviews & Comments
     Route::post('/novels/{novel}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::post('/chapters/{chapter}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
     Route::post('/reactions/{type}/{id}', [ReactionController::class, 'toggle'])->name('reactions.toggle');
+
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+
+    Route::post('/users/{user}/follow', [AuthorFollowController::class, 'toggle'])->name('authors.follow');
+
+    Route::get('/lists', [UserListController::class, 'index'])->name('lists.index');
+    Route::get('/lists/create', [UserListController::class, 'create'])->name('lists.create');
+    Route::post('/lists', [UserListController::class, 'store'])->name('lists.store');
+    Route::get('/lists/{list:slug}', [UserListController::class, 'show'])->name('lists.show');
+    Route::get('/lists/{list:slug}/edit', [UserListController::class, 'edit'])->name('lists.edit');
+    Route::put('/lists/{list:slug}', [UserListController::class, 'update'])->name('lists.update');
+    Route::delete('/lists/{list:slug}', [UserListController::class, 'destroy'])->name('lists.destroy');
+    Route::post('/lists/{list:slug}/novels/{novel}', [UserListController::class, 'addNovel'])->name('lists.novels.add');
+    Route::delete('/lists/{list:slug}/novels/{novel}', [UserListController::class, 'removeNovel'])->name('lists.novels.remove');
 
     // Writer & Admin Routes
     Route::middleware('role:writer,admin')->group(function () {
@@ -136,5 +162,11 @@ Route::middleware('auth')->group(function () {
         // Carousel Management
         Route::get('/admin/carousel', [AdminCarouselController::class, 'index'])->name('admin.carousel.index');
         Route::post('/admin/carousel/{novel}/toggle', [AdminCarouselController::class, 'toggle'])->name('admin.carousel.toggle');
+
+        // Reports & moderation
+        Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
+        Route::patch('/admin/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
+        Route::post('/admin/users/{user}/ban', [AdminReportController::class, 'banUser'])->name('admin.users.ban');
+        Route::post('/admin/users/{user}/unban', [AdminReportController::class, 'unban'])->name('admin.users.unban');
     });
 });

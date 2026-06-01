@@ -4,26 +4,47 @@ namespace App\Http\Controllers;
 
 use App\Models\Chapter;
 use App\Models\Comment;
+use App\Services\InAppNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller
 {
+    public function __construct(
+        private InAppNotificationService $notifications,
+    ) {}
+
     public function store(Request $request, Chapter $chapter)
     {
         $request->validate([
-            'content' => 'required|string',
+            'content' => ['required', 'string', 'max:5000'],
+            'parent_id' => ['nullable', 'integer', 'exists:comments,id'],
         ]);
 
-        Comment::create([
+        $parentId = $request->parent_id;
+
+        if ($parentId) {
+            $parent = Comment::query()
+                ->where('id', $parentId)
+                ->where('chapter_id', $chapter->id)
+                ->whereNull('parent_id')
+                ->firstOrFail();
+            $parentId = $parent->id;
+        }
+
+        $comment = Comment::create([
             'user_id' => Auth::id(),
             'chapter_id' => $chapter->id,
+            'parent_id' => $parentId,
             'content' => $request->content,
         ]);
 
-        return back()->with('success', 'Comment added successfully!');
+        if ($parentId) {
+            $this->notifications->notifyCommentReply($comment);
+        }
+
+        return back()->with('success', $parentId ? 'Balasan dikirim.' : 'Komentar ditambahkan.');
     }
 
     public function destroy(Comment $comment)
@@ -32,6 +53,6 @@ class CommentController extends Controller
 
         $comment->delete();
 
-        return back()->with('success', 'Comment deleted successfully!');
+        return back()->with('success', 'Komentar dihapus.');
     }
 }

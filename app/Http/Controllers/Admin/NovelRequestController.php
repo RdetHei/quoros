@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\NotificationType;
 use App\Http\Controllers\Controller;
 use App\Models\NovelRequest;
+use App\Services\InAppNotificationService;
 use Illuminate\Http\Request;
 
 class NovelRequestController extends Controller
 {
+    public function __construct(
+        private InAppNotificationService $notifications,
+    ) {}
+
     public function index()
     {
         $requests = NovelRequest::with('user')->latest()->paginate(20);
@@ -20,9 +26,19 @@ class NovelRequestController extends Controller
             'status' => 'required|in:pending,fulfilled,rejected',
         ]);
 
+        $previousStatus = $novelRequest->status;
+
         $novelRequest->update([
             'status' => $request->status,
         ]);
+
+        if ($previousStatus !== $request->status) {
+            if ($request->status === 'fulfilled') {
+                $this->notifications->notifyRequestStatus($novelRequest, NotificationType::RequestFulfilled);
+            } elseif ($request->status === 'rejected') {
+                $this->notifications->notifyRequestStatus($novelRequest, NotificationType::RequestRejected);
+            }
+        }
 
         return back()->with('success', 'Status permintaan berhasil diperbarui!');
     }

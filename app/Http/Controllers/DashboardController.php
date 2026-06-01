@@ -35,11 +35,13 @@ class DashboardController extends Controller
 
         // 2. Lanjutkan Membaca (Hero Section)
         $lastRead = $user->readingHistories()
+            ->whereHas('novel')
+            ->whereHas('chapter')
             ->with(['novel', 'chapter'])
             ->latest()
             ->first();
 
-        if ($lastRead) {
+        if ($lastRead && $lastRead->novel) {
             $totalChapters = $lastRead->novel->chapters()->count();
             // Hitung posisi chapter saat ini (berdasarkan ID)
             $currentChapterPos = $lastRead->novel->chapters()
@@ -54,8 +56,19 @@ class DashboardController extends Controller
         // 3. Statistik Penulis dipindah ke halaman profil
 
         // 4. Tabbed Content
-        $bookmarks = $user->bookmarks()->with('novel.author')->latest()->get();
-        $histories = $user->readingHistories()->with(['novel', 'chapter'])->latest()->take(10)->get();
+        $bookmarks = $user->bookmarks()
+            ->whereHas('novel')
+            ->with('novel.author')
+            ->latest()
+            ->get();
+            
+        $histories = $user->readingHistories()
+            ->whereHas('novel')
+            ->whereHas('chapter')
+            ->with(['novel', 'chapter'])
+            ->latest()
+            ->take(10)
+            ->get();
         $recommendations = Novel::whereNotIn('id', $bookmarks->pluck('novel_id'))
             ->orderBy('rating_avg', 'desc')
             ->take(6)

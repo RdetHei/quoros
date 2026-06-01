@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Writer;
 use App\Http\Controllers\Controller;
 use App\Models\Bookmark;
 use App\Models\Review;
+use App\Models\NovelViewLog;
 use App\Models\ReadingHistory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -53,11 +54,11 @@ class StatsController extends Controller
             ->groupBy('date')
             ->pluck('count', 'date');
 
-        // Reading History (Proxy for Daily Readers)
-        $readersDaily = ReadingHistory::whereIn('novel_id', $novelIds)
-            ->where('created_at', '>=', $startDate)
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-            ->groupBy('date')
+        // Daily views from novel_view_logs
+        $readersDaily = NovelViewLog::whereIn('novel_id', $novelIds)
+            ->where('viewed_on', '>=', $startDate->toDateString())
+            ->select('viewed_on as date', DB::raw('SUM(views) as count'))
+            ->groupBy('viewed_on')
             ->pluck('count', 'date');
 
         // Prepare full 30-day range to avoid gaps in chart

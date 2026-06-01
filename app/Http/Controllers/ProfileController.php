@@ -19,6 +19,8 @@ class ProfileController extends Controller
 
         $viewer = Auth::user();
         $isOwner = $viewer && (int) $viewer->id === (int) $user->id;
+        $isFollowing = $user->isFollowedBy($viewer?->id);
+        $canFollow = $user->canBeFollowed() && ! $isOwner;
         $canViewReadingList = $user->is_public_reading_list || $isOwner || ($viewer && $viewer->role === 'admin');
 
         $readingList = collect();
@@ -39,13 +41,22 @@ class ProfileController extends Controller
             ];
         }
 
+        $publicLists = $user->userLists()
+            ->where('is_public', true)
+            ->withCount('items')
+            ->latest()
+            ->get();
+
         return view('profile.show', compact(
             'user',
             'readingList',
             'reviews',
             'canViewReadingList',
             'writerStats',
-            'isOwner'
+            'isOwner',
+            'isFollowing',
+            'canFollow',
+            'publicLists',
         ));
     }
 

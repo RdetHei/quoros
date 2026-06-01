@@ -810,7 +810,7 @@
                                         <span class="text-xs font-black text-slate-300">4.9</span>
                                     </div>
                                     <span class="w-1 h-1 bg-slate-700 rounded-full"></span>
-                                    <span class="text-xs font-bold text-slate-500">{{ $novel->chapters->count() }} Chapters</span>
+                                    <span class="text-xs font-bold text-slate-500">{{ $novel->chapters_count }} Chapters</span>
                                 </div>
                             </div>
                         </a>

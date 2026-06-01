@@ -322,7 +322,7 @@
             <div class="max-h-[50vh] md:max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                 <div class="grid gap-2">
                     <template x-for="ch in allChapters" :key="ch.slug">
-                        <a :href="'{{ url('/novels/' . $novel->slug) }}/' + ch.slug" 
+                        <a :href="'{{ url('/novels/' . $novel->slug . '/read') }}/' + ch.slug" 
                            class="block p-3 rounded-xl text-sm transition-all"
                            :class="currentChapterSlug === ch.slug ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'">
                             <span x-text="ch.title"></span>
@@ -425,11 +425,23 @@
     <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 border border-slate-100 dark:border-slate-800 shadow-sm">
         <h2 class="text-xl md:text-2xl font-bold mb-8 flex items-center gap-3 text-slate-900 dark:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
-            Diskusi ({{ $chapter->comments->count() }})
+            Diskusi ({{ $commentsCount ?? $chapter->comments->count() }})
         </h2>
 
+        <div x-data="{ replyParentId: null, replyName: '' }" @open-reply.window="replyParentId = $event.detail.parentId; replyName = $event.detail.name">
         @auth
-            <form action="{{ route('comments.store', $chapter->id) }}" method="POST" class="mb-10">
+            <form x-show="replyParentId" x-cloak action="{{ route('comments.store', $chapter->id) }}" method="POST" class="mb-6 p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30">
+                @csrf
+                <input type="hidden" name="parent_id" x-model="replyParentId">
+                <p class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-2">Membalas <span x-text="replyName"></span></p>
+                <textarea name="content" rows="2" required class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tulis balasan..."></textarea>
+                <div class="mt-2 flex gap-2 justify-end">
+                    <button type="button" @click="replyParentId = null" class="px-4 py-2 text-xs font-bold text-slate-500">Batal</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-indigo-600 text-white rounded-lg">Kirim Balasan</button>
+                </div>
+            </form>
+
+            <form x-show="!replyParentId" action="{{ route('comments.store', $chapter->id) }}" method="POST" class="mb-10">
                 @csrf
                 <div class="relative">
                     <textarea name="content" rows="3" 
@@ -449,63 +461,13 @@
 
         <div class="space-y-8">
             @forelse($chapter->comments as $comment)
-                <div class="flex gap-3 md:gap-4 group">
-                    <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}"
-                       class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs md:text-sm hover:ring-2 hover:ring-slate-500/40 transition-all"
-                       title="Lihat profil">
-                        @if($comment->user->profile_photo)
-                            <img src="{{ asset('storage/' . $comment->user->profile_photo) }}" alt="" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='/error.png'">
-                        @else
-                            {{ substr($comment->user->name, 0, 1) }}
-                        @endif
-                    </a>
-                    <div class="flex-grow">
-                        <div class="flex items-center justify-between mb-1">
-                            <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}" class="font-bold text-xs md:text-sm text-slate-900 dark:text-white hover:text-slate-900 dark:hover:text-white transition-colors">{{ $comment->user->name }}</a>
-                            <span class="text-[9px] md:text-[10px] font-medium text-slate-400 uppercase tracking-widest">{{ $comment->created_at->diffForHumans() }}</span>
-                        </div>
-                        <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $comment->content }}</p>
-                        
-                        <div class="mt-3 flex items-center gap-4">
-                            <div class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-lg p-1 border border-slate-100 dark:border-slate-700">
-                                <form action="{{ route('reactions.toggle', ['type' => 'comment', 'id' => $comment->id]) }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="reaction_type" value="like">
-                                    <button type="submit" class="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all {{ $comment->likes->where('user_id', Auth::id())->first() ? 'text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-700 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="{{ $comment->likes->where('user_id', Auth::id())->first() ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.757c1.246 0 2.256 1.01 2.256 2.256 0 .42-.116.83-.335 1.189l-2.723 4.856c-.466.83-1.34 1.343-2.285 1.343H10m4-9.644V7a3 3 0 00-3-3H9m1.5 14H7a3 3 0 01-3-3V10a3 3 0 013-3h2.5" />
-                                        </svg>
-                                        <span class="text-[10px] font-bold">{{ $comment->likes->count() }}</span>
-                                    </button>
-                                </form>
-                                <div class="w-px h-3 bg-slate-200 dark:bg-slate-700 mx-1"></div>
-                                <form action="{{ route('reactions.toggle', ['type' => 'comment', 'id' => $comment->id]) }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="reaction_type" value="dislike">
-                                    <button type="submit" class="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all {{ $comment->dislikes->where('user_id', Auth::id())->first() ? 'text-rose-600 bg-rose-50 dark:bg-rose-900/30' : 'text-slate-500 hover:text-rose-600' }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="{{ $comment->dislikes->where('user_id', Auth::id())->first() ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.243c-1.246 0-2.256-1.01-2.256-2.256 0-.42.116-.83.335-1.189l2.723-4.856c.466-.83 1.34-1.343 2.285-1.343H14m-4 9.644V17a3 3 0 003 3h2m-1.5-14H17a3 3 0 013 3v7a3 3 0 01-3 3h-2.5" />
-                                        </svg>
-                                        <span class="text-[10px] font-bold">{{ $comment->dislikes->count() }}</span>
-                                    </button>
-                                </form>
-                            </div>
-
-                            @can('delete', $comment)
-                                <form action="{{ route('comments.destroy', $comment->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-slate-400 hover:text-red-500 text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors" onclick="return confirm('Hapus komentar ini?')">Hapus</button>
-                                </form>
-                            @endcan
-                        </div>
-                    </div>
-                </div>
+                @include('partials.comment-item', ['comment' => $comment, 'chapter' => $chapter])
             @empty
                 <div class="py-12 text-center text-slate-500 italic text-sm">
                     Belum ada komentar. Jadilah yang pertama berkomentar!
                 </div>
             @endforelse
+        </div>
         </div>
     </div>
 </div>

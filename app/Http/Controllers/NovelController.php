@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ImageUploadRequest;
 use App\Services\CloudinaryService;
+use App\Services\NovelViewService;
 use App\Models\Genre;
 use App\Models\Novel;
 use App\Models\NovelRequest;
 use App\Models\ReadingHistory;
+use App\Models\NovelViewLog;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -21,8 +23,10 @@ class NovelController extends Controller
 {
     protected $cloudinaryService;
 
-    public function __construct(CloudinaryService $cloudinaryService)
-    {
+    public function __construct(
+        CloudinaryService $cloudinaryService,
+        private NovelViewService $novelViews,
+    ) {
         $this->cloudinaryService = $cloudinaryService;
     }
 
@@ -30,6 +34,7 @@ class NovelController extends Controller
     {
         // Featured Novels for Carousel
         $featuredQuery = Novel::with(['author', 'genres'])
+            ->withCount('chapters')
             ->where('is_featured', true)
             ->take(5);
 
@@ -44,6 +49,7 @@ class NovelController extends Controller
         // Fallback to top viewed if no featured novels selected
         if ($featuredNovels->isEmpty()) {
             $fallbackQuery = Novel::with(['author', 'genres'])
+                ->withCount('chapters')
                 ->orderByDesc('view_count')
                 ->take(5);
 
@@ -59,6 +65,7 @@ class NovelController extends Controller
         $recentlyUpdated = Novel::with(['author', 'genres', 'chapters' => function($q) {
                 $q->published()->latest()->take(1);
             }])
+            ->withCount('chapters')
             ->whereHas('chapters')
             ->withMax('chapters', 'created_at')
             ->orderByDesc('chapters_max_created_at')
@@ -70,7 +77,8 @@ class NovelController extends Controller
 
     public function index(Request $request)
     {
-        $query = Novel::with(['author', 'genres']);
+        $query = Novel::with(['author', 'genres'])
+            ->withCount('chapters');
 
         if ($request->genre) {
             $query->whereHas('genres', function ($q) use ($request) {
@@ -86,6 +94,7 @@ class NovelController extends Controller
 
         // Featured Novels for Carousel (Selected by Admin)
         $featuredQuery = Novel::with(['author', 'genres'])
+            ->withCount('chapters')
             ->where('is_featured', true)
             ->take(5);
 
@@ -100,6 +109,7 @@ class NovelController extends Controller
         // Fallback to top viewed if no featured novels selected
         if ($featuredNovels->isEmpty()) {
             $fallbackQuery = Novel::with(['author', 'genres'])
+                ->withCount('chapters')
                 ->orderByDesc('view_count')
                 ->take(5);
 
@@ -115,30 +125,34 @@ class NovelController extends Controller
         $recentlyUpdated = Novel::with(['author', 'genres', 'chapters' => function($q) {
                 $q->published()->latest()->take(3);
             }])
+            ->withCount('chapters')
             ->whereHas('chapters')
             ->withMax('chapters', 'created_at')
             ->orderByDesc('chapters_max_created_at')
             ->take(6)
             ->get();
 
-        $genres = Genre::all();
+        $genres = Genre::withCount('novels')->orderBy('name')->get();
 
-        // Leaderboard: Top Novels Weekly & Monthly
-        $weeklyTop = Novel::with(['author', 'genres'])
-            ->withCount(['chapters', 'bookmarks'])
-            ->where('created_at', '>=', now()->subDays(7))
-            ->orderByDesc('view_count')
-            ->take(5)
-            ->get();
+        $popularTags = Tag::withCount('novels')
+            ->orderByDesc('novels_count')
+            ->orderBy('name')
+            ->get()
+            ->filter(fn ($tag) => $tag->novels_count > 0)
+            ->take(32);
 
-        $monthlyTop = Novel::with(['author', 'genres'])
-            ->withCount(['chapters', 'bookmarks'])
-            ->where('created_at', '>=', now()->subMonth())
-            ->orderByDesc('view_count')
-            ->take(5)
-            ->get();
+        $weeklyTop = $this->novelViews->trending(7, 5);
+        $monthlyTop = $this->novelViews->trending(30, 5);
 
-        return view('novels.index', compact('novels', 'genres', 'recentlyUpdated', 'weeklyTop', 'monthlyTop', 'featuredNovels'));
+        return view('novels.index', compact(
+            'novels',
+            'genres',
+            'popularTags',
+            'recentlyUpdated',
+            'weeklyTop',
+            'monthlyTop',
+            'featuredNovels',
+        ));
     }
 
     public function search(Request $request)
@@ -148,6 +162,7 @@ class NovelController extends Controller
         $status = $request->get('status');
         $type = $request->get('type');
         $tag = $request->get('tag');
+        $minRating = $request->get('min_rating');
         $sort = $request->get('sort', 'latest');
 
         $query = Novel::with(['author', 'genres']);
@@ -187,6 +202,10 @@ class NovelController extends Controller
             });
         }
 
+        if ($minRating !== null && $minRating !== '') {
+            $query->where('rating_avg', '>=', (float) $minRating);
+        }
+
         // Sorting
         switch ($sort) {
             case 'rating':
@@ -194,6 +213,15 @@ class NovelController extends Controller
                 break;
             case 'views':
                 $query->orderByDesc('view_count');
+                break;
+            case 'trending':
+                $since = now()->subDays(7)->toDateString();
+                $query->orderByDesc(
+                    NovelViewLog::query()
+                        ->selectRaw('COALESCE(SUM(views), 0)')
+                        ->whereColumn('novel_view_logs.novel_id', 'novels.id')
+                        ->where('viewed_on', '>=', $since),
+                );
                 break;
             case 'title':
                 $query->orderBy('title');
@@ -207,7 +235,7 @@ class NovelController extends Controller
         $genres = Genre::orderBy('name')->get();
         $tags = Tag::orderBy('name')->get();
 
-        return view('novels.search', compact('novels', 'search', 'genres', 'tags'));
+        return view('novels.search', compact('novels', 'search', 'genres', 'tags', 'minRating'));
     }
 
     public function updated()
@@ -240,6 +268,8 @@ class NovelController extends Controller
     public function history()
     {
         $histories = ReadingHistory::where('user_id', Auth::id())
+            ->whereHas('novel')
+            ->whereHas('chapter')
             ->with(['novel.author', 'chapter'])
             ->latest()
             ->paginate(15)
@@ -361,9 +391,34 @@ class NovelController extends Controller
         return redirect()->route('writer.novels.index')->with('success', 'Novel created successfully!');
     }
 
+    public function trending(Request $request)
+    {
+        $days = (int) $request->get('days', 7);
+        if (! in_array($days, [7, 30], true)) {
+            $days = 7;
+        }
+
+        $novels = $this->novelViews->trendingQuery(now()->subDays($days)->toDateString())
+            ->paginate(24)
+            ->withQueryString();
+
+        $weeklyTop = $this->novelViews->trending(7, 5);
+
+        return view('novels.trending', [
+            'novels' => $novels,
+            'days' => $days,
+            'periodLabel' => $this->novelViews->periodLabel($days),
+            'weeklyTop' => $weeklyTop,
+        ]);
+    }
+
     public function show(Novel $novel)
     {
-        $novel->increment('view_count');
+        $this->novelViews->recordView($novel);
+
+        $userLists = Auth::check()
+            ? Auth::user()->userLists()->orderBy('title')->get(['id', 'title'])
+            : collect();
 
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
 
@@ -408,7 +463,7 @@ class NovelController extends Controller
             ->take(6)
             ->get();
 
-        return view('novels.show', compact('novel', 'similarNovels', 'lastReading'));
+        return view('novels.show', compact('novel', 'similarNovels', 'lastReading', 'userLists'));
     }
 
     public function edit(Novel $novel)

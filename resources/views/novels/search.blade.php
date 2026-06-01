@@ -37,7 +37,7 @@
                 </div>
 
                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2 md:mb-3 text-left">Filter</p>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
                     <div class="relative">
                         <select name="genre" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
                             <option value="">Semua Genre</option>
@@ -91,10 +91,23 @@
                     </div>
 
                     <div class="relative">
+                        <select name="min_rating" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
+                            <option value="">Min. Rating</option>
+                            @foreach([4, 3.5, 3, 2.5] as $rating)
+                                <option value="{{ $rating }}" {{ (string) request('min_rating') === (string) $rating ? 'selected' : '' }}>≥ {{ $rating }}</option>
+                            @endforeach
+                        </select>
+                        <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </span>
+                    </div>
+
+                    <div class="relative">
                         <select name="sort" class="w-full appearance-none cursor-pointer pl-3 pr-9 py-2.5 md:py-3 rounded-xl text-xs md:text-sm text-slate-200 bg-slate-800/80 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/35 focus:border-emerald-500 transition-colors">
                             <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Terbaru</option>
                             <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Rating Tertinggi</option>
-                            <option value="views" {{ request('sort') == 'views' ? 'selected' : '' }}>Paling Banyak Dilihat</option>
+                            <option value="views" {{ request('sort') == 'views' ? 'selected' : '' }}>Paling Banyak Dilihat (Total)</option>
+                            <option value="trending" {{ request('sort') == 'trending' ? 'selected' : '' }}>Trending (7 Hari)</option>
                             <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Judul A–Z</option>
                         </select>
                         <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500">

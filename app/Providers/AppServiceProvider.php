@@ -4,18 +4,21 @@ namespace App\Providers;
 
 use App\Models\Chapter;
 use App\Models\Comment;
+use App\Models\InAppNotification;
 use App\Models\Novel;
 use App\Models\Review;
-use App\Observers\ChapterObserver;
+use App\Observers\ChapterNotificationObserver;
 use App\Policies\ChapterPolicy;
 use App\Policies\CommentPolicy;
 use App\Policies\NovelPolicy;
 use App\Policies\ReviewPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,7 +45,27 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Review::class, ReviewPolicy::class);
         Gate::policy(Comment::class, CommentPolicy::class);
 
-        Chapter::observe(ChapterObserver::class);
+        Chapter::observe(ChapterNotificationObserver::class);
+
+        View::composer(['layouts.app', 'partials.notification-bell'], function ($view) {
+            if (! Auth::check()) {
+                return;
+            }
+
+            $userId = Auth::id();
+
+            $view->with([
+                'unreadNotificationsCount' => InAppNotification::query()
+                    ->where('user_id', $userId)
+                    ->whereNull('read_at')
+                    ->count(),
+                'recentNotifications' => InAppNotification::query()
+                    ->where('user_id', $userId)
+                    ->latest()
+                    ->limit(8)
+                    ->get(),
+            ]);
+        });
 
         RateLimiter::for('chapter-read', function (Request $request) {
             $user = $request->user();

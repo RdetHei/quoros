@@ -169,6 +169,60 @@
     </div>
 </section>
 
+{{-- Genre & Tag — di bawah Baru Diupdate --}}
+<section class="mb-12 scroll-mt-24">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div id="genres" class="scroll-mt-28">
+            <div class="h-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
+                @include('partials.section-header', [
+                    'title' => 'Jelajahi Genre',
+                    'description' => 'Pilih kategori cerita favoritmu.',
+                    'accent' => 'emerald',
+                    'href' => route('genres.index'),
+                    'linkText' => 'Semua genre',
+                ])
+
+                <div class="flex flex-wrap gap-2 max-h-[220px] sm:max-h-[280px] overflow-y-auto pr-1">
+                    @forelse($genres as $genre)
+                        <a href="{{ route('novels.search', ['genre' => $genre->slug]) }}"
+                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 hover:border-emerald-500/60 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                            <span>{{ $genre->name }}</span>
+                            <span class="text-[10px] font-bold text-slate-400 tabular-nums">{{ $genre->novels_count }}</span>
+                        </a>
+                    @empty
+                        <p class="text-sm text-slate-500 py-4">Belum ada genre.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <div id="tags" class="scroll-mt-28">
+            <div class="h-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
+                @include('partials.section-header', [
+                    'title' => 'Tag Populer',
+                    'description' => 'Filter cerita dengan elemen spesifik.',
+                    'accent' => 'indigo',
+                    'href' => route('tags.index'),
+                    'linkText' => 'Semua tag',
+                ])
+
+                <div class="flex flex-wrap gap-2 max-h-[220px] sm:max-h-[280px] overflow-y-auto pr-1">
+                    @forelse($popularTags as $tag)
+                        <a href="{{ route('novels.search', ['tag' => $tag->slug]) }}"
+                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 hover:border-indigo-500/60 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                            <span class="text-indigo-500 dark:text-indigo-400">#</span>
+                            <span>{{ $tag->name }}</span>
+                            <span class="text-[10px] font-bold text-slate-400 tabular-nums">{{ $tag->novels_count }}</span>
+                        </a>
+                    @empty
+                        <p class="text-sm text-slate-500 py-4">Belum ada tag.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 {{-- Novel terbaru + leaderboard --}}
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
     <section class="lg:col-span-8 xl:col-span-9">
@@ -215,7 +269,8 @@
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-24">
             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
                 <h2 class="text-base font-semibold text-slate-900 dark:text-white">Top Novel</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Berdasarkan jumlah pembaca</p>
+                <p class="text-xs text-slate-500 mt-0.5">Berdasarkan tayangan harian</p>
+                <a href="{{ route('novels.trending') }}" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-1 inline-block">Lihat semua →</a>
             </div>
 
             <div class="flex p-2 gap-1 border-b border-slate-100 dark:border-slate-800">
@@ -237,7 +292,7 @@
                             </div>
                             <div class="min-w-0 flex-grow">
                                 <p class="text-xs font-semibold text-slate-900 dark:text-white line-clamp-1">{{ $novel->title }}</p>
-                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->view_count) }} views</p>
+                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->period_views ?? 0) }} views (7h)</p>
                             </div>
                         </a>
                     @empty
@@ -257,7 +312,7 @@
                             </div>
                             <div class="min-w-0 flex-grow">
                                 <p class="text-xs font-semibold text-slate-900 dark:text-white line-clamp-1">{{ $novel->title }}</p>
-                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->view_count) }} views</p>
+                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->period_views ?? 0) }} views (30h)</p>
                             </div>
                         </a>
                     @empty

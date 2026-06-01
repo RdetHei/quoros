@@ -172,7 +172,19 @@ class ChapterController extends Controller
             abort(404);
         }
 
-        $chapter->load('comments.user');
+        $chapter->load([
+            'comments' => function ($query) {
+                $query->whereNull('parent_id')
+                    ->with([
+                        'user',
+                        'likes',
+                        'dislikes',
+                        'replies' => fn ($q) => $q->with(['user', 'likes', 'dislikes']),
+                    ])
+                    ->latest();
+            },
+        ]);
+        $commentsCount = $chapter->comments()->count();
 
         if (Auth::check()) {
             ReadingHistory::updateOrCreate(
@@ -228,6 +240,7 @@ class ChapterController extends Controller
             'allChapters',
             'protectContent',
             'chapterBodyHtml',
+            'commentsCount',
         ));
     }
 
