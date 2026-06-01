@@ -16,9 +16,9 @@
                 <div class="hidden md:flex items-center gap-5 p-5 hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
                     <a href="{{ route('novels.show', $novel->slug) }}" class="shrink-0 w-14 h-[4.5rem] rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover">
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                         @endif
                     </a>
 
@@ -56,9 +56,9 @@
                 <a href="{{ route('novels.show', $novel->slug) }}" class="md:hidden flex gap-3 p-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
                     <div class="shrink-0 w-16 h-[5.5rem] rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" alt="" class="w-full h-full object-cover">
+                            <img src="{{ $novel->cover_image_url }}" alt="" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="" class="w-full h-full object-cover">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                         @endif
                     </div>
                     <div class="flex-grow min-w-0">

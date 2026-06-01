@@ -16,9 +16,9 @@
                 <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5 hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
                     <a href="{{ route('novels.show', $history->novel->slug) }}" class="shrink-0 w-16 h-[5.5rem] sm:w-20 sm:h-28 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
                         @if($history->novel->cover_image_url)
-                            <img src="{{ $history->novel->cover_image_url }}" alt="{{ $history->novel->title }}" class="w-full h-full object-cover">
+                            <img src="{{ $history->novel->cover_image_url }}" alt="{{ $history->novel->title }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($history->novel->cover_image)
-                            <img src="{{ asset('storage/' . $history->novel->cover_image) }}" alt="{{ $history->novel->title }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('storage/' . $history->novel->cover_image) }}" alt="{{ $history->novel->title }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
                         @else
                             <div class="w-full h-full flex items-center justify-center p-2">
                                 <span class="text-[10px] font-medium text-slate-400 text-center line-clamp-3">{{ $history->novel->title }}</span>
