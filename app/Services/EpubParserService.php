@@ -16,35 +16,77 @@ class EpubParserService
             throw new \Exception("Gagal membuka file EPUB.");
         }
 
-        // 1. Cari file container.xml untuk menemukan path ke file .opf
+        // 1. Find .opf file via container.xml
         $containerContent = $zip->getFromName('META-INF/container.xml');
         if (!$containerContent) {
             throw new \Exception("Format EPUB tidak valid (META-INF/container.xml tidak ditemukan).");
         }
 
         $containerDom = new DOMDocument();
-        $containerDom->loadXML($containerContent);
-        $opfPath = $containerDom->getElementsByTagName('rootfile')->item(0)->getAttribute('full-path');
+        if (!@$containerDom->loadXML($containerContent)) {
+            // Silently fail or log if needed, but continue
+        }
+        $rootfile = $containerDom->getElementsByTagName('rootfile')->item(0);
+        if (!$rootfile) {
+            throw new \Exception("Format EPUB tidak valid (rootfile tidak ditemukan).");
+        }
+        $opfPath = $rootfile->getAttribute('full-path');
         $baseDir = dirname($opfPath);
         if ($baseDir === '.') $baseDir = '';
         else $baseDir .= '/';
 
-        // 2. Baca file .opf untuk mendapatkan daftar item (manifest) dan urutan bab (spine)
+        // 2. Parse .opf for Metadata, Manifest, and Spine
         $opfContent = $zip->getFromName($opfPath);
+        if (!$opfContent) {
+            throw new \Exception("OPF content not found at $opfPath");
+        }
         $opfDom = new DOMDocument();
-        $opfDom->loadXML($opfContent);
+        if (!@$opfDom->loadXML($opfContent)) {
+            throw new \Exception("Failed to load OPF XML");
+        }
         $xpath = new DOMXPath($opfDom);
         $xpath->registerNamespace('opf', 'http://www.idpf.org/2007/opf');
+        $xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
 
+        // Extract Metadata (Dublin Core)
+        $metadata = [
+            'title' => $xpath->query('//dc:title')->item(0)?->nodeValue,
+            'author' => $xpath->query('//dc:creator')->item(0)?->nodeValue,
+            'description' => $xpath->query('//dc:description')->item(0)?->nodeValue,
+            'language' => $xpath->query('//dc:language')->item(0)?->nodeValue,
+        ];
+
+        // Parse Manifest
         $manifest = [];
         $items = $opfDom->getElementsByTagName('item');
+        $tocId = null;
+        $coverId = null;
+
         foreach ($items as $item) {
-            $manifest[$item->getAttribute('id')] = [
-                'href' => $item->getAttribute('href'),
-                'media-type' => $item->getAttribute('media-type')
+            $id = $item->getAttribute('id');
+            $href = $item->getAttribute('href');
+            $mediaType = $item->getAttribute('media-type');
+            $properties = $item->getAttribute('properties');
+
+            $manifest[$id] = [
+                'href' => $href,
+                'media-type' => $mediaType
             ];
+
+            // Identify TOC (NCX for v2, Nav for v3)
+            if ($mediaType === 'application/x-dtbncx+xml') {
+                $tocId = $id;
+            } elseif (str_contains($properties, 'nav')) {
+                $tocId = $id;
+            }
+
+            // Identify Cover
+            if (str_contains($properties, 'cover-image') || $id === 'cover' || $id === 'cover-image') {
+                $coverId = $id;
+            }
         }
 
+        // Parse Spine
         $spine = [];
         $itemrefs = $opfDom->getElementsByTagName('itemref');
         foreach ($itemrefs as $itemref) {
@@ -54,105 +96,149 @@ class EpubParserService
             }
         }
 
-        // 3. Ekstrak konten dari setiap file di spine
+        // 3. Parse TOC for Chapter Titles
+        $chapterTitles = [];
+        if ($tocId && isset($manifest[$tocId])) {
+            $tocPath = $baseDir . $manifest[$tocId]['href'];
+            $tocContent = $zip->getFromName($tocPath);
+            if ($tocContent) {
+                $chapterTitles = $this->parseToc($tocContent, $manifest[$tocId]['media-type']);
+            }
+        }
+
+        // 4. Extract and Clean Chapters
         $allChapters = [];
         foreach ($spine as $index => $href) {
             $fullPath = $baseDir . $href;
-            $content = $zip->getFromName($fullPath);
-            if (!$content) continue;
-
-            $chapterData = $this->cleanChapterContent($content);
             
-            // Jika konten kosong setelah dibersihkan, lewati
-            if (empty(trim(strip_tags($chapterData['content'])))) {
+            // Optimization: Use stream if content is large (for now getFromName is fine for typical xhtml)
+            $content = $zip->getFromName($fullPath);
+            if (!$content) {
                 continue;
             }
 
-            // Cek apakah di dalam satu file ini ada banyak bab (berdasarkan h1/h2 atau keyword)
-            $subChapters = $this->splitInternalChapters($chapterData);
-            foreach ($subChapters as $sub) {
-                $allChapters[] = $sub;
+            $cleaned = $this->cleanHtmlContent($content);
+            
+            // Skip empty content
+            if (empty(trim(strip_tags($cleaned['content'])))) {
+                continue;
             }
+
+            // Title Detection Priority: 1. TOC, 2. H1/H2 from file, 3. Default
+            $title = $chapterTitles[$href] ?? $cleaned['title'] ?? "Chapter " . (count($allChapters) + 1);
+
+            $allChapters[] = [
+                'title' => $title,
+                'content' => $cleaned['content'],
+                'metadata' => $index === 0 ? $metadata : null // Attach metadata only to first item for controller
+            ];
         }
 
         $zip->close();
         return $allChapters;
     }
 
-    private function splitInternalChapters($chapterData)
+    private function parseToc($content, $mediaType)
     {
-        $content = $chapterData['content'];
-        $title = $chapterData['title'];
+        $titles = [];
+        $dom = new DOMDocument();
+        @$dom->loadXML($content);
+        $xpath = new DOMXPath($dom);
 
-        // Pattern untuk mendeteksi pemisah bab di dalam HTML (h1, h2, atau teks tebal/besar yang mengandung keyword)
-        $pattern = '/<(h[1-2])>(.*?)<\/\1>|(?:\n|^|<p>)\s*(?:chapter|chp|eps|episode|bab|bagian|part)\s*\d+/i';
-        
-        if (preg_match_all($pattern, $content, $matches, PREG_OFFSET_CAPTURE)) {
-            // Jika ditemukan penanda bab, pecah berdasarkan itu
-            if (count($matches[0]) > 0) {
-                $parts = preg_split($pattern, $content);
-                $chapters = [];
-                
-                foreach ($matches[0] as $index => $match) {
-                    $matchText = $match[0];
-                    // Ambil judul dari match (bersihkan tag jika itu h1/h2)
-                    $cTitle = trim(strip_tags($matchText));
-                    $cContent = $parts[$index + 1] ?? '';
-                    
-                    if (!empty(trim(strip_tags($cContent)))) {
-                        $chapters[] = [
-                            'title' => $cTitle,
-                            'content' => trim($cContent)
-                        ];
-                    }
+        if ($mediaType === 'application/x-dtbncx+xml') {
+            // NCX (EPUB 2)
+            $xpath->registerNamespace('ncx', 'http://www.daisy.org/z3986/2005/ncx/');
+            $navPoints = $xpath->query('//ncx:navPoint');
+            foreach ($navPoints as $point) {
+                $label = $xpath->query('ncx:navLabel/ncx:text', $point)->item(0)?->nodeValue;
+                $src = $xpath->query('ncx:content', $point)->item(0)?->getAttribute('src');
+                if ($label && $src) {
+                    $cleanSrc = explode('#', $src)[0];
+                    $titles[$cleanSrc] = trim($label);
                 }
-
-                // Jika berhasil memecah, kembalikan. Jika tidak, fallback ke satu bab.
-                if (!empty($chapters)) return $chapters;
+            }
+        } else {
+            // Nav (EPUB 3)
+            $xpath->registerNamespace('xhtml', 'http://www.w3.org/1999/xhtml');
+            $xpath->registerNamespace('epub', 'http://www.idpf.org/2007/ops');
+            $links = $xpath->query('//xhtml:nav[@epub:type="toc"]//xhtml:a');
+            foreach ($links as $link) {
+                $label = $link->nodeValue;
+                $src = $link->getAttribute('href');
+                if ($label && $src) {
+                    $cleanSrc = explode('#', $src)[0];
+                    $titles[$cleanSrc] = trim($label);
+                }
             }
         }
 
-        // Fallback: satu file = satu bab
-        return [[
-            'title' => $title ?: "Chapter",
-            'content' => $content
-        ]];
+        return $titles;
     }
 
-    private function cleanChapterContent($html)
+    private function cleanHtmlContent($html)
     {
         $dom = new DOMDocument();
-        // Sembunyikan error karena HTML di EPUB mungkin tidak valid sempurna
-        @$dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        // EPUB XHTML often has namespaces, we use loadHTML for easier cleaning
+        @$dom->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         
-        // Ambil judul dari tag h1, h2, atau title
-        $title = '';
+        $xpath = new DOMXPath($dom);
+
+        // 1. Remove scripts, styles, and other noise
+        foreach ($xpath->query('//script|//style|//link|//meta|//iframe|//noscript') as $node) {
+            $node->parentNode?->removeChild($node);
+        }
+
+        // 2. Extract Title from H1 or H2
+        $title = null;
         $h1 = $dom->getElementsByTagName('h1')->item(0);
         $h2 = $dom->getElementsByTagName('h2')->item(0);
-        $titleTag = $dom->getElementsByTagName('title')->item(0);
+        if ($h1) $title = trim($h1->textContent);
+        elseif ($h2) $title = trim($h2->textContent);
 
-        if ($h1) $title = $h1->textContent;
-        elseif ($h2) $title = $h2->textContent;
-        elseif ($titleTag) $title = $titleTag->textContent;
+        // 3. Clean attributes and handle images
+        $body = $dom->getElementsByTagName('body')->item(0) ?: $dom;
+        $this->sanitizeNode($body);
 
-        // Bersihkan body
-        $body = $dom->getElementsByTagName('body')->item(0);
-        if ($body) {
-            // Hapus elemen yang tidak perlu dibaca.
-            $xpath = new DOMXPath($dom);
-            foreach ($xpath->query('//script|//style|//noscript') as $node) {
-                $node->parentNode?->removeChild($node);
-            }
-
-            $content = $this->extractReadableText($body);
-        } else {
-            $content = $this->normalizeText(strip_tags(html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        // 4. Get cleaned HTML content
+        $content = '';
+        foreach ($body->childNodes as $child) {
+            $content .= $dom->saveHTML($child);
         }
 
         return [
-            'title' => trim($title),
+            'title' => $title,
             'content' => trim($content)
         ];
+    }
+
+    private function sanitizeNode(\DOMNode $node)
+    {
+        if ($node instanceof \DOMElement) {
+            // Remove all attributes except essential ones (src, href)
+            $attributes = [];
+            foreach ($node->attributes as $attr) {
+                $attributes[] = $attr->nodeName;
+            }
+            foreach ($attributes as $attrName) {
+                if (!in_array($attrName, ['src', 'href'])) {
+                    $node->removeAttribute($attrName);
+                }
+            }
+
+            // Handle images: Convert to placeholder or ensure they don't break
+            if ($node->tagName === 'img') {
+                $src = $node->getAttribute('src');
+                $node->setAttribute('alt', '[Image: ' . basename($src) . ']');
+                // Optionally keep src but we don't store local EPUB images in DB
+                // $node->removeAttribute('src'); 
+            }
+        }
+
+        if ($node->hasChildNodes()) {
+            foreach ($node->childNodes as $child) {
+                $this->sanitizeNode($child);
+            }
+        }
     }
 
     private function extractReadableText(\DOMNode $body): string

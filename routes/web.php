@@ -141,6 +141,7 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
         // Chapters Management
         Route::get('/writer/novels/{novel}/chapters/create', [ChapterController::class, 'create'])->name('writer.chapters.create');
         Route::post('/writer/novels/{novel}/chapters', [ChapterController::class, 'store'])->name('writer.chapters.store');
+        Route::post('/writer/novels/{novel}/chapters/bulk-upload', [ChapterController::class, 'bulkStore'])->name('writer.chapters.bulk-store');
         Route::post('/writer/novels/{novel}/chapters/bulk-parse', [ChapterController::class, 'parseDocument'])->name('writer.chapters.parse-epub');
         Route::post('/writer/novels/{novel}/chapters/bulk-store', [ChapterController::class, 'storeBulkChapter'])->name('writer.chapters.store-bulk');
         Route::get('/writer/novels/{novel}/chapters/{chapter}/edit', [ChapterController::class, 'edit'])->name('writer.chapters.edit');

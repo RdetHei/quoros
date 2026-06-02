@@ -138,32 +138,48 @@
         'href' => route('novels.updated'),
     ])
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         @foreach($recentlyUpdated as $novel)
-            <article class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
-                <div class="flex gap-3 p-3 border-b border-slate-100 dark:border-slate-800">
-                    <a href="{{ route('novels.show', $novel->slug) }}" class="shrink-0 w-14 h-20 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
+            <article class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-lg hover:shadow-indigo-500/5 hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300">
+                <div class="flex gap-3 p-3">
+                    {{-- Cover --}}
+                    <a href="{{ route('novels.show', $novel->slug) }}" class="shrink-0 w-16 h-24 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm ring-1 ring-slate-200/50 dark:ring-slate-700/50 group-hover:scale-[1.02] transition-transform duration-300">
                         @if($novel->cover_image_url)
                             <img src="{{ $novel->cover_image_url }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
                             <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @endif
                     </a>
-                    <div class="min-w-0 flex flex-col justify-center">
-                        <a href="{{ route('novels.show', $novel->slug) }}" class="text-sm font-semibold text-slate-900 dark:text-white hover:text-indigo-600 line-clamp-2 leading-snug">{{ $novel->title }}</a>
-                        <p class="text-xs text-slate-500 mt-0.5 truncate">{{ $novel->author->name }}</p>
+
+                    {{-- Info --}}
+                    <div class="flex-grow min-w-0 flex flex-col">
+                        <div class="mb-auto">
+                            <div class="flex items-center gap-2 mb-1">
+                                @foreach($novel->genres->take(1) as $genre)
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-900/50">{{ $genre->name }}</span>
+                                @endforeach
+                                <span class="text-[9px] text-slate-400 font-medium">{{ number_format($novel->view_count) }} views</span>
+                            </div>
+                            <a href="{{ route('novels.show', $novel->slug) }}" class="text-sm font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-1 leading-snug transition-colors">{{ $novel->title }}</a>
+                            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">by <span class="font-medium text-slate-600 dark:text-slate-300">{{ $novel->author->name }}</span></p>
+                        </div>
+
+                        {{-- Latest Chapters --}}
+                        @if($novel->chapters->count() > 0)
+                        <div class="mt-2.5 space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800/50">
+                            @foreach($novel->chapters->take(2) as $chapter)
+                                <a href="{{ route('chapters.show', [$novel->slug, $chapter->slug]) }}" class="flex items-center justify-between gap-2 group/ch">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <div class="w-1 h-1 rounded-full bg-indigo-400 dark:bg-indigo-600"></div>
+                                        <span class="text-[10px] font-medium text-slate-600 dark:text-slate-400 group-hover/ch:text-indigo-600 dark:group-hover/ch:text-indigo-400 truncate transition-colors">{{ $chapter->title }}</span>
+                                    </div>
+                                    <span class="text-[9px] text-slate-400 dark:text-slate-500 tabular-nums shrink-0">{{ $chapter->created_at->diffForHumans(null, true) }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                        @endif
                     </div>
                 </div>
-                @if($novel->chapters->count() > 0)
-                <div class="px-3 py-2 space-y-0.5">
-                    @foreach($novel->chapters as $chapter)
-                        <a href="{{ route('chapters.show', [$novel->slug, $chapter->slug]) }}" class="flex items-center justify-between gap-2 py-1.5 px-2 -mx-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group/ch">
-                            <span class="text-xs text-slate-600 dark:text-slate-400 group-hover/ch:text-indigo-600 truncate">{{ $chapter->title }}</span>
-                            <span class="text-[10px] text-slate-400 shrink-0">{{ $chapter->created_at->diffForHumans(null, true) }}</span>
-                        </a>
-                    @endforeach
-                </div>
-                @endif
             </article>
         @endforeach
     </div>

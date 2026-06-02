@@ -64,7 +64,7 @@ class ChapterController extends Controller
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'file' => 'required|file|mimes:epub,docx,pdf|max:51200', // 50MB max
+            'file' => 'required|file|mimes:epub,docx,pdf,zip|max:51200', // 50MB max
         ]);
 
         try {

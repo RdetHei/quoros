@@ -179,24 +179,60 @@
                 'href' => route('novels.updated'),
             ])
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 @foreach($recentlyUpdated as $novel)
-                <a href="{{ route('novels.show', $novel->slug) }}" class="group block">
-                    <div class="relative aspect-[2/3] mb-3 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 group-hover:ring-indigo-400 dark:group-hover:ring-indigo-600 transition-all">
+                <article class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-500 overflow-hidden">
+                    {{-- Cover & Image Overlay --}}
+                    <div class="relative aspect-[16/10] overflow-hidden">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='/error.png'">
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" onerror="this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='/error.png'">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" onerror="this.src='/error.png'">
                         @endif
-                        @if($novel->chapters->first())
-                        <div class="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-slate-950/90 to-transparent">
-                            <p class="text-[10px] font-medium text-white line-clamp-1">{{ $novel->chapters->first()->title }}</p>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
+                        
+                        {{-- Genre Badge on Image --}}
+                        <div class="absolute top-3 left-3">
+                            @foreach($novel->genres->take(1) as $genre)
+                            <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-white/90 dark:bg-slate-950/90 text-indigo-600 dark:text-indigo-400 rounded-md backdrop-blur-md shadow-sm">
+                                {{ $genre->name }}
+                            </span>
+                            @endforeach
                         </div>
+                    </div>
+
+                    {{-- Content --}}
+                    <div class="flex flex-col flex-grow p-4">
+                        <div class="mb-auto">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <span class="text-[9px] font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ $novel->chapters_max_created_at ? \Illuminate\Support\Carbon::parse($novel->chapters_max_created_at)->diffForHumans(null, true) : $novel->updated_at->diffForHumans(null, true) }}
+                                </span>
+                                <span class="text-[9px] font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    {{ number_format($novel->view_count) }}
+                                </span>
+                            </div>
+                            
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white line-clamp-1 mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                <a href="{{ route('novels.show', $novel->slug) }}">{{ $novel->title }}</a>
+                            </h3>
+                            <p class="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mb-3">by <span class="font-medium text-slate-600 dark:text-slate-300">{{ $novel->author->name }}</span></p>
+                        </div>
+
+                        {{-- Latest Chapter CTA --}}
+                        @if($novel->chapters->isNotEmpty())
+                        <a href="{{ route('chapters.show', [$novel->slug, $novel->chapters->first()->slug]) }}" 
+                           class="inline-flex items-center justify-between w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-xl border border-slate-100 dark:border-slate-800/50 group/btn transition-all duration-300">
+                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 group-hover/btn:text-indigo-600 dark:group-hover/btn:text-indigo-400 truncate pr-3">
+                                {{ $novel->chapters->first()->title }}
+                            </span>
+                            <svg class="w-3 h-3 text-slate-400 group-hover/btn:text-indigo-500 group-hover/btn:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </a>
                         @endif
                     </div>
-                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $novel->title }}</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">{{ $novel->updated_at->diffForHumans() }}</p>
-                </a>
+                </article>
                 @endforeach
             </div>
         </div>

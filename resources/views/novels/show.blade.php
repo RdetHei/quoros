@@ -62,6 +62,14 @@
                            class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-sm text-center transition-all shadow-lg shadow-emerald-700/10">
                             + New Chapter
                         </a>
+                        <button type="button" onclick="document.getElementById('bulk-upload-input').click()"
+                           class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm text-center transition-all shadow-lg shadow-indigo-600/10">
+                            Bulk Upload DOCX
+                        </button>
+                        <form id="bulk-upload-form" action="{{ route('writer.chapters.bulk-store', $novel->id) }}" method="POST" enctype="multipart/form-data" class="hidden">
+                            @csrf
+                            <input type="file" id="bulk-upload-input" name="file" accept=".docx" onchange="this.form.submit()">
+                        </form>
                     </div>
                     @endcan
                 </div>
