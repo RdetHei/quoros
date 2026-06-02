@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 <div class="max-w-6xl mx-auto my-12 px-4">
@@ -7,7 +7,7 @@
             <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Carousel Banner Management</h1>
             <p class="text-slate-500 dark:text-slate-400">Select novels to be featured in the main spotlight on the homepage.</p>
         </div>
-        <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Back to Dashboard
         </a>

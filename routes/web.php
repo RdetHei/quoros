@@ -3,6 +3,7 @@
 use App\Http\Controllers\GuideController;
 use App\Http\Controllers\Admin\CarouselController as AdminCarouselController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
+use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\ReportController;
@@ -22,7 +23,11 @@ use App\Http\Controllers\NovelCharacterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AnnouncementsController;
 use App\Http\Controllers\Writer\StatsController as WriterStatsController;
+use App\Http\Controllers\Writer\WorkspaceController as WriterWorkspaceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [NovelController::class, 'index'])->name('home');
@@ -84,6 +89,7 @@ Route::get('/guides/{category:slug}/{article:slug}', [GuideController::class, 's
 Route::middleware(['auth', 'not_banned'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
+    Route::get('/settings/v2', [SettingsController::class, 'indexV2'])->name('settings.v2');
     Route::put('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
     Route::post('/dashboard/profile/photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.photo.update');
     Route::post('/dashboard/become-writer', [DashboardController::class, 'becomeWriter'])->name('dashboard.become-writer');
@@ -132,6 +138,8 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
         })->name('writer.bulk-guide');
 
         Route::get('/writer/stats', [WriterStatsController::class, 'index'])->name('writer.stats');
+        Route::get('/writer/analytics', [WriterWorkspaceController::class, 'analyticsPro'])->name('writer.analytics.pro');
+        Route::get('/writer/feedback-hub', [WriterWorkspaceController::class, 'feedbackHub'])->name('writer.feedback.hub');
         Route::get('/writer/novels', [NovelController::class, 'writerIndex'])->name('writer.novels.index');
         Route::get('/writer/novels/create/step-1', [NovelController::class, 'createStep1'])->name('writer.novels.create.step-1');
         Route::post('/writer/novels/create/step-1', [NovelController::class, 'storeStep1'])->name('writer.novels.store.step-1');
@@ -160,24 +168,45 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
     });
 
     // Admin Only
-    Route::middleware('role:admin')->group(function () {
-        Route::get('/admin/novels', [NovelController::class, 'index'])->name('admin.novels.index');
-        Route::resource('/admin/genres', AdminGenreController::class, ['as' => 'admin']);
-        Route::resource('/admin/tags', AdminTagController::class, ['as' => 'admin']);
+    Route::middleware('role:admin')->prefix('admin')->group(function () {
+        // Admin dashboard entry point
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
-        // Novel Requests Management
-        Route::get('/admin/requests', [AdminNovelRequestController::class, 'index'])->name('admin.requests.index');
-        Route::patch('/admin/requests/{novelRequest}/status', [AdminNovelRequestController::class, 'updateStatus'])->name('admin.requests.status');
-        Route::delete('/admin/requests/{novelRequest}', [AdminNovelRequestController::class, 'destroy'])->name('admin.requests.destroy');
+        Route::get('/novels', [NovelController::class, 'index'])->name('admin.novels.index');
+        Route::resource('genres', AdminGenreController::class, ['as' => 'admin']);
+        Route::resource('tags', AdminTagController::class, ['as' => 'admin']);
 
-        // Carousel Management
-        Route::get('/admin/carousel', [AdminCarouselController::class, 'index'])->name('admin.carousel.index');
-        Route::post('/admin/carousel/{novel}/toggle', [AdminCarouselController::class, 'toggle'])->name('admin.carousel.toggle');
+        // Novel Requests Management (Novel Moderation: Approve/Reject)
+        Route::get('/requests', [AdminNovelRequestController::class, 'index'])->name('admin.requests.index');
+        Route::patch('/requests/{novelRequest}/status', [AdminNovelRequestController::class, 'updateStatus'])->name('admin.requests.status');
+        Route::delete('/requests/{novelRequest}', [AdminNovelRequestController::class, 'destroy'])->name('admin.requests.destroy');
+
+        // Carousel Management (Feature)
+        Route::get('/carousel', [AdminCarouselController::class, 'index'])->name('admin.carousel.index');
+        Route::post('/carousel/{novel}/toggle', [AdminCarouselController::class, 'toggle'])->name('admin.carousel.toggle');
 
         // Reports & moderation
-        Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
-        Route::patch('/admin/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
-        Route::post('/admin/users/{user}/ban', [AdminReportController::class, 'banUser'])->name('admin.users.ban');
-        Route::post('/admin/users/{user}/unban', [AdminReportController::class, 'unban'])->name('admin.users.unban');
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
+        Route::patch('/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
+        Route::post('/users/{user}/ban', [AdminReportController::class, 'banUser'])->name('admin.users.ban');
+        Route::post('/users/{user}/unban', [AdminReportController::class, 'unban'])->name('admin.users.unban');
+
+        // User Management
+        Route::get('/users', [AdminManagementController::class, 'users'])->name('admin.users.index');
+        Route::patch('/users/{user}/role', [AdminManagementController::class, 'updateRole'])->name('admin.users.role.update');
+
+        // Content Moderation + Logs
+        Route::get('/moderation', [AdminManagementController::class, 'moderation'])->name('admin.moderation.index');
+        Route::get('/content-logs', [AdminManagementController::class, 'contentLogs'])->name('admin.content-logs.index');
+
+        // Platform Settings
+        Route::get('/announcements', [AnnouncementsController::class, 'index'])->name('admin.announcements.index');
+        Route::get('/announcements/create', [AnnouncementsController::class, 'create'])->name('admin.announcements.create');
+        Route::post('/announcements', [AnnouncementsController::class, 'store'])->name('admin.announcements.store');
+
+        // System
+        Route::get('/maintenance', function () {
+            return view('admin.maintenance');
+        })->name('admin.maintenance');
     });
 });

@@ -1,6 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
-@section('content')
+@php
+    $dashboardTitle = 'Settings V2';
+    $dashboardSubtitle = 'Manage public profile and account security settings separately.';
+    $dashboardBreadcrumbs = ['Dashboard', 'Settings'];
+@endphp
+
+@section('dashboard-content')
 <div class="max-w-3xl mx-auto" x-data="{
     profilePhotoPreview: null,
     updateProfilePhotoPreview(event) {
@@ -14,23 +20,21 @@
         }
     }
 }">
-    <div class="flex items-center gap-4 mb-8">
-        <div class="w-1.5 h-10 bg-slate-600 rounded-full shrink-0"></div>
-        <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Settings</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage account, privacy, and technical preferences.</p>
-        </div>
+    <div class="mb-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+        <p class="text-sm text-slate-500 dark:text-slate-400">
+            Public Profile controls how people see you. Account Security keeps login identity and privacy settings safe.
+        </p>
     </div>
 
     <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 
-        {{-- Account --}}
+        {{-- Account Security --}}
         <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-                <h2 class="text-sm font-semibold text-slate-900 dark:text-white">Account</h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Login information and basic identity.</p>
+                <h2 class="text-sm font-semibold text-slate-900 dark:text-white">Account Security</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Login identity, username, and privacy visibility.</p>
             </div>
             <div class="p-6 space-y-5">
                 <div>
@@ -116,6 +120,16 @@
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">If disabled, your bookmark list is only visible to you.</p>
                     </div>
                 </label>
+            </div>
+        </section>
+
+        <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                <h2 class="text-sm font-semibold text-slate-900 dark:text-white">Password & Recovery</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Security upgrade placeholder for Phase 2.</p>
+            </div>
+            <div class="p-6 text-sm text-slate-500 dark:text-slate-400">
+                Password change flow is not implemented yet in this phase. Use admin support when credential reset is needed.
             </div>
         </section>
 

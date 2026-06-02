@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Akun') — {{ config('app.name', 'Quoros') }}</title>
+    <title>@yield('title', 'Account') — {{ config('app.name', 'Quoros') }}</title>
 
     <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,7 +60,6 @@
             object-position: center;
             filter: brightness(0.82) contrast(1.05) saturate(1.15);
         }
-        /* Gelap hanya di area teks — bukan seluruh panel, agar tidak menyatu dengan form */
         .auth-visual-overlay {
             position: absolute;
             inset: 0;
@@ -90,13 +89,43 @@
                 background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
             }
         }
+
+        /* Logo badge styling */
+        .auth-logo-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.5rem 0.875rem 0.5rem 0.625rem;
+            background: rgba(245, 158, 11, 0.07);
+            border: 1px solid rgba(245, 158, 11, 0.18);
+            border-radius: 999px;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .auth-logo-wrap:hover {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.28);
+        }
+        .auth-logo-img {
+            height: 28px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+        .auth-logo-name {
+            font-size: 0.8125rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #fbbf24;
+        }
     </style>
     @stack('styles')
 </head>
 <body class="antialiased bg-slate-950 text-slate-100">
     <div class="min-h-screen lg:min-h-[100dvh] flex flex-col lg:flex-row">
+
         {{-- Panel visual (kiri di desktop, atas di mobile) --}}
-        <div class="auth-visual-panel relative lg:w-[52%] xl:w-[55%] min-h-[220px] sm:min-h-[280px] lg:min-h-0 lg:fixed lg:inset-y-0 lg:left-0 overflow-hidden bg-slate-800">
+        <div class="auth-visual-panel relative lg:w-[52%] xl:w-[55%] min-h-[300px] sm:min-h-[350px] lg:min-h-0 lg:fixed lg:inset-y-0 lg:left-0 overflow-hidden bg-slate-800">
             <img src="{{ asset('storage/banners/landingBanner.png') }}"
                  alt=""
                  class="absolute inset-0"
@@ -104,41 +133,31 @@
                  onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?auto=format&fit=crop&w=2000&q=80'">
             <div class="auth-visual-overlay" aria-hidden="true"></div>
 
-            <div class="auth-visual-copy flex flex-col justify-between h-full min-h-[220px] sm:min-h-[280px] lg:min-h-0 p-6 sm:p-10 lg:p-12">
-                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 w-fit group">
-                    <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros" class="h-6 w-auto max-w-[120px] object-contain drop-shadow-md group-hover:opacity-90 transition-opacity" onerror="this.onerror=null; this.src='/error.png'">
-                </a>
-                <div class="hidden sm:block max-w-md">
+            <div class="auth-visual-copy flex flex-col justify-center items-start h-full p-6 sm:p-10 lg:p-12 text-left">
+                <div class="max-w-md">
                     <p class="text-[10px] font-black uppercase tracking-[0.35em] text-amber-400 mb-3">Quoros Translation</p>
                     <h2 class="text-2xl lg:text-3xl font-extrabold text-white leading-tight tracking-tight">
-                        Tempat cerita hidup,<br>
-                        <span class="text-amber-300">dalam bahasa yang kamu pahami.</span>
+                        Where stories come alive,<br>
+                        <span class="text-amber-300">in a language you understand.</span>
                     </h2>
                     <p class="mt-4 text-sm text-slate-100/90 leading-relaxed">
-                        Baca ribuan novel terjemahan, simpan progress, dan ikuti penulis favoritmu.
+                        Read thousands of translated novels, save progress, and follow your favorite authors.
                     </p>
+                    <p class="mt-8 text-[10px] text-slate-300/50">&copy; {{ date('Y') }} {{ config('app.name', 'Quoros') }}. All rights reserved.</p>
                 </div>
-                <p class="text-[10px] text-slate-300/70 hidden lg:block">&copy; {{ date('Y') }} {{ config('app.name', 'Quoros') }}</p>
             </div>
         </div>
 
-        {{-- Panel form (kanan) — terpisah dari panel gambar --}}
-        <div class="auth-form-panel relative z-10 flex-1 flex flex-col lg:ml-[52%] xl:ml-[55%] min-h-0">
-            <header class="flex items-center justify-between px-5 py-4 lg:px-12 lg:py-6 border-b border-slate-800/80 lg:border-none">
-                <a href="{{ route('home') }}" class="lg:hidden inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    Home
-                </a>
-                <div class="lg:hidden">
-                    <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros" class="h-6 w-auto max-w-[100px] object-contain" onerror="this.onerror=null; this.src='/error.png'">
-                </div>
-                <a href="{{ route('home') }}" class="hidden lg:inline-flex text-sm font-medium text-slate-400 hover:text-white transition-colors">
-                    ← Back to home
-                </a>
-            </header>
+        {{-- Panel form (kanan) --}}
+        <div class="auth-form-panel relative z-10 flex-1 flex flex-col lg:ml-[52%] xl:ml-[55%] min-h-screen lg:min-h-0 overflow-hidden">
 
-            <main class="flex-1 flex items-center justify-center px-5 py-8 sm:px-8 lg:px-12 lg:py-12 overflow-y-auto">
+            {{-- Konten utama form --}}
+            <main class="flex-1 flex items-center justify-center px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
                 <div class="w-full max-w-[420px]">
+
+
+
+                    {{-- Flash messages --}}
                     @if(session('success'))
                         <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium">
                             {{ session('success') }}
@@ -150,7 +169,8 @@
                         </div>
                     @endif
 
-                    <div class="mb-8 lg:mb-10">
+                    {{-- Heading — rata kiri --}}
+                    <div class="mb-8 text-left">
                         <p class="text-[10px] font-black uppercase tracking-[0.28em] text-amber-500/90 mb-2">@yield('eyebrow', 'Welcome')</p>
                         <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">@yield('heading')</h1>
                         <p class="mt-2 text-sm text-slate-400 leading-relaxed">@yield('subheading')</p>
@@ -158,11 +178,11 @@
 
                     @yield('content')
 
-                    <p class="mt-8 text-center text-xs text-slate-500 lg:hidden">
-                        &copy; {{ date('Y') }} {{ config('app.name', 'Quoros') }}
-                    </p>
                 </div>
             </main>
+
+
+
         </div>
     </div>
     @stack('scripts')

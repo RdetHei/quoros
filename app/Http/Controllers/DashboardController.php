@@ -2,12 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ReportStatus;
+use App\Models\Bookmark;
+use App\Models\Chapter;
+use App\Models\Comment;
 use App\Models\Novel;
+use App\Models\NovelRequest;
 use App\Models\ReadingHistory;
+use App\Models\Report;
+use App\Models\Review;
+use App\Models\User;
 use App\Models\Announcement;
 use App\Services\CloudinaryService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
@@ -27,74 +37,16 @@ class DashboardController extends Controller
 
         $user = Auth::user();
 
-        // 1. Stats Ringkas
-        // Simulasi jam baca (karena belum ada tracking di DB)
-        $totalReadingHours = $user->readingHistories()->count() * 0.5; // Anggap 1 chapter = 30 menit
-        $favoriteNovel = $user->bookmarks()->first()?->novel;
-        $userPoints = 1250; // Simulasi poin/koin
-
-        // 2. Lanjutkan Membaca (Hero Section)
-        $lastRead = $user->readingHistories()
-            ->whereHas('novel')
-            ->whereHas('chapter')
-            ->with(['novel', 'chapter'])
-            ->latest()
-            ->first();
-
-        if ($lastRead && $lastRead->novel) {
-            $totalChapters = $lastRead->novel->chapters()->count();
-            // Hitung posisi chapter saat ini (berdasarkan ID)
-            $currentChapterPos = $lastRead->novel->chapters()
-                ->where('id', '<=', $lastRead->chapter_id)
-                ->count();
-            
-            $lastRead->progress = $totalChapters > 0 ? round(($currentChapterPos / $totalChapters) * 100) : 0;
-            $lastRead->current_pos = $currentChapterPos;
-            $lastRead->total_chapters = $totalChapters;
-        }
-
-        // 3. Statistik Penulis dipindah ke halaman profil
-
-        // 4. Tabbed Content
-        $bookmarks = $user->bookmarks()
-            ->whereHas('novel')
-            ->with('novel.author')
-            ->latest()
-            ->get();
-            
-        $histories = $user->readingHistories()
-            ->whereHas('novel')
-            ->whereHas('chapter')
-            ->with(['novel', 'chapter'])
-            ->latest()
-            ->take(10)
-            ->get();
-        $recommendations = Novel::whereNotIn('id', $bookmarks->pluck('novel_id'))
-            ->orderBy('rating_avg', 'desc')
-            ->take(6)
-            ->get();
-
-        $announcements = Announcement::where('is_active', true)
-            ->latest()
-            ->take(3)
-            ->get();
-
-        return view('dashboard', compact(
-            'user', 
-            'totalReadingHours', 
-            'favoriteNovel', 
-            'userPoints',
-            'lastRead',
-            'bookmarks',
-            'histories',
-            'recommendations',
-            'announcements'
-        ));
+        return match ($user->role) {
+            'admin' => $this->adminDashboard($user),
+            'writer' => $this->writerDashboard($user),
+            default => $this->readerDashboard($user),
+        };
     }
 
     public function settings()
     {
-        return view('settings.index', ['user' => Auth::user()]);
+        return redirect()->route('settings.v2');
     }
 
     public function updateProfile(Request $request)
@@ -140,5 +92,160 @@ class DashboardController extends Controller
         $user->save();
 
         return back()->with('success', 'Congratulations! Your account has been successfully changed to Writer. You can now start creating your own novels.');
+    }
+
+    private function adminDashboard(User $user)
+    {
+        $activeUsersCount = User::where('is_banned', false)->count();
+        $totalNovelsCount = Novel::count();
+        $writerCount = User::whereIn('role', ['writer', 'admin'])->count();
+
+        $pendingReports = Report::where('status', ReportStatus::Pending->value)->count();
+        $newNovelRequests = NovelRequest::where('status', 'pending')->count();
+
+        $trendDays = 30;
+        $trendStart = Carbon::today()->subDays($trendDays - 1);
+        $trendDates = collect(range(0, $trendDays - 1))
+            ->map(fn (int $dayOffset) => $trendStart->copy()->addDays($dayOffset));
+
+        $userGrowthMap = User::whereDate('created_at', '>=', $trendStart)
+            ->select(DB::raw('DATE(created_at) as trend_date'), DB::raw('COUNT(*) as total'))
+            ->groupBy('trend_date')
+            ->pluck('total', 'trend_date');
+
+        $novelGrowthMap = Novel::whereDate('created_at', '>=', $trendStart)
+            ->select(DB::raw('DATE(created_at) as trend_date'), DB::raw('COUNT(*) as total'))
+            ->groupBy('trend_date')
+            ->pluck('total', 'trend_date');
+
+        $trendLabels = $trendDates->map(fn (Carbon $date) => $date->format('d M'))->values();
+        $userGrowth = $trendDates->map(fn (Carbon $date) => (int) $userGrowthMap->get($date->toDateString(), 0))->values();
+        $novelGrowth = $trendDates->map(fn (Carbon $date) => (int) $novelGrowthMap->get($date->toDateString(), 0))->values();
+
+        $recentUsers = User::latest()->take(4)->get(['id', 'name', 'role', 'created_at']);
+        $recentNovels = Novel::with('author:id,name')->latest()->take(4)->get(['id', 'author_id', 'title', 'created_at']);
+        $recentChapters = Chapter::with('novel:id,title')->latest()->take(4)->get(['id', 'novel_id', 'title', 'created_at']);
+
+        return view('dashboard.admin', compact(
+            'user',
+            'activeUsersCount',
+            'totalNovelsCount',
+            'writerCount',
+            'pendingReports',
+            'newNovelRequests',
+            'trendLabels',
+            'userGrowth',
+            'novelGrowth',
+            'recentUsers',
+            'recentNovels',
+            'recentChapters'
+        ));
+    }
+
+    private function writerDashboard(User $user)
+    {
+        $novelIds = $user->novels()->pluck('id');
+        $todayStart = Carbon::today();
+
+        $viewsToday = $user->novels()
+            ->whereDate('updated_at', '>=', $todayStart)
+            ->sum('view_count');
+
+        $newBookmarksToday = Bookmark::whereIn('novel_id', $novelIds)
+            ->whereDate('created_at', '>=', $todayStart)
+            ->count();
+
+        $averageRating = (float) Review::whereIn('novel_id', $novelIds)->avg('rating');
+
+        $latestReviews = Review::with(['user:id,name', 'novel:id,title,slug'])
+            ->whereIn('novel_id', $novelIds)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $latestComments = Comment::with([
+            'user:id,name',
+            'chapter:id,novel_id,title',
+            'chapter.novel:id,title,slug',
+        ])
+            ->whereHas('chapter', fn ($query) => $query->whereIn('novel_id', $novelIds))
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $draftChapters = Chapter::with('novel:id,title,slug')
+            ->whereHas('novel', fn ($query) => $query->where('author_id', $user->id))
+            ->where(function ($query) {
+                $query->where('status', 'draft')
+                    ->orWhere('published_at', '>', now());
+            })
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $writerTips = Announcement::where('is_active', true)
+            ->where(function ($query) {
+                $query->where('title', 'like', '%writer%')
+                    ->orWhere('content', 'like', '%writer%');
+            })
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('dashboard.writer', compact(
+            'user',
+            'viewsToday',
+            'newBookmarksToday',
+            'averageRating',
+            'latestReviews',
+            'latestComments',
+            'draftChapters',
+            'writerTips'
+        ));
+    }
+
+    private function readerDashboard(User $user)
+    {
+        $totalReadingHours = round($user->readingHistories()->count() * 0.5, 1);
+
+        $lastRead = $user->readingHistories()
+            ->whereHas('novel')
+            ->whereHas('chapter')
+            ->with(['novel', 'chapter'])
+            ->latest()
+            ->first();
+
+        if ($lastRead && $lastRead->novel) {
+            $totalChapters = $lastRead->novel->chapters()->count();
+            $currentChapterPos = $lastRead->novel->chapters()
+                ->where('id', '<=', $lastRead->chapter_id)
+                ->count();
+
+            $lastRead->progress = $totalChapters > 0 ? round(($currentChapterPos / $totalChapters) * 100) : 0;
+        }
+
+        $bookmarks = $user->bookmarks()
+            ->whereHas('novel')
+            ->with('novel.author')
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $dailyGoalMinutes = 60;
+        $todayReads = ReadingHistory::where('user_id', $user->id)
+            ->whereDate('created_at', now()->toDateString())
+            ->count();
+        $todayMinutes = min($dailyGoalMinutes, $todayReads * 15);
+        $dailyGoalProgress = (int) round(($todayMinutes / $dailyGoalMinutes) * 100);
+
+        return view('dashboard.reader', compact(
+            'user',
+            'totalReadingHours',
+            'lastRead',
+            'bookmarks',
+            'dailyGoalMinutes',
+            'todayMinutes',
+            'dailyGoalProgress'
+        ));
     }
 }
