@@ -13,11 +13,8 @@ use App\Models\ReadingHistory;
 use App\Models\NovelViewLog;
 use App\Models\Tag;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class NovelController extends Controller
@@ -334,10 +331,110 @@ class NovelController extends Controller
 
     public function create()
     {
+        return redirect()->route('writer.novels.create.step-1');
+    }
+
+    public function createStep1()
+    {
+        return view('writer.novels.create-step-1');
+    }
+
+    public function storeStep1(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'alternative_title' => 'nullable|string|max:255',
+            'status' => 'required|in:ongoing,hiatus,complete',
+            'type' => 'required|in:web_novel,light_novel,original',
+            'region' => 'nullable|string|max:255',
+            'language' => 'nullable|string|max:255',
+            'content_rating' => 'required|in:everyone,teen,mature',
+        ]);
+
+        $novel = new Novel;
+        $novel->title = $validated['title'];
+        $novel->alternative_title = $validated['alternative_title'] ?? null;
+        $novel->slug = $this->generateUniqueSlug($validated['title']);
+        $novel->status = $validated['status'];
+        $novel->type = $validated['type'];
+        $novel->region = $validated['region'] ?? null;
+        $novel->language = $validated['language'] ?? null;
+        $novel->content_rating = $validated['content_rating'];
+        $novel->author_id = Auth::id();
+        $novel->creation_step = 1;
+        $novel->save();
+
+        return redirect()
+            ->route('writer.novels.create.step-2', $novel)
+            ->with('success', 'Step 1 selesai. Lanjutkan isi sinopsis dan cover.');
+    }
+
+    public function createStep2(Novel $novel)
+    {
+        Gate::authorize('update', $novel);
+
+        return view('writer.novels.create-step-2', compact('novel'));
+    }
+
+    public function updateStep2(Request $request, Novel $novel)
+    {
+        Gate::authorize('update', $novel);
+
+        $validated = $request->validate([
+            'description' => 'nullable|string',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $novel->description = $validated['description'] ?? null;
+
+        if ($request->hasFile('cover_image')) {
+            if ($novel->cover_public_id) {
+                $this->cloudinaryService->deleteImage($novel->cover_public_id);
+            }
+
+            $result = $this->cloudinaryService->uploadCover($request->file('cover_image'));
+            $novel->cover_image_url = $result['url'];
+            $novel->cover_public_id = $result['public_id'];
+        }
+
+        $novel->creation_step = max(2, (int) $novel->creation_step);
+        $novel->save();
+
+        return redirect()
+            ->route('writer.novels.create.step-3', $novel)
+            ->with('success', 'Step 2 selesai. Pilih genre dan tag novel.');
+    }
+
+    public function createStep3(Novel $novel)
+    {
+        Gate::authorize('update', $novel);
+
         $genres = Genre::all();
         $tags = Tag::all();
+        $novel->load(['genres:id', 'tags:id']);
 
-        return view('writer.novels.create', compact('genres', 'tags'));
+        return view('writer.novels.create-step-3', compact('novel', 'genres', 'tags'));
+    }
+
+    public function updateStep3(Request $request, Novel $novel)
+    {
+        Gate::authorize('update', $novel);
+
+        $validated = $request->validate([
+            'genres' => 'required|array|min:1',
+            'genres.*' => 'exists:genres,id',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
+        ]);
+
+        $novel->genres()->sync($validated['genres']);
+        $novel->tags()->sync($validated['tags'] ?? []);
+        $novel->creation_step = 3;
+        $novel->save();
+
+        return redirect()
+            ->route('writer.novels.index')
+            ->with('success', 'Novel berhasil dibuat. Kamu bisa lanjut kelola karakter dari halaman novel.');
     }
 
     public function store(Request $request)
@@ -354,16 +451,6 @@ class NovelController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'genres' => 'required|array',
             'tags' => 'nullable|array',
-            'character_name' => 'nullable|array',
-            'character_name.*' => 'nullable|string|max:255',
-            'character_role' => 'nullable|array',
-            'character_role.*' => 'nullable|string|max:255',
-            'character_description' => 'nullable|array',
-            'character_description.*' => 'nullable|string|max:1000',
-            'character_image' => 'nullable|array',
-            'character_image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'existing_character_image' => 'nullable|array',
-            'existing_character_image.*' => 'nullable|string',
         ]);
 
         $slug = Str::slug($request->title);
@@ -396,7 +483,6 @@ class NovelController extends Controller
         if ($request->tags) {
             $novel->tags()->sync($request->tags);
         }
-        $this->syncCharacters($novel, $request);
 
         return redirect()->route('writer.novels.index')->with('success', 'Novel created successfully!');
     }
@@ -503,16 +589,6 @@ class NovelController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'genres' => 'required|array',
             'tags' => 'nullable|array',
-            'character_name' => 'nullable|array',
-            'character_name.*' => 'nullable|string|max:255',
-            'character_role' => 'nullable|array',
-            'character_role.*' => 'nullable|string|max:255',
-            'character_description' => 'nullable|array',
-            'character_description.*' => 'nullable|string|max:1000',
-            'character_image' => 'nullable|array',
-            'character_image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'existing_character_image' => 'nullable|array',
-            'existing_character_image.*' => 'nullable|string',
         ]);
 
         $novel->title = $request->title;
@@ -537,7 +613,6 @@ class NovelController extends Controller
 
         $novel->genres()->sync($request->genres);
         $novel->tags()->sync($request->tags ?? []);
-        $this->syncCharacters($novel, $request);
 
         return redirect()->route('writer.novels.index')->with('success', 'Novel updated successfully!');
     }
@@ -561,64 +636,15 @@ class NovelController extends Controller
         return redirect()->route('writer.novels.index')->with('success', 'Novel deleted successfully!');
     }
 
-    private function syncCharacters(Novel $novel, Request $request): void
+    private function generateUniqueSlug(string $title): string
     {
-        $oldPublicIds = $novel->characters()->pluck('image_public_id')->filter()->values();
-        $novel->characters()->delete();
+        $slug = Str::slug($title);
+        $count = Novel::where('slug', 'like', $slug.'%')->count();
 
-        $names = collect($request->input('character_name', []));
-        $roles = collect($request->input('character_role', []));
-        $descriptions = collect($request->input('character_description', []));
-        /** @var Collection<int, UploadedFile|null> $images */
-        $images = collect($request->file('character_image', []));
-        $existingImages = collect($request->input('existing_character_image', []));
-        $existingPublicIds = collect($request->input('existing_character_public_id', []));
-        $newPublicIds = collect();
+        if ($count > 0) {
+            $slug .= '-'.($count + 1);
+        }
 
-        $names->each(function ($name, $index) use ($novel, $roles, $descriptions, $images, $existingImages, $existingPublicIds, $newPublicIds): void {
-            $cleanName = trim((string) $name);
-            if ($cleanName === '') {
-                return;
-            }
-
-            $imagePath = null;
-            $localImage = null;
-            $publicId = null;
-            $uploadedImage = $images->get($index);
-
-            if ($uploadedImage) {
-                $result = $this->cloudinaryService->uploadCharacter($uploadedImage);
-                $imagePath = $result['url'];
-                $publicId = $result['public_id'];
-                $newPublicIds->push($publicId);
-            } else {
-                $existingImage = $existingImages->get($index);
-                $existingPublicId = $existingPublicIds->get($index);
-                
-                if (is_string($existingImage) && $existingImage !== '') {
-                    if (str_starts_with($existingImage, 'http')) {
-                        $imagePath = $existingImage;
-                        $publicId = $existingPublicId;
-                        $newPublicIds->push($publicId);
-                    } else {
-                        $localImage = $existingImage;
-                    }
-                }
-            }
-
-            $novel->characters()->create([
-                'name' => $cleanName,
-                'role' => trim((string) $roles->get($index, '')) ?: null,
-                'description' => trim((string) $descriptions->get($index, '')) ?: null,
-                'image_url' => $imagePath,
-                'image' => $localImage,
-                'image_public_id' => $publicId,
-                'sort_order' => $index,
-            ]);
-        });
-
-        $oldPublicIds->diff($newPublicIds)->each(function ($publicId): void {
-            $this->cloudinaryService->deleteImage($publicId);
-        });
+        return $slug;
     }
 }

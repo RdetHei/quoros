@@ -28,7 +28,8 @@ class Novel extends Model
         'cover_image',
         'is_featured',
         'cover_image_url',
-        'cover_public_id'
+        'cover_public_id',
+        'creation_step',
     ];
 
     public function author(): BelongsTo

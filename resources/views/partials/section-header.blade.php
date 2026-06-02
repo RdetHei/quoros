@@ -21,7 +21,7 @@
     </div>
     @if(!empty($href))
         <a href="{{ $href }}" class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors shrink-0">
-            {{ $linkText ?? 'Lihat semua' }} →
+            {{ $linkText ?? 'View all' }}
         </a>
     @endif
 </div>

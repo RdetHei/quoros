@@ -18,6 +18,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NovelController;
+use App\Http\Controllers\NovelCharacterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\ReviewController;
@@ -132,8 +133,17 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
 
         Route::get('/writer/stats', [WriterStatsController::class, 'index'])->name('writer.stats');
         Route::get('/writer/novels', [NovelController::class, 'writerIndex'])->name('writer.novels.index');
+        Route::get('/writer/novels/create/step-1', [NovelController::class, 'createStep1'])->name('writer.novels.create.step-1');
+        Route::post('/writer/novels/create/step-1', [NovelController::class, 'storeStep1'])->name('writer.novels.store.step-1');
+        Route::get('/writer/novels/{novel}/create/step-2', [NovelController::class, 'createStep2'])->name('writer.novels.create.step-2');
+        Route::put('/writer/novels/{novel}/create/step-2', [NovelController::class, 'updateStep2'])->name('writer.novels.update.step-2');
+        Route::get('/writer/novels/{novel}/create/step-3', [NovelController::class, 'createStep3'])->name('writer.novels.create.step-3');
+        Route::put('/writer/novels/{novel}/create/step-3', [NovelController::class, 'updateStep3'])->name('writer.novels.update.step-3');
         Route::get('/writer/novels/create', [NovelController::class, 'create'])->name('writer.novels.create');
         Route::post('/writer/novels', [NovelController::class, 'store'])->name('writer.novels.store');
+        Route::resource('/writer/novels/{novel}/characters', NovelCharacterController::class)
+            ->except(['show'])
+            ->names('writer.novels.characters');
         Route::get('/writer/novels/{novel}/edit', [NovelController::class, 'edit'])->name('writer.novels.edit');
         Route::put('/writer/novels/{novel}', [NovelController::class, 'update'])->name('writer.novels.update');
         Route::delete('/writer/novels/{novel}', [NovelController::class, 'destroy'])->name('writer.novels.destroy');

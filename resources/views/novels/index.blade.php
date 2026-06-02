@@ -76,7 +76,6 @@
                         <a :href="current.url"
                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors">
                             Read Now
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                         </a>
 
                         <button type="button"
@@ -138,12 +137,12 @@
         'href' => route('novels.updated'),
     ])
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3">
         @foreach($recentlyUpdated as $novel)
-            <article class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-lg hover:shadow-indigo-500/5 hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300">
-                <div class="flex gap-3 p-3">
+            <article class="group bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300">
+                <div class="flex gap-2.5 p-2">
                     {{-- Cover --}}
-                    <a href="{{ route('novels.show', $novel->slug) }}" class="shrink-0 w-16 h-24 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm ring-1 ring-slate-200/50 dark:ring-slate-700/50 group-hover:scale-[1.02] transition-transform duration-300">
+                    <a href="{{ route('novels.show', $novel->slug) }}" class="shrink-0 w-12 h-18 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200/50 dark:ring-slate-700/50">
                         @if($novel->cover_image_url)
                             <img src="{{ $novel->cover_image_url }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
@@ -154,26 +153,21 @@
                     {{-- Info --}}
                     <div class="flex-grow min-w-0 flex flex-col">
                         <div class="mb-auto">
-                            <div class="flex items-center gap-2 mb-1">
+                            <div class="flex items-center gap-1.5 mb-0.5">
                                 @foreach($novel->genres->take(1) as $genre)
-                                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-900/50">{{ $genre->name }}</span>
+                                    <span class="text-[8px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">{{ $genre->name }}</span>
                                 @endforeach
-                                <span class="text-[9px] text-slate-400 font-medium">{{ number_format($novel->view_count) }} views</span>
                             </div>
-                            <a href="{{ route('novels.show', $novel->slug) }}" class="text-sm font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-1 leading-snug transition-colors">{{ $novel->title }}</a>
-                            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">by <span class="font-medium text-slate-600 dark:text-slate-300">{{ $novel->author->name }}</span></p>
+                            <a href="{{ route('novels.show', $novel->slug) }}" class="text-[13px] font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 line-clamp-1 leading-tight transition-colors">{{ $novel->title }}</a>
                         </div>
 
                         {{-- Latest Chapters --}}
                         @if($novel->chapters->count() > 0)
-                        <div class="mt-2.5 space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800/50">
+                        <div class="mt-2 space-y-0.5 pt-1.5 border-t border-slate-100 dark:border-slate-800/50">
                             @foreach($novel->chapters->take(2) as $chapter)
                                 <a href="{{ route('chapters.show', [$novel->slug, $chapter->slug]) }}" class="flex items-center justify-between gap-2 group/ch">
-                                    <div class="flex items-center gap-1.5 min-w-0">
-                                        <div class="w-1 h-1 rounded-full bg-indigo-400 dark:bg-indigo-600"></div>
-                                        <span class="text-[10px] font-medium text-slate-600 dark:text-slate-400 group-hover/ch:text-indigo-600 dark:group-hover/ch:text-indigo-400 truncate transition-colors">{{ $chapter->title }}</span>
-                                    </div>
-                                    <span class="text-[9px] text-slate-400 dark:text-slate-500 tabular-nums shrink-0">{{ $chapter->created_at->diffForHumans(null, true) }}</span>
+                                    <span class="text-[10px] font-medium text-slate-500 dark:text-slate-400 group-hover/ch:text-indigo-600 dark:group-hover/ch:text-indigo-400 truncate transition-colors">{{ $chapter->title }}</span>
+                                    <span class="text-[9px] text-slate-400 dark:text-slate-500 shrink-0">{{ $chapter->created_at->diffForHumans(null, true) }}</span>
                                 </a>
                             @endforeach
                         </div>
@@ -286,7 +280,7 @@
             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
                 <h2 class="text-base font-semibold text-slate-900 dark:text-white">Top Novels</h2>
                 <p class="text-xs text-slate-500 mt-0.5">Based on daily views</p>
-                <a href="{{ route('novels.trending') }}" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-1 inline-block">View all →</a>
+                <a href="{{ route('novels.trending') }}" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-1 inline-block">View all</a>
             </div>
 
             <div class="flex p-2 gap-1 border-b border-slate-100 dark:border-slate-800">
@@ -295,15 +289,15 @@
             </div>
 
             <div class="p-2 max-h-[480px] overflow-y-auto">
-                <div x-show="tab === 'weekly'">
+                <div x-show="tab === 'weekly'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                     @forelse($weeklyTop as $index => $novel)
                         <a href="{{ route('novels.show', $novel->slug) }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <span class="w-6 text-center text-sm font-bold {{ $index < 3 ? 'text-amber-500' : 'text-slate-400' }}">{{ $index + 1 }}</span>
                             <div class="w-10 h-14 shrink-0 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800">
                                 @if($novel->cover_image_url)
-                                    <img src="{{ $novel->cover_image_url }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                                    <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                 @elseif($novel->cover_image)
-                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                 @endif
                             </div>
                             <div class="min-w-0 flex-grow">
@@ -315,15 +309,15 @@
                         <p class="text-center py-6 text-xs text-slate-400">No data yet.</p>
                     @endforelse
                 </div>
-                <div x-show="tab === 'monthly'" x-cloak>
+                <div x-show="tab === 'monthly'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                     @forelse($monthlyTop as $index => $novel)
                         <a href="{{ route('novels.show', $novel->slug) }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <span class="w-6 text-center text-sm font-bold {{ $index < 3 ? 'text-amber-500' : 'text-slate-400' }}">{{ $index + 1 }}</span>
                             <div class="w-10 h-14 shrink-0 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800">
                                 @if($novel->cover_image_url)
-                                    <img src="{{ $novel->cover_image_url }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                                    <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                 @elseif($novel->cover_image)
-                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                 @endif
                             </div>
                             <div class="min-w-0 flex-grow">
@@ -369,7 +363,7 @@
                             </span>
                         @endif
                         <span>{{ number_format($novel->view_count) }} views</span>
-                        <span>{{ $novel->chapters->count() }} ch</span>
+                        <span>{{ $novel->chapters->count() }} chapters</span>
                     </div>
                 </div>
             </a>

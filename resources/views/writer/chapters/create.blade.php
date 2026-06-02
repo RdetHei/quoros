@@ -264,7 +264,7 @@
                             })
                         });
 
-                        if (!response.ok) throw new Error('Gagal mengupload chapter: ' + this.chapters[i].title);
+                        if (!response.ok) throw new Error('Failed to upload chapter: ' + this.chapters[i].title);
                         
                     } catch (error) {
                         console.error(error);

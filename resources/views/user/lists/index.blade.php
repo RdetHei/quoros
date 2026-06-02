@@ -26,7 +26,6 @@
                         @endif
                         <p class="text-xs text-slate-400 mt-2">{{ $list->items_count }} novels · {{ $list->is_public ? 'Public' : 'Private' }}</p>
                     </div>
-                    <span class="text-slate-400">→</span>
                 </div>
             </a>
         @empty

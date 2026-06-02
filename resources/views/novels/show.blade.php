@@ -438,10 +438,10 @@
                     </form>
                     @else
                     <div class="p-6 bg-slate-50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-700/40 rounded-2xl text-center">
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Login to give a review and rating for this novel.</p>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Log in to write a review and rate this novel.</p>
                         <a href="{{ route('login') }}"
                            class="inline-block w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-xs uppercase tracking-wider transition-all">
-                            Login Now
+                            Log In Now
                         </a>
                     </div>
                     @endauth
@@ -562,7 +562,7 @@
                     </div>
                 @endif
                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                    <span class="text-[10px] font-bold text-white bg-slate-800 px-2 py-1 rounded-md">Detail</span>
+                    <span class="text-[10px] font-bold text-white bg-slate-800 px-2 py-1 rounded-md">Details</span>
                 </div>
             </div>
             <h3 class="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-slate-900 dark:group-hover:text-white transition-colors line-clamp-2 leading-snug mb-0.5">
@@ -684,7 +684,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="/writer/novels/${novelId}/chapters/${chapter.id}" method="POST" class="inline">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" onclick="return confirm('Hapus chapter ini?')" class="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all" title="Hapus">
+                    <button type="submit" onclick="return confirm('Delete this chapter?')" class="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all" title="Delete">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                     </button>
                 </form>
@@ -698,7 +698,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (chapters.length === 0 && !append) {
-                chapterList.innerHTML = '<div class="py-16 text-center text-slate-400 text-sm">Chapter tidak ditemukan.</div>';
+                chapterList.innerHTML = '<div class="py-16 text-center text-slate-400 text-sm">No chapters found.</div>';
                 if (loadMoreBtn) loadMoreBtn.parentElement.style.display = 'none';
                 return;
             }
@@ -737,7 +737,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const remaining = filteredChapters.length - displayedCount;
                 if (remaining > 0) {
                     loadMoreBtn.parentElement.style.display = 'block';
-                    loadMoreBtn.textContent = `Lihat ${remaining} Chapter Lainnya`;
+                    loadMoreBtn.textContent = `View ${remaining} More Chapters`;
                 } else {
                     loadMoreBtn.parentElement.style.display = 'none';
                 }
@@ -748,7 +748,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (filteredChapters.length > 0) {
             renderChapters(filteredChapters.slice(0, 10));
         } else {
-            chapterList.innerHTML = '<div class="py-16 text-center text-slate-400 text-sm">Belum ada chapter untuk novel ini.</div>';
+            chapterList.innerHTML = '<div class="py-16 text-center text-slate-400 text-sm">No chapters available for this novel yet.</div>';
             if (loadMoreBtn) loadMoreBtn.parentElement.style.display = 'none';
         }
 
@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (orderToggle) {
             orderToggle.addEventListener('click', function() {
                 isNewestFirst = !isNewestFirst;
-                orderLabel.textContent = isNewestFirst ? 'Terbaru' : 'Terlama';
+                orderLabel.textContent = isNewestFirst ? 'Newest' : 'Oldest';
                 filteredChapters.reverse();
                 renderChapters(filteredChapters.slice(0, 10));
             });

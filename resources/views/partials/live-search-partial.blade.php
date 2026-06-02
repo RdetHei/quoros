@@ -10,7 +10,7 @@
 
 @php
     $componentId  = $id ?? 'live-search';
-    $placeholder  = $placeholder ?? 'Cari novel...';
+    $placeholder  = $placeholder ?? 'Search novels...';
     $wrapperClass = $classes ?? '';
 @endphp
 
@@ -34,7 +34,7 @@
                    spellcheck="false"
                    value="{{ request('q') }}"
                    placeholder="{{ $placeholder }}"
-                   class="live-search-input w-full pl-9 pr-3 py-2 text-sm rounded-xl
+                   class="live-search-input w-full pl-9 pr-3 py-2 text-xs rounded-xl
                           bg-slate-800 text-slate-100 placeholder-slate-500
                           border border-slate-700 shadow-inner shadow-black/20
                           focus:outline-none focus:ring-2 focus:ring-slate-500/50 focus:border-slate-400
@@ -53,7 +53,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
             </svg>
-            <span>Mencari…</span>
+            <span>Searching…</span>
         </div>
 
         <div id="{{ $componentId }}-results" class="max-h-[min(70vh,360px)] overflow-y-auto overscroll-contain divide-y divide-slate-800/90"></div>
@@ -63,17 +63,14 @@
                href="{{ route('novels.search') }}"
                class="flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 transition-colors group">
                 <span>Advanced search</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
             </a>
         </div>
 
         <div id="{{ $componentId }}-empty" class="hidden px-4 py-8 text-center border-t border-transparent">
-            <p class="text-sm text-slate-400">Tidak ada novel yang cocok.</p>
+            <p class="text-sm text-slate-400">No matching novels found.</p>
             <a id="{{ $componentId }}-empty-link" href="{{ route('novels.search') }}"
                class="inline-block mt-3 text-xs font-bold text-slate-300 hover:text-white transition-colors">
-                Coba di Advanced Search →
+                Try Advanced Search
             </a>
         </div>
     </div>
