@@ -18,6 +18,14 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    /**
+     * Override notifications relationship to use our custom InAppNotification model.
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(InAppNotification::class)->latest();
+    }
+
     public function bookmarks(): HasMany
     {
         return $this->hasMany(Bookmark::class);

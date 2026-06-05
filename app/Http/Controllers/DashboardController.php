@@ -37,8 +37,11 @@ class DashboardController extends Controller
 
         $user = Auth::user();
 
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
         return match ($user->role) {
-            'admin' => $this->adminDashboard($user),
             'writer' => $this->writerDashboard($user),
             default => $this->readerDashboard($user),
         };
@@ -94,62 +97,16 @@ class DashboardController extends Controller
         return back()->with('success', 'Congratulations! Your account has been successfully changed to Writer. You can now start creating your own novels.');
     }
 
-    private function adminDashboard(User $user)
-    {
-        $activeUsersCount = User::where('is_banned', false)->count();
-        $totalNovelsCount = Novel::count();
-        $writerCount = User::whereIn('role', ['writer', 'admin'])->count();
-
-        $pendingReports = Report::where('status', ReportStatus::Pending->value)->count();
-        $newNovelRequests = NovelRequest::where('status', 'pending')->count();
-
-        $trendDays = 30;
-        $trendStart = Carbon::today()->subDays($trendDays - 1);
-        $trendDates = collect(range(0, $trendDays - 1))
-            ->map(fn (int $dayOffset) => $trendStart->copy()->addDays($dayOffset));
-
-        $userGrowthMap = User::whereDate('created_at', '>=', $trendStart)
-            ->select(DB::raw('DATE(created_at) as trend_date'), DB::raw('COUNT(*) as total'))
-            ->groupBy('trend_date')
-            ->pluck('total', 'trend_date');
-
-        $novelGrowthMap = Novel::whereDate('created_at', '>=', $trendStart)
-            ->select(DB::raw('DATE(created_at) as trend_date'), DB::raw('COUNT(*) as total'))
-            ->groupBy('trend_date')
-            ->pluck('total', 'trend_date');
-
-        $trendLabels = $trendDates->map(fn (Carbon $date) => $date->format('d M'))->values();
-        $userGrowth = $trendDates->map(fn (Carbon $date) => (int) $userGrowthMap->get($date->toDateString(), 0))->values();
-        $novelGrowth = $trendDates->map(fn (Carbon $date) => (int) $novelGrowthMap->get($date->toDateString(), 0))->values();
-
-        $recentUsers = User::latest()->take(4)->get(['id', 'name', 'role', 'created_at']);
-        $recentNovels = Novel::with('author:id,name')->latest()->take(4)->get(['id', 'author_id', 'title', 'created_at']);
-        $recentChapters = Chapter::with('novel:id,title')->latest()->take(4)->get(['id', 'novel_id', 'title', 'created_at']);
-
-        return view('dashboard.admin', compact(
-            'user',
-            'activeUsersCount',
-            'totalNovelsCount',
-            'writerCount',
-            'pendingReports',
-            'newNovelRequests',
-            'trendLabels',
-            'userGrowth',
-            'novelGrowth',
-            'recentUsers',
-            'recentNovels',
-            'recentChapters'
-        ));
-    }
-
     private function writerDashboard(User $user)
     {
         $novelIds = $user->novels()->pluck('id');
         $todayStart = Carbon::today();
 
-        $viewsToday = $user->novels()
-            ->whereDate('updated_at', '>=', $todayStart)
-            ->sum('view_count');
+        // Stats for current user
+        $viewsToday = DB::table('novel_view_logs')
+            ->whereIn('novel_id', $novelIds)
+            ->whereDate('viewed_on', '>=', $todayStart)
+            ->sum('views');
 
         $newBookmarksToday = Bookmark::whereIn('novel_id', $novelIds)
             ->whereDate('created_at', '>=', $todayStart)
@@ -183,6 +140,13 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
+        $myNovels = Novel::where('author_id', $user->id)
+            ->withCount(['chapters', 'bookmarks'])
+            ->withAvg('reviews', 'rating')
+            ->latest()
+            ->take(4)
+            ->get();
+
         $writerTips = Announcement::where('is_active', true)
             ->where(function ($query) {
                 $query->where('title', 'like', '%writer%')
@@ -200,6 +164,7 @@ class DashboardController extends Controller
             'latestReviews',
             'latestComments',
             'draftChapters',
+            'myNovels',
             'writerTips'
         ));
     }

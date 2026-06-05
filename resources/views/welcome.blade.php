@@ -30,7 +30,7 @@
             <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(99,102,241,0.12),transparent)]"></div>
         </div>
 
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-24">
+       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20 lg:pb-24">
             <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <div class="max-w-xl text-center lg:text-left">
                     <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 mb-6">
@@ -143,7 +143,7 @@
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($featuredNovels->take(6) as $novel)
-                <a href="{{ route('novels.show', $novel->slug) }}"
+                <a href="{{ route('novels.show', $novel->slug) }}" data-novel-id="{{ $novel->id }}"
                    class="group flex gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
                     <div class="shrink-0 w-16 aspect-[2/3] rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
                         @if($novel->cover_image_url)
@@ -180,7 +180,7 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
                 @foreach($recentlyUpdated as $novel)
-                <article class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300 overflow-hidden">
+                <article data-novel-id="{{ $novel->id }}" class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300 overflow-hidden">
                     {{-- Cover & Image Overlay --}}
                     <div class="relative aspect-[16/11] overflow-hidden">
                         @if($novel->cover_image_url)

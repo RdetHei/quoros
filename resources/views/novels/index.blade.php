@@ -11,7 +11,7 @@
         'is_bookmarked' => (bool) ($n->is_bookmarked ?? false),
     ])->values();
 @endphp
-<div class="relative mb-10 md:mb-12 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm"
+<div class="relative mb-10 md:mb-12 rounded-b-2xl overflow-hidden border-b border-slate-200 dark:border-slate-800 shadow-sm"
      x-data="featuredCarousel()"
      @mouseenter="paused = true"
      @mouseleave="paused = false">
@@ -42,19 +42,19 @@
         {{-- Konten + tombol tetap --}}
         <div class="relative z-10 h-full max-w-7xl mx-auto px-5 sm:px-8 md:px-12 flex items-center">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
-                <div class="lg:col-span-7 flex flex-col min-h-[280px] sm:min-h-[300px] justify-end">
+                <div class="lg:col-span-7 flex flex-col min-h-[360px] sm:min-h-[400px] justify-start pt-8">
                     {{-- Teks berubah per slide (tinggi tetap) --}}
-                    <div class="relative flex-grow min-h-[180px] sm:min-h-[200px] mb-6">
+                    <div class="relative flex-grow min-h-[220px] sm:min-h-[240px] mb-4">
                         @foreach($featuredNovels as $index => $novel)
                             <div x-show="activeSlide === {{ $index }}"
                                  x-transition:enter="transition ease-out duration-500"
-                                 x-transition:enter-start="opacity-0"
-                                 x-transition:enter-end="opacity-100"
+                                 x-transition:enter-start="opacity-0 translate-y-4"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
                                  x-transition:leave="transition ease-in duration-300"
-                                 x-transition:leave-start="opacity-100"
-                                 x-transition:leave-end="opacity-0"
-                                 class="absolute inset-0 flex flex-col justify-end">
-                                <div class="flex flex-wrap gap-2 mb-4 min-h-[28px]">
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 -translate-y-4"
+                                 class="absolute inset-0 flex flex-col justify-start">
+                                <div class="flex flex-wrap gap-2 mb-4">
                                     <span class="px-2.5 py-0.5 bg-indigo-600 text-white text-[10px] font-semibold uppercase tracking-wide rounded-md">Featured</span>
                                     @foreach($novel->genres->take(2) as $genre)
                                         <span class="px-2.5 py-0.5 bg-white/10 text-white/90 text-[10px] font-medium rounded-md border border-white/10">{{ $genre->name }}</span>
@@ -129,7 +129,7 @@
 @endif
 
 {{-- Recently updated --}}
-<section class="mb-12">
+<section class="mb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     @include('partials.section-header', [
         'title' => 'Recently Updated',
         'description' => "The latest chapters from readers' favorite novels.",
@@ -139,7 +139,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3">
         @foreach($recentlyUpdated as $novel)
-            <article class="group bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300">
+            <article data-novel-id="{{ $novel->id }}" class="group bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300">
                 <div class="flex gap-2.5 p-2">
                     {{-- Cover --}}
                     <a href="{{ route('novels.show', $novel->slug) }}" class="shrink-0 w-12 h-18 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200/50 dark:ring-slate-700/50">
@@ -180,7 +180,7 @@
 </section>
 
 {{-- Genre & Tag --}}
-<section class="mb-12 scroll-mt-24">
+<section class="mb-12 scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div id="genres" class="scroll-mt-28">
             <div class="h-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
@@ -233,109 +233,171 @@
     </div>
 </section>
 
-{{-- Newest novels + leaderboard --}}
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-    <section class="lg:col-span-8 xl:col-span-9">
-        @include('partials.section-header', [
-            'title' => 'Newest Novels',
-            'description' => 'The latest works recently added to the catalog.',
-            'accent' => 'slate',
-        ])
+{{-- Newest novels section --}}
+<section class="mb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    @include('partials.section-header', [
+        'title' => 'Newest Novels',
+        'description' => 'The latest works recently added to the catalog.',
+        'accent' => 'slate',
+    ])
 
-        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            @forelse($novels as $novel)
-                <a href="{{ route('novels.show', $novel->slug) }}" class="group block">
-                    <div class="relative aspect-[2/3] mb-2 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 group-hover:ring-indigo-400 dark:group-hover:ring-indigo-600 transition-all">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-10">
+        @forelse($novels->take(8) as $novel)
+            <a href="{{ route('novels.show', $novel->slug) }}" data-novel-id="{{ $novel->id }}" class="group block">
+                <div class="relative aspect-[2/3] w-full max-w-[160px] mx-auto mb-3 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 group-hover:ring-indigo-400 dark:group-hover:ring-indigo-600 transition-all shadow-sm">
+                    @if($novel->cover_image_url)
+                        <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                    @elseif($novel->cover_image)
+                        <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center p-2">
+                            <span class="text-[10px] font-medium text-slate-400 text-center line-clamp-3">{{ $novel->title }}</span>
+                        </div>
+                    @endif
+                    @if($novel->rating_avg > 0)
+                    <div class="absolute top-1.5 right-1.5 px-1.5 py-0.5 bg-black/60 backdrop-blur-sm rounded text-[10px] font-semibold text-white flex items-center gap-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                        {{ number_format($novel->rating_avg, 1) }}
+                    </div>
+                    @endif
+                </div>
+                <div class="text-center sm:text-left max-w-[160px] mx-auto">
+                    <h3 class="text-xs font-bold text-slate-900 dark:text-white line-clamp-1 leading-snug group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</h3>
+                    <p class="text-[10px] text-slate-500 mt-0.5 truncate">{{ $novel->author->name }}</p>
+                </div>
+            </a>
+        @empty
+            <div class="col-span-full py-12 text-center text-sm text-slate-500">No novels yet.</div>
+        @endforelse
+    </div>
+</section>
+
+{{-- Top novels section --}}
+<section class="mb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ tab: 'weekly' }">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        <div>
+            @include('partials.section-header', [
+                'title' => 'Top Leaderboard',
+                'description' => 'Novel terbaik berdasarkan performa mingguan, bulanan, rating, dan bookmark.',
+                'accent' => 'indigo',
+            ])
+        </div>
+        
+        <div class="flex flex-wrap gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl w-fit">
+            <button @click="tab = 'weekly'" :class="tab === 'weekly' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Weekly</button>
+            <button @click="tab = 'monthly'" :class="tab === 'monthly' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Monthly</button>
+            <button @click="tab = 'rated'" :class="tab === 'rated' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Top Rated</button>
+            <button @click="tab = 'bookmarks'" :class="tab === 'bookmarks' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Most Saved</button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+        {{-- Weekly --}}
+        <template x-if="tab === 'weekly'">
+            @forelse($weeklyTop->take(10) as $index => $novel)
+                <a href="{{ route('novels.show', $novel->slug) }}" data-novel-id="{{ $novel->id }}" class="flex flex-col gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all group border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+                    <div class="relative aspect-[2/3] w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm group-hover:scale-[1.02] transition-transform duration-300">
+                        <span class="absolute top-2 left-2 w-7 h-7 flex items-center justify-center rounded-lg text-xs font-black z-10 {{ $index < 3 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-900/60 backdrop-blur-sm text-white' }}">
+                            {{ $index + 1 }}
+                        </span>
                         @if($novel->cover_image_url)
                             <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
                             <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center p-2">
-                                <span class="text-[10px] font-medium text-slate-400 text-center line-clamp-3">{{ $novel->title }}</span>
-                            </div>
-                        @endif
-                        @if($novel->rating_avg > 0)
-                        <div class="absolute top-1.5 right-1.5 px-1.5 py-0.5 bg-black/60 backdrop-blur-sm rounded text-[10px] font-semibold text-white flex items-center gap-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                            {{ number_format($novel->rating_avg, 1) }}
-                        </div>
                         @endif
                     </div>
-                    <h3 class="text-xs font-semibold text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</h3>
-                    <p class="text-[10px] text-slate-500 mt-0.5 truncate">{{ $novel->author->name }}</p>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</p>
+                        <p class="text-[10px] text-slate-500 font-medium truncate mt-0.5">{{ number_format($novel->period_views ?? 0) }} views</p>
+                    </div>
                 </a>
             @empty
-                <div class="col-span-full py-12 text-center text-sm text-slate-500">No novels yet.</div>
+                <p class="col-span-full text-center py-12 text-xs text-slate-400">No data yet.</p>
             @endforelse
-        </div>
+        </template>
 
-        @if($novels->hasPages())
-            <div class="mt-8 flex justify-center">{{ $novels->links() }}</div>
-        @endif
-    </section>
+        {{-- Monthly --}}
+        <template x-if="tab === 'monthly'">
+            @forelse($monthlyTop->take(10) as $index => $novel)
+                <a href="{{ route('novels.show', $novel->slug) }}" data-novel-id="{{ $novel->id }}" class="flex flex-col gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all group border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+                    <div class="relative aspect-[2/3] w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm group-hover:scale-[1.02] transition-transform duration-300">
+                        <span class="absolute top-2 left-2 w-7 h-7 flex items-center justify-center rounded-lg text-xs font-black z-10 {{ $index < 3 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-900/60 backdrop-blur-sm text-white' }}">
+                            {{ $index + 1 }}
+                        </span>
+                        @if($novel->cover_image_url)
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                        @elseif($novel->cover_image)
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                        @endif
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</p>
+                        <p class="text-[10px] text-slate-500 font-medium truncate mt-0.5">{{ number_format($novel->period_views ?? 0) }} views</p>
+                    </div>
+                </a>
+            @empty
+                <p class="col-span-full text-center py-12 text-xs text-slate-400">No data yet.</p>
+            @endforelse
+        </template>
 
-    <aside class="lg:col-span-4 xl:col-span-3" x-data="{ tab: 'weekly' }">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-24">
-            <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-                <h2 class="text-base font-semibold text-slate-900 dark:text-white">Top Novels</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Based on daily views</p>
-                <a href="{{ route('novels.trending') }}" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-1 inline-block">View all</a>
-            </div>
+        {{-- Rated --}}
+        <template x-if="tab === 'rated'">
+            @forelse($topRated->take(10) as $index => $novel)
+                <a href="{{ route('novels.show', $novel->slug) }}" data-novel-id="{{ $novel->id }}" class="flex flex-col gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all group border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+                    <div class="relative aspect-[2/3] w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm group-hover:scale-[1.02] transition-transform duration-300">
+                        <span class="absolute top-2 left-2 w-7 h-7 flex items-center justify-center rounded-lg text-xs font-black z-10 {{ $index < 3 ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'bg-slate-900/60 backdrop-blur-sm text-white' }}">
+                            {{ $index + 1 }}
+                        </span>
+                        @if($novel->cover_image_url)
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                        @elseif($novel->cover_image)
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                        @endif
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</p>
+                        <div class="flex items-center gap-1 mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                            <span class="text-[10px] text-slate-500 font-bold">{{ number_format($novel->rating_avg, 1) }}</span>
+                        </div>
+                    </div>
+                </a>
+            @empty
+                <p class="col-span-full text-center py-12 text-xs text-slate-400">No data yet.</p>
+            @endforelse
+        </template>
 
-            <div class="flex p-2 gap-1 border-b border-slate-100 dark:border-slate-800">
-                <button @click="tab = 'weekly'" :class="tab === 'weekly' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'" class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors">Weekly</button>
-                <button @click="tab = 'monthly'" :class="tab === 'monthly' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'" class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors">Monthly</button>
-            </div>
-
-            <div class="p-2 max-h-[480px] overflow-y-auto">
-                <div x-show="tab === 'weekly'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                    @forelse($weeklyTop as $index => $novel)
-                        <a href="{{ route('novels.show', $novel->slug) }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                            <span class="w-6 text-center text-sm font-bold {{ $index < 3 ? 'text-amber-500' : 'text-slate-400' }}">{{ $index + 1 }}</span>
-                            <div class="w-10 h-14 shrink-0 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                @if($novel->cover_image_url)
-                                    <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
-                                @elseif($novel->cover_image)
-                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
-                                @endif
-                            </div>
-                            <div class="min-w-0 flex-grow">
-                                <p class="text-xs font-semibold text-slate-900 dark:text-white line-clamp-1">{{ $novel->title }}</p>
-                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->period_views ?? 0) }} views (7d)</p>
-                            </div>
-                        </a>
-                    @empty
-                        <p class="text-center py-6 text-xs text-slate-400">No data yet.</p>
-                    @endforelse
-                </div>
-                <div x-show="tab === 'monthly'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                    @forelse($monthlyTop as $index => $novel)
-                        <a href="{{ route('novels.show', $novel->slug) }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                            <span class="w-6 text-center text-sm font-bold {{ $index < 3 ? 'text-amber-500' : 'text-slate-400' }}">{{ $index + 1 }}</span>
-                            <div class="w-10 h-14 shrink-0 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                @if($novel->cover_image_url)
-                                    <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
-                                @elseif($novel->cover_image)
-                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
-                                @endif
-                            </div>
-                            <div class="min-w-0 flex-grow">
-                                <p class="text-xs font-semibold text-slate-900 dark:text-white line-clamp-1">{{ $novel->title }}</p>
-                                <p class="text-[10px] text-slate-500 truncate">{{ number_format($novel->period_views ?? 0) }} views (30d)</p>
-                            </div>
-                        </a>
-                    @empty
-                        <p class="text-center py-6 text-xs text-slate-400">No data yet.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-    </aside>
-</div>
+        {{-- Saved --}}
+        <template x-if="tab === 'saved'">
+            @forelse($mostBookmarked->take(10) as $index => $novel)
+                <a href="{{ route('novels.show', $novel->slug) }}" data-novel-id="{{ $novel->id }}" class="flex flex-col gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all group border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+                    <div class="relative aspect-[2/3] w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm group-hover:scale-[1.02] transition-transform duration-300">
+                        <span class="absolute top-2 left-2 w-7 h-7 flex items-center justify-center rounded-lg text-xs font-black z-10 {{ $index < 3 ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'bg-slate-900/60 backdrop-blur-sm text-white' }}">
+                            {{ $index + 1 }}
+                        </span>
+                        @if($novel->cover_image_url)
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                        @elseif($novel->cover_image)
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                        @endif
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</p>
+                        <div class="flex items-center gap-1 mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-rose-500" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" /></svg>
+                            <span class="text-[10px] text-slate-500 font-bold">{{ number_format($novel->bookmarks_count) }} saves</span>
+                        </div>
+                    </div>
+                </a>
+            @empty
+                <p class="col-span-full text-center py-12 text-xs text-slate-400">No data yet.</p>
+            @endforelse
+        </template>
+    </div>
+</section>
 
 {{-- Populer --}}
-<section class="mb-8">
+<section class="mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     @include('partials.section-header', [
         'title' => 'Popular',
         'description' => 'Novels with the highest rating and engagement.',

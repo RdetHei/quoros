@@ -1,111 +1,112 @@
-@extends('layouts.app')
+@extends('layouts.dashboard', [
+    'title' => 'Analytics Engine',
+    'subtitle' => 'Deep dive into your story performance and reader behavior.'
+])
 
-@section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+@section('dashboard-content')
+<div class="space-y-10">
+    {{-- Filter Header --}}
+    <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <h2 class="text-xl font-black text-slate-900 dark:text-white">Performance Overview</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Showing data for the last 30 days.</p>
+        </div>
+
+        <form action="{{ route('writer.stats') }}" method="GET" id="novelFilterForm" class="w-full md:w-80">
+            <select name="novel_id" id="novel_id" onchange="document.getElementById('novelFilterForm').submit()"
+                class="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-all">
+                <option value="">All Managed Novels</option>
+                @foreach($allNovels as $novel)
+                    <option value="{{ $novel->id }}" {{ $selectedNovelId == $novel->id ? 'selected' : '' }}>{{ $novel->title }}</option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+
+    {{-- KPI Cards --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Readers</p>
+                <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                </div>
+            </div>
+            <p class="text-3xl font-black text-slate-900 dark:text-white">{{ number_format($totalViews) }}</p>
+        </div>
+        
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Bookmarks</p>
+                <div class="w-10 h-10 bg-rose-50 dark:bg-rose-900/30 rounded-xl flex items-center justify-center text-rose-600 dark:text-rose-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                </div>
+            </div>
+            <p class="text-3xl font-black text-slate-900 dark:text-white">{{ number_format($totalBookmarks) }}</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Reviews</p>
+                <div class="w-10 h-10 bg-amber-50 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-600 dark:text-amber-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                </div>
+            </div>
+            <p class="text-3xl font-black text-slate-900 dark:text-white">{{ number_format($totalReviews) }}</p>
+        </div>
+    </div>
+
+    {{-- Charts Section --}}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        @include('partials.writer-nav', ['active' => 'stats'])
-
-        <div class="lg:col-span-9 space-y-6">
-            {{-- Page header --}}
-            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-1.5 h-10 bg-indigo-600 rounded-full shrink-0"></div>
-                    <div>
-                        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Writer Dashboard</h1>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Your work performance statistics in the last 30 days.</p>
-                    </div>
+        <div class="lg:col-span-8 bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10">
+                <div>
+                    <h2 class="text-xl font-black text-slate-900 dark:text-white">Engagement Trend</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Daily interactions across works</p>
                 </div>
-
-                <form action="{{ route('writer.stats') }}" method="GET" id="novelFilterForm" class="w-full sm:w-64">
-                    <label for="novel_id" class="sr-only">Filter novel</label>
-                    <select name="novel_id" id="novel_id" onchange="document.getElementById('novelFilterForm').submit()"
-                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                        <option value="">All Novels</option>
-                        @foreach($allNovels as $novel)
-                            <option value="{{ $novel->id }}" {{ $selectedNovelId == $novel->id ? 'selected' : '' }}>{{ $novel->title }}</option>
-                        @endforeach
-                    </select>
-                </form>
-            </div>
-
-            {{-- KPI cards --}}
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Readers</p>
-                        <div class="p-1.5 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                        </div>
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-rose-500 shadow-lg shadow-rose-500/20"></span>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bookmarks</span>
                     </div>
-                    <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($totalViews) }}</p>
-                </div>
-                <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Bookmarks</p>
-                        <div class="p-1.5 bg-rose-50 dark:bg-rose-900/30 rounded-lg text-rose-600 dark:text-rose-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                        </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-amber-500 shadow-lg shadow-amber-500/20"></span>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Reviews</span>
                     </div>
-                    <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($totalBookmarks) }}</p>
-                </div>
-                <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Reviews</p>
-                        <div class="p-1.5 bg-amber-50 dark:bg-amber-900/30 rounded-lg text-amber-600 dark:text-amber-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
-                        </div>
-                    </div>
-                    <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($totalReviews) }}</p>
                 </div>
             </div>
+            <div class="h-[400px]">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
 
-            {{-- Charts --}}
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                        <div>
-                            <h2 class="text-base font-semibold text-slate-900 dark:text-white">Interaction Growth</h2>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Daily bookmarks & reviews</p>
-                        </div>
-                        <div class="flex items-center gap-4 text-xs font-medium text-slate-500">
-                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Bookmarks</span>
-                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Reviews</span>
-                        </div>
-                    </div>
-                    <div class="h-[320px]">
-                        <canvas id="growthChart"></canvas>
+        <div class="lg:col-span-4 flex flex-col gap-8">
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm flex-grow">
+                <h2 class="text-xl font-black text-slate-900 dark:text-white mb-2">Interaction Ratio</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-10">Bookmarks vs Reviews share</p>
+                
+                <div class="h-[220px] relative mb-10">
+                    <canvas id="interactionChart"></canvas>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Grand Total</p>
+                        <p class="text-3xl font-black text-slate-900 dark:text-white mt-1">{{ number_format($totalBookmarks + $totalReviews) }}</p>
                     </div>
                 </div>
 
-                <div class="space-y-6">
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-                        <h2 class="text-base font-semibold text-slate-900 dark:text-white mb-1">Interaction Ratio</h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">Bookmarks vs reviews</p>
-                        <div class="h-[180px] relative">
-                            <canvas id="interactionChart"></canvas>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wide">Total</p>
-                                <p class="text-xl font-bold text-slate-900 dark:text-white">{{ number_format($totalBookmarks + $totalReviews) }}</p>
-                            </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-rose-500 shadow-lg shadow-rose-500/20"></div>
+                            <span class="text-xs font-bold text-slate-500">Bookmarks</span>
                         </div>
-                        <div class="mt-4 space-y-2">
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Bookmarks</span>
-                                <span class="font-semibold text-slate-900 dark:text-white">{{ number_format($totalBookmarks) }}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Reviews</span>
-                                <span class="font-semibold text-slate-900 dark:text-white">{{ number_format($totalReviews) }}</span>
-                            </div>
-                        </div>
+                        <span class="text-sm font-black text-slate-900 dark:text-white">{{ number_format($totalBookmarks) }}</span>
                     </div>
-
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-                        <h2 class="text-base font-semibold text-slate-900 dark:text-white mb-1">Aktivitas Membaca</h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">Riwayat baca harian</p>
-                        <div class="h-[140px]">
-                            <canvas id="readersChart"></canvas>
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-amber-500 shadow-lg shadow-amber-500/20"></div>
+                            <span class="text-xs font-bold text-slate-500">Reviews</span>
                         </div>
+                        <span class="text-sm font-black text-slate-900 dark:text-white">{{ number_format($totalReviews) }}</span>
                     </div>
                 </div>
             </div>

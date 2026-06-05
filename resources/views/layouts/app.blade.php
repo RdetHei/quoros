@@ -23,6 +23,7 @@
         body {
             font-family: 'Instrument Sans', sans-serif;
         }
+        [x-cloak] { display: none !important; }
     </style>
 
     <!-- Styles & Scripts -->
@@ -41,39 +42,54 @@
 
         window.initCropper = function(input, previewId, options) {
             if (input.files && input.files[0]) {
-                currentInput = input;
-                currentPreviewId = previewId;
-                currentCropOptions = options || {};
-                
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     const modal = document.getElementById('cropping-modal');
                     const image = document.getElementById('cropping-image');
-                    image.src = e.target.result;
                     
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
-                    
+                    if (!modal || !image) {
+                        console.error('Cropping modal elements not found');
+                        return;
+                    }
+
+                    // Reset existing cropper
                     if (currentCropper) {
                         currentCropper.destroy();
+                        currentCropper = null;
                     }
                     
-                    // Delay init slightly to ensure image is loaded and modal is visible
-                    setTimeout(() => {
-                        currentCropper = new Cropper(image, {
-                            aspectRatio: currentCropOptions.aspectRatio || 1,
-                            viewMode: 1,
-                            dragMode: 'move',
-                            autoCropArea: 0.8,
-                            restore: false,
-                            guides: true,
-                            center: true,
-                            highlight: false,
-                            cropBoxMovable: true,
-                            cropBoxResizable: true,
-                            toggleDragModeOnDblclick: false,
-                        });
-                    }, 100);
+                    currentInput = input;
+                    currentPreviewId = previewId;
+                    currentCropOptions = options || {};
+                    
+                    image.onload = function() {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                        
+                        // Small timeout to ensure modal is rendered for dimensions
+                        setTimeout(() => {
+                            if (currentCropper) {
+                                currentCropper.destroy();
+                            }
+                            
+                            currentCropper = new Cropper(image, {
+                                aspectRatio: currentCropOptions.aspectRatio || 1,
+                                viewMode: 1,
+                                dragMode: 'move',
+                                autoCropArea: 0.8,
+                                restore: false,
+                                guides: true,
+                                center: true,
+                                highlight: false,
+                                cropBoxMovable: true,
+                                cropBoxResizable: true,
+                                toggleDragModeOnDblclick: false,
+                                responsive: true,
+                                checkOrientation: true,
+                            });
+                        }, 100);
+                    };
+                    image.src = e.target.result;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -82,30 +98,45 @@
         window.saveCrop = function() {
             if (!currentCropper) return;
             
-            const canvas = currentCropper.getCroppedCanvas({
-                width: currentCropOptions.width || 400,
-                height: currentCropOptions.height || 400,
+            let canvasOptions = {
                 imageSmoothingEnabled: true,
                 imageSmoothingQuality: 'high',
-            });
+            };
+
+            if (currentCropOptions.width) canvasOptions.width = currentCropOptions.width;
+            if (currentCropOptions.height) canvasOptions.height = currentCropOptions.height;
+            
+            const canvas = currentCropper.getCroppedCanvas(canvasOptions);
             
             canvas.toBlob((blob) => {
-                // Show preview
                 const preview = document.getElementById(currentPreviewId);
                 if (preview) {
                     preview.src = URL.createObjectURL(blob);
                     preview.classList.remove('hidden');
                     
-                    // Special case for profile photo placeholder in dashboard
-                    const placeholder = document.getElementById('profile-photo-placeholder');
-                    if (placeholder) placeholder.classList.add('hidden');
+                    // Handle dynamic placeholder ID
+                    const placeholderId = currentCropOptions.placeholderId;
+                    if (placeholderId) {
+                        const placeholder = document.getElementById(placeholderId);
+                        if (placeholder) placeholder.classList.add('hidden');
+                    }
+                    
+                    // Fallback for hardcoded cover-placeholder if not provided
+                    if (!placeholderId && document.getElementById('cover-placeholder')) {
+                        document.getElementById('cover-placeholder').classList.add('hidden');
+                    }
                 }
                 
-                // Replace file in input using DataTransfer
+                // Update file input with cropped image
                 const file = new File([blob], 'cropped_image.jpg', { type: 'image/jpeg' });
                 const container = new DataTransfer();
                 container.items.add(file);
                 currentInput.files = container.files;
+                
+                // Execute callback if exists
+                if (currentCropOptions.onSave) {
+                    currentCropOptions.onSave();
+                }
                 
                 window.closeCropModal();
             }, 'image/jpeg', 0.9);
@@ -119,13 +150,8 @@
                 currentCropper.destroy();
                 currentCropper = null;
             }
-            // Reset input if cancelled to allow re-selecting same file
-            if (currentInput && !currentCropper) {
-                // currentInput.value = ''; // Don't reset if we might have already saved a crop
-            }
         };
 
-        // On page load or when changing themes, best to add inline in `head` to avoid FOUC
         if (localStorage.getItem('color-theme') === 'dark' || !('color-theme' in localStorage) || window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
         } else {
@@ -133,10 +159,10 @@
         }
     </script>
 </head>
-<body class="font-sans antialiased bg-slate-950 text-slate-100">
-    <div class="min-h-screen flex flex-col">
+<body class="font-sans antialiased bg-slate-950 text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div class="min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
         <!-- Navbar -->
-        <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800"
+        <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-slate-950 border-b border-white/5 h-16"
              x-data="{
                 mobileMenuOpen: false,
                 scrollY: 0,
@@ -160,8 +186,8 @@
                     window.scrollTo(0, y);
                 }
              }">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                <div class="flex justify-between h-full">
                     <div class="flex items-center gap-4 md:gap-8 flex-1">
                         <!-- Mobile Menu Button -->
                         <button @click="mobileMenuOpen ? closeMobileMenu() : openMobileMenu()"
@@ -188,37 +214,23 @@
                     </div>
 
                     <div class="flex items-center gap-2 md:gap-4">
-                        <!-- Search Bar (Desktop - Live Search) -->
                         @include('partials.live-search-partial', [
                             'id'          => 'desktop-search',
                             'placeholder' => 'Search novels...',
                             'classes'     => 'hidden md:block w-64 lg:w-80',
                         ])
-                        <!-- Search Toggle (Mobile) -->
                         <div x-data="{ open: false }" class="md:hidden">
                             <button @click="open = !open" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </button>
-
-                
-                            <!-- Mobile Search Overlay (Live Search) -->
-                            <div x-show="open"
-                                @click.away="open = false"
-                                x-transition:enter="transition ease-out duration-200"
-                                x-transition:enter-start="opacity-0 -translate-y-4"
-                                x-transition:enter-end="opacity-100 translate-y-0"
-                                class="absolute left-0 right-0 top-full bg-slate-900 border-b border-slate-800 p-4 shadow-xl z-50">
-                                @include('partials.live-search-partial', [
-                                    'id'          => 'mobile-search',
-                                    'placeholder' => 'Search novels...',
-                                ])
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="absolute left-0 right-0 top-full bg-slate-900 border-b border-slate-800 p-4 shadow-xl z-50">
+                                @include('partials.live-search-partial', [ 'id' => 'mobile-search', 'placeholder' => 'Search novels...' ])
                             </div>
                         </div>
-
-                        <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
-
-                        @include('partials.notification-bell')
-
+                        @auth
+                            <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+                            @include('partials.notification-bell')
+                        @endauth
                         @guest
                             <div class="flex items-center gap-1 md:gap-2">
                                 <a href="{{ route('login') }}" class="px-3 md:px-4 py-2 text-xs font-medium hover:text-slate-900 dark:hover:text-white transition-colors">Login</a>
@@ -239,513 +251,198 @@
                                     <span class="hidden sm:block text-xs font-medium max-w-[100px] truncate">{{ Auth::user()->name }}</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                 </button>
-
-                                <div x-show="open"
-                                     @click.away="open = false"
-                                     x-transition:enter="transition ease-out duration-100"
-                                     x-transition:enter-start="transform opacity-0 scale-95"
-                                     x-transition:enter-end="transform opacity-100 scale-100"
-                                     x-transition:leave="transition ease-in duration-75"
-                                     x-transition:leave-start="transform opacity-100 scale-100"
-                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                     class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50">
-                                    <div class="p-2 border-b border-slate-100 dark:border-slate-800">
-                                        <p class="px-3 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
-                                        <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">My Profile</a>
-                                        <a href="{{ route('notifications.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Notifications</a>
-                                        <a href="{{ route('settings') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Settings</a>
-                                        <a href="{{ route('guides.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Guide</a>
-                                        @if(Auth::user()->role === 'user')
-                                            <form action="{{ route('dashboard.become-writer') }}" method="POST" class="block">
-                                                @csrf
-                                                <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">Start Writing</button>
-                                            </form>
-                                        @endif
-                                        @if(Auth::user()->role === 'writer' || Auth::user()->role === 'admin')
-                                            <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Dashboard</a>
-                                            <a href="{{ route('writer.novels.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">My Novels</a>
-                                        @endif
-                                        @if(Auth::user()->role === 'admin')
-                                            <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                                                <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin</p>
-                                                <a href="{{ route('admin.genres.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Manage Genres</a>
-                                                <a href="{{ route('admin.tags.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Manage Tags</a>
-                                                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Reports & Moderation</a>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="p-2">
-                                        <form action="{{ route('logout') }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Logout</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        @endguest
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mobile Sidebar Overlay -->
-            <div x-show="mobileMenuOpen"
-                 x-cloak
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 @keydown.escape.window="closeMobileMenu()"
-                 class="fixed inset-0 z-[60] lg:hidden" style="display: none;">
-                <!-- Backdrop -->
-                <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
-                     @click="closeMobileMenu()"
-                     @touchmove.prevent></div>
-                
-                <!-- Content -->
-                <div x-show="mobileMenuOpen"
-                     x-transition:enter="transition ease-out duration-300"
-                     x-transition:enter-start="-translate-x-full"
-                     x-transition:enter-end="translate-x-0"
-                     x-transition:leave="transition ease-in duration-200"
-                     x-transition:leave-start="translate-x-0"
-                     x-transition:leave-end="-translate-x-full"
-                     class="relative w-[84vw] max-w-[340px] h-[100dvh] bg-white dark:bg-slate-900 shadow-2xl flex flex-col rounded-r-3xl overflow-hidden border-r border-slate-100 dark:border-slate-800"
-                     @click.stop>
-                    <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto" onerror="this.onerror=null; this.src='/error.png'">
-                            <div class="leading-tight">
-                                <p class="text-xs font-black uppercase tracking-widest text-slate-400">Menu</p>
-                                <p class="text-sm font-bold text-slate-900 dark:text-white">Navigation</p>
-                            </div>
-                        </div>
-                        <button @click="closeMobileMenu()" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl transition-colors" aria-label="Close navigation">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                    </div>
-                    
-                    <div class="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-6 space-y-6" style="-webkit-overflow-scrolling: touch;">
-                        @auth
-                        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold">
-                                    @if(Auth::user()->profile_photo)
-                                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
-                                    @else
-                                        {{ substr(Auth::user()->name, 0, 1) }}
+                                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50">
+                                    @if(Auth::user()->role === 'writer' || Auth::user()->role === 'admin')
+                                        <div class="px-2 py-2">
+                                            <a href="{{ route('dashboard') }}" class="flex items-center justify-center gap-3 w-full px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-slate-900/10 dark:shadow-white/5 group">
+                                                Workspace
+                                            </a>
+                                        </div>
                                     @endif
+                                    <div class="px-2 py-2 space-y-1">
+                                        <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="block px-3 py-2 text-sm font-bold text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">My Profile</a>
+                                        <a href="{{ route('settings') }}" class="block px-3 py-2 text-sm font-bold text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Settings</a>
+                                        <form action="{{ route('logout') }}" method="POST">@csrf<button type="submit" class="w-full text-left px-3 py-2 text-sm font-bold text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all">Logout</button></form>
+                                    </div>
                                 </div>
-                                <div class="min-w-0">
-                                    <p class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ Auth::user()->name }}</p>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">{{ Auth::user()->role }}</p>
-                                </div>
                             </div>
-                            <div class="flex flex-col gap-3 mt-4">
-                                <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-lg shadow-slate-900/10">
-                                    My Profile
-                                </a>
-                                <a href="{{ route('settings') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
-                                    Settings
-                                </a>
-                                <a href="{{ route('guides.index') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
-                                    Guide
-                                </a>
-                                @if(Auth::user()->role === 'user')
-                                    <form action="{{ route('dashboard.become-writer') }}" method="POST" class="block">
-                                        @csrf
-                                        <button type="submit" class="w-full px-4 py-3 text-center text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-900/10">
-                                            Start Writing
-                                        </button>
-                                    </form>
-                                @endif
-                                @if(Auth::user()->role === 'writer' || Auth::user()->role === 'admin')
-                                    <a href="{{ route('dashboard') }}" class="px-4 py-3 text-center text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
-                                        Dashboard
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                        @endauth
-
-                        <div class="space-y-1">
-                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Main Navigation</p>
-                            <a href="{{ route('home') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold {{ request()->routeIs('home') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                                <span>Home</span>
-                            </a>
-                            <a href="{{ route('novels.updated') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold {{ request()->routeIs('novels.updated') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <span>Updated</span>
-                            </a>
-                        </div>
-
-                        @auth
-                        <div class="space-y-1">
-                            <p class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Activity</p>
-                            <a href="{{ route('bookmarks.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold {{ request()->routeIs('bookmarks.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                                <span>Bookmark</span>
-                            </a>
-                            <a href="{{ route('lists.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold {{ request()->routeIs('lists.*') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-                                <span>Novel List</span>
-                            </a>
-                            <a href="{{ route('history.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold {{ request()->routeIs('history.index') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <span>History</span>
-                            </a>
-                            <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold {{ request()->routeIs('notifications.*') ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50' }} transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                                <span>Notifications</span>
-                            </a>
-                        </div>
-                        @endauth
-                    </div>
-
-                    <div class="p-6 border-t border-slate-100 dark:border-slate-800">
-                        @guest
-                            <div class="grid grid-cols-2 gap-3">
-                                <a href="{{ route('login') }}" class="px-4 py-3 text-center text-sm font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 rounded-xl">Login</a>
-                                <a href="{{ route('register') }}" class="px-4 py-3 text-center text-sm font-bold text-white dark:text-slate-900 bg-slate-900 dark:bg-white rounded-xl">Sign Up</a>
-                            </div>
-                        @else
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full px-4 py-3 text-center text-sm font-bold text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl transition-colors">Logout from Account</button>
-                            </form>
                         @endguest
                     </div>
                 </div>
             </div>
         </nav>
 
+        <!-- Mobile Menu Overlay (Simplified for cleanup) -->
+        <div x-show="mobileMenuOpen" x-cloak class="fixed inset-0 z-[60] lg:hidden">
+            <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" @click="closeMobileMenu()"></div>
+            <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" class="relative w-[80vw] max-w-[300px] h-full bg-slate-900 shadow-2xl flex flex-col">
+                <div class="p-6 space-y-4">
+                    <a href="{{ route('home') }}" class="block text-sm font-bold text-white">Home</a>
+                    <a href="{{ route('novels.updated') }}" class="block text-sm font-bold text-white">Updated</a>
+                    @auth
+                        <a href="{{ route('bookmarks.index') }}" class="block text-sm font-bold text-white">Bookmarks</a>
+                    @endauth
+                </div>
+            </div>
+        </div>
+
         <!-- Main Content -->
-        <main class="flex-grow {{ request()->routeIs('welcome') ? 'pt-16' : 'pt-24 px-4 sm:px-6 lg:px-8 pb-8' }}">
-            <div class="{{ request()->routeIs('welcome') ? '' : 'max-w-7xl mx-auto' }}">
+        <main class="flex-grow pt-16 bg-slate-950">
+            <div class="{{ request()->routeIs('welcome', 'home') ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-8' }}">
                 @if(session('success'))
-                    <div class="mb-6 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                        <span class="text-sm font-medium">{{ session('success') }}</span>
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                        <div class="p-4 rounded-xl bg-indigo-900/20 border border-indigo-800 text-indigo-400 text-sm font-medium">
+                            {{ session('success') }}
+                        </div>
                     </div>
                 @endif
-
-                @if(session('error'))
-                    <div class="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
-                        <span class="text-sm font-medium">{{ session('error') }}</span>
-                    </div>
-                @endif
-
                 @yield('content')
             </div>
         </main>
-        <footer class="bg-white dark:bg-slate-900 relative overflow-hidden pt-14 pb-7 px-6 lg:px-10">
 
-    {{-- Decorative top line --}}
-    <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300/50 dark:via-slate-600/30 to-transparent"></div>
-
-    {{-- Decorative blobs --}}
-    <div class="absolute -bottom-20 -left-20 w-56 h-56 bg-slate-500/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -top-20 -right-20 w-56 h-56 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-
-    <div class="max-w-7xl mx-auto relative">
-
-        {{-- ===== TOP GRID ===== --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 mb-14">
-
-            {{-- Brand + Newsletter + Social --}}
-            <div class="lg:col-span-4 flex flex-col">
-
-                {{-- Logo --}}
-                <a href="{{ route('home') }}" class="inline-block mb-4 group">
-                    <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros"
-                         class="h-10 w-auto group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='/error.png'">
-                </a>
-
-                <p class="text-[13px] leading-relaxed text-slate-500 dark:text-slate-400 max-w-[230px] mb-6">
-                    Modern novel reading platform with a clean experience. Discover thousands of interesting stories from talented authors.
-                </p>
-
-                {{-- Newsletter --}}
-                <p class="text-[10px] uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 mb-2">Newsletter</p>
-                <div class="flex">
-                    <input
-                        type="email"
-                        placeholder="Your email..."
-                        class="flex-1 min-w-0 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0 rounded-l-lg px-3 py-2 text-[12px] text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-600 outline-none focus:border-indigo-400 dark:focus:border-indigo-500 transition-colors duration-200"
-                    />
-                    <button
-                        type="button"
-                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-[12px] px-4 py-2 rounded-r-lg transition-colors duration-200 whitespace-nowrap"
-                    >
-                        Subscribe
-                    </button>
+        <footer class="bg-slate-900 border-t border-white/5 py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                    <div class="md:col-span-2">
+                        <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-10 w-auto mb-6 grayscale opacity-80" onerror="this.onerror=null; this.src='/error.png'">
+                        <p class="text-sm text-slate-500 max-w-sm leading-relaxed">
+                            Quoros adalah platform novel premium yang didedikasikan untuk menghadirkan cerita terbaik dari seluruh dunia dengan pengalaman membaca yang nyaman dan berkualitas.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-6">Navigation</h4>
+                        <ul class="space-y-4">
+                            <li><a href="{{ route('home') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Home</a></li>
+                            <li><a href="{{ route('novels.updated') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Recently Updated</a></li>
+                            <li><a href="{{ route('genres.index') }}" class="text-sm text-slate-500 hover:text-white transition-colors">All Genres</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-6">Community</h4>
+                        <ul class="space-y-4">
+                            <li><a href="{{ route('guides.index') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Guides</a></li>
+                            @guest
+                                <li><a href="{{ route('login') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Join Us</a></li>
+                            @else
+                                <li><a href="{{ route('dashboard') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Writer Workspace</a></li>
+                            @endguest
+                        </ul>
+                    </div>
                 </div>
-
-                {{-- Social Icons --}}
-                <div class="flex gap-2 mt-5">
-                    <a href="#" aria-label="Facebook"
-                        class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                        </svg>
-                    </a>
-                    <a href="#" aria-label="Instagram"
-                        class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all duration-200">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                        </svg>
-                    </a>
-                    <a href="#" aria-label="Twitter / X"
-                        class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-200">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.019 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                        </svg>
-                    </a>
+                <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">&copy; {{ date('Y') }} Quoros &mdash; Crafted for Readers</p>
+                    <div class="flex items-center gap-6">
+                        <a href="#" class="text-slate-500 hover:text-white transition-colors"><span class="sr-only">Twitter</span><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-1.015-2.174-1.648-3.594-1.648-2.72 0-4.925 2.205-4.925 4.925 0 .386.044.762.128 1.123-4.092-.205-7.719-2.165-10.148-5.144-.424.729-.666 1.576-.666 2.476 0 1.71.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.062c0 2.387 1.699 4.379 3.953 4.83-.414.113-.85.174-1.3.174-.317 0-.626-.03-.926-.086.626 1.956 2.444 3.379 4.6 3.419-1.685 1.321-3.808 2.108-6.115 2.108-.397 0-.79-.023-1.175-.068 2.179 1.397 4.768 2.212 7.548 2.212 9.057 0 13.996-7.502 13.996-13.996 0-.213-.005-.426-.014-.637 1.002-.72 1.815-1.558 2.43-2.527z"/></svg></a>
+                        <a href="#" class="text-slate-500 hover:text-white transition-colors"><span class="sr-only">Discord</span><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.077 0 0 0 .084-.028 14.062 14.062 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.23 10.23 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg></a>
+                    </div>
                 </div>
             </div>
-
-            {{-- Nav Columns --}}
-            <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">
-
-                {{-- Catalog --}}
-                <div>
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Catalog</h4>
-                    <ul class="space-y-3.5">
-                        <li><a href="{{ route('home') }}"           class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">All Novels</a></li>
-                        <li><a href="{{ route('novels.updated') }}" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Recently Updated</a></li>
-                        <li><a href="{{ route('novels.trending') }}" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Trending</a></li>
-                        <li><a href="{{ route('home') }}#genres" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Genres</a></li>
-                        <li><a href="{{ route('home') }}#tags" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Popular Tags</a></li>
-                    </ul>
-                </div>
-
-                {{-- Community --}}
-                <div>
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Community</h4>
-                    <ul class="space-y-3.5">
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">About Quoros</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Become a Writer</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Help Center</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                {{-- Legal --}}
-                <div class="col-span-2 sm:col-span-1">
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-900 dark:text-white mb-5">Legal</h4>
-                    <ul class="space-y-3.5">
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Terms &amp; Conditions</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Privacy Policy</a></li>
-                        <li><a href="#" class="text-[13px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150">Cookie Policy</a></li>
-                    </ul>
-                </div>
-
-            </div>
-        </div>
-
-        {{-- ===== BOTTOM BAR ===== --}}
-        <div class="border-t border-slate-100 dark:border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-
-            <p class="text-[11px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
-                &copy; {{ date('Y') }} Quoros &mdash; Crafted for Readers
-            </p>
-
-            <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                <span class="text-[11px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">System Status: Operational</span>
-            </div>
-
-        </div>
+        </footer>
     </div>
-</footer>
-       
-    </div>
+
+    @auth @include('partials.report-modal') @endauth
+    @include('partials.novel-hover-card')
 
     <script>
-        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        document.addEventListener('DOMContentLoaded', function() {
+            // === Live Search Logic ===
+            const searchInputs = document.querySelectorAll('.live-search-input');
+            searchInputs.forEach(input => {
+                const componentId = input.id.replace('-input', '');
+                const dropdown = document.getElementById(`${componentId}-dropdown`);
+                const resultsContainer = document.getElementById(`${componentId}-results`);
+                const loadingIndicator = document.getElementById(`${componentId}-loading`);
+                const footer = document.getElementById(`${componentId}-footer`);
+                const emptyState = document.getElementById(`${componentId}-empty`);
+                let debounceTimer;
 
-        // Change the icons inside the button based on previous settings
-        if (themeToggleDarkIcon && themeToggleLightIcon) {
-            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                themeToggleLightIcon.classList.remove('hidden');
-            } else {
-                themeToggleDarkIcon.classList.remove('hidden');
-            }
-        }
+                input.addEventListener('input', function() {
+                    const query = this.value.trim();
+                    clearTimeout(debounceTimer);
 
-        var themeToggleBtn = document.getElementById('theme-toggle');
-
-        if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', function() {
-            // toggle icons inside button
-            if (themeToggleDarkIcon && themeToggleLightIcon) {
-                themeToggleDarkIcon.classList.toggle('hidden');
-                themeToggleLightIcon.classList.toggle('hidden');
-            }
-
-            // if set via local storage previously
-            if (localStorage.getItem('color-theme')) {
-                if (localStorage.getItem('color-theme') === 'light') {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                }
-
-            // if NOT set via local storage previously
-            } else {
-                if (document.documentElement.classList.contains('dark')) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                }
-            }
-        });
-        }
-    
-document.addEventListener('DOMContentLoaded', function () {
-    const DEBOUNCE_MS  = 220;
-    const MIN_CHARS    = 2;
-    const API_ENDPOINT = '/api/live-search';
-
-    function buildResultCard(novel) {
-        const cover = novel.cover_image
-            ? `<img src="${novel.cover_image}" alt="${escHtml(novel.title)}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">`
-            : `<div class="w-full h-full bg-slate-800 flex items-center justify-center p-1">
-                   <span class="text-[8px] text-slate-500 font-bold text-center leading-tight">${escHtml(novel.title)}</span>
-               </div>`;
-
-        const genres = (novel.genres || [])
-            .map(g => `<span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">${escHtml(g)}</span>`)
-            .join('');
-
-        const statusDot = { ongoing: 'bg-indigo-500', complete: 'bg-slate-500', hiatus: 'bg-amber-500' }[novel.status] || 'bg-slate-500';
-
-        return `
-        <a href="${novel.url}"
-           class="live-search-result flex items-center gap-3 px-3 py-2.5 hover:bg-slate-800/70 transition-colors group outline-none focus:bg-slate-800/70 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500/30"
-           tabindex="0">
-            <div class="w-10 h-[3.35rem] flex-shrink-0 rounded-lg overflow-hidden bg-slate-800 ring-1 ring-slate-700/50 relative">
-                ${cover}
-                <span class="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-full ${statusDot} ring-1 ring-black/40"></span>
-            </div>
-            <div class="flex-grow min-w-0">
-                <p class="text-sm font-bold text-slate-100 group-hover:text-white transition-colors line-clamp-1">${escHtml(novel.title)}</p>
-                <p class="text-[10px] text-slate-500 mb-1 line-clamp-1">${escHtml(novel.author)}</p>
-                <div class="flex flex-wrap items-center gap-1">${genres}</div>
-            </div>
-            <div class="flex-shrink-0 flex items-center gap-1 text-amber-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-                <span class="text-[10px] font-bold text-slate-300 tabular-nums">${novel.rating_avg}</span>
-            </div>
-        </a>`;
-    }
-
-    function escHtml(str) {
-        return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function initLiveSearch(wrapper) {
-        const id       = wrapper.dataset.componentId;
-        const input    = document.getElementById(`${id}-input`);
-        const dropdown = document.getElementById(`${id}-dropdown`);
-        const loading  = document.getElementById(`${id}-loading`);
-        const results  = document.getElementById(`${id}-results`);
-        const footer   = document.getElementById(`${id}-footer`);
-        const empty    = document.getElementById(`${id}-empty`);
-        const seeAll   = document.getElementById(`${id}-see-all`);
-        const emptyLink= document.getElementById(`${id}-empty-link`);
-        const form     = wrapper.querySelector('.live-search-form');
-
-        if (!input || !dropdown) return;
-
-        let timeout = null;
-
-        input.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-            
-            clearTimeout(timeout);
-            if (query.length < MIN_CHARS) {
-                dropdown.classList.add('hidden');
-                return;
-            }
-
-            timeout = setTimeout(async () => {
-                loading.classList.remove('hidden');
-                results.innerHTML = '';
-                dropdown.classList.remove('hidden');
-                footer.classList.add('hidden');
-                empty.classList.add('hidden');
-
-                try {
-                    const res = await fetch(`${API_ENDPOINT}?q=${encodeURIComponent(query)}`);
-                    const data = await res.json();
-                    
-                    loading.classList.add('hidden');
-                    
-                    if (data.length > 0) {
-                        data.slice(0, 5).forEach(novel => {
-                            results.innerHTML += buildResultCard(novel);
-                        });
-                        footer.classList.remove('hidden');
-                        seeAll.href = `/novels/search?q=${encodeURIComponent(query)}`;
-                    } else {
-                        empty.classList.remove('hidden');
-                        emptyLink.href = `/novels/search?q=${encodeURIComponent(query)}`;
+                    if (query.length < 2) {
+                        dropdown.style.display = 'none';
+                        return;
                     }
-                } catch (err) {
-                    console.error('Live search error:', err);
-                    loading.classList.add('hidden');
+
+                    debounceTimer = setTimeout(async () => {
+                        dropdown.style.display = 'block';
+                        loadingIndicator.classList.remove('hidden');
+                        resultsContainer.innerHTML = '';
+                        footer.classList.add('hidden');
+                        emptyState.classList.add('hidden');
+
+                        try {
+                            const response = await fetch(`/api/live-search?q=${encodeURIComponent(query)}`);
+                            const results = await response.json();
+
+                            loadingIndicator.classList.add('hidden');
+
+                            if (results.length > 0) {
+                                results.forEach(novel => {
+                                    const item = document.createElement('a');
+                                    item.href = novel.url;
+                                    item.className = 'flex items-center gap-3 p-3 hover:bg-slate-800/50 transition-colors group';
+                                    item.innerHTML = `
+                                        <div class="w-10 h-14 shrink-0 rounded overflow-hidden bg-slate-800 ring-1 ring-slate-700">
+                                            <img src="${novel.cover_image || '/error.png'}" class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="text-xs font-bold text-slate-200 group-hover:text-white truncate">${novel.title}</h4>
+                                            <p class="text-[10px] text-slate-500 mt-0.5">${novel.author}</p>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="text-[9px] px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded uppercase tracking-wider font-bold">${novel.type}</span>
+                                                <span class="text-[9px] text-amber-500 font-bold flex items-center gap-0.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                                    ${novel.rating_avg}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    `;
+                                    resultsContainer.appendChild(item);
+                                });
+                                footer.classList.remove('hidden');
+                            } else {
+                                emptyState.classList.remove('hidden');
+                            }
+                        } catch (e) {
+                            console.error('Search error:', e);
+                            loadingIndicator.classList.add('hidden');
+                        }
+                    }, 300);
+                });
+
+                // Close on click away
+                document.addEventListener('click', function(e) {
+                    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            });
+
+            // === Global Novel Hover Logic ===
+            document.addEventListener('mouseover', function(e) {
+                const target = e.target.closest('[data-novel-id]');
+                if (target) {
+                    const rect = target.getBoundingClientRect();
+                    window.dispatchEvent(new CustomEvent('novel-hover-show', {
+                        detail: {
+                            id: target.dataset.novelId,
+                            x: rect.right,
+                            y: rect.top + (rect.height / 2)
+                        }
+                    }));
                 }
-            }, DEBOUNCE_MS);
+            });
+
+            document.addEventListener('mouseout', function(e) {
+                const target = e.target.closest('[data-novel-id]');
+                if (target) {
+                    window.dispatchEvent(new CustomEvent('novel-hover-hide'));
+                }
+            });
         });
-
-        document.addEventListener('click', (e) => {
-            if (!wrapper.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-    }
-
-    document.querySelectorAll('.live-search-wrapper').forEach(initLiveSearch);
-});
-</script>
-
-    <!-- Global Cropping Modal -->
-    <div id="cropping-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 sm:p-6 md:p-10">
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeCropModal()"></div>
-        <div class="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
-            <div class="p-4 md:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Crop Photo</h3>
-                <button onclick="closeCropModal()" class="text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div class="flex-grow overflow-hidden bg-slate-100 dark:bg-slate-950 p-4">
-                <div class="w-full h-full min-h-[300px] flex items-center justify-center">
-                    <img id="cropping-image" src="" class="max-w-full max-h-full" onerror="this.onerror=null; this.src='/error.png'">
-                </div>
-            </div>
-            <div class="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
-                <button onclick="closeCropModal()" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">Cancel</button>
-                <button onclick="saveCrop()" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all">Crop & Save</button>
-            </div>
-        </div>
-    </div>
-
-    @auth
-        @include('partials.report-modal')
-    @endauth
-
+    </script>
     @stack('scripts')
 </body>
 </html>

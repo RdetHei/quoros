@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Novel;
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class LiveSearchController extends Controller
 {
@@ -47,5 +48,22 @@ class LiveSearchController extends Controller
             });
 
         return response()->json($novels);
+    }
+
+    public function details(Novel $novel)
+    {
+        $novel->load(['author', 'genres']);
+        
+        return response()->json([
+            'id' => $novel->id,
+            'title' => $novel->title,
+            'description' => Str::limit(strip_tags($novel->description ?? ''), 200),
+            'author_name' => $novel->author->name ?? 'Unknown',
+            'cover_image_url' => $novel->cover_image_url ?: ($novel->cover_image ? asset('storage/' . $novel->cover_image) : null),
+            'rating_avg' => number_format($novel->rating_avg, 1),
+            'view_count' => number_format($novel->view_count),
+            'bookmarks_count' => number_format($novel->bookmarks_count ?? 0),
+            'genres' => $novel->genres->map(fn($g) => ['id' => $g->id, 'name' => $g->name]),
+        ]);
     }
 }

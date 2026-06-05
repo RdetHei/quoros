@@ -56,6 +56,7 @@ Route::get('/site.webmanifest', function () {
 // Public API (Discord bot integration can use this after production deploy)
 Route::get('/api/latest-chapter', [ApiChapterController::class, 'latest']);
 Route::get('/api/live-search', [LiveSearchController::class, 'search']);
+Route::get('/api/novel-details/{novel}', [LiveSearchController::class, 'details']);
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
@@ -131,40 +132,50 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
     Route::post('/lists/{list:slug}/novels/{novel}', [UserListController::class, 'addNovel'])->name('lists.novels.add');
     Route::delete('/lists/{list:slug}/novels/{novel}', [UserListController::class, 'removeNovel'])->name('lists.novels.remove');
 
-    // Writer & Admin Routes
-    Route::middleware('role:writer,admin')->group(function () {
-        Route::get('/writer/bulk-guide', function () {
+    // Writer & Admin Routes (Workspace)
+    Route::middleware('role:writer,admin')->prefix('writer')->name('writer.')->group(function () {
+        
+        Route::get('/bulk-guide', function () {
             return view('writer.bulk-guide');
-        })->name('writer.bulk-guide');
+        })->name('bulk-guide');
 
-        Route::get('/writer/stats', [WriterStatsController::class, 'index'])->name('writer.stats');
-        Route::get('/writer/analytics', [WriterWorkspaceController::class, 'analyticsPro'])->name('writer.analytics.pro');
-        Route::get('/writer/feedback-hub', [WriterWorkspaceController::class, 'feedbackHub'])->name('writer.feedback.hub');
-        Route::get('/writer/novels', [NovelController::class, 'writerIndex'])->name('writer.novels.index');
-        Route::get('/writer/novels/create/step-1', [NovelController::class, 'createStep1'])->name('writer.novels.create.step-1');
-        Route::post('/writer/novels/create/step-1', [NovelController::class, 'storeStep1'])->name('writer.novels.store.step-1');
-        Route::get('/writer/novels/{novel}/create/step-2', [NovelController::class, 'createStep2'])->name('writer.novels.create.step-2');
-        Route::put('/writer/novels/{novel}/create/step-2', [NovelController::class, 'updateStep2'])->name('writer.novels.update.step-2');
-        Route::get('/writer/novels/{novel}/create/step-3', [NovelController::class, 'createStep3'])->name('writer.novels.create.step-3');
-        Route::put('/writer/novels/{novel}/create/step-3', [NovelController::class, 'updateStep3'])->name('writer.novels.update.step-3');
-        Route::get('/writer/novels/create', [NovelController::class, 'create'])->name('writer.novels.create');
-        Route::post('/writer/novels', [NovelController::class, 'store'])->name('writer.novels.store');
-        Route::resource('/writer/novels/{novel}/characters', NovelCharacterController::class)
-            ->except(['show'])
-            ->names('writer.novels.characters');
-        Route::get('/writer/novels/{novel}/edit', [NovelController::class, 'edit'])->name('writer.novels.edit');
-        Route::put('/writer/novels/{novel}', [NovelController::class, 'update'])->name('writer.novels.update');
-        Route::delete('/writer/novels/{novel}', [NovelController::class, 'destroy'])->name('writer.novels.destroy');
+        Route::get('/stats', [WriterStatsController::class, 'index'])->name('stats');
+        Route::get('/analytics', [WriterWorkspaceController::class, 'analyticsPro'])->name('analytics.pro');
+        Route::get('/feedback-hub', [WriterWorkspaceController::class, 'feedbackHub'])->name('feedback.hub');
+        
+        // Novel Management
+        Route::prefix('novels')->name('novels.')->group(function () {
+            Route::get('/', [NovelController::class, 'writerIndex'])->name('index');
+            Route::get('/create', [NovelController::class, 'create'])->name('create');
+            Route::get('/create/step-1', [NovelController::class, 'createStep1'])->name('create.step-1');
+            Route::post('/create/step-1', [NovelController::class, 'storeStep1'])->name('store.step-1');
+            Route::get('/{novel}/create/step-2', [NovelController::class, 'createStep2'])->name('create.step-2');
+            Route::put('/{novel}/create/step-2', [NovelController::class, 'updateStep2'])->name('update.step-2');
+            Route::get('/{novel}/create/step-3', [NovelController::class, 'createStep3'])->name('create.step-3');
+            Route::put('/{novel}/create/step-3', [NovelController::class, 'updateStep3'])->name('update.step-3');
+            Route::post('/', [NovelController::class, 'store'])->name('store');
+            Route::get('/{novel}/edit', [NovelController::class, 'edit'])->name('edit');
+            Route::put('/{novel}', [NovelController::class, 'update'])->name('update');
+            Route::delete('/{novel}', [NovelController::class, 'destroy'])->name('destroy');
 
-        // Chapters Management
-        Route::get('/writer/novels/{novel}/chapters/create', [ChapterController::class, 'create'])->name('writer.chapters.create');
-        Route::post('/writer/novels/{novel}/chapters', [ChapterController::class, 'store'])->name('writer.chapters.store');
-        Route::post('/writer/novels/{novel}/chapters/bulk-upload', [ChapterController::class, 'bulkStore'])->name('writer.chapters.bulk-store');
-        Route::post('/writer/novels/{novel}/chapters/bulk-parse', [ChapterController::class, 'parseDocument'])->name('writer.chapters.parse-epub');
-        Route::post('/writer/novels/{novel}/chapters/bulk-store', [ChapterController::class, 'storeBulkChapter'])->name('writer.chapters.store-bulk');
-        Route::get('/writer/novels/{novel}/chapters/{chapter}/edit', [ChapterController::class, 'edit'])->name('writer.chapters.edit');
-        Route::put('/writer/novels/{novel}/chapters/{chapter}', [ChapterController::class, 'update'])->name('writer.chapters.update');
-        Route::delete('/writer/novels/{novel}/chapters/{chapter}', [ChapterController::class, 'destroy'])->name('writer.chapters.destroy');
+            Route::resource('{novel}/characters', NovelCharacterController::class)
+                ->except(['show'])
+                ->names('characters');
+
+            // Chapters Management
+            Route::prefix('{novel}/chapters')->name('chapters.')->group(function () {
+                Route::get('/create', [ChapterController::class, 'create'])->name('create');
+                Route::post('/', [ChapterController::class, 'store'])->name('store');
+                Route::get('/bulk', [ChapterController::class, 'bulkCreate'])->name('bulk-create');
+                Route::post('/bulk-upload', [ChapterController::class, 'bulkStore'])->name('bulk-upload');
+                Route::post('/bulk-parse', [ChapterController::class, 'parseDocument'])->name('bulk-parse');
+                Route::post('/bulk-store', [ChapterController::class, 'storeBulkChapter'])->name('store-bulk');
+                Route::post('/reorder', [ChapterController::class, 'reorder'])->name('reorder');
+                Route::get('/{chapter}/edit', [ChapterController::class, 'edit'])->name('edit');
+                Route::put('/{chapter}', [ChapterController::class, 'update'])->name('update');
+                Route::delete('/{chapter}', [ChapterController::class, 'destroy'])->name('destroy');
+            });
+        });
     });
 
     // Admin Only

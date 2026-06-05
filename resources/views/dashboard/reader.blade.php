@@ -1,10 +1,7 @@
-@extends('layouts.dashboard')
-
-@php
-    $dashboardTitle = 'Reading Hub';
-    $dashboardSubtitle = 'Continue reading, manage bookmarks, and stay on your daily goal.';
-    $dashboardBreadcrumbs = ['Dashboard', 'Reader'];
-@endphp
+@extends('layouts.dashboard', [
+    'title' => 'Reading Hub',
+    'subtitle' => 'Continue reading, manage bookmarks, and stay on your daily goal.'
+])
 
 @section('dashboard-content')
 <section class="bg-slate-900 dark:bg-indigo-950 rounded-2xl p-6 text-white">

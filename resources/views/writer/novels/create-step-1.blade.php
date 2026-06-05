@@ -1,76 +1,97 @@
-@extends('layouts.app')
+@extends('layouts.writer', [
+    'title' => 'Novel Identity',
+    'subtitle' => 'Step 1: Define the core details of your story.'
+])
 
 @section('content')
-<div class="max-w-5xl mx-auto my-8 space-y-6">
+<div class="space-y-8">
     @include('writer.novels._wizard-steps', ['currentStep' => 1])
 
-    <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
-        <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Buat Novel - Info Dasar</h1>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Isi informasi utama novel terlebih dahulu.</p>
-    </div>
+    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <form action="{{ route('writer.novels.store.step-1') }}" method="POST" class="space-y-8">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Judul -->
+                <div class="space-y-2">
+                    <label for="title" class="text-xs font-black uppercase tracking-widest text-slate-400">Novel Title</label>
+                    <input type="text" name="title" id="title" value="{{ old('title', $novel->title ?? '') }}" 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-slate-900 dark:text-white"
+                        placeholder="Enter an catchy title..." required>
+                    @error('title') <p class="text-rose-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
+                </div>
 
-    <form action="{{ route('writer.novels.store.step-1') }}" method="POST" class="space-y-6">
-        @csrf
+                <!-- Judul Alternatif -->
+                <div class="space-y-2">
+                    <label for="alternative_title" class="text-xs font-black uppercase tracking-widest text-slate-400">Alternative Title</label>
+                    <input type="text" name="alternative_title" id="alternative_title" value="{{ old('alternative_title', $novel->alternative_title ?? '') }}" 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-slate-900 dark:text-white"
+                        placeholder="Optional...">
+                </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 space-y-6">
-            <div>
-                <label for="title" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Judul Novel <span class="text-rose-500">*</span></label>
-                <input type="text" name="title" id="title" value="{{ old('title') }}" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
-                @error('title') <p class="mt-2 text-xs text-rose-500 font-medium">{{ $message }}</p> @enderror
-            </div>
+                <!-- Tipe -->
+                <div class="space-y-2">
+                    <label for="type" class="text-xs font-black uppercase tracking-widest text-slate-400">Content Type</label>
+                    <select name="type" id="type" 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-slate-900 dark:text-white" required>
+                        <option value="original" {{ old('type', $novel->type ?? '') === 'original' ? 'selected' : '' }}>Original Story</option>
+                        <option value="web_novel" {{ old('type', $novel->type ?? '') === 'web_novel' ? 'selected' : '' }}>Web Novel</option>
+                        <option value="light_novel" {{ old('type', $novel->type ?? '') === 'light_novel' ? 'selected' : '' }}>Light Novel</option>
+                    </select>
+                    @error('type') <p class="text-rose-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
+                </div>
 
-            <div>
-                <label for="alternative_title" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Alternative Title</label>
-                <input type="text" name="alternative_title" id="alternative_title" value="{{ old('alternative_title') }}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
-            </div>
+                <!-- Status -->
+                <div class="space-y-2">
+                    <label for="status" class="text-xs font-black uppercase tracking-widest text-slate-400">Status</label>
+                    <select name="status" id="status" 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-slate-900 dark:text-white" required>
+                        <option value="ongoing" {{ old('status', $novel->status ?? '') === 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                        <option value="hiatus" {{ old('status', $novel->status ?? '') === 'hiatus' ? 'selected' : '' }}>Hiatus</option>
+                        <option value="complete" {{ old('status', $novel->status ?? '') === 'complete' ? 'selected' : '' }}>Complete</option>
+                    </select>
+                    @error('status') <p class="text-rose-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div>
-                    <label for="type" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Tipe <span class="text-rose-500">*</span></label>
-                    <select name="type" id="type" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
-                        <option value="original" {{ old('type', 'original') === 'original' ? 'selected' : '' }}>Original Story</option>
-                        <option value="web_novel" {{ old('type') === 'web_novel' ? 'selected' : '' }}>Web Novel</option>
-                        <option value="light_novel" {{ old('type') === 'light_novel' ? 'selected' : '' }}>Light Novel</option>
+                <!-- Content Rating -->
+                <div class="space-y-2">
+                    <label for="content_rating" class="text-xs font-black uppercase tracking-widest text-slate-400">Content Rating</label>
+                    <select name="content_rating" id="content_rating" 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-slate-900 dark:text-white" required>
+                        <option value="everyone" {{ old('content_rating', $novel->content_rating ?? '') === 'everyone' ? 'selected' : '' }}>Everyone</option>
+                        <option value="teen" {{ old('content_rating', $novel->content_rating ?? '') === 'teen' ? 'selected' : '' }}>Teen (13+)</option>
+                        <option value="mature" {{ old('content_rating', $novel->content_rating ?? '') === 'mature' ? 'selected' : '' }}>Mature (18+)</option>
+                    </select>
+                    @error('content_rating') <p class="text-rose-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- Bahasa -->
+                <div class="space-y-2">
+                    <label for="language" class="text-xs font-black uppercase tracking-widest text-slate-400">Language</label>
+                    <select name="language" id="language" 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-slate-900 dark:text-white" required>
+                        <option value="id" {{ old('language', $novel->language ?? '') === 'id' ? 'selected' : '' }}>Indonesian</option>
+                        <option value="en" {{ old('language', $novel->language ?? '') === 'en' ? 'selected' : '' }}>English</option>
                     </select>
                 </div>
 
-                <div>
-                    <label for="language" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bahasa</label>
-                    <input type="text" name="language" id="language" value="{{ old('language') }}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
-                </div>
-
-                <div>
-                    <label for="region" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Region</label>
-                    <input type="text" name="region" id="region" value="{{ old('region') }}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
-                </div>
-
-                <div>
-                    <label for="content_rating" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Age Rating <span class="text-rose-500">*</span></label>
-                    <select name="content_rating" id="content_rating" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
-                        <option value="everyone" {{ old('content_rating', 'everyone') === 'everyone' ? 'selected' : '' }}>Everyone</option>
-                        <option value="teen" {{ old('content_rating') === 'teen' ? 'selected' : '' }}>Teen</option>
-                        <option value="mature" {{ old('content_rating') === 'mature' ? 'selected' : '' }}>Mature</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="status" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Status <span class="text-rose-500">*</span></label>
-                    <select name="status" id="status" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
-                        <option value="ongoing" {{ old('status', 'ongoing') === 'ongoing' ? 'selected' : '' }}>Ongoing</option>
-                        <option value="hiatus" {{ old('status') === 'hiatus' ? 'selected' : '' }}>Hiatus</option>
-                        <option value="complete" {{ old('status') === 'complete' ? 'selected' : '' }}>Complete</option>
+                <!-- Region -->
+                <div class="space-y-2">
+                    <label for="region" class="text-xs font-black uppercase tracking-widest text-slate-400">Content Region</label>
+                    <select name="region" id="region" 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-slate-900 dark:text-white" required>
+                        <option value="lokal" {{ old('region', $novel->region ?? '') === 'lokal' ? 'selected' : '' }}>Lokal</option>
+                        <option value="global" {{ old('region', $novel->region ?? '') === 'global' ? 'selected' : '' }}>Global</option>
                     </select>
                 </div>
             </div>
-        </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
-            <div class="flex justify-end">
-                <button type="submit" class="px-8 py-3 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 transition-all">
-                    Lanjut ke Step 2
+            <div class="flex items-center justify-end gap-4 pt-6 border-t border-slate-100 dark:border-slate-800">
+                <a href="{{ route('writer.novels.index') }}" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Cancel</a>
+                <button type="submit" class="px-10 py-4 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20">
+                    Next Step
                 </button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 @endsection

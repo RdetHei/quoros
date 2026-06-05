@@ -58,7 +58,7 @@
                            class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-sm text-center transition-all shadow-lg shadow-amber-600/10">
                             Edit Novel
                         </a>
-                        <a href="{{ route('writer.chapters.create', $novel->id) }}"
+                        <a href="{{ route('writer.novels.chapters.create', $novel->id) }}"
                            class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-sm text-center transition-all shadow-lg shadow-emerald-700/10">
                             + New Chapter
                         </a>
@@ -66,7 +66,7 @@
                            class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm text-center transition-all shadow-lg shadow-indigo-600/10">
                             Bulk Upload DOCX
                         </button>
-                        <form id="bulk-upload-form" action="{{ route('writer.chapters.bulk-store', $novel->id) }}" method="POST" enctype="multipart/form-data" class="hidden">
+                        <form id="bulk-upload-form" action="{{ route('writer.novels.chapters.bulk-upload', $novel->id) }}" method="POST" enctype="multipart/form-data" class="hidden">
                             @csrf
                             <input type="file" id="bulk-upload-input" name="file" accept=".docx" onchange="this.form.submit()">
                         </form>
@@ -543,7 +543,7 @@
 
     <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 md:gap-6">
         @foreach($similarNovels as $similar)
-        <a href="{{ route('novels.show', $similar->slug) }}" class="group">
+        <a href="{{ route('novels.show', $similar->slug) }}" data-novel-id="{{ $similar->id }}" class="group">
             <div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-2.5 bg-slate-100 dark:bg-slate-800
                         ring-1 ring-slate-200 dark:ring-slate-700
                         group-hover:-translate-y-1.5 group-hover:shadow-xl group-hover:shadow-slate-500/10 dark:group-hover:shadow-black/30

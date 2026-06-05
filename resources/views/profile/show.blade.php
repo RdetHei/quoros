@@ -12,16 +12,21 @@
         <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-48 md:w-64 h-48 md:h-64 bg-emerald-500/10 rounded-full blur-2xl md:blur-3xl pointer-events-none"></div>
 
         <div class="relative flex flex-col md:flex-row items-center gap-6 md:gap-10">
-            <div class="relative shrink-0">
+            <div class="relative shrink-0 group">
                 <div class="w-28 h-28 md:w-44 md:h-44 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center ring-2 ring-slate-200/80 dark:ring-slate-700/80">
                     @if($user->profile_photo_url)
-                        <img src="{{ $user->profile_photo_url }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
+                        <div id="profile-photo-placeholder" class="hidden"></div>
+                        <img id="profile-preview" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @elseif($user->profile_photo)
-                        <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
+                        <div id="profile-photo-placeholder" class="hidden"></div>
+                        <img id="profile-preview" src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @else
-                        <span class="text-4xl md:text-6xl font-black text-slate-400/20 uppercase">
-                            {{ substr($user->name, 0, 1) }}
-                        </span>
+                        <div id="profile-photo-placeholder" class="w-full h-full flex items-center justify-center">
+                            <span class="text-4xl md:text-6xl font-black text-slate-400/20 uppercase">
+                                {{ substr($user->name, 0, 1) }}
+                            </span>
+                        </div>
+                        <img id="profile-preview" src="" class="hidden w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @endif
                 </div>
                 @if($user->role === 'admin')
@@ -32,6 +37,16 @@
                     <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-emerald-700 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] rounded-full shadow-lg shadow-emerald-900/30 ring-2 ring-white dark:ring-slate-900">
                         Writer
                     </div>
+                @endif
+
+                @if(auth()->id() === $user->id)
+                    <label class="absolute -bottom-1 -right-1 p-2.5 bg-indigo-600 text-white rounded-xl shadow-xl shadow-indigo-500/30 cursor-pointer hover:scale-110 active:scale-95 transition-all group-hover:flex hidden z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812-1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <form action="{{ route('profile.update-photo') }}" method="POST" enctype="multipart/form-data" id="photo-form">
+                            @csrf
+                            <input type="file" name="profile_photo" class="hidden" onchange="initCropper(this, 'profile-preview', {aspectRatio: 1, placeholderId: 'profile-photo-placeholder', onSave: () => document.getElementById('photo-form').submit()})">
+                        </form>
+                    </label>
                 @endif
             </div>
 
@@ -227,4 +242,6 @@
         @endif
     </div>
 </div>
+
+@include('partials.cropping-modal')
 @endsection

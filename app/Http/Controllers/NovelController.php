@@ -148,8 +148,22 @@ class NovelController extends Controller
             ->filter(fn ($tag) => $tag->novels_count > 0)
             ->take(32);
 
-        $weeklyTop = $this->novelViews->trending(7, 5);
-        $monthlyTop = $this->novelViews->trending(30, 5);
+        $weeklyTop = $this->novelViews->trending(7, 10);
+        $monthlyTop = $this->novelViews->trending(30, 10);
+
+        // New nominations
+        $topRated = Novel::with(['author', 'genres'])
+            ->withCount('chapters')
+            ->orderByDesc('rating_avg')
+            ->take(10)
+            ->get();
+
+        $mostBookmarked = Novel::with(['author', 'genres'])
+            ->withCount('chapters')
+            ->withCount('bookmarks')
+            ->orderByDesc('bookmarks_count')
+            ->take(10)
+            ->get();
 
         return view('novels.index', compact(
             'novels',
@@ -159,6 +173,8 @@ class NovelController extends Controller
             'weeklyTop',
             'monthlyTop',
             'featuredNovels',
+            'topRated',
+            'mostBookmarked',
         ));
     }
 

@@ -1,55 +1,63 @@
-@extends('layouts.app')
+@extends('layouts.writer', [
+    'title' => 'Categories & Tags',
+    'subtitle' => 'Step 3: Categorize your story so readers can find it easily.'
+])
 
 @section('content')
-<div class="max-w-5xl mx-auto my-8 space-y-6">
+<div class="space-y-8">
     @include('writer.novels._wizard-steps', ['currentStep' => 3])
 
-    <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
-        <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Buat Novel - Genre & Tags</h1>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Pilih genre dan tag untuk membantu novel lebih mudah ditemukan pembaca.</p>
-    </div>
-
-    <form action="{{ route('writer.novels.update.step-3', $novel) }}" method="POST" class="space-y-6">
-        @csrf
-        @method('PUT')
-
-        <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Genre <span class="text-rose-500">*</span></label>
-                    <div class="grid grid-cols-2 gap-3 max-h-[320px] overflow-y-auto pr-2">
+    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <form action="{{ route('writer.novels.update.step-3', $novel->id) }}" method="POST" class="space-y-10">
+            @csrf
+            @method('PUT')
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Genres Area -->
+                <div class="space-y-4">
+                    <label class="text-xs font-black uppercase tracking-widest text-slate-400">Genres (Select up to 3)</label>
+                    <div class="grid grid-cols-2 gap-3">
                         @foreach($genres as $genre)
-                            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30">
-                                <input type="checkbox" name="genres[]" value="{{ $genre->id }}" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 dark:focus:ring-offset-slate-900" {{ in_array($genre->id, old('genres', $novel->genres->pluck('id')->all()), true) ? 'checked' : '' }}>
-                                <span class="text-sm font-medium text-slate-600 dark:text-slate-400">{{ $genre->name }}</span>
+                            <label class="relative cursor-pointer">
+                                <input type="checkbox" name="genres[]" value="{{ $genre->id }}" class="peer hidden" 
+                                    {{ in_array($genre->id, old('genres', $novel->genres->pluck('id')->toArray())) ? 'checked' : '' }}>
+                                <div class="px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-500 dark:text-slate-400 peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all text-center">
+                                    {{ $genre->name }}
+                                </div>
                             </label>
                         @endforeach
                     </div>
-                    @error('genres') <p class="mt-2 text-xs text-rose-500 font-medium">{{ $message }}</p> @enderror
+                    @error('genres') <p class="text-rose-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Tag</label>
-                    <div class="grid grid-cols-2 gap-3 max-h-[320px] overflow-y-auto pr-2">
+                <!-- Tags Area -->
+                <div class="space-y-4">
+                    <label class="text-xs font-black uppercase tracking-widest text-slate-400">Story Tags (Select relevant tags)</label>
+                    <div class="flex flex-wrap gap-2">
                         @foreach($tags as $tag)
-                            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30">
-                                <input type="checkbox" name="tags[]" value="{{ $tag->id }}" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 dark:focus:ring-offset-slate-900" {{ in_array($tag->id, old('tags', $novel->tags->pluck('id')->all()), true) ? 'checked' : '' }}>
-                                <span class="text-sm font-medium text-slate-600 dark:text-slate-400">#{{ $tag->name }}</span>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="tags[]" value="{{ $tag->id }}" class="peer hidden"
+                                    {{ in_array($tag->id, old('tags', $novel->tags->pluck('id')->toArray())) ? 'checked' : '' }}>
+                                <div class="px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 transition-all">
+                                    #{{ $tag->name }}
+                                </div>
                             </label>
                         @endforeach
                     </div>
+                    @error('tags') <p class="text-rose-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                 </div>
             </div>
-        </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
-            <div class="flex justify-between">
-                <a href="{{ route('writer.novels.create.step-2', $novel) }}" class="px-6 py-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">Kembali</a>
-                <button type="submit" class="px-8 py-3 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 transition-all">
-                    Selesaikan Novel
+            <div class="flex items-center justify-between pt-10 border-t border-slate-100 dark:border-slate-800">
+                <a href="{{ route('writer.novels.create.step-2', $novel->id) }}" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    Previous
+                </a>
+                <button type="submit" class="px-10 py-4 bg-emerald-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20">
+                    Finish & Publish
                 </button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 @endsection
