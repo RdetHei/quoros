@@ -118,9 +118,10 @@ class EpubParserService
             }
 
             $cleaned = $this->cleanHtmlContent($content);
+            $plainText = $this->extractReadableText($cleaned['node']);
             
             // Skip empty content
-            if (empty(trim(strip_tags($cleaned['content'])))) {
+            if (empty(trim($plainText))) {
                 continue;
             }
 
@@ -129,7 +130,7 @@ class EpubParserService
 
             $allChapters[] = [
                 'title' => $title,
-                'content' => $cleaned['content'],
+                'content' => $plainText,
                 'metadata' => $index === 0 ? $metadata : null // Attach metadata only to first item for controller
             ];
         }
@@ -207,7 +208,8 @@ class EpubParserService
 
         return [
             'title' => $title,
-            'content' => trim($content)
+            'content' => trim($content),
+            'node' => $body
         ];
     }
 
@@ -241,32 +243,53 @@ class EpubParserService
         }
     }
 
-    private function extractReadableText(\DOMNode $body): string
+    private function extractReadableText(\DOMNode $node): string
     {
-        $blockTags = ['p', 'div', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
-        $lines = [];
-
-        foreach ($blockTags as $tag) {
-            foreach ($body->getElementsByTagName($tag) as $node) {
-                $text = $this->normalizeText($node->textContent ?? '');
-                if ($text !== '') {
-                    $lines[] = $text;
+        $text = '';
+        foreach ($node->childNodes as $child) {
+            if ($child instanceof \DOMText) {
+                $text .= $child->textContent;
+            } elseif ($child instanceof \DOMElement) {
+                if ($child->tagName === 'br') {
+                    $text .= "\n";
+                } elseif (in_array($child->tagName, ['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote'])) {
+                    $text .= "\n" . $this->extractReadableText($child) . "\n";
+                } else {
+                    $text .= $this->extractReadableText($child);
                 }
             }
         }
-
-        if (!empty($lines)) {
-            return implode("\n\n", $lines);
-        }
-
-        return $this->normalizeText($body->textContent ?? '');
+        
+        return $this->normalizeText($text);
     }
 
     private function normalizeText(string $text): string
     {
+        // Handle special characters like curly quotes, various dashes and ellipses
+        $search = [
+            "\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9a", "\xe2\x80\x9b", // single quotes
+            "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x9e", "\xe2\x80\x9f", // double quotes
+            "\xe2\x80\x93", "\xe2\x80\x94", // dashes
+            "\xe2\x80\xa6", // ellipsis
+            "‘", "’", "‚", "‛",
+            "“", "”", "„", "‟",
+            "–", "—", "…",
+        ];
+        $replace = [
+            "'", "'", "'", "'",
+            '"', '"', '"', '"',
+            '-', '--',
+            '...',
+            "'", "'", "'", "'",
+            '"', '"', '"', '"',
+            '-', '--', '...',
+        ];
+        $text = str_replace($search, $replace, $text);
+
         $decoded = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $decoded = str_replace(["\r\n", "\r"], "\n", $decoded);
         $decoded = preg_replace("/[ \t]+/u", ' ', $decoded);
+        // Normalize multiple newlines to double newlines (paragraphed)
         $decoded = preg_replace("/\n{3,}/u", "\n\n", $decoded);
 
         return trim($decoded ?? '');

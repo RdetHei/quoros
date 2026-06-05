@@ -57,7 +57,7 @@ class NovelParserService
 
             $chapters[] = [
                 'title' => trim($title),
-                'content' => nl2br(trim($body))
+                'content' => trim($body)
             ];
         }
 

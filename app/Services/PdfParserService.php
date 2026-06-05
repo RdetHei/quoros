@@ -41,7 +41,7 @@ class PdfParserService
 
             $chapters[] = [
                 'title' => $title,
-                'content' => nl2br(e(trim($body)))
+                'content' => trim($body)
             ];
         }
 
@@ -49,7 +49,7 @@ class PdfParserService
         if (empty($chapters)) {
             $chapters[] = [
                 'title' => 'Full Story',
-                'content' => nl2br(e(trim($text)))
+                'content' => trim($text)
             ];
         }
 

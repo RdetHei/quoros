@@ -33,7 +33,12 @@ class DocxParserService
                 $trimmedText = trim($text);
                 $fullText .= $text . "\n";
 
-                if (empty($trimmedText)) continue;
+                if (empty($trimmedText)) {
+                    if (!empty($currentChapter['title'])) {
+                        $currentChapter['content'][] = '';
+                    }
+                    continue;
+                }
 
                 // 1. Metadata Block Detection (Prioritized before first chapter)
                 if (empty($chapters) && empty($currentChapter['title'])) {
@@ -95,7 +100,7 @@ class DocxParserService
                     if (!empty($currentChapter['title'])) {
                         $chapters[] = [
                             'title' => $currentChapter['title'],
-                            'content' => nl2br(implode("\n", $currentChapter['content']))
+                            'content' => implode("\n", $currentChapter['content'])
                         ];
                     }
                     
@@ -107,7 +112,8 @@ class DocxParserService
                     // 3. Content: Text with Normal style (or any non-heading)
                     // Only collect content if we are already inside a chapter
                     if (!empty($currentChapter['title'])) {
-                        $currentChapter['content'][] = e($trimmedText);
+                        // Preserve empty lines for paragraph spacing
+                        $currentChapter['content'][] = $trimmedText;
                     }
                 }
             }
@@ -117,7 +123,7 @@ class DocxParserService
         if (!empty($currentChapter['title'])) {
             $chapters[] = [
                 'title' => $currentChapter['title'],
-                'content' => nl2br(implode("\n", $currentChapter['content']))
+                'content' => implode("\n", $currentChapter['content'])
             ];
         }
 
@@ -136,9 +142,13 @@ class DocxParserService
 
     private function getElementText($element)
     {
+        if ($element instanceof \PhpOffice\PhpWord\Element\TextBreak) {
+            return "\n";
+        }
+
         if (method_exists($element, 'getText')) {
             $text = $element->getText();
-            if (is_string($text)) return $text;
+            if (is_string($text)) return $this->normalizeText($text);
         }
 
         $text = '';
@@ -147,6 +157,41 @@ class DocxParserService
                 $text .= $this->getElementText($childElement);
             }
         }
-        return $text;
+        return $this->normalizeText($text);
+    }
+
+    private function normalizeText(string $text): string
+    {
+        // Handle special characters like curly quotes, various dashes and ellipses
+        $search = [
+            "\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9a", "\xe2\x80\x9b", // single quotes
+            "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x9e", "\xe2\x80\x9f", // double quotes
+            "\xe2\x80\x93", "\xe2\x80\x94", // dashes
+            "\xe2\x80\xa6", // ellipsis
+            "‘", "’", "‚", "‛",
+            "“", "”", "„", "‟",
+            "–", "—", "…",
+        ];
+        $replace = [
+            "'", "'", "'", "'",
+            '"', '"', '"', '"',
+            '-', '--',
+            '...',
+            "'", "'", "'", "'",
+            '"', '"', '"', '"',
+            '-', '--', '...',
+        ];
+        $text = str_replace($search, $replace, $text);
+
+        // Decode HTML entities if any
+        $decoded = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        
+        // Normalize whitespace
+        $decoded = str_replace(["\r\n", "\r"], "\n", $decoded);
+        $decoded = preg_replace("/[ \t]+/u", ' ', $decoded);
+        // Normalize multiple newlines to double newlines (paragraphed)
+        $decoded = preg_replace("/\n{3,}/u", "\n\n", $decoded);
+        
+        return trim($decoded ?? '');
     }
 }
