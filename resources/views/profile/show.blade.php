@@ -109,6 +109,11 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 012 2h2a2 2 0 012-2" /></svg>
                                     Writer Dashboard
                                 </a>
+                            @else
+                                <a href="{{ route('guides.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 group/profile-write">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover/profile-write:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    Start Writing
+                                </a>
                             @endif
                         @endif
                     @endauth
@@ -127,6 +132,30 @@
     </div>
 
     @include('partials.writer-insights', ['writerStats' => $writerStats, 'isOwner' => $isOwner])
+
+    @if($isOwner && $user->role === 'user')
+        <div class="mb-10 p-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 rounded-[2.5rem] shadow-xl shadow-indigo-500/10">
+            <div class="bg-white dark:bg-slate-950 rounded-[2.3rem] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 overflow-hidden relative group">
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors"></div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-6 relative z-10">
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-indigo-600 rounded-3xl flex items-center justify-center shadow-lg shadow-indigo-600/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-10 md:w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Ready to tell your own story?</h3>
+                        <p class="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-2 font-medium">Join our community of creators and share your imagination with the world.</p>
+                    </div>
+                </div>
+
+                <a href="{{ route('guides.index') }}" class="shrink-0 px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl text-sm font-black uppercase tracking-widest hover:scale-[1.05] active:scale-[0.95] transition-all shadow-xl shadow-slate-900/20 relative z-10">
+                    Start My Journey
+                </a>
+            </div>
+        </div>
+    @endif
 
     @if($isOwner)
         <div class="mb-6">

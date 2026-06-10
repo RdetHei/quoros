@@ -1,13 +1,22 @@
-@extends('layouts.dashboard')
-
 @php
-    $dashboardTitle = 'Settings V2';
-    $dashboardSubtitle = 'Manage public profile and account security settings separately.';
-    $dashboardBreadcrumbs = ['Dashboard', 'Settings'];
+    $role = auth()->user()->role;
+    $layout = match($role) {
+        'admin' => 'layouts.admin',
+        'writer' => 'layouts.writer',
+        default => 'layouts.app'
+    };
+    $isUser = $role === 'user';
 @endphp
 
-@section('dashboard-content')
-<div class="max-w-3xl mx-auto" x-data="{
+@extends($layout, [
+    'title' => 'Account Settings',
+    'subtitle' => 'Manage your public profile and system security.',
+    'adminTitle' => 'System Preferences',
+    'adminBreadcrumbs' => ['Admin', 'Settings']
+])
+
+@section($isUser ? 'content' : 'dashboard-content')
+<div class="{{ $isUser ? 'max-w-4xl mx-auto pb-20' : 'max-w-3xl mx-auto' }}" x-data="{
     profilePhotoPreview: null,
     updateProfilePhotoPreview(event) {
         const input = event.target;
@@ -20,6 +29,15 @@
         }
     }
 }">
+    @if($isUser)
+        <div class="flex items-center gap-4 mb-10">
+            <div class="w-1.5 h-10 bg-indigo-600 rounded-full shadow-lg shadow-indigo-500/20"></div>
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Settings</h1>
+                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Configure your personal preference and account security.</p>
+            </div>
+        </div>
+    @endif
     <div class="mb-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
         <p class="text-sm text-slate-500 dark:text-slate-400">
             Public Profile controls how people see you. Account Security keeps login identity and privacy settings safe.

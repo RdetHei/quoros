@@ -1,116 +1,151 @@
 @extends('layouts.admin')
 
+@php
+    $adminTitle = 'Novel Requests';
+    $adminBreadcrumbs = ['Admin', 'Novel Requests'];
+@endphp
+
 @section('content')
-<div class="max-w-6xl mx-auto mb-12">
-    <div class="flex items-center gap-4 mb-8">
-        <div class="w-2 h-10 bg-indigo-600 rounded-full"></div>
+<div class="max-w-6xl mx-auto space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Novel Request Management</h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium">Manage novel requests from readers.</p>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest">
+                    Moderation Queue
+                </span>
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Novel Requests</p>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                Request <span class="text-indigo-600 dark:text-indigo-400">Moderation</span>
+            </h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
+                Review and manage reader suggestions for new titles to be added to the platform.
+            </p>
         </div>
     </div>
 
     @if(session('success'))
-        <div class="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-2xl text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+        <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-2xl text-emerald-600 dark:text-emerald-400 font-bold text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
             {{ session('success') }}
         </div>
     @endif
 
-    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[820px]">
-                <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-800/50">
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">User</th>
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Novel Title</th>
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                        <th class="px-4 md:px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
-                    @forelse($requests as $request)
-                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all">
-                            <td class="px-4 md:px-6 py-6">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xs font-bold">
-                                        {{ substr($request->user->name, 0, 1) }}
-                                    </div>
-                                    <div class="text-sm font-bold text-slate-900 dark:text-white">{{ $request->user->name }}</div>
+    <x-admin.data-table class="p-0 border-none shadow-xl shadow-slate-200/50 dark:shadow-none">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-slate-50/80 dark:bg-slate-800/50 text-left border-b border-slate-100 dark:border-slate-800">
+                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Requested By</th>
+                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Novel Details</th>
+                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Current Status</th>
+                    <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Moderation Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                @forelse($requests as $request)
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
+                        <td class="px-6 py-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 font-bold text-slate-500 group-hover:border-indigo-200 dark:group-hover:border-indigo-900/50 transition-colors">
+                                    {{ strtoupper(substr($request->user->name, 0, 1)) }}
                                 </div>
-                            </td>
-                            <td class="px-4 md:px-6 py-6">
-                                <div class="text-sm font-bold text-slate-900 dark:text-white mb-1">{{ $request->title }}</div>
-                                <div class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 italic">{{ $request->description ?? 'No description' }}</div>
-                            </td>
-                            <td class="px-4 md:px-6 py-6">
-                                @php
-                                    $statusClasses = [
-                                        'pending' => 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800',
-                                        'fulfilled' => 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',
-                                        'rejected' => 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800',
-                                    ];
-                                    $statusLabels = [
-                                        'pending' => 'Pending',
-                                        'fulfilled' => 'Accepted',
-                                        'rejected' => 'Declined',
-                                    ];
-                                @endphp
-                                <span class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border {{ $statusClasses[$request->status] }}">
-                                    {{ $statusLabels[$request->status] }}
-                                </span>
-                            </td>
-                            <td class="px-4 md:px-6 py-6">
-                                <div class="flex items-center gap-2">
-                                    @if($request->status === 'pending')
-                                        <form action="{{ route('admin.requests.status', $request->id) }}" method="POST">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="hidden" name="status" value="fulfilled">
-                                            <button type="submit" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">Accept</button>
-                                        </form>
-                                        <form action="{{ route('admin.requests.status', $request->id) }}" method="POST">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="hidden" name="status" value="rejected">
-                                            <button type="submit" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">Decline</button>
-                                        </form>
-                                    @else
-                                        <form action="{{ route('admin.requests.status', $request->id) }}" method="POST">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="hidden" name="status" value="pending">
-                                            <button type="submit" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-slate-200 transition-all">Reset</button>
-                                        </form>
-                                    @endif
-                                    
-                                    <form action="{{ route('admin.requests.destroy', $request->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this request?')">
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{{ $request->user->name }}</p>
+                                    <p class="text-[10px] font-medium text-slate-500 uppercase tracking-tighter">{{ $request->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6 max-w-xs">
+                            <p class="text-sm font-black text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $request->title }}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed italic">
+                                {{ $request->description ?: 'No additional context provided.' }}
+                            </p>
+                        </td>
+                        <td class="px-6 py-6 text-center">
+                            @php
+                                $variant = match($request->status) {
+                                    'pending' => 'warning',
+                                    'fulfilled' => 'success',
+                                    'rejected' => 'danger',
+                                    default => 'neutral',
+                                };
+                                $label = match($request->status) {
+                                    'pending' => 'Pending Review',
+                                    'fulfilled' => 'Approved',
+                                    'rejected' => 'Rejected',
+                                    default => 'Unknown',
+                                };
+                            @endphp
+                            <x-admin.status-badge :label="$label" :variant="$variant" />
+                        </td>
+                        <td class="px-6 py-6">
+                            <div class="flex items-center justify-end gap-2">
+                                @if($request->status === 'pending')
+                                    <form action="{{ route('admin.requests.status', $request->id) }}" method="POST">
                                         @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 transition-colors">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="fulfilled">
+                                        <button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/10">
+                                            Approve
                                         </button>
                                     </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="px-6 py-20 text-center">
-                                <div class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-300 mb-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                </div>
-                                <p class="text-slate-500 font-medium">Belum ada permintaan novel yang masuk.</p>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                    <form action="{{ route('admin.requests.status', $request->id) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="rejected">
+                                        <button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 transition-all shadow-lg shadow-rose-500/10">
+                                            Reject
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('admin.requests.status', $request->id) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="pending">
+                                        <button type="submit" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all">
+                                            Re-evaluate
+                                        </button>
+                                    </form>
+                                @endif
+                                
+                                <div class="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-1"></div>
+
+                                <form action="{{ route('admin.requests.destroy', $request->id) }}" method="POST" onsubmit="return confirm('Securely delete this request permanently?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 transition-colors group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="px-6 py-20 text-center">
+                            <div class="w-20 h-20 rounded-full bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center mx-auto mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-300 dark:text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-black text-slate-900 dark:text-white">Queue Clear</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">All reader requests have been processed.</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </x-admin.data-table>
+
+    @if($requests->hasPages())
+        <div class="px-4">
+            {{ $requests->links() }}
         </div>
-        @if($requests->hasPages())
-            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
-                {{ $requests->links() }}
-            </div>
-        @endif
-    </div>
+    @endif
 </div>
 @endsection

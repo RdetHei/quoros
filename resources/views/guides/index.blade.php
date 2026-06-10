@@ -49,15 +49,36 @@
 
         @auth
             @if(Auth::user()->role === 'user')
-                <div class="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-3xl p-8 text-white flex flex-col justify-between">
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">Ingin Menjadi Penulis?</h2>
-                        <p class="text-emerald-50 mb-8 leading-relaxed">Bagikan ceritamu dengan ribuan pembaca di Quoros. Mulai perjalanan menulismu sekarang juga!</p>
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute -right-16 -top-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors"></div>
+                    
+                    <div class="relative z-10">
+                        <h2 class="text-2xl font-bold text-white mb-4">Become a <span class="text-emerald-500">Quoros Writer</span></h2>
+                        <p class="text-slate-400 mb-6 leading-relaxed">Share your stories with thousands of readers. Start your writing journey today!</p>
+                        
+                        <div class="bg-slate-950/50 border border-slate-800/50 rounded-2xl p-5 mb-8 space-y-4">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Submission Guidelines</p>
+                            <ul class="space-y-3">
+                                <li class="flex items-start gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p class="text-[11px] text-slate-400 leading-normal"><strong class="text-slate-200">Manual Review:</strong> All submissions must pass a review phase by our staff to ensure content suitability.</p>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <p class="text-[11px] text-slate-400 leading-normal"><strong class="text-slate-200">Strict Prohibitions:</strong> Pornographic material, sexually explicit imagery, and privacy violations are strictly forbidden.</p>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <form action="{{ route('dashboard.become-writer') }}" method="POST">
+
+                    <form action="{{ route('dashboard.become-writer') }}" method="POST" class="relative z-10">
                         @csrf
-                        <button type="submit" class="w-full py-4 bg-white text-emerald-600 font-bold rounded-2xl hover:bg-emerald-50 transition-all shadow-lg">
-                            Mulai Menulis Sekarang
+                        <button type="submit" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98]">
+                            Apply as Writer
                         </button>
                     </form>
                 </div>

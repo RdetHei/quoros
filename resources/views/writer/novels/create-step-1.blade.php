@@ -7,6 +7,35 @@
 <div class="space-y-8">
     @include('writer.novels._wizard-steps', ['currentStep' => 1])
 
+    <!-- Submission Guidelines -->
+    <div class="bg-indigo-600 rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-xl shadow-indigo-500/20">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center gap-8">
+            <div class="shrink-0 p-4 bg-white/10 rounded-[2rem] border border-white/20 backdrop-blur-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-xl font-black uppercase tracking-tight">Submission Protocol & Guidelines</h3>
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="flex items-start gap-3">
+                        <div class="w-1.5 h-1.5 rounded-full bg-indigo-300 mt-2 shrink-0"></div>
+                        <p class="text-[11px] leading-relaxed text-indigo-100 italic">
+                            <strong class="text-white">Manual Review:</strong> All new works undergo a thorough review by the Quoros Team to ensure catalog quality and safety.
+                        </p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-1.5 h-1.5 rounded-full bg-rose-400 mt-2 shrink-0"></div>
+                        <p class="text-[11px] leading-relaxed text-indigo-100 italic">
+                            <strong class="text-white">Strict Prohibitions:</strong> Sexually explicit imagery, pornographic content, and privacy violations will result in immediate rejection and account suspension.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
         <form action="{{ route('writer.novels.store.step-1') }}" method="POST" class="space-y-8">
             @csrf
