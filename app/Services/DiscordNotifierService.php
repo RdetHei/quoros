@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Chapter;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Reserved for post-production Discord integration. Not wired into the app yet.
@@ -27,9 +28,13 @@ class DiscordNotifierService
             return;
         }
 
+        $summary = $chapter->content 
+            ? Str::limit(strip_tags($chapter->content), 200)
+            : 'Chapter baru telah rilis!';
+
         $payload = [
             'title' => $chapter->novel->title . ' - ' . $chapter->title,
-            'summary' => $chapter->summary ?: 'Chapter baru telah rilis!',
+            'summary' => $summary,
             'url' => url('/novels/' . $chapter->novel->slug . '/read/' . $chapter->slug),
         ];
 

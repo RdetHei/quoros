@@ -61,7 +61,7 @@ class DocxBulkUploadTest extends TestCase
 
         // 3. Act: Call the bulk store endpoint
         $response = $this->actingAs($user)
-            ->post(route('writer.chapters.bulk-store', $novel), [
+            ->post(route('writer.novels.chapters.bulk-upload', $novel), [
                 'file' => $uploadedFile
             ]);
 
@@ -124,7 +124,7 @@ class DocxBulkUploadTest extends TestCase
         );
 
         $response = $this->actingAs($user)
-            ->post(route('writer.chapters.bulk-store', $novel), [
+            ->post(route('writer.novels.chapters.bulk-upload', $novel), [
                 'file' => $uploadedFile
             ]);
 

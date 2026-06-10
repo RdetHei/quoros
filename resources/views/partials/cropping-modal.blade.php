@@ -19,9 +19,9 @@
         </div>
 
         <!-- Image Container -->
-        <div class="bg-slate-50 dark:bg-slate-950/50 flex-grow flex items-center justify-center min-h-[400px] relative p-4">
-            <div class="w-full h-full flex items-center justify-center overflow-hidden">
-                <img id="cropping-image" src="" class="block max-w-full max-h-[60vh]">
+        <div class="p-8 bg-slate-50 dark:bg-slate-950/50 overflow-hidden flex-grow flex items-center justify-center min-h-[300px]">
+            <div class="max-w-full max-h-[50vh] flex items-center justify-center">
+                <img id="cropping-image" src="" class="block max-w-full max-h-[50vh]">
             </div>
         </div>
 

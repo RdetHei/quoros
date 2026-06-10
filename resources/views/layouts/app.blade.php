@@ -62,34 +62,31 @@
                     currentPreviewId = previewId;
                     currentCropOptions = options || {};
                     
-                    image.onload = function() {
-                        modal.classList.remove('hidden');
-                        modal.classList.add('flex');
+                    // Initialize cropper after image is loaded in modal
+                    image.onload = () => {
+                        if (typeof Cropper === 'undefined') {
+                            console.error('Cropper.js library not loaded');
+                            return;
+                        }
                         
-                        // Small timeout to ensure modal is rendered for dimensions
-                        setTimeout(() => {
-                            if (currentCropper) {
-                                currentCropper.destroy();
-                            }
-                            
-                            currentCropper = new Cropper(image, {
-                                aspectRatio: currentCropOptions.aspectRatio || 1,
-                                viewMode: 1,
-                                dragMode: 'move',
-                                autoCropArea: 0.8,
-                                restore: false,
-                                guides: true,
-                                center: true,
-                                highlight: false,
-                                cropBoxMovable: true,
-                                cropBoxResizable: true,
-                                toggleDragModeOnDblclick: false,
-                                responsive: true,
-                                checkOrientation: true,
-                            });
-                        }, 100);
+                        currentCropper = new Cropper(image, {
+                            aspectRatio: currentCropOptions.aspectRatio || 1,
+                            viewMode: 1,
+                            dragMode: 'move',
+                            autoCropArea: 0.8,
+                            restore: false,
+                            guides: true,
+                            center: true,
+                            highlight: false,
+                            cropBoxMovable: true,
+                            cropBoxResizable: true,
+                            toggleDragModeOnDblclick: false,
+                        });
                     };
+                    
                     image.src = e.target.result;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -115,14 +112,12 @@
                     preview.classList.remove('hidden');
                     
                     // Handle dynamic placeholder ID
-                    const placeholderId = currentCropOptions.placeholderId;
-                    if (placeholderId) {
-                        const placeholder = document.getElementById(placeholderId);
-                        if (placeholder) placeholder.classList.add('hidden');
-                    }
+                    const placeholderId = currentCropOptions.placeholderId || 'profile-photo-placeholder';
+                    const placeholder = document.getElementById(placeholderId);
+                    if (placeholder) placeholder.classList.add('hidden');
                     
                     // Fallback for hardcoded cover-placeholder if not provided
-                    if (!placeholderId && document.getElementById('cover-placeholder')) {
+                    if (!currentCropOptions.placeholderId && document.getElementById('cover-placeholder')) {
                         document.getElementById('cover-placeholder').classList.add('hidden');
                     }
                 }
@@ -443,7 +438,6 @@
             });
         });
     </script>
-    @include('partials.cookie-consent')
     @stack('scripts')
 </body>
 </html>

@@ -40,6 +40,11 @@ class ChapterController extends Controller
         $request->validate($rules);
 
         $slug = Str::slug($request->title);
+        $originalSlug = $slug;
+        $count = 1;
+        while (Chapter::where('novel_id', $novel->id)->where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $count++;
+        }
 
         $chapter = new Chapter;
         $chapter->novel_id = $novel->id;

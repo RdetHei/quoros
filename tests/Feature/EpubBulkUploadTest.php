@@ -85,7 +85,7 @@ class EpubBulkUploadTest extends TestCase
 
         // 2. Act
         $response = $this->actingAs($user)
-            ->post(route('writer.chapters.bulk-store', $novel), [
+            ->post(route('writer.novels.chapters.bulk-upload', $novel), [
                 'file' => $uploadedFile
             ]);
 

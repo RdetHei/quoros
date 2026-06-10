@@ -165,6 +165,12 @@ class NovelController extends Controller
             ->take(10)
             ->get();
 
+        $popularNovels = Novel::with(['author', 'genres'])
+            ->withCount('chapters')
+            ->orderByDesc('view_count')
+            ->take(6)
+            ->get();
+
         return view('novels.index', compact(
             'novels',
             'genres',
@@ -175,6 +181,7 @@ class NovelController extends Controller
             'featuredNovels',
             'topRated',
             'mostBookmarked',
+            'popularNovels',
         ));
     }
 
@@ -469,11 +476,7 @@ class NovelController extends Controller
             'tags' => 'nullable|array',
         ]);
 
-        $slug = Str::slug($request->title);
-        $count = Novel::where('slug', 'like', $slug.'%')->count();
-        if ($count > 0) {
-            $slug = $slug.'-'.($count + 1);
-        }
+        $slug = $this->generateUniqueSlug($request->title);
 
         $novel = new Novel;
         $novel->title = $request->title;
@@ -655,10 +658,11 @@ class NovelController extends Controller
     private function generateUniqueSlug(string $title): string
     {
         $slug = Str::slug($title);
-        $count = Novel::where('slug', 'like', $slug.'%')->count();
+        $originalSlug = $slug;
+        $count = 1;
 
-        if ($count > 0) {
-            $slug .= '-'.($count + 1);
+        while (Novel::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $count++;
         }
 
         return $slug;

@@ -134,7 +134,6 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
 
     // Writer & Admin Routes (Workspace)
     Route::middleware('role:writer,admin')->prefix('writer')->name('writer.')->group(function () {
-        
         Route::get('/bulk-guide', function () {
             return view('writer.bulk-guide');
         })->name('bulk-guide');
