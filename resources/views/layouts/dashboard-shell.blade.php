@@ -229,6 +229,7 @@
         @include('partials.report-modal')
     @endauth
 
+    @include('partials.cookie-consent')
     @stack('scripts')
 </body>
 </html>
