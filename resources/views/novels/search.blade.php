@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Pencarian Novel — Quoros')
+@section('meta_description', 'Temukan novel favorit Anda dengan fitur pencarian lanjutan. Filter berdasarkan genre, status, tipe, dan rating untuk mendapatkan bacaan terbaik di Quoros.')
+
 @section('content')
 <div class="max-w-7xl mx-auto">
 
@@ -21,6 +24,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
+                    <label for="adv-search-input" class="sr-only">Search novels</label>
                     <input type="text"
                            name="q"
                            id="adv-search-input"
@@ -31,7 +35,9 @@
                                   bg-slate-800/80 border border-slate-700 rounded-xl md:rounded-2xl
                                   text-sm md:text-base text-white placeholder-slate-500 shadow-inner shadow-black/20
                                   focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-colors">
-                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-4 md:px-6 py-2 md:py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs md:text-sm transition-colors shadow-lg shadow-black/40">
+                    <button type="submit"
+                            aria-label="Submit search"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 px-4 md:px-6 py-2 md:py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs md:text-sm transition-colors shadow-lg shadow-black/40">
                         Search
                     </button>
                 </div>
@@ -160,14 +166,16 @@
                                     transition-all duration-300">
                             @if($novel->cover_image_url)
                                 <img src="{{ $novel->cover_image_url }}"
-                                     alt="{{ $novel->title }}"
+                                     alt="{{ $novel->title }} cover"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     width="200" height="267"
                                      loading="lazy"
                                      onerror="this.onerror=null; this.src='/error.png'">
                             @elseif($novel->cover_image)
                                 <img src="{{ asset('storage/' . $novel->cover_image) }}"
-                                     alt="{{ $novel->title }}"
+                                     alt="{{ $novel->title }} cover"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     width="200" height="267"
                                      loading="lazy"
                                      onerror="this.onerror=null; this.src='/error.png'">
                             @else

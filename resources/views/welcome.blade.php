@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Quoros — Platform Novel Premium')
+@section('meta_description', 'Baca ribuan novel terjemahan berkualitas tinggi dengan fitur bookmark, riwayat baca, dan mode gelap di Quoros. Platform novel premium untuk pembaca setia.')
+
 @section('content')
 @php
     $featuredCarouselData = $featuredNovels->map(fn ($n) => [
@@ -23,8 +26,10 @@
              @if($featuredCarouselData->isNotEmpty()) x-data="landingHero(@js($featuredCarouselData))" @endif>
         <div class="absolute inset-0">
             <img src="{{ asset('storage/banners/landingBanner.png') }}"
-                 alt=""
+                 alt="Quoros background banner"
                  class="w-full h-full object-cover opacity-30 dark:opacity-25 scale-105"
+                 width="1920" height="1080"
+                 fetchpriority="high"
                  onerror="this.style.display='none'">
             <div class="absolute inset-0 bg-gradient-to-b from-white/90 via-white/80 to-slate-50 dark:from-slate-950/95 dark:via-slate-950/90 dark:to-slate-950"></div>
             <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(99,102,241,0.12),transparent)]"></div>
@@ -73,8 +78,9 @@
                                 <template x-for="(novel, index) in novels" :key="novel.id">
                                     <img x-show="activeSlide === index"
                                          :src="novel.cover || '/error.png'"
-                                         :alt="novel.title"
+                                         :alt="novel.title + ' cover image'"
                                          class="w-full h-full object-cover"
+                                         width="128" height="192"
                                          x-transition:enter="transition ease-out duration-400"
                                          x-transition:enter-start="opacity-0"
                                          x-transition:enter-end="opacity-100">
@@ -147,9 +153,9 @@
                    class="group flex gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
                     <div class="shrink-0 w-16 aspect-[2/3] rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.src='/error.png'">
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }} cover" class="w-full h-full object-cover" width="64" height="96" loading="lazy" onerror="this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.src='/error.png'">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }} cover" class="w-full h-full object-cover" width="64" height="96" loading="lazy" onerror="this.src='/error.png'">
                         @endif
                     </div>
                     <div class="min-w-0 flex flex-col justify-center">
@@ -184,9 +190,9 @@
                     {{-- Cover & Image Overlay --}}
                     <div class="relative aspect-[16/11] overflow-hidden">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.src='/error.png'">
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }} cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" width="320" height="220" loading="lazy" onerror="this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.src='/error.png'">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }} cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" width="320" height="220" loading="lazy" onerror="this.src='/error.png'">
                         @endif
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-40"></div>
                         
@@ -292,37 +298,3 @@
 
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    function landingHero(initialNovels) {
-        return {
-            activeSlide: 0,
-            novels: initialNovels,
-            paused: false,
-            timer: null,
-            get current() { return this.novels[this.activeSlide] || {}; },
-            get slideCount() { return this.novels.length; },
-            init() {
-                if (this.slideCount > 1) this.startTimer();
-            },
-            goTo(index) {
-                this.activeSlide = index;
-                this.resetTimer();
-            },
-            next() {
-                this.activeSlide = (this.activeSlide + 1) % this.slideCount;
-            },
-            startTimer() {
-                this.timer = setInterval(() => {
-                    if (!this.paused) this.next();
-                }, 6000);
-            },
-            resetTimer() {
-                clearInterval(this.timer);
-                if (this.slideCount > 1) this.startTimer();
-            },
-        };
-    }
-</script>
-@endpush

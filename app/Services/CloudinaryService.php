@@ -45,7 +45,7 @@ class CloudinaryService
 
         $url = $this->cloudinary->image($result['public_id'])
             ->resize($resizeAction)
-            ->format('webp')
+            ->format('auto')
             ->quality('auto')
             ->toUrl();
 

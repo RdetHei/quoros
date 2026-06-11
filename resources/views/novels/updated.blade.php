@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Pembaruan Terbaru — Quoros')
+@section('meta_description', 'Lihat novel-novel dengan bab terbaru yang baru saja diterbitkan di Quoros. Tetap update dengan seri favorit Anda setiap hari.')
+
 @section('content')
 <div>
     <div class="flex items-center gap-4 mb-8">
@@ -16,11 +19,13 @@
                 {{-- Desktop View --}}
                 <div class="hidden md:flex items-center gap-3 p-2.5">
                     {{-- Cover --}}
-                    <a href="{{ route('novels.show', $novel->slug) }}" class="shrink-0 w-12 h-18 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200/50 dark:ring-slate-700/50">
+                    <a href="{{ route('novels.show', $novel->slug) }}" 
+                       aria-label="View {{ $novel->title }}"
+                       class="shrink-0 w-12 h-18 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200/50 dark:ring-slate-700/50">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }} cover" class="w-full h-full object-cover" width="48" height="72" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }} cover" class="w-full h-full object-cover" width="48" height="72" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @endif
                     </a>
 
@@ -49,12 +54,14 @@
                 </div>
 
                 {{-- Mobile View --}}
-                <a href="{{ route('novels.show', $novel->slug) }}" class="md:hidden flex gap-3 p-2.5 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                <a href="{{ route('novels.show', $novel->slug) }}" 
+                   aria-label="View {{ $novel->title }}"
+                   class="md:hidden flex gap-3 p-2.5 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                     <div class="shrink-0 w-12 h-18 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200/50 dark:ring-slate-700/50">
                         @if($novel->cover_image_url)
-                            <img src="{{ $novel->cover_image_url }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }} cover" class="w-full h-full object-cover" width="48" height="72" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @elseif($novel->cover_image)
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }} cover" class="w-full h-full object-cover" width="48" height="72" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                         @endif
                     </div>
                     <div class="flex-grow min-w-0 flex flex-col justify-center">

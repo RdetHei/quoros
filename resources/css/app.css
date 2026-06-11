@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'cropperjs/dist/cropper.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -15,11 +16,14 @@
         color-scheme: dark;
     }
 
+    [x-cloak] { display: none !important; }
+
     html,
     body {
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
+        font-family: 'Instrument Sans', sans-serif;
     }
 
     body {

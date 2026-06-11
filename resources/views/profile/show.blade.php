@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Profil ' . $user->name . ' — Quoros')
+@section('meta_description', 'Lihat profil ' . $user->name . ' di Quoros. Daftar bacaan, ulasan novel, dan kontribusi lainnya dari anggota komunitas Quoros.')
+
 @section('content')
 <style>[x-cloak]{display:none!important}</style>
 
@@ -16,17 +19,17 @@
                 <div class="w-28 h-28 md:w-44 md:h-44 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center ring-2 ring-slate-200/80 dark:ring-slate-700/80">
                     @if($user->profile_photo_url)
                         <div id="profile-photo-placeholder" class="hidden"></div>
-                        <img id="profile-preview" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
+                        <img id="profile-preview" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}'s profile photo" class="w-full h-full object-cover" width="176" height="176" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @elseif($user->profile_photo)
                         <div id="profile-photo-placeholder" class="hidden"></div>
-                        <img id="profile-preview" src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
+                        <img id="profile-preview" src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}'s profile photo" class="w-full h-full object-cover" width="176" height="176" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @else
                         <div id="profile-photo-placeholder" class="w-full h-full flex items-center justify-center">
                             <span class="text-4xl md:text-6xl font-black text-slate-400/20 uppercase">
                                 {{ substr($user->name, 0, 1) }}
                             </span>
                         </div>
-                        <img id="profile-preview" src="" class="hidden w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
+                        <img id="profile-preview" src="" class="hidden w-full h-full object-cover" width="176" height="176" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
                     @endif
                 </div>
                 @if($user->role === 'admin')
@@ -214,7 +217,12 @@
                     <a href="{{ route('novels.show', $bookmark->novel->slug) }}" class="group block">
                         <div class="relative aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden mb-2 md:mb-3 bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200/80 dark:ring-slate-700/50 group-hover:-translate-y-1 transition-transform duration-300">
                             @if($bookmark->novel->cover_image)
-                                <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='/error.png';">
+                                <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}"
+                                     alt="{{ $bookmark->novel->title }} cover"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     width="200" height="267"
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='/error.png';">
                             @else
                                 <div class="w-full h-full flex items-center justify-center p-3">
                                     <span class="text-[10px] text-slate-400 font-bold text-center leading-snug">{{ $bookmark->novel->title }}</span>

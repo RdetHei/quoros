@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Quoros') }} - Where Story Lives</title>
+    <meta name="description" content="@yield('meta_description', 'Quoros adalah platform novel premium yang menghadirkan cerita terbaik dengan pengalaman membaca berkualitas.')">
+    <title>@yield('title', config('app.name', 'Quoros')) — Where Story Lives</title>
     
-    <!-- Favicon -->
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
     <meta name="theme-color" content="#0f172a">
@@ -15,144 +16,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="{{ asset('storage/logo/quorosLogo.png') }}">
     
+    <!-- Preload Critical Assets -->
+    <link rel="preload" href="{{ asset('storage/logo/quorosLogo.png') }}" as="image" fetchpriority="high">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Instrument Sans', sans-serif;
-        }
-        [x-cloak] { display: none !important; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
     <!-- Styles & Scripts -->
+    <style>[x-cloak] { display: none !important; }</style>
     @stack('styles')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <script>
-        // Global Cropper Functions
-        let currentCropper = null;
-        let currentPreviewId = null;
-        let currentInput = null;
-        let currentCropOptions = {};
-
-        window.initCropper = function(input, previewId, options) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const modal = document.getElementById('cropping-modal');
-                    const image = document.getElementById('cropping-image');
-                    
-                    if (!modal || !image) {
-                        console.error('Cropping modal elements not found');
-                        return;
-                    }
-
-                    // Reset existing cropper
-                    if (currentCropper) {
-                        currentCropper.destroy();
-                        currentCropper = null;
-                    }
-                    
-                    currentInput = input;
-                    currentPreviewId = previewId;
-                    currentCropOptions = options || {};
-                    
-                    // Initialize cropper after image is loaded in modal
-                    image.onload = () => {
-                        if (typeof Cropper === 'undefined') {
-                            console.error('Cropper.js library not loaded');
-                            return;
-                        }
-                        
-                        currentCropper = new Cropper(image, {
-                            aspectRatio: currentCropOptions.aspectRatio || 1,
-                            viewMode: 1,
-                            dragMode: 'move',
-                            autoCropArea: 0.8,
-                            restore: false,
-                            guides: true,
-                            center: true,
-                            highlight: false,
-                            cropBoxMovable: true,
-                            cropBoxResizable: true,
-                            toggleDragModeOnDblclick: false,
-                        });
-                    };
-                    
-                    image.src = e.target.result;
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        };
-
-        window.saveCrop = function() {
-            if (!currentCropper) return;
-            
-            let canvasOptions = {
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: 'high',
-            };
-
-            if (currentCropOptions.width) canvasOptions.width = currentCropOptions.width;
-            if (currentCropOptions.height) canvasOptions.height = currentCropOptions.height;
-            
-            const canvas = currentCropper.getCroppedCanvas(canvasOptions);
-            
-            canvas.toBlob((blob) => {
-                const preview = document.getElementById(currentPreviewId);
-                if (preview) {
-                    preview.src = URL.createObjectURL(blob);
-                    preview.classList.remove('hidden');
-                    
-                    // Handle dynamic placeholder ID
-                    const placeholderId = currentCropOptions.placeholderId || 'profile-photo-placeholder';
-                    const placeholder = document.getElementById(placeholderId);
-                    if (placeholder) placeholder.classList.add('hidden');
-                    
-                    // Fallback for hardcoded cover-placeholder if not provided
-                    if (!currentCropOptions.placeholderId && document.getElementById('cover-placeholder')) {
-                        document.getElementById('cover-placeholder').classList.add('hidden');
-                    }
-                }
-                
-                // Update file input with cropped image
-                const file = new File([blob], 'cropped_image.jpg', { type: 'image/jpeg' });
-                const container = new DataTransfer();
-                container.items.add(file);
-                currentInput.files = container.files;
-                
-                // Execute callback if exists
-                if (currentCropOptions.onSave) {
-                    currentCropOptions.onSave();
-                }
-                
-                window.closeCropModal();
-            }, 'image/jpeg', 0.9);
-        };
-
-        window.closeCropModal = function() {
-            const modal = document.getElementById('cropping-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            if (currentCropper) {
-                currentCropper.destroy();
-                currentCropper = null;
-            }
-        };
-
-        if (localStorage.getItem('color-theme') === 'dark' || !('color-theme' in localStorage) || window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark')
-        }
-    </script>
 </head>
 <body class="font-sans antialiased bg-slate-950 text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200">
     <div class="min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
@@ -187,15 +60,16 @@
                         <!-- Mobile Menu Button -->
                         <button @click="mobileMenuOpen ? closeMobileMenu() : openMobileMenu()"
                                 class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
-                                aria-label="Open navigation"
+                                aria-label="Toggle navigation menu"
                                 :aria-expanded="mobileMenuOpen.toString()">
-                            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
-                            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
 
-                        <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
-                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 md:h-10 w-auto group-hover:opacity-80 transition-opacity" onerror="this.onerror=null; this.src='/error.png'">
+                        <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0" aria-label="Quoros Home">
+                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 md:h-10 w-auto group-hover:opacity-80 transition-opacity" fetchpriority="high" width="40" height="40">
                         </a>
+
                         
                         <div class="hidden lg:flex items-center gap-6">
                             <a href="{{ route('home') }}" class="text-xs font-medium {{ request()->routeIs('home') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Home</a>
@@ -343,107 +217,6 @@
 
     @auth @include('partials.report-modal') @endauth
     @include('partials.novel-hover-card')
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // === Live Search Logic ===
-            const searchInputs = document.querySelectorAll('.live-search-input');
-            searchInputs.forEach(input => {
-                const componentId = input.id.replace('-input', '');
-                const dropdown = document.getElementById(`${componentId}-dropdown`);
-                const resultsContainer = document.getElementById(`${componentId}-results`);
-                const loadingIndicator = document.getElementById(`${componentId}-loading`);
-                const footer = document.getElementById(`${componentId}-footer`);
-                const emptyState = document.getElementById(`${componentId}-empty`);
-                let debounceTimer;
-
-                input.addEventListener('input', function() {
-                    const query = this.value.trim();
-                    clearTimeout(debounceTimer);
-
-                    if (query.length < 2) {
-                        dropdown.style.display = 'none';
-                        return;
-                    }
-
-                    debounceTimer = setTimeout(async () => {
-                        dropdown.style.display = 'block';
-                        loadingIndicator.classList.remove('hidden');
-                        resultsContainer.innerHTML = '';
-                        footer.classList.add('hidden');
-                        emptyState.classList.add('hidden');
-
-                        try {
-                            const response = await fetch(`/api/live-search?q=${encodeURIComponent(query)}`);
-                            const results = await response.json();
-
-                            loadingIndicator.classList.add('hidden');
-
-                            if (results.length > 0) {
-                                results.forEach(novel => {
-                                    const item = document.createElement('a');
-                                    item.href = novel.url;
-                                    item.className = 'flex items-center gap-3 p-3 hover:bg-slate-800/50 transition-colors group';
-                                    item.innerHTML = `
-                                        <div class="w-10 h-14 shrink-0 rounded overflow-hidden bg-slate-800 ring-1 ring-slate-700">
-                                            <img src="${novel.cover_image || '/error.png'}" class="w-full h-full object-cover">
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <h4 class="text-xs font-bold text-slate-200 group-hover:text-white truncate">${novel.title}</h4>
-                                            <p class="text-[10px] text-slate-500 mt-0.5">${novel.author}</p>
-                                            <div class="flex items-center gap-2 mt-1">
-                                                <span class="text-[9px] px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded uppercase tracking-wider font-bold">${novel.type}</span>
-                                                <span class="text-[9px] text-amber-500 font-bold flex items-center gap-0.5">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                                    ${novel.rating_avg}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    `;
-                                    resultsContainer.appendChild(item);
-                                });
-                                footer.classList.remove('hidden');
-                            } else {
-                                emptyState.classList.remove('hidden');
-                            }
-                        } catch (e) {
-                            console.error('Search error:', e);
-                            loadingIndicator.classList.add('hidden');
-                        }
-                    }, 300);
-                });
-
-                // Close on click away
-                document.addEventListener('click', function(e) {
-                    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                        dropdown.style.display = 'none';
-                    }
-                });
-            });
-
-            // === Global Novel Hover Logic ===
-            document.addEventListener('mouseover', function(e) {
-                const target = e.target.closest('[data-novel-id]');
-                if (target) {
-                    const rect = target.getBoundingClientRect();
-                    window.dispatchEvent(new CustomEvent('novel-hover-show', {
-                        detail: {
-                            id: target.dataset.novelId,
-                            x: rect.right,
-                            y: rect.top + (rect.height / 2)
-                        }
-                    }));
-                }
-            });
-
-            document.addEventListener('mouseout', function(e) {
-                const target = e.target.closest('[data-novel-id]');
-                if (target) {
-                    window.dispatchEvent(new CustomEvent('novel-hover-hide'));
-                }
-            });
-        });
-    </script>
     @stack('scripts')
 </body>
 </html>

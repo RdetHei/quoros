@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', $novel->title . ' — Quoros')
+@section('meta_description', Str::limit(strip_tags($novel->description ?: 'Baca novel ' . $novel->title . ' terjemahan bahasa Indonesia di Quoros. ' . ($novel->author ? 'Oleh ' . $novel->author->name : '')), 155))
+
 @section('content')
 
 {{-- ===== BREADCRUMB ===== --}}
@@ -17,9 +20,9 @@
     {{-- Blurred Cover Background --}}
     <div class="absolute inset-0 -z-0">
         @if($novel->cover_image_url)
-            <img src="{{ $novel->cover_image_url }}" class="w-full h-full object-cover scale-105 blur-sm opacity-90 dark:opacity-70" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
+            <img src="{{ $novel->cover_image_url }}" alt="{{ $novel->title }} backdrop" class="w-full h-full object-cover scale-105 blur-sm opacity-90 dark:opacity-70" width="1200" height="400" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
         @elseif($novel->cover_image)
-            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover scale-105 blur-sm opacity-90 dark:opacity-70" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
+            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }} backdrop" class="w-full h-full object-cover scale-105 blur-sm opacity-90 dark:opacity-70" width="1200" height="400" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
         @endif
         {{-- Overlay Gradients for Readability --}}
         <div class="absolute inset-0 bg-white/20 dark:bg-slate-950/40"></div>
@@ -36,14 +39,16 @@
                         @if($novel->cover_image_url)
                             <img src="{{ $novel->cover_image_url }}"
                                  class="w-full h-full object-cover"
-                                 alt="{{ $novel->title }}"
-                                 loading="lazy"
+                                 alt="{{ $novel->title }} cover image"
+                                 width="256" height="341"
+                                 fetchpriority="high"
                                  onerror="this.onerror=null; this.src='/error.png';">
                         @elseif($novel->cover_image)
                             <img src="{{ asset('storage/' . $novel->cover_image) }}"
                                  class="w-full h-full object-cover"
-                                 alt="{{ $novel->title }}"
-                                 loading="lazy"
+                                 alt="{{ $novel->title }} cover image"
+                                 width="256" height="341"
+                                 fetchpriority="high"
                                  onerror="this.onerror=null; this.src='/error.png';">
                         @else
                             <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-6 text-center">
@@ -294,12 +299,16 @@
         <div class="group relative min-h-[350px] md:min-h-[400px] overflow-hidden rounded-3xl border border-white/20 dark:border-slate-700/50 shadow-lg shadow-slate-900/10 hover:shadow-2xl hover:shadow-slate-500/10 transition-all duration-500">
             @if($character->image_url)
                 <img src="{{ $character->image_url }}"
-                     alt="{{ $character->name }}"
-                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.onerror=null; this.src='/error.png';">
+                     alt="{{ $character->name }} illustration"
+                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                     width="400" height="600" loading="lazy"
+                     onerror="this.onerror=null; this.src='/error.png';">
             @elseif($character->image)
                 <img src="{{ asset('storage/' . $character->image) }}"
-                     alt="{{ $character->name }}"
-                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.onerror=null; this.src='/error.png';">
+                     alt="{{ $character->name }} illustration"
+                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                     width="400" height="600" loading="lazy"
+                     onerror="this.onerror=null; this.src='/error.png';">
             @else
                 <div class="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 dark:from-slate-800 dark:via-slate-700 dark:to-slate-900"></div>
                 <div class="absolute inset-0 flex items-center justify-center text-8xl font-black text-white/20 select-none">
@@ -550,12 +559,16 @@
                         transition-all duration-300">
                 @if($similar->cover_image_url)
                     <img src="{{ $similar->cover_image_url }}"
-                         alt="{{ $similar->title }}"
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='/error.png';">
+                         alt="{{ $similar->title }} cover"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                         width="128" height="170" loading="lazy"
+                         onerror="this.onerror=null; this.src='/error.png';">
                 @elseif($similar->cover_image)
                     <img src="{{ asset('storage/' . $similar->cover_image) }}"
-                         alt="{{ $similar->title }}"
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='/error.png';">
+                         alt="{{ $similar->title }} cover"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                         width="128" height="170" loading="lazy"
+                         onerror="this.onerror=null; this.src='/error.png';">
                 @else
                     <div class="w-full h-full flex items-center justify-center p-3">
                         <span class="text-[10px] text-slate-400 text-center leading-snug">{{ $similar->title }}</span>

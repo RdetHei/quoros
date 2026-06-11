@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
         body { font-family: 'Instrument Sans', sans-serif; }
@@ -127,9 +126,9 @@
         {{-- Panel visual (kiri di desktop, atas di mobile) --}}
         <div class="auth-visual-panel relative lg:w-[52%] xl:w-[55%] min-h-[300px] sm:min-h-[350px] lg:min-h-0 lg:fixed lg:inset-y-0 lg:left-0 overflow-hidden bg-slate-800">
             <img src="{{ asset('storage/banners/landingBanner.png') }}"
-                 alt=""
+                 alt="Quoros auth banner"
                  class="absolute inset-0"
-                 loading="eager"
+                 fetchpriority="high"
                  onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?auto=format&fit=crop&w=2000&q=80'">
             <div class="auth-visual-overlay" aria-hidden="true"></div>
 

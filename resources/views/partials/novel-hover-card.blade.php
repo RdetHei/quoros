@@ -49,10 +49,10 @@
 
     <div x-show="!loading" class="flex flex-col">
         <div class="h-32 relative overflow-hidden">
-            <img :src="novel.cover_image_url || '/error.png'" class="w-full h-full object-cover blur-sm opacity-50">
+            <img :src="novel.cover_image_url || '/error.png'" class="w-full h-full object-cover blur-sm opacity-50" width="300" height="128">
             <div class="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 to-transparent"></div>
             <div class="absolute bottom-3 left-4 right-4 flex gap-3 items-end">
-                <img :src="novel.cover_image_url || '/error.png'" class="w-16 h-24 rounded-lg shadow-lg border border-white dark:border-slate-800 object-cover shrink-0">
+                <img :src="novel.cover_image_url || '/error.png'" class="w-16 h-24 rounded-lg shadow-lg border border-white dark:border-slate-800 object-cover shrink-0" width="64" height="96">
                 <div class="min-w-0 pb-1">
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white line-clamp-1" x-text="novel.title"></h3>
                     <p class="text-[10px] text-slate-500 dark:text-slate-400" x-text="novel.author_name"></p>
