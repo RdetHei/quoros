@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Quoros — Platform Novel Premium')
-@section('meta_description', 'Baca ribuan novel terjemahan berkualitas tinggi dengan fitur bookmark, riwayat baca, dan mode gelap di Quoros. Platform novel premium untuk pembaca setia.')
-
 @section('content')
 @php
     $featuredCarouselData = $featuredNovels->map(fn ($n) => [

@@ -29,7 +29,17 @@ class SecurityHeadersMiddleware
             $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
         }
 
-        $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com *; connect-src 'self' ws://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5174 ws://127.0.0.1:5174 http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174;");
+        $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com *; connect-src 'self' ws://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5174 ws://127.0.0.1:5174 http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174; worker-src 'self' blob:;");
+
+        // Browser Caching for static-ish responses (PWA manifest, etc)
+        if ($request->isMethod('GET') && $response->isSuccessful()) {
+            if ($request->routeIs('pwa.manifest') || $request->is('build/*') || $request->is('storage/*')) {
+                $response->headers->set('Cache-Control', 'public, max-age=31536000, immutable');
+            } else {
+                $response->headers->set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+                $response->headers->set('Pragma', 'no-cache');
+            }
+        }
 
         return $response;
     }

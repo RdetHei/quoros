@@ -68,7 +68,7 @@ class MassiveDummyNovelSeeder extends Seeder
                 'description' => 'In a world where gates connect our world to dungeons, E-rank hunter Sung Jin-Woo is the weakest of them all. But everything changes when he finds a hidden dungeon.',
                 'region' => 'Korea',
                 'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1519669556878-63bdad8a1a49?auto=format&fit=crop&w=800&q=80', 
+                'cover' => 'https://images.unsplash.com/photo-1519669556878-63bdad8a1a49?auto=format&fit=crop&w=800&q=80',
             ],
             [
                 'title' => 'Reincarnation of the Heavenly Demon',

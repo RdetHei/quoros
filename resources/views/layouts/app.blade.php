@@ -2,12 +2,26 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="@yield('meta_description', 'Quoros adalah platform novel premium yang menghadirkan cerita terbaik dengan pengalaman membaca berkualitas.')">
-    <title>@yield('title', config('app.name', 'Quoros')) — Where Story Lives</title>
+    <title>@yield('title', config('app.name', 'Quoros') . ' - Where Story Lives')</title>
+    <meta name="description" content="@yield('meta_description', 'Quoros adalah platform novel premium yang didedikasikan untuk menghadirkan cerita terbaik dengan pengalaman membaca yang nyaman.')">
     
-    <!-- Favicon & PWA -->
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('title', config('app.name', 'Quoros'))">
+    <meta property="og:description" content="@yield('meta_description', 'Quoros adalah platform novel premium.')">
+    <meta property="og:image" content="{{ asset('storage/logo/quorosLogo.png') }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="@yield('title', config('app.name', 'Quoros'))">
+    <meta property="twitter:description" content="@yield('meta_description', 'Quoros adalah platform novel premium.')">
+    <meta property="twitter:image" content="{{ asset('storage/logo/quorosLogo.png') }}">
+
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
     <meta name="theme-color" content="#0f172a">
@@ -17,10 +31,19 @@
     <link rel="apple-touch-icon" href="{{ asset('storage/logo/quorosLogo.png') }}">
     
     <!-- Preload Critical Assets -->
-    <link rel="preload" href="{{ asset('storage/logo/quorosLogo.png') }}" as="image" fetchpriority="high">
+    @stack('preload')
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://res.cloudinary.com">
+    
+    <!-- Optimized Font Loading -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    </noscript>
 
     <!-- Styles & Scripts -->
     <style>[x-cloak] { display: none !important; }</style>
@@ -28,48 +51,47 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased bg-slate-950 text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200">
-    <div class="min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
+    <div class="min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950"
+         x-data="{
+            mobileMenuOpen: false,
+            scrollY: 0,
+            openMobileMenu() {
+                this.scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${this.scrollY}px`;
+                document.body.style.left = '0';
+                document.body.style.right = '0';
+                document.body.style.width = '100%';
+                this.mobileMenuOpen = true;
+            },
+            closeMobileMenu() {
+                this.mobileMenuOpen = false;
+                const y = this.scrollY || 0;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.left = '';
+                document.body.style.right = '';
+                document.body.style.width = '';
+                window.scrollTo(0, y);
+            }
+         }">
         <!-- Navbar -->
-        <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-slate-950 border-b border-white/5 h-16"
-             x-data="{
-                mobileMenuOpen: false,
-                scrollY: 0,
-                openMobileMenu() {
-                    this.scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-                    document.body.style.position = 'fixed';
-                    document.body.style.top = `-${this.scrollY}px`;
-                    document.body.style.left = '0';
-                    document.body.style.right = '0';
-                    document.body.style.width = '100%';
-                    this.mobileMenuOpen = true;
-                },
-                closeMobileMenu() {
-                    this.mobileMenuOpen = false;
-                    const y = this.scrollY || 0;
-                    document.body.style.position = '';
-                    document.body.style.top = '';
-                    document.body.style.left = '';
-                    document.body.style.right = '';
-                    document.body.style.width = '';
-                    window.scrollTo(0, y);
-                }
-             }">
+        <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-slate-950 border-b border-white/5 h-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
                 <div class="flex justify-between h-full">
                     <div class="flex items-center gap-4 md:gap-8 flex-1">
                         <!-- Mobile Menu Button -->
                         <button @click="mobileMenuOpen ? closeMobileMenu() : openMobileMenu()"
                                 class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
-                                aria-label="Toggle navigation menu"
+                                aria-label="Open navigation"
                                 :aria-expanded="mobileMenuOpen.toString()">
-                            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
-                            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
 
-                        <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0" aria-label="Quoros Home">
-                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 md:h-10 w-auto group-hover:opacity-80 transition-opacity" fetchpriority="high" width="40" height="40">
+                        <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
+                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 md:h-10 w-auto group-hover:opacity-80 transition-opacity" fetchpriority="high">
                         </a>
-
                         
                         <div class="hidden lg:flex items-center gap-6">
                             <a href="{{ route('home') }}" class="text-xs font-medium {{ request()->routeIs('home') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Home</a>

@@ -3,8 +3,7 @@
 @section('content')
 <div>
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-        <div class="flex items-center gap-4">
-            <div class="w-1 h-10 bg-amber-500 rounded-full shrink-0"></div>
+        <div class="flex items-center">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Trending</h1>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Novel paling banyak dibaca — {{ $periodLabel }}.</p>

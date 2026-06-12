@@ -6,152 +6,53 @@ window.Alpine = Alpine;
 if (localStorage.getItem('color-theme') === 'dark' || !('color-theme' in localStorage) || window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.documentElement.classList.add('dark');
 } else {
-    document.documentElement.classList.remove('dark')
+    document.documentElement.classList.remove('dark');
 }
 
-// Global Cropper Logic (Lazy Loaded)
-let currentCropper = null;
-let currentPreviewId = null;
-let currentInput = null;
-let currentCropOptions = {};
-
-window.initCropper = async function(input, previewId, options) {
-    if (input.files && input.files[0]) {
-        // Dynamic import to reduce initial bundle size
-        const { default: Cropper } = await import('cropperjs');
-        
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const modal = document.getElementById('cropping-modal');
-            const image = document.getElementById('cropping-image');
-            
-            if (!modal || !image) {
-                console.error('Cropping modal elements not found');
-                return;
-            }
-
-            if (currentCropper) {
-                currentCropper.destroy();
-                currentCropper = null;
-            }
-            
-            currentInput = input;
-            currentPreviewId = previewId;
-            currentCropOptions = options || {};
-            
-            image.onload = () => {
-                currentCropper = new Cropper(image, {
-                    aspectRatio: currentCropOptions.aspectRatio || 1,
-                    viewMode: 1,
-                    dragMode: 'move',
-                    autoCropArea: 0.8,
-                    restore: false,
-                    guides: true,
-                    center: true,
-                    highlight: false,
-                    cropBoxMovable: true,
-                    cropBoxResizable: true,
-                    toggleDragModeOnDblclick: false,
-                });
-            };
-            
-            image.src = e.target.result;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
+// Global Cropper Logic (Lazy Loaded Module)
+window.initCropper = async function(...args) {
+    const { initCropper } = await import('./modules/cropper-setup');
+    return initCropper(...args);
 };
 
-window.saveCrop = async function() {
-    if (!currentCropper) return;
-    
-    let canvasOptions = {
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high',
+window.saveCrop = async function(...args) {
+    const { saveCrop } = await import('./modules/cropper-setup');
+    return saveCrop(...args);
+};
+
+window.closeCropModal = async function(...args) {
+    const { closeCropModal } = await import('./modules/cropper-setup');
+    return closeCropModal(...args);
+};
+
+// Lazy Load landingHero only if needed
+if (document.querySelector('[x-data*="landingHero"]')) {
+    window.landingHero = async function(initialNovels) {
+        const { landingHero } = await import('./modules/landing-hero');
+        return landingHero(initialNovels);
     };
-
-    if (currentCropOptions.width) canvasOptions.width = currentCropOptions.width;
-    if (currentCropOptions.height) canvasOptions.height = currentCropOptions.height;
-    
-    const canvas = currentCropper.getCroppedCanvas(canvasOptions);
-    
-    canvas.toBlob((blob) => {
-        const preview = document.getElementById(currentPreviewId);
-        if (preview) {
-            preview.src = URL.createObjectURL(blob);
-            preview.classList.remove('hidden');
-            
-            const placeholderId = currentCropOptions.placeholderId || 'profile-photo-placeholder';
-            const placeholder = document.getElementById(placeholderId);
-            if (placeholder) placeholder.classList.add('hidden');
-            
-            if (!currentCropOptions.placeholderId && document.getElementById('cover-placeholder')) {
-                document.getElementById('cover-placeholder').classList.add('hidden');
-            }
-        }
-        
-        const file = new File([blob], 'cropped_image.jpg', { type: 'image/jpeg' });
-        const container = new DataTransfer();
-        container.items.add(file);
-        currentInput.files = container.files;
-        
-        if (currentCropOptions.onSave) {
-            currentCropOptions.onSave();
-        }
-        
-        window.closeCropModal();
-    }, 'image/jpeg', 0.9);
-};
-
-window.closeCropModal = function() {
-    const modal = document.getElementById('cropping-modal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    if (currentCropper) {
-        currentCropper.destroy();
-        currentCropper = null;
-    }
-};
+}
 
 // Start Alpine
 Alpine.start();
 
-// Lazy Load landingHero only if needed
-if (document.querySelector('[x-data*="landingHero"]')) {
-    window.landingHero = function(initialNovels) {
-        return {
-            activeSlide: 0,
-            novels: initialNovels,
-            paused: false,
-            timer: null,
-            get current() { return this.novels[this.activeSlide] || {}; },
-            get slideCount() { return this.novels.length; },
-            init() {
-                if (this.slideCount > 1) this.startTimer();
-            },
-            goTo(index) {
-                this.activeSlide = index;
-                this.resetTimer();
-            },
-            next() {
-                this.activeSlide = (this.activeSlide + 1) % this.slideCount;
-            },
-            startTimer() {
-                this.timer = setInterval(() => {
-                    if (!this.paused) this.next();
-                }, 6000);
-            },
-            resetTimer() {
-                clearInterval(this.timer);
-                if (this.slideCount > 1) this.startTimer();
-            },
-        };
-    };
+// PWA Service Worker Registration (Deferred)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        } else {
+            setTimeout(() => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            }, 3000);
+        }
+    });
 }
 
-// Live Search & Novel Hover logic
-document.addEventListener('DOMContentLoaded', function() {
+// Live Search & Novel Hover logic (Deferred)
+window.addEventListener('load', function() {
     // Live Search
     const searchInputs = document.querySelectorAll('.live-search-input');
     searchInputs.forEach(input => {
@@ -230,24 +131,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Novel Hover
+    // Novel Hover (Optimized)
+    let hoverTimeout;
     document.addEventListener('mouseover', function(e) {
         const target = e.target.closest('[data-novel-id]');
         if (target) {
-            const rect = target.getBoundingClientRect();
-            window.dispatchEvent(new CustomEvent('novel-hover-show', {
-                detail: {
-                    id: target.dataset.novelId,
-                    x: rect.right,
-                    y: rect.top + (rect.height / 2)
-                }
-            }));
+            clearTimeout(hoverTimeout);
+            hoverTimeout = setTimeout(() => {
+                const rect = target.getBoundingClientRect();
+                window.dispatchEvent(new CustomEvent('novel-hover-show', {
+                    detail: {
+                        id: target.dataset.novelId,
+                        x: rect.right,
+                        y: rect.top + (rect.height / 2)
+                    }
+                }));
+            }, 150);
         }
     });
 
     document.addEventListener('mouseout', function(e) {
         const target = e.target.closest('[data-novel-id]');
         if (target) {
+            clearTimeout(hoverTimeout);
             window.dispatchEvent(new CustomEvent('novel-hover-hide'));
         }
     });

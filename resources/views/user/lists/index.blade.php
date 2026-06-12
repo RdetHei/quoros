@@ -3,8 +3,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div class="flex items-center gap-4">
-            <div class="w-1 h-10 bg-violet-600 rounded-full shrink-0"></div>
+        <div class="flex items-center">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">My Lists</h1>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Custom novel collections that can be shared.</p>

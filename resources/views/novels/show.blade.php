@@ -1,7 +1,12 @@
 @extends('layouts.app')
 
-@section('title', $novel->title . ' — Quoros')
-@section('meta_description', Str::limit(strip_tags($novel->description ?: 'Baca novel ' . $novel->title . ' terjemahan bahasa Indonesia di Quoros. ' . ($novel->author ? 'Oleh ' . $novel->author->name : '')), 155))
+@push('preload')
+    @if($novel->cover_image_url)
+        <link rel="preload" as="image" href="{{ $novel->cover_image_url }}" fetchpriority="high">
+    @elseif($novel->cover_image)
+        <link rel="preload" as="image" href="{{ asset('storage/' . $novel->cover_image) }}" fetchpriority="high">
+    @endif
+@endpush
 
 @section('content')
 

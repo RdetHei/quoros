@@ -35,9 +35,9 @@ class LiveSearchController extends Controller
                     'title'             => $novel->title,
                     'alternative_title' => $novel->alternative_title,
                     'slug'              => $novel->slug,
-                    'cover_image'       => $novel->cover_image
+                    'cover_image'       => $novel->cover_image_url ?: ($novel->cover_image
                         ? asset('storage/' . $novel->cover_image)
-                        : null,
+                        : null),
                     'rating_avg'        => number_format($novel->rating_avg, 1),
                     'author'            => $novel->author->name ?? '-',
                     'status'            => $novel->status,

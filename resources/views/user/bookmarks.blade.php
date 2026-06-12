@@ -2,8 +2,7 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <div class="flex items-center gap-4 mb-8">
-        <div class="w-1 h-10 bg-rose-600 rounded-full shrink-0"></div>
+    <div class="flex items-center mb-8">
         <div>
             <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">My Bookmarks</h1>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Collection of novels you saved to read later.</p>

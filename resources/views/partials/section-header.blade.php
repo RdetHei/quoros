@@ -10,8 +10,7 @@
 @endphp
 
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
-    <div class="flex items-center gap-4">
-        <div class="w-1 h-9 {{ $accentClass }} rounded-full shrink-0"></div>
+    <div class="flex items-center">
         <div>
             <h2 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{{ $title }}</h2>
             @if(!empty($description))
