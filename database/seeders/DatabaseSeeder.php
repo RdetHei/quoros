@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             MassiveDummyNovelSeeder::class,
             AnnouncementSeeder::class,
             GuideSeeder::class,
+            ChaptersOrderSeeder::class,
         ]);
     }
 }

@@ -11,7 +11,7 @@ class Chapter extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['novel_id', 'title', 'slug', 'content', 'file_path', 'status', 'published_at'];
+    protected $fillable = ['novel_id', 'title', 'slug', 'content', 'file_path', 'status', 'published_at', 'order'];
 
     protected $casts = [
         'published_at' => 'datetime',

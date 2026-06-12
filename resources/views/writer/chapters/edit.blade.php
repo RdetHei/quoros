@@ -6,7 +6,7 @@
 @section('content')
 <div class="space-y-8">
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
-        <form action="{{ route('writer.chapters.update', [$novel->id, $chapter->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-10" x-data="{ status: '{{ old('status', $chapter->status) }}' }">
+        <form action="{{ route('writer.novels.chapters.update', [$novel, $chapter]) }}" method="POST" enctype="multipart/form-data" class="space-y-10" x-data="{ status: '{{ old('status', $chapter->status) }}' }">
             @csrf
             @method('PUT')
             
@@ -83,7 +83,7 @@
             <h3 class="text-lg font-black text-rose-900 dark:text-rose-400 mb-1">Delete Chapter</h3>
             <p class="text-sm text-rose-600/70 dark:text-rose-400/60 font-medium">This action is permanent and cannot be undone.</p>
         </div>
-        <form action="{{ route('writer.chapters.destroy', [$novel->id, $chapter->id]) }}" method="POST">
+        <form action="{{ route('writer.novels.chapters.destroy', [$novel, $chapter]) }}" method="POST">
             @csrf
             @method('DELETE')
             <button type="submit" class="px-10 py-4 bg-rose-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20" onclick="return confirm('Permanently delete this chapter?')">

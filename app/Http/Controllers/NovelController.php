@@ -352,6 +352,15 @@ class NovelController extends Controller
         return view('writer.novels.index', compact('novels', 'summary'));
     }
 
+    public function workspace(Novel $novel)
+    {
+        Gate::authorize('update', $novel);
+
+        $chapters = Chapter::where('novel_id', $novel->id)->orderBy('order')->get();
+
+        return view('writer.novels.workspace', compact('novel', 'chapters'));
+    }
+
     public function create()
     {
         return redirect()->route('writer.novels.create.step-1');

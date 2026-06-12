@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('slug');
             $table->longText('content')->nullable();
             $table->string('file_path')->nullable();
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }
