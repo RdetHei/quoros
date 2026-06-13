@@ -26,8 +26,6 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AnnouncementsController;
-use App\Http\Controllers\Writer\StatsController as WriterStatsController;
-use App\Http\Controllers\Writer\WorkspaceController as WriterWorkspaceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [NovelController::class, 'index'])->name('home');
@@ -134,17 +132,10 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
 
     // Writer & Admin Routes (Workspace)
     Route::middleware('role:writer,admin')->prefix('writer')->name('writer.')->group(function () {
-        Route::get('/bulk-guide', function () {
-            return view('writer.bulk-guide');
-        })->name('bulk-guide');
 
-        Route::get('/stats', [WriterStatsController::class, 'index'])->name('stats');
-        Route::get('/analytics', [WriterWorkspaceController::class, 'analyticsPro'])->name('analytics.pro');
-        Route::get('/feedback-hub', [WriterWorkspaceController::class, 'feedbackHub'])->name('feedback.hub');
-        
         // Novel Management
         Route::prefix('novels')->name('novels.')->group(function () {
-            Route::get('/', [NovelController::class, 'writerIndex'])->name('index');
+            Route::get('/', function() { return redirect()->route('dashboard', ['tab' => 'library']); })->name('index');
             Route::get('/create', [NovelController::class, 'create'])->name('create');
             Route::get('/create/step-1', [NovelController::class, 'createStep1'])->name('create.step-1');
             Route::post('/create/step-1', [NovelController::class, 'storeStep1'])->name('store.step-1');

@@ -25,13 +25,7 @@
             <p class="px-3 text-[10px] font-black text-slate-500/80 uppercase tracking-[0.2em]">Creative Hub</p>
             <div class="space-y-1">
                 <x-writer.nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')" icon="home">
-                    Main Desk
-                </x-writer.nav-link>
-                <x-writer.nav-link href="{{ route('writer.novels.index') }}" :active="request()->routeIs('writer.novels.*')" icon="book">
-                    Catalog
-                </x-writer.nav-link>
-                <x-writer.nav-link href="{{ route('writer.analytics.pro') }}" :active="request()->routeIs('writer.analytics.pro')" icon="chart">
-                    Insights
+                    Author Studio
                 </x-writer.nav-link>
             </div>
         </div>
@@ -40,9 +34,6 @@
         <div class="space-y-4">
             <p class="px-3 text-[10px] font-black text-slate-500/80 uppercase tracking-[0.2em]">Community</p>
             <div class="space-y-1">
-                <x-writer.nav-link href="{{ route('writer.feedback.hub') }}" :active="request()->routeIs('writer.feedback.hub')" icon="chat">
-                    Reader Feed
-                </x-writer.nav-link>
                 <x-writer.nav-link href="{{ route('notifications.index') }}" :active="request()->routeIs('notifications.index')" icon="bell">
                     Alerts
                     @php($unread = auth()->user()->unreadNotifications->count())

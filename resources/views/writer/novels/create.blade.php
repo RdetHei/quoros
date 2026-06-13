@@ -30,7 +30,7 @@
             <a href="{{ route('writer.novels.create.step-1') }}" class="w-full sm:w-auto px-10 py-4 bg-indigo-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20">
                 Launch Wizard
             </a>
-            <a href="{{ route('writer.novels.index') }}" class="w-full sm:w-auto px-10 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+            <a href="{{ route('dashboard', ['tab' => 'library']) }}" class="w-full sm:w-auto px-10 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
                 Cancel
             </a>
         </div>

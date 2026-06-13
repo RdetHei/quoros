@@ -69,7 +69,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-4 pt-10 border-t border-slate-100 dark:border-slate-800">
-                <a href="{{ route('writer.novels.index') }}" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Cancel</a>
+                <a href="{{ route('dashboard', ['tab' => 'library']) }}" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Cancel</a>
                 <button type="submit" class="px-12 py-4 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20">
                     Update Chapter
                 </button>

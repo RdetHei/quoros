@@ -331,27 +331,6 @@ class NovelController extends Controller
         return back()->with('success', 'Novel request submitted successfully!');
     }
 
-    public function writerIndex()
-    {
-        $userId = Auth::id();
-
-        $novels = Novel::where('author_id', $userId)
-            ->with('genres')
-            ->withCount(['chapters', 'bookmarks'])
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        $summary = [
-            'novel_count' => Novel::where('author_id', $userId)->count(),
-            'chapter_count' => Novel::where('author_id', $userId)->withCount('chapters')->get()->sum('chapters_count'),
-            'total_views' => Novel::where('author_id', $userId)->sum('view_count'),
-            'total_bookmarks' => Novel::where('author_id', $userId)->withCount('bookmarks')->get()->sum('bookmarks_count'),
-        ];
-
-        return view('writer.novels.index', compact('novels', 'summary'));
-    }
-
     public function workspace(Novel $novel)
     {
         Gate::authorize('update', $novel);
@@ -465,7 +444,7 @@ class NovelController extends Controller
         $novel->save();
 
         return redirect()
-            ->route('writer.novels.index')
+            ->route('dashboard', ['tab' => 'library'])
             ->with('success', 'Novel berhasil dibuat. Kamu bisa lanjut kelola karakter dari halaman novel.');
     }
 
@@ -512,7 +491,7 @@ class NovelController extends Controller
             $novel->tags()->sync($request->tags);
         }
 
-        return redirect()->route('writer.novels.index')->with('success', 'Novel created successfully!');
+        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Novel created successfully!');
     }
 
     public function trending(Request $request)
@@ -642,7 +621,7 @@ class NovelController extends Controller
         $novel->genres()->sync($request->genres);
         $novel->tags()->sync($request->tags ?? []);
 
-        return redirect()->route('writer.novels.index')->with('success', 'Novel updated successfully!');
+        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Novel updated successfully!');
     }
 
     public function destroy(Novel $novel)
@@ -661,7 +640,7 @@ class NovelController extends Controller
 
         $novel->delete();
 
-        return redirect()->route('writer.novels.index')->with('success', 'Novel deleted successfully!');
+        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Novel deleted successfully!');
     }
 
     private function generateUniqueSlug(string $title): string

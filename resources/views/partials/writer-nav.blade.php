@@ -9,7 +9,7 @@
             <p class="text-sm font-semibold text-slate-900 dark:text-white mt-0.5">Manage works & statistics</p>
         </div>
         <nav class="p-2 space-y-0.5">
-            <a href="{{ route('writer.stats') }}"
+            <a href="{{ route('dashboard', ['tab' => 'analytics']) }}"
                @class([
                    'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors',
                    'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' => $active === 'stats',
@@ -20,7 +20,7 @@
                 </svg>
                 Writer Dashboard
             </a>
-            <a href="{{ route('writer.novels.index') }}"
+            <a href="{{ route('dashboard', ['tab' => 'library']) }}"
                @class([
                    'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors',
                    'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' => $active === 'novels',

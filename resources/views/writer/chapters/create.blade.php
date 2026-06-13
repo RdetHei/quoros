@@ -75,7 +75,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-4 pt-10 border-t border-slate-100 dark:border-slate-800">
-                <a href="{{ route('writer.novels.index') }}" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Cancel</a>
+                <a href="{{ route('dashboard', ['tab' => 'library']) }}" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Cancel</a>
                 <button type="submit" class="px-12 py-4 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20">
                     Publish Chapter
                 </button>
@@ -169,7 +169,7 @@
                 </div>
                 <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Mission Accomplished!</h2>
                 <p class="text-lg text-slate-500 dark:text-slate-400 mb-12 max-w-md mx-auto leading-relaxed"><span class="font-black text-slate-900 dark:text-white" x-text="chapters.length"></span> chapters have been extracted and added to your novel library.</p>
-                <a href="{{ route('writer.novels.index') }}" class="inline-flex items-center gap-3 px-12 py-5 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20">
+                <a href="{{ route('dashboard', ['tab' => 'library']) }}" class="inline-flex items-center gap-3 px-12 py-5 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20">
                     Back to Workspace
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                 </a>

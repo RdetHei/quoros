@@ -99,25 +99,85 @@ class DashboardController extends Controller
 
     private function writerDashboard(User $user)
     {
-        $novelIds = $user->novels()->pluck('id');
+        $request = request();
+        $allNovels = $user->novels()->select('id', 'title', 'view_count')->get();
+        $selectedNovelId = $request->get('novel_id');
+
+        if ($selectedNovelId && $allNovels->contains('id', $selectedNovelId)) {
+            $novelIds = [$selectedNovelId];
+            $selectedNovel = $allNovels->firstWhere('id', $selectedNovelId);
+            $totalViews = $selectedNovel->view_count ?? 0;
+        } else {
+            $novelIds = $allNovels->pluck('id');
+            $selectedNovelId = null;
+            $totalViews = $user->novels()->sum('view_count');
+        }
+
         $todayStart = Carbon::today();
 
-        // Stats for current user
+        // 1. Overview KPIs (Aggregated for all novels)
         $viewsToday = DB::table('novel_view_logs')
-            ->whereIn('novel_id', $novelIds)
+            ->whereIn('novel_id', $allNovels->pluck('id'))
             ->whereDate('viewed_on', '>=', $todayStart)
             ->sum('views');
 
-        $newBookmarksToday = Bookmark::whereIn('novel_id', $novelIds)
+        $newBookmarksToday = Bookmark::whereIn('novel_id', $allNovels->pluck('id'))
             ->whereDate('created_at', '>=', $todayStart)
             ->count();
 
-        $averageRating = (float) Review::whereIn('novel_id', $novelIds)->avg('rating');
+        $averageRating = (float) Review::whereIn('novel_id', $allNovels->pluck('id'))->avg('rating');
 
-        $latestReviews = Review::with(['user:id,name', 'novel:id,title,slug'])
-            ->whereIn('novel_id', $novelIds)
+        // 2. Library / Catalog
+        $myNovels = Novel::where('author_id', $user->id)
+            ->withCount(['chapters', 'bookmarks'])
+            ->withAvg('reviews', 'rating')
             ->latest()
-            ->take(5)
+            ->get();
+
+        // 3. Analytics (Last 30 Days - Filtered)
+        $days = 30;
+        $startDate = Carbon::now()->subDays($days);
+
+        $bookmarksDaily = Bookmark::whereIn('novel_id', $novelIds)
+            ->where('created_at', '>=', $startDate)
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+            ->groupBy('date')
+            ->pluck('count', 'date');
+
+        $reviewsDaily = Review::whereIn('novel_id', $novelIds)
+            ->where('created_at', '>=', $startDate)
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+            ->groupBy('date')
+            ->pluck('count', 'date');
+
+        $readersDaily = DB::table('novel_view_logs')
+            ->whereIn('novel_id', $novelIds)
+            ->where('viewed_on', '>=', $startDate->toDateString())
+            ->select('viewed_on as date', DB::raw('SUM(views) as count'))
+            ->groupBy('viewed_on')
+            ->pluck('count', 'date');
+
+        $labels = [];
+        $bookmarkData = [];
+        $reviewData = [];
+        $readerData = [];
+
+        for ($i = $days; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $labels[] = Carbon::now()->subDays($i)->format('d M');
+            $bookmarkData[] = $bookmarksDaily->get($date, 0);
+            $reviewData[] = $reviewsDaily->get($date, 0);
+            $readerData[] = $readersDaily->get($date, 0);
+        }
+
+        $totalBookmarks = Bookmark::whereIn('novel_id', $novelIds)->count();
+        $totalReviews = Review::whereIn('novel_id', $novelIds)->count();
+
+        // 4. Community (Reviews & Comments - Unfiltered for overview)
+        $latestReviews = Review::with(['user:id,name', 'novel:id,title,slug'])
+            ->whereIn('novel_id', $allNovels->pluck('id'))
+            ->latest()
+            ->take(10)
             ->get();
 
         $latestComments = Comment::with([
@@ -125,11 +185,12 @@ class DashboardController extends Controller
             'chapter:id,novel_id,title',
             'chapter.novel:id,title,slug',
         ])
-            ->whereHas('chapter', fn ($query) => $query->whereIn('novel_id', $novelIds))
+            ->whereHas('chapter', fn ($query) => $query->whereIn('novel_id', $allNovels->pluck('id')))
             ->latest()
-            ->take(5)
+            ->take(10)
             ->get();
 
+        // 5. Drafts & Work in Progress
         $draftChapters = Chapter::with('novel:id,title,slug')
             ->whereHas('novel', fn ($query) => $query->where('author_id', $user->id))
             ->where(function ($query) {
@@ -138,13 +199,6 @@ class DashboardController extends Controller
             })
             ->latest()
             ->take(6)
-            ->get();
-
-        $myNovels = Novel::where('author_id', $user->id)
-            ->withCount(['chapters', 'bookmarks'])
-            ->withAvg('reviews', 'rating')
-            ->latest()
-            ->take(4)
             ->get();
 
         $writerTips = Announcement::where('is_active', true)
@@ -165,7 +219,16 @@ class DashboardController extends Controller
             'latestComments',
             'draftChapters',
             'myNovels',
-            'writerTips'
+            'writerTips',
+            'labels',
+            'bookmarkData',
+            'reviewData',
+            'readerData',
+            'totalViews',
+            'totalBookmarks',
+            'totalReviews',
+            'allNovels',
+            'selectedNovelId'
         ));
     }
 
