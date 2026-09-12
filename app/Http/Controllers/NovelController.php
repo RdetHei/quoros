@@ -33,6 +33,7 @@ class NovelController extends Controller
         // Featured Novels for Carousel
         $featuredQuery = Novel::with(['author', 'genres'])
             ->withCount('chapters')
+            ->withAvg('reviews', 'rating')
             ->where('is_featured', true)
             ->take(5);
 
@@ -48,6 +49,7 @@ class NovelController extends Controller
         if ($featuredNovels->isEmpty()) {
             $fallbackQuery = Novel::with(['author', 'genres'])
                 ->withCount('chapters')
+                ->withAvg('reviews', 'rating')
                 ->orderByDesc('view_count')
                 ->take(5);
 
@@ -268,17 +270,47 @@ class NovelController extends Controller
         return view('novels.search', compact('novels', 'search', 'genres', 'tags', 'minRating'));
     }
 
-    public function updated()
+    public function updated(Request $request)
     {
-        $novels = Novel::with(['author', 'genres'])
-            ->whereHas('chapters')
-            ->withMax('chapters', 'created_at')
-            ->withCount('chapters')
-            ->orderByDesc('chapters_max_created_at')
-            ->paginate(18)
-            ->withQueryString();
+        $period = $request->get('period', 'all');
+        $periods = [
+            'today' => ['label' => 'Hari Ini', 'days' => 1],
+            'week' => ['label' => 'Minggu Ini', 'days' => 7],
+            'month' => ['label' => 'Bulan Ini', 'days' => 30],
+            'all' => ['label' => 'Semua', 'days' => null],
+        ];
+        if (!array_key_exists($period, $periods)) {
+            $period = 'all';
+        }
 
-        return view('novels.updated', compact('novels'));
+        $query = Novel::with(['chapters' => function ($q) {
+                $q->published()->latest('published_at')->latest('id')->take(3);
+            }])
+            ->whereHas('chapters', function ($q) use ($periods, $period) {
+                if ($periods[$period]['days']) {
+                    $since = now()->subDays($periods[$period]['days']);
+                    $q->published()
+                        ->where(function ($sub) use ($since) {
+                            $sub->where(function ($s) {
+                                $s->whereNull('published_at')->orWhere('published_at', '<=', now());
+                            })
+                                ->where(function ($s) use ($since) {
+                                    $s->where('published_at', '>=', $since)
+                                        ->orWhere('created_at', '>=', $since);
+                                });
+                        });
+                } else {
+                    $q->published();
+                }
+            })
+            ->withMax('chapters', 'published_at')
+            ->withMax('chapters', 'created_at');
+
+        $query->orderByRaw('COALESCE(chapters_max_published_at, chapters_max_created_at) DESC');
+
+        $novels = $query->paginate(24)->withQueryString();
+
+        return view('novels.updated', compact('novels', 'period', 'periods'));
     }
 
     public function genres()
@@ -520,7 +552,7 @@ class NovelController extends Controller
         $this->novelViews->recordView($novel);
 
         $userLists = Auth::check()
-            ? Auth::user()->userLists()->orderBy('title')->get(['id', 'title'])
+            ? Auth::user()->userLists()->orderBy('title')->get(['id', 'slug', 'title'])
             : collect();
 
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());

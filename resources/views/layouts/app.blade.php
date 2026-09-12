@@ -76,67 +76,104 @@
             }
          }">
         <!-- Navbar -->
-        <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-slate-950 border-b border-white/5 h-16">
+        <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur border-b border-white/5 h-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-                <div class="flex justify-between h-full">
-                    <div class="flex items-center gap-4 md:gap-8 flex-1">
+                <div class="flex items-center justify-between h-full gap-2 sm:gap-3">
+                    <!-- Left: Menu + Logo + Nav -->
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
                         <!-- Mobile Menu Button -->
                         <button @click="mobileMenuOpen ? closeMobileMenu() : openMobileMenu()"
-                                class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
+                                class="lg:hidden h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors shrink-0"
                                 aria-label="Open navigation"
                                 :aria-expanded="mobileMenuOpen.toString()">
-                            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
-                            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
 
                         <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
-                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 md:h-10 w-auto group-hover:opacity-80 transition-opacity" fetchpriority="high">
+                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-7 w-auto group-hover:opacity-80 transition-opacity" fetchpriority="high">
                         </a>
-                        
-                        <div class="hidden lg:flex items-center gap-6">
-                            <a href="{{ route('home') }}" class="text-xs font-medium {{ request()->routeIs('home') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Home</a>
-                            <a href="{{ route('novels.updated') }}" class="text-xs font-medium {{ request()->routeIs('novels.updated') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Updated</a>
+
+                        <div class="hidden lg:flex items-center gap-0.5 ml-1.5">
+                            @php
+                                $navLinks = [];
+                                $navLinks[] = ['route' => 'home', 'label' => 'Home', 'active' => request()->routeIs('home')];
+                                $navLinks[] = ['route' => 'novels.updated', 'label' => 'Updated', 'active' => request()->routeIs('novels.updated')];
+                                if (Auth::check()) {
+                                    $navLinks[] = ['route' => 'bookmarks.index', 'label' => 'Bookmarks', 'active' => request()->routeIs('bookmarks.index')];
+                                    $navLinks[] = ['route' => 'lists.index', 'label' => 'My Lists', 'active' => request()->routeIs('lists.*')];
+                                    $navLinks[] = ['route' => 'history.index', 'label' => 'History', 'active' => request()->routeIs('history.index')];
+                                }
+                            @endphp
+                            @foreach($navLinks as $link)
+                                <a href="{{ route($link['route']) }}"
+                                   class="h-8 inline-flex items-center px-2.5 rounded-lg text-[11px] font-semibold tracking-normal transition-colors whitespace-nowrap
+                                          {{ $link['active']
+                                              ? 'text-white bg-white/5'
+                                              : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
+                                    {{ $link['label'] }}
+                                </a>
+                            @endforeach
                             @auth
-                                <a href="{{ route('bookmarks.index') }}" class="text-xs font-medium {{ request()->routeIs('bookmarks.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">Bookmarks</a>
-                                <a href="{{ route('lists.index') }}" class="text-xs font-medium {{ request()->routeIs('lists.*') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">My Lists</a>
-                                <a href="{{ route('history.index') }}" class="text-xs font-medium {{ request()->routeIs('history.index') ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400' }} hover:text-slate-900 dark:hover:text-white transition-colors">History</a>
                                 @if(Auth::user()->role === 'user')
-                                    <a href="{{ route('guides.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-indigo-600 hover:text-white transition-all group/write">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 group-hover/write:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                        Write a Story
+                                    <div class="w-px h-4 bg-white/10 mx-1.5"></div>
+                                    <a href="{{ route('guides.index') }}"
+                                       class="h-8 inline-flex items-center gap-1.5 px-2.5 bg-indigo-600/10 text-indigo-400 text-[10px] font-black uppercase tracking-[0.14em] rounded-lg hover:bg-indigo-600 hover:text-white transition-all border border-indigo-500/20 hover:border-indigo-500/40 group/write whitespace-nowrap">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 group-hover/write:rotate-12 transition-transform shrink-0" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                        Write
                                     </a>
                                 @endif
                             @endauth
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 md:gap-4">
+                    <!-- Right: Search + Actions -->
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                         @include('partials.live-search-partial', [
                             'id'          => 'desktop-search',
                             'placeholder' => 'Search novels...',
-                            'classes'     => 'hidden md:block w-64 lg:w-80',
+                            'classes'     => 'hidden md:block w-52 lg:w-60',
                         ])
+
+                        <!-- Mobile Search Toggle -->
                         <div x-data="{ open: false }" class="md:hidden">
-                            <button @click="open = !open" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            <button @click="open = !open"
+                                    class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                                    aria-label="Search">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </button>
-                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="absolute left-0 right-0 top-full bg-slate-900 border-b border-slate-800 p-4 shadow-xl z-50">
+                            <div x-show="open"
+                                 @click.away="open = false"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 -translate-y-2"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 class="absolute left-0 right-0 top-full bg-slate-950/95 backdrop-blur border-b border-white/5 px-4 py-3 shadow-xl z-50">
                                 @include('partials.live-search-partial', [ 'id' => 'mobile-search', 'placeholder' => 'Search novels...' ])
                             </div>
                         </div>
+
                         @auth
-                            <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+                            <div class="hidden sm:block w-px h-5 bg-white/10"></div>
                             @include('partials.notification-bell')
                         @endauth
+
                         @guest
-                            <div class="flex items-center gap-1 md:gap-2">
-                                <a href="{{ route('login') }}" class="px-3 md:px-4 py-2 text-xs font-medium hover:text-slate-900 dark:hover:text-white transition-colors">Login</a>
-                                <a href="{{ route('register') }}" class="px-3 md:px-4 py-2 text-xs font-medium bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm transition-all">Sign Up</a>
+                            <div class="flex items-center gap-1">
+                                <a href="{{ route('login') }}"
+                                   class="h-8 inline-flex items-center px-2.5 text-[11px] font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors whitespace-nowrap">
+                                    Login
+                                </a>
+                                <a href="{{ route('register') }}"
+                                   class="h-8 inline-flex items-center px-3 text-[11px] font-bold bg-white text-slate-900 rounded-lg hover:bg-slate-100 shadow-sm transition-all whitespace-nowrap">
+                                    Sign Up
+                                </a>
                             </div>
                         @else
+                            <!-- Profile Dropdown -->
                             <div x-data="{ open: false }" class="relative">
-                                <button @click="open = !open" class="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                    <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-sm">
+                                <button @click="open = !open"
+                                        class="h-8 inline-flex items-center gap-1.5 pl-1 pr-1.5 rounded-lg hover:bg-white/5 transition-colors">
+                                    <div class="w-6 h-6 rounded-full overflow-hidden bg-slate-800 ring-1 ring-white/10 flex items-center justify-center text-slate-300 font-bold text-[10px] shrink-0">
                                         @if(Auth::user()->profile_photo_url)
                                             <img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png'">
                                         @elseif(Auth::user()->profile_photo)
@@ -145,21 +182,44 @@
                                             {{ substr(Auth::user()->name, 0, 1) }}
                                         @endif
                                     </div>
-                                    <span class="hidden sm:block text-xs font-medium max-w-[100px] truncate">{{ Auth::user()->name }}</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                    <span class="hidden md:block text-[11px] font-semibold text-slate-200 max-w-[80px] truncate">{{ Auth::user()->name }}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-500 shrink-0 hidden sm:block" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                 </button>
-                                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50">
+                                <div x-show="open"
+                                     @click.away="open = false"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95 translate-y-1"
+                                     x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+                                     class="absolute right-0 top-full mt-2 w-52 bg-slate-900 rounded-2xl shadow-2xl shadow-black/40 border border-white/10 z-50 overflow-hidden">
+                                    <div class="px-3 py-3 border-b border-white/5">
+                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Signed in as</p>
+                                        <p class="text-sm font-bold text-white truncate">{{ Auth::user()->name }}</p>
+                                        <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
+                                    </div>
                                     @if(Auth::user()->role === 'writer' || Auth::user()->role === 'admin')
-                                        <div class="px-2 py-2">
-                                            <a href="{{ route('dashboard') }}" class="flex items-center justify-center gap-3 w-full px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-slate-900/10 dark:shadow-white/5 group">
+                                        <div class="p-2">
+                                            <a href="{{ route('dashboard') }}"
+                                               class="flex items-center justify-center w-full h-10 px-3 bg-white text-slate-900 text-[10px] font-black uppercase tracking-[0.18em] rounded-xl hover:bg-slate-100 transition-all shadow-sm">
                                                 Workspace
                                             </a>
                                         </div>
                                     @endif
-                                    <div class="px-2 py-2 space-y-1">
-                                        <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}" class="block px-3 py-2 text-sm font-bold text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">My Profile</a>
-                                        <a href="{{ route('settings') }}" class="block px-3 py-2 text-sm font-bold text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Settings</a>
-                                        <form action="{{ route('logout') }}" method="POST">@csrf<button type="submit" class="w-full text-left px-3 py-2 text-sm font-bold text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all">Logout</button></form>
+                                    <div class="p-2 space-y-0.5">
+                                        <a href="{{ route('profile.show', Auth::user()->username ?? Auth::user()->id) }}"
+                                           class="h-9 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-all">
+                                            My Profile
+                                        </a>
+                                        <a href="{{ route('settings') }}"
+                                           class="h-9 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-all">
+                                            Settings
+                                        </a>
+                                        <form action="{{ route('logout') }}" method="POST">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="w-full h-9 flex items-center px-3 text-sm font-semibold text-rose-400 rounded-xl hover:bg-rose-500/10 transition-all text-left">
+                                                Logout
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -169,23 +229,81 @@
             </div>
         </nav>
 
-        <!-- Mobile Menu Overlay (Simplified for cleanup) -->
+        <!-- Mobile Menu Overlay -->
         <div x-show="mobileMenuOpen" x-cloak class="fixed inset-0 z-[60] lg:hidden">
-            <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" @click="closeMobileMenu()"></div>
-            <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" class="relative w-[80vw] max-w-[300px] h-full bg-slate-900 shadow-2xl flex flex-col">
-                <div class="p-6 space-y-4">
-                    <a href="{{ route('home') }}" class="block text-sm font-bold text-white">Home</a>
-                    <a href="{{ route('novels.updated') }}" class="block text-sm font-bold text-white">Updated</a>
+            <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" @click="closeMobileMenu()"></div>
+            <div x-show="mobileMenuOpen"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="-translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 class="relative w-[82vw] max-w-[320px] h-full bg-slate-950 shadow-2xl flex flex-col border-r border-white/10">
+                <div class="px-5 py-5 border-b border-white/5 flex items-center justify-between">
+                    <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-8 w-auto">
+                    <button @click="closeMobileMenu()" class="h-8 w-8 inline-flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" aria-label="Close menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div class="p-3 space-y-1 flex-grow">
+                    <a href="{{ route('home') }}"
+                       class="h-10 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-colors {{ request()->routeIs('home') ? 'bg-white/5 text-white' : '' }}">
+                        Home
+                    </a>
+                    <a href="{{ route('novels.updated') }}"
+                       class="h-10 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-colors {{ request()->routeIs('novels.updated') ? 'bg-white/5 text-white' : '' }}">
+                        Updated
+                    </a>
                     @auth
-                        <a href="{{ route('bookmarks.index') }}" class="block text-sm font-bold text-white">Bookmarks</a>
+                        <a href="{{ route('bookmarks.index') }}"
+                           class="h-10 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-colors {{ request()->routeIs('bookmarks.index') ? 'bg-white/5 text-white' : '' }}">
+                            Bookmarks
+                        </a>
+                        <a href="{{ route('lists.index') }}"
+                           class="h-10 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-colors {{ request()->routeIs('lists.*') ? 'bg-white/5 text-white' : '' }}">
+                            My Lists
+                        </a>
+                        <a href="{{ route('history.index') }}"
+                           class="h-10 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-colors {{ request()->routeIs('history.index') ? 'bg-white/5 text-white' : '' }}">
+                            History
+                        </a>
+                        @if(Auth::user()->role === 'user')
+                            <div class="pt-2 mt-2 border-t border-white/5">
+                                <a href="{{ route('guides.index') }}"
+                                   class="h-10 flex items-center justify-center gap-2 px-3 bg-indigo-600/10 text-indigo-400 text-[11px] font-black uppercase tracking-[0.18em] rounded-xl hover:bg-indigo-600 hover:text-white transition-all border border-indigo-500/20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    Write a Story
+                                </a>
+                            </div>
+                        @endif
                     @endauth
+                </div>
+                <div class="p-3 border-t border-white/5 space-y-2">
+                    @guest
+                        <a href="{{ route('login') }}"
+                           class="h-10 flex items-center justify-center w-full text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-colors">
+                            Login
+                        </a>
+                        <a href="{{ route('register') }}"
+                           class="h-10 flex items-center justify-center w-full text-sm font-bold bg-white text-slate-900 rounded-xl hover:bg-slate-100 shadow-sm transition-all">
+                            Create Free Account
+                        </a>
+                    @else
+                        <form action="{{ route('logout') }}" method="POST" class="w-full">
+                            @csrf
+                            <button type="submit"
+                                    class="h-10 w-full flex items-center justify-center text-sm font-bold text-rose-400 rounded-xl hover:bg-rose-500/10 transition-all border border-rose-500/10">
+                                Logout
+                            </button>
+                        </form>
+                    @endguest
                 </div>
             </div>
         </div>
 
         <!-- Main Content -->
         <main class="flex-grow pt-16 bg-slate-950">
-            <div class="{{ request()->routeIs('welcome', 'home') ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-8' }}">
+            <div class="{{ request()->routeIs('welcome', 'home')
+                ? 'pt-4 pb-4'
+                : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-8' }}">
                 @if(session('success'))
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
                         <div class="p-4 rounded-xl bg-indigo-900/20 border border-indigo-800 text-indigo-400 text-sm font-medium">

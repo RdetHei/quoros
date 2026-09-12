@@ -23,8 +23,8 @@
           data-target="{{ $componentId }}">
         <div class="relative w-full">
             <label for="{{ $componentId }}-input" class="sr-only">Search novels</label>
-            <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
             </div>
@@ -35,11 +35,11 @@
                    spellcheck="false"
                    value="{{ request('q') }}"
                    placeholder="{{ $placeholder }}"
-                   class="live-search-input w-full pl-9 pr-3 py-2 text-xs rounded-xl
-                          bg-slate-800 text-slate-100 placeholder-slate-500
-                          border border-slate-700 shadow-inner shadow-black/20
-                          focus:outline-none focus:ring-2 focus:ring-slate-500/50 focus:border-slate-400
-                          hover:border-slate-600 transition-colors">
+                   class="live-search-input w-full h-8 pl-8 pr-3 text-[11px] rounded-lg
+                          bg-white/5 text-slate-100 placeholder-slate-500
+                          border border-white/10
+                          focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/40
+                          hover:border-white/20 transition-all">
         </div>
     </form>
 
