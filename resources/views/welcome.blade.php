@@ -19,7 +19,7 @@
 
 @push('styles')
 <style>
-    /* ── Ticker ──────────────────────────────── */
+    /* ── Ticker ──────────────────────────────── s*/
     .stat-ticker-track {
         display: flex;
         gap: 0;
