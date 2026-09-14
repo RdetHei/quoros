@@ -39,7 +39,7 @@
                 <ul class="space-y-3 mb-6">
                     @foreach($category->articles->take(5) as $article)
                         <li>
-                            <a href="{{ route('guides.show', [$category->slug, $article->slug) }}" @class([
+                            <a href="{{ route('guides.show', [$category->slug, $article->slug]) }}" @class([
                                 'flex items-center gap-2 transition-colors group/link text-sm',
                                 $useWriterShell ? 'text-neutral-400 hover:text-white' : 'text-slate-300 hover:text-purple-400',
                             ])>
