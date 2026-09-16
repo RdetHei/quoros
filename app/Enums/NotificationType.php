@@ -9,4 +9,5 @@ enum NotificationType: string
     case AuthorChapterNew = 'author_chapter_new';
     case RequestFulfilled = 'request_fulfilled';
     case RequestRejected = 'request_rejected';
+    case Announcement = 'announcement';
 }

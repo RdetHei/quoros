@@ -4,10 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Services\InAppNotificationService;
 use Illuminate\Http\Request;
 
 class AnnouncementsController extends Controller
 {
+    public function __construct(private readonly InAppNotificationService $notifications)
+    {
+    }
+
     public function index()
     {
         $announcements = Announcement::latest()->paginate(20);
@@ -30,13 +35,20 @@ class AnnouncementsController extends Controller
             'link' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        Announcement::create([
+        $announcement = Announcement::create([
             'title' => $data['title'],
             'content' => $data['content'],
             'type' => $data['type'] ?? null,
             'is_active' => (bool) ($data['is_active'] ?? false),
             'link' => $data['link'] ?? null,
         ]);
+
+        $this->notifications->notifyAnnouncementToAllUsers(
+            $announcement->title,
+            $announcement->content,
+            $announcement->link,
+            $announcement->type,
+        );
 
         return redirect()
             ->route('admin.announcements.index')

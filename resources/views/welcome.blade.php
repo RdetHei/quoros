@@ -35,43 +35,91 @@
     /* ── Rak novel ───────────────────────────── */
     .novel-shelf {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.625rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.8rem;
     }
-    @media (min-width: 480px)  { .novel-shelf { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 768px)  { .novel-shelf { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; } }
-    @media (min-width: 1024px) { .novel-shelf { grid-template-columns: repeat(5, 1fr); } }
-    @media (min-width: 1280px) { .novel-shelf { grid-template-columns: repeat(6, 1fr); } }
+    @media (min-width: 480px)  { .novel-shelf { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (min-width: 768px)  { .novel-shelf { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.8rem; } }
+    @media (min-width: 1024px) { .novel-shelf { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+    @media (min-width: 1280px) { .novel-shelf { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+    .latest-update-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        padding: 0.4rem;
+        border-radius: 0.9rem;
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .latest-update-card:hover {
+        transform: translateY(-2px);
+        background: rgba(15, 23, 42, 0.7);
+        border-color: rgba(148, 163, 184, 0.18);
+    }
 
     .novel-cover-wrap {
         position: relative;
-        aspect-ratio: 2/3;
-        border-radius: 0.625rem;
+        aspect-ratio: 3 / 4.15;
+        border-radius: 0.7rem;
         overflow: hidden;
-        background: #1e293b;
-        box-shadow: 0 6px 20px -8px rgba(0,0,0,0.6);
+        background: #111827;
+        box-shadow: 0 12px 24px -18px rgba(0,0,0,0.9);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     }
     .novel-cover-wrap img {
         width: 100%; height: 100%;
         object-fit: cover;
-        transition: transform 0.4s ease;
+        transition: transform 0.35s ease;
         display: block;
     }
-    .novel-cover-wrap:hover img { transform: scale(1.05); }
+    .novel-cover-wrap:hover {
+        border-color: rgba(148, 163, 184, 0.22);
+        box-shadow: 0 16px 28px -18px rgba(15, 23, 42, 0.9);
+    }
+    .novel-cover-wrap:hover img { transform: scale(1.03); }
 
     .novel-cover-wrap::after {
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 50%);
+        background: linear-gradient(to top, rgba(2,6,23,0.78) 0%, rgba(2,6,23,0.12) 42%, rgba(2,6,23,0) 100%);
         pointer-events: none;
     }
 
     .novel-cover-meta {
         position: absolute;
         bottom: 0; left: 0; right: 0;
-        padding: 0.55rem 0.55rem 0.5rem;
+        padding: 0.4rem 0.45rem 0.45rem;
         z-index: 1;
+    }
+
+    .latest-update-meta {
+        display: block;
+        padding: 0 0.15rem 0.1rem;
+        text-decoration: none;
+    }
+    .latest-update-title {
+        display: block;
+        color: #e2e8f0;
+        font-size: 0.68rem;
+        font-weight: 700;
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+        transition: color 0.2s ease;
+    }
+    .latest-update-meta:hover .latest-update-title {
+        color: #a5b4fc;
+    }
+    .latest-update-time {
+        display: block;
+        margin-top: 0.22rem;
+        color: #64748b;
+        font-size: 0.58rem;
+        letter-spacing: 0.02em;
+        text-transform: lowercase;
     }
 
     /* ── Chapter badge hijau ─────────────────── */
@@ -664,7 +712,7 @@
         min-height: 28rem;
     }
 
-    .landing-page .scene-card {
+    .landing-page .scene-card1 {
         position: relative;
         min-height: 10rem;
         overflow: hidden;
@@ -678,7 +726,37 @@
         transition: transform 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
     }
 
-    .landing-page .scene-card::after {
+    .landing-page .scene-card2 {
+        position: relative;
+        min-height: 10rem;
+        overflow: hidden;
+        border: 1px solid #333333;
+        border-radius: 0.5rem;
+        background-color: #151515;
+        background-image: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 45%), url('/storage/banners/sceneshowcase2.png');
+        background-size: cover;
+        background-position: center;
+        text-decoration: none;
+        transition: transform 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
+    }
+
+    .landing-page .scene-card3{
+        position: relative;
+        min-height: 10rem;
+        overflow: hidden;
+        border: 1px solid #333333;
+        border-radius: 0.5rem;
+        background-color: #151515;
+        background-image: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 45%), url('/storage/banners/sceneshowcase3.png');
+        background-size: cover;
+        background-position: center;
+        text-decoration: none;
+        transition: transform 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
+    }
+
+    .landing-page .scene-card1::after,
+    .landing-page .scene-card2::after,
+    .landing-page .scene-card3::after {
         content: '';
         position: absolute;
         inset: 0;
@@ -1128,67 +1206,7 @@
     </section>
     @endif
 
-    {{-- ═══════════════════════════════════════════
-         LATEST UPDATES
-    ═══════════════════════════════════════════ --}}
-    @if($recentlyUpdated->count() > 0)
-    <section style="padding:2.5rem 0 3rem; border-top:1px solid #0a1220;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="section-heading">
-                <div class="section-heading-bar" style="background: linear-gradient(to bottom,#34d399,#10b981);"></div>
-                <h2>Baru Diperbarui</h2>
-                <a href="{{ route('novels.updated') }}">
-                    Lihat semua
-                    <svg style="width:11px;height:11px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </a>
-            </div>
-
-            <div class="novel-shelf">
-                @foreach($recentlyUpdated as $novel)
-                @php
-                    $coverUrl  = $novel->cover_image_url ?: ($novel->cover_image ? asset('storage/' . $novel->cover_image) : null);
-                    $latestCh  = $novel->chapters->first();
-                    $latestAgo = $latestCh
-                        ? \Illuminate\Support\Carbon::parse($latestCh->published_at ?? $latestCh->created_at)->diffForHumans(null, true)
-                        : null;
-                @endphp
-                <div class="group">
-                    <a href="{{ $latestCh ? route('chapters.show', [$novel->slug, $latestCh->slug]) : route('novels.show', $novel->slug) }}"
-                       class="novel-cover-wrap block">
-                        @if($coverUrl)
-                        <img src="{{ $coverUrl }}" alt="{{ $novel->title }}"
-                             width="240" height="360" loading="lazy"
-                             onerror="this.src='/error.png'">
-                        @else
-                        <div class="w-full h-full" style="background:#1e293b;"></div>
-                        @endif
-
-                        @if($latestCh)
-                        <div class="novel-cover-meta">
-                            <div class="ch-badge">
-                                <span class="ch-badge-dot"></span>
-                                <span class="truncate" style="max-width:8rem;">{{ $latestCh->title }}</span>
-                            </div>
-                        </div>
-                        @endif
-                    </a>
-
-                    <a href="{{ route('novels.show', $novel->slug) }}" class="block mt-2">
-                        <h3 class="text-[11px] font-semibold line-clamp-1 leading-snug" style="color:#94a3b8;">
-                            {{ $novel->title }}
-                        </h3>
-                        @if($latestAgo)
-                        <p class="text-[9px] mt-0.5" style="color:#334155;">{{ $latestAgo }}</p>
-                        @endif
-                    </a>
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
-    @endif
-
-    {{-- ═══════════════════════════════════════════
+        {{-- ═══════════════════════════════════════════
          SCENE NOTES — hard-coded editorial scenes
     ═══════════════════════════════════════════ --}}
     <section style="padding:3rem 0 5rem;">
@@ -1210,20 +1228,20 @@
             </div>
 
             <div class="scene-board">
-                <div class="scene-card scene-card-main">
+                <div class="scene-card1 scene-card-main">
                     <div class="scene-card-content">
                         <span class="scene-card-kicker">01 / The first page</span>
                         <h3 class="scene-card-title">Satu halaman, satu dunia baru.</h3>
                         <p class="scene-card-copy">Mulai dari kalimat pertama dan biarkan suasana menemukan bentuknya sendiri.</p>
                     </div>
                 </div>
-                <div class="scene-card scene-card-night">
+                <div class="scene-card2 scene-card-night">
                     <div class="scene-card-content">
                         <span class="scene-card-kicker">02 / After hours</span>
                         <h3 class="scene-card-title">Cerita untuk malam yang belum selesai.</h3>
                     </div>
                 </div>
-                <div class="scene-card scene-card-quiet">
+                <div class="scene-card3 scene-card-quiet">
                     <div class="scene-card-content">
                         <span class="scene-card-kicker">03 / Quiet chapter</span>
                         <h3 class="scene-card-title">Pelan-pelan, tapi menetap.</h3>
@@ -1232,6 +1250,65 @@
             </div>
         </div>
     </section>
+
+    {{-- ═══════════════════════════════════════════
+         LATEST UPDATES
+    ═══════════════════════════════════════════ --}}
+    @if($recentlyUpdated->count() > 0)
+    <section class="latest-updates" style="padding:2.5rem 0 3rem; border-top:1px solid rgba(15,23,42,0.9); background: linear-gradient(180deg, rgba(15,23,42,0.35), rgba(2,6,23,0.18));">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="section-heading">
+                <div class="section-heading-bar" style="background: linear-gradient(to bottom,#34d399,#10b981);"></div>
+                <h2>Baru Diperbarui</h2>
+                <a href="{{ route('novels.updated') }}">
+                    Lihat semua
+                    <svg style="width:11px;height:11px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
+
+            <div class="novel-shelf">
+                @foreach($recentlyUpdated as $novel)
+                @php
+                    $coverUrl  = $novel->cover_image_url ?: ($novel->cover_image ? asset('storage/' . $novel->cover_image) : null);
+                    $latestCh  = $novel->chapters->first();
+                    $latestAgo = $latestCh
+                        ? \Illuminate\Support\Carbon::parse($latestCh->published_at ?? $latestCh->created_at)->diffForHumans(null, true)
+                        : null;
+                @endphp
+                <div class="group latest-update-card">
+                    <a href="{{ $latestCh ? route('chapters.show', [$novel->slug, $latestCh->slug]) : route('novels.show', $novel->slug) }}"
+                       class="novel-cover-wrap block">
+                        @if($coverUrl)
+                        <img src="{{ $coverUrl }}" alt="{{ $novel->title }}"
+                             width="240" height="360" loading="lazy"
+                             onerror="this.src='/error.png'">
+                        @else
+                        <div class="w-full h-full" style="background:linear-gradient(135deg,#1e293b,#0f172a);"></div>
+                        @endif
+
+                        @if($latestCh)
+                        <div class="novel-cover-meta">
+                            <div class="ch-badge">
+                                <span class="ch-badge-dot"></span>
+                                <span class="truncate" style="max-width:7.2rem;">{{ $latestCh->title }}</span>
+                            </div>
+                        </div>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('novels.show', $novel->slug) }}" class="latest-update-meta">
+                        <span class="latest-update-title">{{ $novel->title }}</span>
+                        @if($latestAgo)
+                        <span class="latest-update-time">{{ $latestAgo }}</span>
+                        @endif
+                    </a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
 
 </div>
 @endsection

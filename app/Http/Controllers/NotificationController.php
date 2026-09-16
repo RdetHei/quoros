@@ -23,13 +23,28 @@ class NotificationController extends Controller
         return view('notifications.index', compact('notifications', 'hasUnread'));
     }
 
+    public function show(InAppNotification $notification)
+    {
+        abort_unless($notification->user_id === Auth::id(), 403);
+
+        $notification->markAsRead();
+
+        return view('notifications.show', compact('notification'));
+    }
+
     public function markRead(InAppNotification $notification)
     {
         abort_unless($notification->user_id === Auth::id(), 403);
 
         $notification->markAsRead();
 
-        if ($url = $notification->url()) {
+        $url = $notification->url();
+
+        if ($notification->type === \App\Enums\NotificationType::Announcement && $notification->url()) {
+            return redirect()->route('notifications.show', $notification);
+        }
+
+        if ($url) {
             return redirect($url);
         }
 

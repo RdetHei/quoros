@@ -126,6 +126,24 @@ class InAppNotificationService
         ]);
     }
 
+    public function notifyAnnouncementToAllUsers(string $title, string $content, ?string $link = null, ?string $type = null): void
+    {
+        $userIds = \App\Models\User::query()->pluck('id');
+
+        if ($userIds->isEmpty()) {
+            return;
+        }
+
+        $payload = [
+            'title' => $title,
+            'body' => $content,
+            'url' => $link,
+            'announcement_type' => $type,
+        ];
+
+        $this->insertForUsers($userIds, NotificationType::Announcement, $payload);
+    }
+
     /**
      * @param  Collection<int, int>|array<int, int>  $userIds
      */
