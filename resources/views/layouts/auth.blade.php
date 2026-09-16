@@ -20,18 +20,18 @@
             width: 100%;
             padding: 0.875rem 1rem;
             font-size: 0.875rem;
-            color: #f8fafc;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(51, 65, 85, 0.8);
+            color: #f5f5f5;
+            background: #202020;
+            border: 1px solid #3a3a3a;
             border-radius: 0.75rem;
             transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
         }
-        .auth-input::placeholder { color: #64748b; }
+        .auth-input::placeholder { color: #737373; }
         .auth-input:focus {
             outline: none;
-            border-color: rgba(245, 158, 11, 0.5);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
-            background: rgba(15, 23, 42, 0.9);
+            border-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.10);
+            background: #262626;
         }
         .auth-input-error { border-color: rgba(244, 63, 94, 0.6); }
         .auth-btn-primary {
@@ -41,15 +41,15 @@
             padding: 0.875rem 1.5rem;
             font-size: 0.875rem;
             font-weight: 700;
-            color: #0f172a;
-            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            color: #000000;
+            background: #ffffff;
             border-radius: 0.75rem;
-            box-shadow: 0 4px 24px rgba(245, 158, 11, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
             transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
         }
         .auth-btn-primary:hover {
             filter: brightness(1.05);
-            box-shadow: 0 6px 28px rgba(245, 158, 11, 0.28);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.38);
         }
         .auth-btn-primary:active { transform: scale(0.99); }
         .auth-visual-panel img {
@@ -80,12 +80,12 @@
             text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65);
         }
         .auth-form-panel {
-            background: #020617;
-            box-shadow: -1px 0 0 rgba(51, 65, 85, 0.45), -24px 0 48px rgba(0, 0, 0, 0.35);
+            background: #151515;
+            box-shadow: -1px 0 0 #333333, -24px 0 48px rgba(0, 0, 0, 0.35);
         }
         @media (min-width: 1024px) {
             .auth-form-panel {
-                background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+                background: linear-gradient(180deg, #202020 0%, #151515 100%);
             }
         }
 
@@ -95,14 +95,14 @@
             align-items: center;
             gap: 0.625rem;
             padding: 0.5rem 0.875rem 0.5rem 0.625rem;
-            background: rgba(245, 158, 11, 0.07);
-            border: 1px solid rgba(245, 158, 11, 0.18);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 999px;
             transition: background 0.15s, border-color 0.15s;
         }
         .auth-logo-wrap:hover {
-            background: rgba(245, 158, 11, 0.12);
-            border-color: rgba(245, 158, 11, 0.28);
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(255, 255, 255, 0.30);
         }
         .auth-logo-img {
             height: 28px;
@@ -115,7 +115,19 @@
             font-weight: 800;
             letter-spacing: 0.06em;
             text-transform: uppercase;
-            color: #fbbf24;
+            color: #ffffff;
+        }
+
+        @media (max-width: 1023px) {
+            .auth-visual-panel {
+                display: none;
+            }
+
+            .auth-form-panel {
+                width: 100%;
+                margin-left: 0;
+                min-height: 100dvh;
+            }
         }
     </style>
     @stack('styles')
@@ -134,10 +146,10 @@
 
             <div class="auth-visual-copy flex flex-col justify-center items-start h-full p-6 sm:p-10 lg:p-12 text-left">
                 <div class="max-w-md">
-                    <p class="text-[10px] font-black uppercase tracking-[0.35em] text-amber-400 mb-3">Quoros Translation</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.35em] text-white/70 mb-3">Quoros Translation</p>
                     <h2 class="text-2xl lg:text-3xl font-extrabold text-white leading-tight tracking-tight">
                         Where stories come alive,<br>
-                        <span class="text-amber-300">in a language you understand.</span>
+                        <span class="text-white">in a language you understand.</span>
                     </h2>
                     <p class="mt-4 text-sm text-slate-100/90 leading-relaxed">
                         Read thousands of translated novels, save progress, and follow your favorite authors.
@@ -170,7 +182,7 @@
 
                     {{-- Heading — rata kiri --}}
                     <div class="mb-8 text-left">
-                        <p class="text-[10px] font-black uppercase tracking-[0.28em] text-amber-500/90 mb-2">@yield('eyebrow', 'Welcome')</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.28em] text-white/60 mb-2">@yield('eyebrow', 'Welcome')</p>
                         <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">@yield('heading')</h1>
                         <p class="mt-2 text-sm text-slate-400 leading-relaxed">@yield('subheading')</p>
                     </div>

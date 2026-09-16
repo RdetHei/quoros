@@ -28,7 +28,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-neutral-950 text-neutral-100 min-h-screen" x-data="{ sidebarOpen: false }">
+<body class="font-sans antialiased bg-neutral-900 text-neutral-100 min-h-screen" x-data="{ sidebarOpen: false }">
     <div class="h-screen flex overflow-hidden">
         <!-- Sidebar -->
         <x-writer.sidebar />
@@ -46,9 +46,9 @@
 
         <!-- Main Content Area -->
         <div class="flex-1 min-w-0 w-full h-full overflow-hidden">
-            <div class="h-full bg-neutral-950 border-l border-neutral-800 overflow-y-auto custom-scrollbar flex flex-col">
+            <div class="h-full bg-neutral-900 border-l border-neutral-800 overflow-y-auto custom-scrollbar flex flex-col">
                 <!-- Mobile Header -->
-                <header class="lg:hidden flex items-center justify-between h-14 px-4 bg-black border-b border-neutral-800 sticky top-0 z-40">
+                <header class="lg:hidden flex items-center justify-between h-14 px-4 bg-neutral-950 border-b border-neutral-800 sticky top-0 z-40">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-7 w-auto">
                         <span class="text-base font-semibold tracking-tight text-white">Quoros</span>

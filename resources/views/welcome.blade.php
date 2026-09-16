@@ -491,14 +491,357 @@
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
-        color: #fbbf24;
+        color: #ffffff;
         font-size: 0.65rem;
         font-weight: 800;
+    }
+
+    /* Editorial landing treatment: quiet surfaces, one warm accent, and clear hierarchy. */
+    .landing-page {
+        --landing-ink: #f5f5f5;
+        --landing-muted: #a3a3a3;
+        --landing-paper: #000000;
+        --landing-paper-deep: #0a0a0a;
+        --landing-panel: #171717;
+        --landing-coral: #ffffff;
+        --landing-teal: #a3a3a3;
+        background: var(--landing-paper) !important;
+        color: var(--landing-ink) !important;
+    }
+
+    .landing-page .hero-wrap {
+        border-radius: 0.35rem;
+        border-color: rgba(255,255,255,0.12) !important;
+        background: var(--landing-panel);
+        box-shadow: 0 24px 50px -32px rgba(23,33,38,0.65) !important;
+    }
+
+    .landing-page .hero-bg-vignette {
+        background: linear-gradient(105deg, rgba(23,23,23,0.99) 0%, rgba(23,23,23,0.94) 55%, rgba(10,10,10,0.78) 100%) !important;
+    }
+
+    .landing-page .hero-grid-overlay,
+    .landing-page .hero-cover-bg {
+        display: none;
+    }
+
+    .landing-page .eyebrow-tag {
+        border-radius: 0.2rem;
+        background: rgba(255,255,255,0.10) !important;
+        border-color: rgba(255,255,255,0.28) !important;
+        color: #ffffff !important;
+        letter-spacing: 0.11em;
+    }
+
+    .landing-page .eyebrow-dot {
+        background: var(--landing-coral);
+        box-shadow: none;
+    }
+
+    .landing-page h1 span,
+    .landing-page .showcase-eyebrow + h2 span {
+        background: none !important;
+        -webkit-text-fill-color: #ffffff !important;
+        color: #ffffff !important;
+    }
+
+    .landing-page .hero-btn-primary {
+        border-radius: 0.25rem;
+        background: var(--landing-coral) !important;
+        color: #000000 !important;
+        box-shadow: 0 12px 25px -16px rgba(255,255,255,0.5) !important;
+    }
+
+    .landing-page .hero-btn-primary:hover {
+        background: #e5e5e5 !important;
+    }
+
+    .landing-page .hero-btn-secondary {
+        border-radius: 0.25rem;
+        background: transparent;
+        border-color: rgba(255,255,255,0.22);
+    }
+
+    .landing-page .hero-stat-pill {
+        border-radius: 0.2rem;
+        background: rgba(255,255,255,0.06);
+    }
+
+    .landing-page .stack-card {
+        border-radius: 0.35rem;
+        box-shadow: 0 25px 45px -22px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.14);
+    }
+
+    .landing-page .stack-dot.active {
+        background: var(--landing-coral);
+    }
+
+    .landing-page .stack-arrow:hover {
+        background: rgba(215,107,77,0.2);
+        border-color: rgba(215,107,77,0.45);
+        color: #ffffff;
+    }
+
+    .landing-page .section-heading h2,
+    .landing-page .showcase-cell .cell-title,
+    .landing-page .showcase-eyebrow + h2 {
+        color: var(--landing-ink) !important;
+    }
+
+    .landing-page .section-heading a,
+    .landing-page .showcase-cell .cell-sub {
+        color: var(--landing-muted) !important;
+    }
+
+    .landing-page .stat-ticker {
+        border-color: #262626 !important;
+        background: #0a0a0a !important;
+    }
+
+    .landing-page .stat-ticker span:first-child {
+        color: #f5f5f5 !important;
+    }
+
+    .landing-page .stat-ticker span:nth-child(2) {
+        color: #737373 !important;
+    }
+
+    .landing-page .stat-ticker span:last-child {
+        background: #737373 !important;
+    }
+
+    .landing-page .section-heading-bar {
+        background: var(--landing-coral) !important;
+    }
+
+    .landing-page .showcase-eyebrow {
+        color: var(--landing-teal) !important;
+    }
+
+    .landing-page .showcase-eyebrow-dot {
+        background: var(--landing-teal);
+        box-shadow: none;
+    }
+
+    .landing-page .showcase-eyebrow + h2 span {
+        color: var(--landing-coral) !important;
+    }
+
+    .landing-page .showcase-eyebrow + h2 + p {
+        color: var(--landing-muted) !important;
+    }
+
+    .landing-page .ec-card {
+        border-radius: 0.3rem;
+        background: #0a0a0a;
+        border-color: #262626;
+        box-shadow: 0 8px 20px -18px rgba(0,0,0,0.9);
+    }
+
+    .landing-page .ec-card:hover {
+        background: #171717;
+        border-color: rgba(255,255,255,0.55);
+        box-shadow: 0 16px 28px -20px rgba(0,0,0,0.8);
+    }
+
+    .landing-page .ec-card h3 {
+        color: var(--landing-ink) !important;
+    }
+
+    .landing-page .ec-card p {
+        color: var(--landing-muted) !important;
+    }
+
+    .landing-page .cover-showcase {
+        gap: 0.5rem;
+    }
+
+    .landing-page .scene-board {
+        display: grid;
+        grid-template-columns: 1.35fr 0.65fr;
+        grid-template-rows: repeat(2, minmax(150px, 1fr));
+        gap: 0.75rem;
+        min-height: 28rem;
+    }
+
+    .landing-page .scene-card {
+        position: relative;
+        min-height: 10rem;
+        overflow: hidden;
+        border: 1px solid #333333;
+        border-radius: 0.5rem;
+        background-color: #151515;
+        background-image: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 45%), url('/storage/banners/sceneshowcase1.png');
+        background-size: cover;
+        background-position: center;
+        text-decoration: none;
+        transition: transform 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
+    }
+
+    .landing-page .scene-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.12) 70%);
+    }
+
+    .landing-page .scene-card:hover {
+        transform: translateY(-3px);
+        border-color: #737373;
+        filter: brightness(1.08);
+    }
+
+    .landing-page .scene-card-main {
+        grid-row: span 2;
+        background-position: 65% center;
+    }
+
+    .landing-page .scene-card-night {
+        background-position: 20% center;
+    }
+
+    .landing-page .scene-card-quiet {
+        background-position: 85% center;
+        filter: grayscale(0.35);
+    }
+
+    .landing-page .scene-card-content {
+        position: absolute;
+        inset: auto 1.25rem 1.25rem;
+        z-index: 1;
+    }
+
+    .landing-page .scene-card-kicker {
+        display: block;
+        margin-bottom: 0.45rem;
+        color: #d4d4d4;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    .landing-page .scene-card-title {
+        color: #ffffff;
+        font-size: clamp(1rem, 2vw, 1.6rem);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
+
+    .landing-page .scene-card-copy {
+        max-width: 28rem;
+        margin-top: 0.45rem;
+        color: #a3a3a3;
+        font-size: 0.72rem;
+        line-height: 1.5;
+    }
+
+    .landing-page .reading-route {
+        display: flex;
+        min-height: 10rem;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 1.5rem;
+        border: 1px solid #333333;
+        border-radius: 0.5rem;
+        background: #151515;
+        padding: 1.25rem;
+        text-decoration: none;
+        transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+    }
+
+    .landing-page .reading-route:hover {
+        transform: translateY(-3px);
+        border-color: #737373;
+        background: #202020;
+    }
+
+    .landing-page .reading-route-index {
+        color: #737373;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+    }
+
+    .landing-page .reading-route-title {
+        color: #f5f5f5;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .landing-page .reading-route-copy {
+        margin-top: 0.35rem;
+        color: #a3a3a3;
+        font-size: 0.72rem;
+        line-height: 1.45;
+    }
+
+    .landing-page .reading-route-arrow {
+        align-self: flex-end;
+        color: #ffffff;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 639px) {
+        .landing-page .scene-board {
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(3, 12rem);
+            min-height: 0;
+        }
+
+        .landing-page .scene-card-main {
+            grid-row: span 1;
+        }
+    }
+
+    .landing-page .showcase-cell {
+        border-radius: 0.3rem;
+        border-color: #262626;
+    }
+
+    .landing-page .showcase-cell:hover {
+        border-color: var(--landing-coral);
+        box-shadow: 0 18px 32px -20px rgba(0,0,0,0.8);
+    }
+
+    .landing-page .showcase-cell .cell-tag {
+        border-radius: 0.2rem;
+        background: rgba(23,33,38,0.78);
+        border-color: rgba(255,255,255,0.22);
+        color: #ffffff;
+    }
+
+    .landing-page .novel-cover-wrap {
+        border-radius: 0.3rem;
+        box-shadow: 0 10px 22px -15px rgba(0,0,0,0.8);
+    }
+
+    .landing-page .ch-badge {
+        background: rgba(111,155,145,0.9);
+        border-color: rgba(255,255,255,0.24);
+        color: #f5faf7;
+    }
+
+    .landing-page .ch-badge-dot {
+        background: #d8eee6;
+    }
+
+    @media (max-width: 639px) {
+        .landing-page .hero-wrap {
+            border-radius: 0;
+            margin-inline: -1rem;
+        }
+
+        .landing-page .stack-wrap {
+            height: 22rem;
+        }
     }
 </style>
 @endpush
 
-<div class="min-h-screen" style="background:#060a10; color:#e2e8f0;">
+<div class="landing-page min-h-screen">
 
     {{-- ═══════════════════════════════════════════
          HERO — Featured Stack Visual
@@ -665,7 +1008,7 @@
     {{-- ═══════════════════════════════════════════
          STATISTIK — ticker horizontal
     ═══════════════════════════════════════════ --}}
-    <div style="border-top:1px solid #0f172a; border-bottom:1px solid #0f172a; background: linear-gradient(to right, #060a10, #0a1220, #060a10); overflow:hidden; padding:0.7rem 0;">
+    <div class="stat-ticker" style="border-top:1px solid #262626; border-bottom:1px solid #262626; background:#0a0a0a; overflow:hidden; padding:0.7rem 0;">
         <div class="stat-ticker-track">
             @php
                 $tickerItems = [
@@ -678,13 +1021,54 @@
             @endphp
             @foreach($tickerItems as $t)
             <div class="flex items-center shrink-0" style="padding:0 2.25rem;">
-                <span class="text-[15px] font-black tabular-nums" style="color:#e2e8f0;">{{ $t['val'] }}</span>
-                <span class="text-xs font-medium ml-1.5" style="color:#475569;">{{ $t['lbl'] }}</span>
-                <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#1e293b;margin-left:2.25rem;"></span>
+                <span class="text-[15px] font-black tabular-nums" style="color:#f5f5f5;">{{ $t['val'] }}</span>
+                <span class="text-xs font-medium ml-1.5" style="color:#737373;">{{ $t['lbl'] }}</span>
+                <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#737373;margin-left:2.25rem;"></span>
             </div>
             @endforeach
         </div>
     </div>
+
+    {{-- ═══════════════════════════════════════════
+         READING ROUTES — hard-coded entry points
+    ═══════════════════════════════════════════ --}}
+    <section style="padding:2.5rem 0 1rem;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col gap-2 mb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="showcase-eyebrow">Start here</p>
+                    <h2 class="mt-2 text-xl font-black tracking-tight text-white sm:text-2xl">Choose your reading route.</h2>
+                </div>
+                <p class="max-w-sm text-xs leading-relaxed text-neutral-500">Tiga cara sederhana untuk menemukan bacaan berikutnya.</p>
+            </div>
+            <div class="grid gap-3 md:grid-cols-3">
+                <a href="{{ route('novels.updated') }}" class="reading-route">
+                    <span class="reading-route-index">01 / FRESH</span>
+                    <div>
+                        <h3 class="reading-route-title">Yang baru datang</h3>
+                        <p class="reading-route-copy">Ikuti chapter dan novel yang baru diperbarui minggu ini.</p>
+                    </div>
+                    <span class="reading-route-arrow">&rarr;</span>
+                </a>
+                <a href="{{ route('home') }}" class="reading-route">
+                    <span class="reading-route-index">02 / CURATED</span>
+                    <div>
+                        <h3 class="reading-route-title">Pilihan yang terkurasi</h3>
+                        <p class="reading-route-copy">Masuk ke katalog utama dan temukan cerita sesuai ritmemu.</p>
+                    </div>
+                    <span class="reading-route-arrow">&rarr;</span>
+                </a>
+                <a href="{{ route('genres.index') }}" class="reading-route">
+                    <span class="reading-route-index">03 / MOOD</span>
+                    <div>
+                        <h3 class="reading-route-title">Mulai dari suasana</h3>
+                        <p class="reading-route-copy">Pilih genre ketika kamu sudah tahu rasa cerita yang dicari.</p>
+                    </div>
+                    <span class="reading-route-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+    </section>
 
     {{-- ═══════════════════════════════════════════
          EDITOR'S CHOICE
@@ -805,81 +1189,49 @@
     @endif
 
     {{-- ═══════════════════════════════════════════
-         COVER SHOWCASE — Bento Mosaic Gallery
+         SCENE NOTES — hard-coded editorial scenes
     ═══════════════════════════════════════════ --}}
-    @php
-        $showcaseNovels = collect()
-            ->merge($featuredNovels ?? collect())
-            ->merge($recentlyUpdated ?? collect())
-            ->unique('id')
-            ->take(5)
-            ->values();
-
-        $cellLayouts = ['cell-hero', 'cell-tall', 'cell-wide', 'cell-square', 'cell-compact'];
-    @endphp
-    @if($showcaseNovels->count() >= 4)
     <section style="padding:3rem 0 5rem;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-end justify-between gap-4 mb-5 sm:mb-7">
                 <div class="min-w-0">
                     <div class="showcase-eyebrow mb-2.5">
                         <span class="showcase-eyebrow-dot"></span>
-                        Cover Showcase
+                        Scene Notes
                     </div>
                     <h2 class="text-xl sm:text-2xl font-black tracking-tight leading-tight" style="color:#f1f5f9;">
-                        Karya pilihan terbaik<br>
-                        <span style="background: linear-gradient(135deg,#a5b4fc 0%,#818cf8 60%,#6366f1 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">dengan ilustrasi cover memukau.</span>
+                        Ruang untuk cerita<br>
+                        <span>yang tinggal lebih lama.</span>
                     </h2>
                     <p class="mt-2 text-xs max-w-lg" style="color:#64748b;">
-                        Setiap cover dipilih untuk memberikan gambaran visual dari alur cerita yang akan kamu nikmati.
+                        Sebuah jeda visual dari dunia yang sedang kamu baca. Bagian ini sengaja dibuat tetap dan bisa diubah langsung dari template.
                     </p>
                 </div>
-                <a href="{{ route('home') }}"
-                   class="shrink-0 hidden sm:inline-flex items-center gap-1.5 px-3.5 h-8 rounded-lg text-[11px] font-bold transition-all"
-                   style="background:rgba(99,102,241,0.1); color:#a5b4fc; border:1px solid rgba(99,102,241,0.22);"
-                   onmouseenter="this.style.background='rgba(99,102,241,0.2)';"
-                   onmouseleave="this.style.background='rgba(99,102,241,0.1)';">
-                    Jelajahi semua
-                    <svg style="width:12px;height:12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </a>
             </div>
 
-            <div class="cover-showcase">
-                @foreach($showcaseNovels as $i => $novel)
-                    @php
-                        $coverUrl = $novel->cover_image_url ?: ($novel->cover_image ? asset('storage/' . $novel->cover_image) : null);
-                        $firstGenre = $novel->genres->first()?->name ?? 'Featured';
-                        $cellClass = $cellLayouts[$i] ?? 'cell-square';
-                        $chCount = $novel->chapters_count ?? 0;
-                    @endphp
-                    <a href="{{ route('novels.show', $novel->slug) }}"
-                       class="showcase-cell {{ $cellClass }}">
-                        @if($coverUrl)
-                            <img src="{{ $coverUrl }}"
-                                 alt="{{ $novel->title }}"
-                                 loading="lazy"
-                                 onerror="this.style.display='none'">
-                        @endif
-                        <div class="cell-overlay">
-                            <span class="cell-tag">{{ $firstGenre }}</span>
-                            <h3 class="cell-title {{ $cellClass === 'cell-compact' ? 'line-clamp-3' : 'line-clamp-2' }}">
-                                {{ $novel->title }}
-                            </h3>
-                            @if($cellClass !== 'cell-compact')
-                            <p class="cell-sub">
-                                {{ $novel->author->name }}
-                                @if($chCount > 0)
-                                    &middot; {{ $chCount }} bab
-                                @endif
-                            </p>
-                            @endif
-                        </div>
-                    </a>
-                @endforeach
+            <div class="scene-board">
+                <div class="scene-card scene-card-main">
+                    <div class="scene-card-content">
+                        <span class="scene-card-kicker">01 / The first page</span>
+                        <h3 class="scene-card-title">Satu halaman, satu dunia baru.</h3>
+                        <p class="scene-card-copy">Mulai dari kalimat pertama dan biarkan suasana menemukan bentuknya sendiri.</p>
+                    </div>
+                </div>
+                <div class="scene-card scene-card-night">
+                    <div class="scene-card-content">
+                        <span class="scene-card-kicker">02 / After hours</span>
+                        <h3 class="scene-card-title">Cerita untuk malam yang belum selesai.</h3>
+                    </div>
+                </div>
+                <div class="scene-card scene-card-quiet">
+                    <div class="scene-card-content">
+                        <span class="scene-card-kicker">03 / Quiet chapter</span>
+                        <h3 class="scene-card-title">Pelan-pelan, tapi menetap.</h3>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
-    @endif
 
 </div>
 @endsection

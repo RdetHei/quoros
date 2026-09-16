@@ -30,7 +30,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen antialiased">
+<body class="bg-slate-900 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen antialiased">
 <div class="h-screen flex overflow-hidden" x-data="{ sidebarOpen: false, profileOpen: false }">
     <!-- Mobile Overlay -->
     <div
@@ -194,9 +194,9 @@
 
     <!-- Main -->
     <div class="flex-1 min-w-0 w-full h-full overflow-y-auto overflow-x-hidden">
-        <div class="h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 overflow-y-auto custom-scrollbar">
+        <div class="h-full bg-slate-800 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 overflow-y-auto custom-scrollbar">
             <!-- Top Bar -->
-        <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+        <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-800/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
             <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 gap-4">
                 <div class="flex items-center gap-3 min-w-0">
                     <button
@@ -271,7 +271,7 @@
         </header>
 
         <!-- Content -->
-        <main class="px-4 sm:px-6 lg:px-8 py-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100vh-80px)]">
+        <main class="px-4 sm:px-6 lg:px-8 py-8 bg-slate-800 dark:bg-slate-950 min-h-[calc(100vh-80px)]">
             @yield('content')
         </main>
     </div>

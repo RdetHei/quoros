@@ -13,10 +13,10 @@
 @layer base {
     :root {
         color-scheme: dark;
-        --q-bg: #000000;
-        --q-surface: #0a0a0a;
-        --q-surface-raised: #171717;
-        --q-border: #262626;
+        --q-bg: #0b0b0b;
+        --q-surface: #151515;
+        --q-surface-raised: #202020;
+        --q-border: #333333;
         --q-text: #fafafa;
         --q-text-muted: #a3a3a3;
         --q-text-subtle: #737373;
@@ -104,6 +104,147 @@
 
     .dark .text-slate-800 {
         color: #e5e5e5 !important;
+    }
+
+    .dark [class*="bg-slate-950"] {
+        background-color: #0b0b0b !important;
+    }
+
+    .dark [class*="bg-slate-900"] {
+        background-color: #151515 !important;
+    }
+
+    .dark [class*="bg-slate-800"] {
+        background-color: #202020 !important;
+    }
+
+    .dark [class*="bg-slate-700"] {
+        background-color: #2d2d2d !important;
+    }
+
+    .dark [class*="border-slate-"] {
+        border-color: #333333 !important;
+    }
+
+    .dark [class*="text-slate-100"],
+    .dark [class*="text-slate-200"] {
+        color: #f5f5f5 !important;
+    }
+
+    .dark [class*="text-slate-300"],
+    .dark [class*="text-slate-400"] {
+        color: #a3a3a3 !important;
+    }
+
+    .dark [class*="text-slate-500"],
+    .dark [class*="text-slate-600"] {
+        color: #737373 !important;
+    }
+
+    .dark [class*="text-neutral-100"],
+    .dark [class*="text-neutral-200"],
+    .dark [class*="text-neutral-300"] {
+        color: #f5f5f5 !important;
+    }
+
+    .dark [class*="text-neutral-400"],
+    .dark [class*="text-neutral-500"],
+    .dark [class*="text-neutral-600"] {
+        color: #a3a3a3 !important;
+    }
+
+    /* Keep the product palette monochrome while preserving semantic alert colors. */
+    .dark [class*="bg-indigo-"],
+    .dark [class*="bg-purple-"],
+    .dark [class*="bg-violet-"],
+    .dark [class*="bg-blue-"],
+    .dark [class*="bg-emerald-"] {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    .dark [class*="text-indigo-"],
+    .dark [class*="text-purple-"],
+    .dark [class*="text-violet-"],
+    .dark [class*="text-blue-"],
+    .dark [class*="text-emerald-"],
+    .dark [class*="text-teal-"],
+    .dark [class*="text-cyan-"],
+    .dark [class*="text-amber-"],
+    .dark [class*="text-yellow-"],
+    .dark [class*="text-orange-"],
+    .dark [class*="text-rose-"],
+    .dark [class*="text-red-"],
+    .dark [class*="text-green-"] {
+        color: #ffffff !important;
+    }
+
+    .dark [class*="border-indigo-"],
+    .dark [class*="border-purple-"],
+    .dark [class*="border-violet-"],
+    .dark [class*="border-blue-"],
+    .dark [class*="border-emerald-"],
+    .dark [class*="border-teal-"],
+    .dark [class*="border-cyan-"],
+    .dark [class*="border-amber-"],
+    .dark [class*="border-yellow-"],
+    .dark [class*="border-orange-"],
+    .dark [class*="border-rose-"],
+    .dark [class*="border-red-"],
+    .dark [class*="border-green-"] {
+        border-color: rgba(255, 255, 255, 0.35) !important;
+    }
+
+    .dark [class*="bg-amber-"],
+    .dark [class*="bg-yellow-"],
+    .dark [class*="bg-orange-"],
+    .dark [class*="bg-rose-"],
+    .dark [class*="bg-red-"],
+    .dark [class*="bg-green-"],
+    .dark [class*="bg-teal-"],
+    .dark [class*="bg-cyan-"] {
+        background-color: #202020 !important;
+        color: #f5f5f5 !important;
+    }
+
+    .dark [class*="hover:bg-indigo-"]:hover,
+    .dark [class*="hover:bg-purple-"]:hover,
+    .dark [class*="hover:bg-violet-"]:hover,
+    .dark [class*="hover:bg-blue-"]:hover,
+    .dark [class*="hover:bg-emerald-"]:hover {
+        background-color: #e5e5e5 !important;
+        color: #000000 !important;
+    }
+
+    .dark [class*="hover:bg-amber-"]:hover,
+    .dark [class*="hover:bg-yellow-"]:hover,
+    .dark [class*="hover:bg-orange-"]:hover,
+    .dark [class*="hover:bg-rose-"]:hover,
+    .dark [class*="hover:bg-red-"]:hover,
+    .dark [class*="hover:bg-green-"]:hover,
+    .dark [class*="hover:bg-teal-"]:hover,
+    .dark [class*="hover:bg-cyan-"]:hover {
+        background-color: #2d2d2d !important;
+        color: #ffffff !important;
+    }
+
+    .dark [class*="hover:text-indigo-"]:hover,
+    .dark [class*="hover:text-purple-"]:hover,
+    .dark [class*="hover:text-violet-"]:hover,
+    .dark [class*="hover:text-blue-"]:hover,
+    .dark [class*="hover:text-emerald-"]:hover {
+        color: #ffffff !important;
+    }
+
+    .dark [class*="hover:text-amber-"]:hover,
+    .dark [class*="hover:text-yellow-"]:hover,
+    .dark [class*="hover:text-orange-"]:hover,
+    .dark [class*="hover:text-rose-"]:hover,
+    .dark [class*="hover:text-red-"]:hover,
+    .dark [class*="hover:text-green-"]:hover,
+    .dark [class*="hover:text-teal-"]:hover,
+    .dark [class*="hover:text-cyan-"]:hover {
+        color: #ffffff !important;
     }
 }
 

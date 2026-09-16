@@ -24,7 +24,7 @@
     #scroll-progress {
         height: 100%;
         width: 0%;
-        background: linear-gradient(90deg, #6366f1, #a78bfa);
+        background: #ffffff;
         transition: width 0.1s linear;
         box-shadow: 0 0 12px rgba(99,102,241,0.6);
     }
@@ -39,10 +39,10 @@
         transform: translateY(-50%);
         z-index: 100;
         width: 3.75rem;
-        background: rgba(15, 23, 42, 0.92);
+        background: rgba(21, 21, 21, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(99,102,241,0.18);
+        border: 1px solid #333333;
         border-radius: 2rem;
         display: flex;
         flex-direction: column;
@@ -76,17 +76,17 @@
     }
 
     .sidebar-btn:hover {
-        background: rgba(99,102,241,0.15);
-        color: #e2e8f0;
+        background: #2d2d2d;
+        color: #f5f5f5;
         transform: scale(1.08);
-        box-shadow: 0 0 0 1px rgba(99,102,241,0.3);
+        box-shadow: none;
     }
 
     .sidebar-btn.active {
-        background: #6366f1;
+        background: #ffffff;
         color: #ffffff;
         border-color: rgba(255,255,255,0.12);
-        box-shadow: 0 4px 12px rgba(99,102,241,0.45);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.35);
     }
 
     .sidebar-btn.disabled {
@@ -102,14 +102,14 @@
         right: calc(100% + 0.75rem);
         top: 50%;
         transform: translateY(-50%);
-        background: #0f172a;
-        color: #e2e8f0;
+        background: #202020;
+        color: #f5f5f5;
         font-size: 0.7rem;
         font-weight: 600;
         white-space: nowrap;
         padding: 0.35rem 0.65rem;
         border-radius: 0.5rem;
-        border: 1px solid #334155;
+        border: 1px solid #404040;
         pointer-events: none;
         opacity: 0;
         transition: opacity 0.15s;
@@ -136,10 +136,10 @@
         transform: translateY(-50%);
         width: 20rem;
         max-height: 80vh;
-        background: rgba(15, 23, 42, 0.96);
+        background: rgba(21, 21, 21, 0.96);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(99,102,241,0.2);
+        border: 1px solid #333333;
         border-radius: 1.5rem;
         padding: 1.5rem;
         box-shadow: 0 32px 64px rgba(0,0,0,0.5);
@@ -176,15 +176,15 @@
         transition: background 0.15s, color 0.15s;
     }
 
-    .panel-close-btn:hover { background: #1e293b; color: #e2e8f0; }
+    .panel-close-btn:hover { background: #2d2d2d; color: #f5f5f5; }
 
     /* Custom Scrollbar */
     .custom-scrollbar { overflow-y: auto; flex: 1; min-height: 0; }
 
     .custom-scrollbar::-webkit-scrollbar { width: 3px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #404040; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #737373; }
 
     /* Chapter list item */
     .chapter-list-item {
@@ -198,8 +198,8 @@
         line-height: 1.4;
     }
 
-    .chapter-list-item:hover { background: #1e293b; color: #e2e8f0; }
-    .chapter-list-item.active { background: #6366f1; color: #fff; font-weight: 700; }
+    .chapter-list-item:hover { background: #2d2d2d; color: #f5f5f5; }
+    .chapter-list-item.active { background: #ffffff; color: #000000; font-weight: 700; }
 
     /* Settings controls */
     .settings-label {
@@ -219,16 +219,16 @@
         font-weight: 700;
         font-size: 0.85rem;
         color: #64748b;
-        background: #0f172a;
-        border: 1px solid #1e293b;
+        background: #202020;
+        border: 1px solid #333333;
         transition: all 0.15s;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    .font-size-btn:hover { background: #1e293b; color: #e2e8f0; }
-    .font-size-btn.active { background: #6366f1; color: #fff; border-color: transparent; box-shadow: 0 4px 10px rgba(99,102,241,0.35); }
+    .font-size-btn:hover { background: #2d2d2d; color: #f5f5f5; }
+    .font-size-btn.active { background: #ffffff; color: #000000; border-color: transparent; box-shadow: 0 6px 16px rgba(0,0,0,0.35); }
 
     .font-family-btn {
         width: 100%;
@@ -237,8 +237,8 @@
         font-size: 0.8rem;
         font-weight: 600;
         color: #64748b;
-        background: #0f172a;
-        border: 1px solid #1e293b;
+        background: #202020;
+        border: 1px solid #333333;
         transition: all 0.15s;
         display: flex;
         align-items: center;
@@ -246,8 +246,8 @@
         gap: 0.75rem;
     }
 
-    .font-family-btn:hover { background: #1e293b; color: #e2e8f0; }
-    .font-family-btn.active { background: #6366f1; color: #fff; border-color: transparent; }
+    .font-family-btn:hover { background: #2d2d2d; color: #f5f5f5; }
+    .font-family-btn.active { background: #ffffff; color: #000000; border-color: transparent; }
 
     .font-family-btn .font-preview { font-size: 1.1rem; opacity: 0.7; }
 
@@ -266,18 +266,19 @@
             width: 3.5rem;
             height: 3.5rem;
             border-radius: 9999px;
-            background: #6366f1;
+            background: #ffffff;
             color: #ffffff;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             z-index: 150;
             border: none;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
         }
         .mobile-fab:hover {
-            background: #4f46e5;
+            background: #e5e5e5;
+            color: #000000;
             transform: scale(1.05);
         }
         .mobile-fab:active {
@@ -301,13 +302,13 @@
         font-size: 0.75rem;
         font-weight: 700;
         color: #94a3b8;
-        background: rgba(30,41,59,0.8);
+        background: rgba(32,32,32,0.92);
         border: 1px solid rgba(148,163,184,0.1);
         transition: background 0.15s, color 0.15s;
         text-decoration: none;
     }
 
-    .mobile-nav-btn:hover { background: #1e293b; color: #e2e8f0; }
+    .mobile-nav-btn:hover { background: #2d2d2d; color: #f5f5f5; }
 
     .mobile-nav-btn.disabled {
         opacity: 0.3;
@@ -335,7 +336,7 @@
     .mobile-drawer-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(2, 6, 23, 0.75);
+        background: rgba(0, 0, 0, 0.78);
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
         z-index: 160;
@@ -345,8 +346,8 @@
         position: fixed;
         top: 0; bottom: 0; right: 0;
         z-index: 170;
-        background: #0f172a;
-        border-left: 1px solid rgba(99,102,241,0.2);
+        background: #151515;
+        border-left: 1px solid #333333;
         border-radius: 1.5rem 0 0 1.5rem;
         padding: 1.5rem 1.25rem;
         width: 18rem;
@@ -361,7 +362,7 @@
     .drawer-handle {
         width: 2.5rem;
         height: 4px;
-        background: #334155;
+        background: #404040;
         border-radius: 2px;
         margin: 0.875rem auto 1.25rem;
     }
@@ -385,15 +386,15 @@
         color: #cbd5e1;
         font-size: 0.875rem;
         font-weight: 600;
-        background: #1e293b;
+        background: #202020;
         border: 1px solid transparent;
         margin-bottom: 0.5rem;
         transition: background 0.15s, color 0.15s;
         text-decoration: none;
     }
 
-    .drawer-btn:hover { background: #293548; color: #fff; }
-    .drawer-btn .icon-wrap { width: 2.25rem; height: 2.25rem; border-radius: 0.75rem; background: #334155; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .drawer-btn:hover { background: #2d2d2d; color: #fff; }
+    .drawer-btn .icon-wrap { width: 2.25rem; height: 2.25rem; border-radius: 0.75rem; background: #404040; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
     /* ============================================
        READING AREA
@@ -419,8 +420,8 @@
     }
 
     .dark .chapter-card {
-        background: #0f172a;
-        border-color: #1e293b;
+        background: #151515;
+        border-color: #333333;
         box-shadow: none;
     }
 
@@ -450,7 +451,7 @@
         content: '';
         flex: 1;
         height: 1px;
-        background: linear-gradient(to right, transparent, #334155, transparent);
+        background: linear-gradient(to right, transparent, #404040, transparent);
     }
 
     .chapter-divider span {
@@ -493,7 +494,7 @@
         width: 6px;
         height: 6px;
         border-radius: 50%;
-        background: #6366f1;
+        background: #ffffff;
         animation: bounce 1.2s infinite ease-in-out;
     }
 
@@ -527,8 +528,133 @@
     }
 
     .dark .comments-section {
-        background: #0f172a;
-        border-color: #1e293b;
+        background: #151515;
+        border-color: #333333;
+    }
+
+    /* Reader monochrome surfaces */
+    #scroll-progress {
+        background: #ffffff;
+        box-shadow: 0 0 12px rgba(255,255,255,0.35);
+    }
+
+    .reader-sidebar,
+    .sidebar-panel,
+    .mobile-drawer {
+        background: rgba(21,21,21,0.96);
+        border-color: #333333;
+    }
+
+    .sidebar-btn,
+    .mobile-nav-btn {
+        color: #a3a3a3;
+    }
+
+    .sidebar-btn:hover,
+    .mobile-nav-btn:hover,
+    .panel-close-btn:hover,
+    .chapter-list-item:hover,
+    .font-size-btn:hover,
+    .font-family-btn:hover {
+        background: #2d2d2d;
+        color: #f5f5f5;
+        box-shadow: none;
+    }
+
+    .sidebar-btn.active,
+    .chapter-list-item.active,
+    .font-size-btn.active,
+    .font-family-btn.active,
+    .mobile-fab {
+        background: #ffffff;
+        color: #000000;
+        border-color: #ffffff;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    }
+
+    .sidebar-btn::after {
+        background: #202020;
+        color: #f5f5f5;
+        border-color: #404040;
+    }
+
+    .sidebar-divider,
+    .drawer-handle {
+        background: #404040;
+    }
+
+    .sidebar-panel-title,
+    .drawer-section-title {
+        color: #f5f5f5;
+    }
+
+    .panel-close-btn,
+    .chapter-list-item,
+    .font-size-btn,
+    .font-family-btn {
+        color: #a3a3a3;
+        background: #202020;
+        border-color: #333333;
+    }
+
+    .settings-label {
+        color: #d4d4d4;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #404040;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #737373;
+    }
+
+    .mobile-nav-btn {
+        background: rgba(32,32,32,0.92);
+        border-color: #333333;
+    }
+
+    .mobile-fab:hover {
+        background: #e5e5e5;
+        color: #000000;
+    }
+
+    .mobile-drawer-overlay {
+        background: rgba(0,0,0,0.78);
+    }
+
+    .drawer-btn {
+        color: #d4d4d4;
+        background: #202020;
+        border-color: #333333;
+    }
+
+    .drawer-btn:hover,
+    .drawer-btn .icon-wrap {
+        background: #2d2d2d;
+        color: #ffffff;
+    }
+
+    .chapter-card,
+    .comments-section,
+    .dark .chapter-card,
+    .dark .comments-section {
+        background: #151515;
+        border-color: #333333;
+        box-shadow: 0 16px 40px -30px rgba(0,0,0,0.9);
+    }
+
+    .chapter-divider::before,
+    .chapter-divider::after {
+        background: linear-gradient(to right, transparent, #404040, transparent);
+    }
+
+    .autoload-indicator {
+        color: #737373;
+    }
+
+    .autoload-dots span {
+        background: #ffffff;
     }
 
 
@@ -545,7 +671,8 @@
     'novelSlug'          => $novel->slug,
     'novelTitle'         => $novel->title,
     'baseUrl'            => url('/'),
-    'protectChapter'     => $protectContent ?? false
+    'protectChapter'      => $protectContent ?? false,
+    'autoLoadChapters'    => auth()->check() ? (bool) (auth()->user()->auto_load_chapters ?? true) : true,
 ]))" class="max-w-5xl mx-auto px-2 sm:px-6 pb-16 pt-8">
 
     {{-- ── Reading progress bar ───────────────────── --}}
@@ -678,6 +805,19 @@
                             </button>
                         </template>
                     </div>
+                </div>
+                <div class="border-t border-slate-800/80 pt-5">
+                    <label class="flex items-center justify-between gap-4 cursor-pointer">
+                        <span>
+                            <span class="settings-label block mb-1">Auto-load Chapter</span>
+                            <span class="block text-[0.68rem] text-slate-400">Muat chapter berikutnya otomatis saat scroll.</span>
+                        </span>
+                        <span class="relative inline-flex shrink-0">
+                            <input type="checkbox" class="peer sr-only" x-model="autoLoadChapters" @change="toggleAutoLoad()">
+                            <span class="h-6 w-11 rounded-full bg-slate-700 transition-colors peer-checked:bg-white"></span>
+                            <span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-slate-300 transition-transform peer-checked:translate-x-5 peer-checked:bg-black"></span>
+                        </span>
+                    </label>
                 </div>
             </div>
         </div>
@@ -824,6 +964,19 @@
                                     </button>
                                 </template>
                             </div>
+                        </div>
+                        <div class="border-t border-slate-800/80 pt-5">
+                            <label class="flex items-center justify-between gap-4 cursor-pointer">
+                                <span>
+                                    <span class="settings-label block mb-1">Auto-load Chapter</span>
+                                    <span class="block text-[0.68rem] text-slate-400">Muat otomatis saat scroll.</span>
+                                </span>
+                                <span class="relative inline-flex shrink-0">
+                                    <input type="checkbox" class="peer sr-only" x-model="autoLoadChapters" @change="toggleAutoLoad()">
+                                    <span class="h-6 w-11 rounded-full bg-slate-700 transition-colors peer-checked:bg-white"></span>
+                                    <span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-slate-300 transition-transform peer-checked:translate-x-5 peer-checked:bg-black"></span>
+                                </span>
+                            </label>
                         </div>
                     </div>
 
@@ -1039,11 +1192,17 @@ window.reader = function (config = {}) {
         novelTitle:          config.novelTitle          || '',
         baseUrl:             config.baseUrl             || '',
         protectChapter:      config.protectChapter      || false,
+        autoLoadChapters:    config.autoLoadChapters !== false,
+        autoloadObserver:    null,
         scrollObserver:      null,
 
         /* ── Init ───────────────────────────────── */
         init() {
             this.baseUrl = (this.baseUrl || '').replace(/\/$/, '');
+            try {
+                const savedAutoLoad = localStorage.getItem('reader-auto-load');
+                if (savedAutoLoad !== null) this.autoLoadChapters = savedAutoLoad === 'true';
+            } catch (e) {}
 
             // Set initial chapter title for mobile indicator
             const firstDiv = document.querySelector('#chapters-container > div');
@@ -1059,7 +1218,7 @@ window.reader = function (config = {}) {
             this.updateAllChapters();
             this.setupScrollProgress();
             this.setupScrollObserver();
-            this.setupAutoloadObserver();
+            if (this.autoLoadChapters) this.setupAutoloadObserver();
             this.setupTouchGestures();
 
             if (this.protectChapter) {
@@ -1087,11 +1246,23 @@ window.reader = function (config = {}) {
         setupAutoloadObserver() {
             const trigger = document.getElementById('autoload-trigger');
             if (!trigger) return;
-            new IntersectionObserver((entries) => {
+            if (this.autoloadObserver) this.autoloadObserver.disconnect();
+            this.autoloadObserver = new IntersectionObserver((entries) => {
                 if (entries[0].isIntersecting && !this.isLoading && this.nextChapterSlug) {
                     this.loadNextChapter();
                 }
-            }, { rootMargin: '400px' }).observe(trigger);
+            }, { rootMargin: '400px' });
+            this.autoloadObserver.observe(trigger);
+        },
+
+        toggleAutoLoad() {
+            try { localStorage.setItem('reader-auto-load', String(this.autoLoadChapters)); } catch (e) {}
+            if (this.autoLoadChapters) {
+                this.setupAutoloadObserver();
+            } else if (this.autoloadObserver) {
+                this.autoloadObserver.disconnect();
+                this.autoloadObserver = null;
+            }
         },
 
         setupTouchGestures() {

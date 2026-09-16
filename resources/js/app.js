@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import { landingHero } from './modules/landing-hero';
 
 window.Alpine = Alpine;
 
@@ -25,12 +26,9 @@ window.closeCropModal = async function(...args) {
     return closeCropModal(...args);
 };
 
-// Lazy Load landingHero only if needed
+// Register the carousel state synchronously so Alpine can initialize x-data.
 if (document.querySelector('[x-data*="landingHero"]')) {
-    window.landingHero = async function(initialNovels) {
-        const { landingHero } = await import('./modules/landing-hero');
-        return landingHero(initialNovels);
-    };
+    window.landingHero = landingHero;
 }
 
 // Start Alpine

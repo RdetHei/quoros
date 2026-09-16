@@ -1,6 +1,6 @@
 @props(['novel' => null])
 
-<aside class="fixed inset-y-0 left-0 z-40 w-72 lg:static lg:translate-x-0 lg:shrink-0 bg-black border-r border-neutral-800 transition-transform flex flex-col"
+<aside class="fixed inset-y-0 left-0 z-40 w-72 lg:static lg:translate-x-0 lg:shrink-0 bg-neutral-950 border-r border-neutral-800 transition-transform flex flex-col"
        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
        aria-label="Sidebar">
     <!-- Logo & Brand -->

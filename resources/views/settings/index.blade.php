@@ -1,10 +1,5 @@
 @php
     $role = auth()->user()->role;
-    $layout = match($role) {
-        'admin' => 'layouts.admin',
-        'writer' => 'layouts.writer',
-        default => 'layouts.app'
-    };
     $isUser = $role === 'user';
     $isWriter = $role === 'writer';
 
@@ -17,7 +12,7 @@
     $labelClass = $isWriter ? 'block text-[11px] font-medium text-neutral-500 uppercase tracking-wider mb-1.5' : 'block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5';
     $inputClass = $isWriter
         ? 'w-full px-4 py-2.5 bg-black border border-neutral-700 rounded-lg text-sm text-white focus:ring-1 focus:ring-white focus:border-white transition-all'
-        : 'w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white text-sm transition-colors';
+        : 'w-full px-4 py-2.5 bg-white dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-white/30 focus:border-white dark:text-white text-sm transition-colors';
     $readonlyInputClass = $isWriter
         ? 'w-full px-4 py-2.5 bg-neutral-800/50 border border-neutral-700 rounded-lg text-sm text-neutral-500 cursor-not-allowed'
         : 'w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-500 cursor-not-allowed';
@@ -34,21 +29,19 @@
         : 'px-5 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors';
     $submitBtn = $isWriter
         ? 'px-6 py-2.5 bg-white text-black text-xs font-medium uppercase tracking-wider rounded-lg hover:bg-neutral-200 transition-all'
-        : 'px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors';
+        : 'px-6 py-2.5 bg-white text-black text-sm font-semibold rounded-xl hover:bg-slate-200 transition-colors';
     $checkboxClass = $isWriter
         ? 'mt-0.5 h-4 w-4 rounded border-neutral-600 bg-black text-white focus:ring-white focus:ring-offset-neutral-900'
         : 'mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500';
 @endphp
 
-@extends($layout, [
+@extends('layouts.settings', [
     'title' => 'Account Settings',
-    'subtitle' => 'Manage your public profile and system security.',
-    'adminTitle' => 'System Preferences',
-    'adminBreadcrumbs' => ['Admin', 'Settings']
+    'settingsBackUrl' => $role === 'admin' ? route('admin.dashboard') : route('dashboard'),
 ])
 
-@section($isUser || $isWriter ? 'content' : 'dashboard-content')
-<div class="{{ $isUser ? 'max-w-4xl mx-auto pb-20' : 'max-w-3xl mx-auto' }}" x-data="{
+@section('content')
+<div class="max-w-5xl mx-auto pb-20" x-data="{
     profilePhotoPreview: null,
     updateProfilePhotoPreview(event) {
         const input = event.target;
@@ -61,15 +54,17 @@
         }
     }
 }">
-    @if($isUser)
-        <div class="flex items-center gap-4 mb-10">
-            <div class="w-1.5 h-10 bg-indigo-600 rounded-full shadow-lg shadow-indigo-500/20"></div>
-            <div>
-                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Settings</h1>
-                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Configure your personal preference and account security.</p>
-            </div>
+    <div class="mb-10 flex flex-col gap-3 border-b border-neutral-800 pb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <p class="mb-2 text-[10px] font-black uppercase tracking-[0.25em] text-neutral-500">{{ ucfirst($role) }} account</p>
+            <h1 class="text-3xl font-black tracking-tight text-white sm:text-4xl">Settings</h1>
+            <p class="mt-2 max-w-2xl text-sm leading-relaxed text-neutral-400">Manage your profile, reading experience, privacy, and account security from one place.</p>
         </div>
-    @endif
+        <span class="inline-flex w-fit items-center gap-2 rounded-full border border-neutral-700 bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-neutral-300">
+            <span class="h-1.5 w-1.5 rounded-full bg-white"></span>
+            Changes save to your account
+        </span>
+    </div>
 
     <div class="{{ $infoBox }}">
         <p class="{{ $infoText }}">
@@ -164,6 +159,25 @@
                     <div>
                         <span class="text-sm font-medium {{ $isWriter ? 'text-white' : 'text-slate-900 dark:text-white' }}">Show reading list on public profile</span>
                         <p class="{{ $subtitleClass }} mt-0.5">If disabled, your bookmark list is only visible to you.</p>
+                    </div>
+                </label>
+            </div>
+        </section>
+
+        <section class="{{ $card }}">
+            <div class="px-6 py-4 border-b {{ $cardHeader }}">
+                <h2 class="{{ $titleClass }}">Reading Experience</h2>
+                <p class="{{ $subtitleClass }} mt-0.5">Choose how the next chapter appears while reading.</p>
+            </div>
+            <div class="p-6">
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="hidden" name="auto_load_chapters" value="0">
+                    <input type="checkbox" name="auto_load_chapters" value="1"
+                        {{ old('auto_load_chapters', $user->auto_load_chapters ?? true) ? 'checked' : '' }}
+                        class="{{ $checkboxClass }}">
+                    <div>
+                        <span class="text-sm font-medium {{ $isWriter ? 'text-white' : 'text-slate-900 dark:text-white' }}">Auto-load next chapters</span>
+                        <p class="{{ $subtitleClass }} mt-0.5">Load the next chapter automatically when you reach the end of the current one.</p>
                     </div>
                 </label>
             </div>

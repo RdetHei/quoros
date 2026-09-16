@@ -61,12 +61,14 @@ class DashboardController extends Controller
             'username' => ['nullable', 'string', 'alpha_dash', 'max:255', Rule::unique('users', 'username')->ignore($user->id)],
             'bio' => 'nullable|string|max:500',
             'is_public_reading_list' => 'nullable|boolean',
+            'auto_load_chapters' => 'nullable|boolean',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->only(['name', 'bio']);
         $data['username'] = $request->filled('username') ? $request->username : null;
         $data['is_public_reading_list'] = $request->boolean('is_public_reading_list');
+        $data['auto_load_chapters'] = $request->boolean('auto_load_chapters');
 
         if ($request->hasFile('profile_photo')) {
             if ($user->profile_photo_public_id) {
