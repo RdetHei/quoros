@@ -122,6 +122,166 @@
         text-transform: lowercase;
     }
 
+    .fresh-picks {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 1rem;
+        align-items: stretch;
+        background: #000000;
+        padding: 0.2rem;
+        border-radius: 1.25rem;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .fresh-feature {
+        position: relative;
+        min-height: 22rem;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #000000;
+        box-shadow: 0 18px 38px -22px rgba(0, 0, 0, 0.9);
+    }
+
+    .fresh-feature img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: saturate(1.1);
+    }
+
+    .fresh-feature::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.62) 42%, rgba(0,0,0,0.18) 100%);
+    }
+
+    .fresh-feature-content {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        padding: 1.2rem;
+    }
+
+    .fresh-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        width: fit-content;
+        padding: 0.38rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #f8fafc;
+    }
+
+    .fresh-feature-title {
+        margin-top: 0.9rem;
+        font-size: clamp(1.3rem, 2vw, 2rem);
+        line-height: 1.1;
+        font-weight: 900;
+        color: #f8fafc;
+    }
+
+    .fresh-feature-meta {
+        margin-top: 0.7rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        color: #cbd5e1;
+        font-size: 0.7rem;
+    }
+
+    .fresh-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        background: #000000;
+        padding: 0.2rem;
+        border-radius: 1.25rem;
+    }
+
+    .fresh-item {
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+        padding: 0.7rem;
+        border-radius: 1rem;
+        background: #000000;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    }
+
+    .fresh-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(255, 255, 255, 0.12);
+        background: #0a0a0a;
+    }
+
+    .fresh-item-cover {
+        width: 4.35rem;
+        aspect-ratio: 2/3;
+        border-radius: 0.7rem;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .fresh-item-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .fresh-item-info {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .fresh-item-tag {
+        display: inline-block;
+        font-size: 0.56rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #f5f5f5;
+        margin-bottom: 0.38rem;
+    }
+
+    .fresh-item-title {
+        display: block;
+        color: #f8fafc;
+        font-size: 0.8rem;
+        font-weight: 800;
+        line-height: 1.3;
+        margin-bottom: 0.25rem;
+    }
+
+    .fresh-item-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: #a1a1aa;
+        font-size: 0.63rem;
+    }
+
+    @media (max-width: 767px) {
+        .fresh-picks {
+            grid-template-columns: 1fr;
+        }
+    }
+
     /* ── Chapter badge hijau ─────────────────── */
     .ch-badge {
         display: inline-flex;
@@ -1252,58 +1412,82 @@
     </section>
 
     {{-- ═══════════════════════════════════════════
-         LATEST UPDATES
+         FRESH PICKS / RILIS TERBARU
     ═══════════════════════════════════════════ --}}
     @if($recentlyUpdated->count() > 0)
-    <section class="latest-updates" style="padding:2.5rem 0 3rem; border-top:1px solid rgba(15,23,42,0.9); background: linear-gradient(180deg, rgba(15,23,42,0.35), rgba(2,6,23,0.18));">
+    <section class="latest-updates" style="padding:2.5rem 0 3rem; border-top:1px solid rgba(255,255,255,0.05); background: #000000;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="section-heading">
-                <div class="section-heading-bar" style="background: linear-gradient(to bottom,#34d399,#10b981);"></div>
-                <h2>Baru Diperbarui</h2>
+                <div class="section-heading-bar" style="background: linear-gradient(to bottom,#22c55e,#16a34a);"></div>
+                <h2>Fresh Picks</h2>
                 <a href="{{ route('novels.updated') }}">
                     Lihat semua
                     <svg style="width:11px;height:11px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
             </div>
 
-            <div class="novel-shelf">
-                @foreach($recentlyUpdated as $novel)
-                @php
-                    $coverUrl  = $novel->cover_image_url ?: ($novel->cover_image ? asset('storage/' . $novel->cover_image) : null);
-                    $latestCh  = $novel->chapters->first();
-                    $latestAgo = $latestCh
-                        ? \Illuminate\Support\Carbon::parse($latestCh->published_at ?? $latestCh->created_at)->diffForHumans(null, true)
-                        : null;
-                @endphp
-                <div class="group latest-update-card">
-                    <a href="{{ $latestCh ? route('chapters.show', [$novel->slug, $latestCh->slug]) : route('novels.show', $novel->slug) }}"
-                       class="novel-cover-wrap block">
-                        @if($coverUrl)
-                        <img src="{{ $coverUrl }}" alt="{{ $novel->title }}"
-                             width="240" height="360" loading="lazy"
-                             onerror="this.src='/error.png'">
-                        @else
-                        <div class="w-full h-full" style="background:linear-gradient(135deg,#1e293b,#0f172a);"></div>
-                        @endif
+            @php
+                $featureNovel = $recentlyUpdated->first();
+                $featureCover = $featureNovel?->cover_image_url ?: ($featureNovel?->cover_image ? asset('storage/' . $featureNovel->cover_image) : null);
+                $featureLatestCh = $featureNovel?->chapters->first();
+                $featureLatestAgo = $featureLatestCh
+                    ? \Illuminate\Support\Carbon::parse($featureLatestCh->published_at ?? $featureLatestCh->created_at)->diffForHumans(null, true)
+                    : null;
+            @endphp
 
-                        @if($latestCh)
-                        <div class="novel-cover-meta">
-                            <div class="ch-badge">
-                                <span class="ch-badge-dot"></span>
-                                <span class="truncate" style="max-width:7.2rem;">{{ $latestCh->title }}</span>
+            <div class="fresh-picks">
+                @if($featureNovel)
+                <div class="fresh-feature">
+                    <a href="{{ $featureLatestCh ? route('chapters.show', [$featureNovel->slug, $featureLatestCh->slug]) : route('novels.show', $featureNovel->slug) }}" class="block h-full w-full">
+                        @if($featureCover)
+                        <img src="{{ $featureCover }}" alt="{{ $featureNovel->title }}" loading="lazy" onerror="this.src='/error.png'">
+                        @endif
+                        <div class="fresh-feature-content">
+                            <span class="fresh-kicker">Rilis baru</span>
+                            <h3 class="fresh-feature-title">{{ $featureNovel->title }}</h3>
+                            <div class="fresh-feature-meta">
+                                @if($featureLatestAgo)
+                                <span>{{ $featureLatestAgo }}</span>
+                                @endif
+                                @if($featureLatestCh)
+                                <span>&middot; {{ $featureLatestCh->title }}</span>
+                                @endif
                             </div>
                         </div>
-                        @endif
-                    </a>
-
-                    <a href="{{ route('novels.show', $novel->slug) }}" class="latest-update-meta">
-                        <span class="latest-update-title">{{ $novel->title }}</span>
-                        @if($latestAgo)
-                        <span class="latest-update-time">{{ $latestAgo }}</span>
-                        @endif
                     </a>
                 </div>
-                @endforeach
+                @endif
+
+                <div class="fresh-list">
+                    @foreach($recentlyUpdated->skip(1)->take(4) as $novel)
+                    @php
+                        $coverUrl = $novel->cover_image_url ?: ($novel->cover_image ? asset('storage/' . $novel->cover_image) : null);
+                        $latestCh = $novel->chapters->first();
+                        $latestAgo = $latestCh
+                            ? \Illuminate\Support\Carbon::parse($latestCh->published_at ?? $latestCh->created_at)->diffForHumans(null, true)
+                            : null;
+                    @endphp
+                    <a href="{{ $latestCh ? route('chapters.show', [$novel->slug, $latestCh->slug]) : route('novels.show', $novel->slug) }}" class="fresh-item">
+                        <div class="fresh-item-cover">
+                            @if($coverUrl)
+                            <img src="{{ $coverUrl }}" alt="{{ $novel->title }}" loading="lazy" onerror="this.src='/error.png'">
+                            @endif
+                        </div>
+                        <div class="fresh-item-info">
+                            <span class="fresh-item-tag">Update</span>
+                            <span class="fresh-item-title">{{ $novel->title }}</span>
+                            <div class="fresh-item-meta">
+                                @if($latestAgo)
+                                <span>{{ $latestAgo }}</span>
+                                @endif
+                                @if($latestCh)
+                                <span>&middot; {{ $latestCh->title }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    </a>
+                    @endforeach
+                </div>
             </div>
         </div>
     </section>

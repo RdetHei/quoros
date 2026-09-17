@@ -5,6 +5,7 @@ namespace App\Services;
 use Cloudinary\Cloudinary;
 use Cloudinary\Transformation\Resize;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 
 class CloudinaryService
 {
@@ -12,11 +13,19 @@ class CloudinaryService
 
     public function __construct()
     {
+        $cloudName = env('CLOUDINARY_CLOUD_NAME');
+        $apiKey = env('CLOUDINARY_KEY');
+        $apiSecret = env('CLOUDINARY_SECRET');
+
+        if (empty($cloudName) || empty($apiKey) || empty($apiSecret)) {
+            throw new \RuntimeException('Cloudinary credentials are not configured. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_KEY, and CLOUDINARY_SECRET in the .env file.');
+        }
+
         $this->cloudinary = new Cloudinary([
             'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key' => env('CLOUDINARY_KEY'),
-                'api_secret' => env('CLOUDINARY_SECRET'),
+                'cloud_name' => $cloudName,
+                'api_key' => $apiKey,
+                'api_secret' => $apiSecret,
             ],
         ]);
     }
@@ -39,24 +48,45 @@ class CloudinaryService
 
     protected function upload(UploadedFile $file, string $folder, $resizeAction): array
     {
-        $result = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
-            'folder' => $folder,
-        ]);
+        try {
+            $result = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                'folder' => $folder,
+            ]);
 
-        $url = $this->cloudinary->image($result['public_id'])
-            ->resize($resizeAction)
-            ->format('auto')
-            ->quality('auto')
-            ->toUrl();
+            $url = $this->cloudinary->image($result['public_id'])
+                ->resize($resizeAction)
+                ->format('auto')
+                ->quality('auto')
+                ->toUrl();
 
-        return [
-            'url' => $url,
-            'public_id' => $result['public_id'],
-        ];
+            return [
+                'url' => $url,
+                'public_id' => $result['public_id'] ?? null,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Cloudinary upload failed', [
+                'message' => $e->getMessage(),
+                'folder' => $folder,
+                'file' => $file->getClientOriginalName(),
+            ]);
+
+            throw new \RuntimeException('Upload gagal ke Cloudinary. Periksa kredensial Cloudinary dan koneksi API.', 0, $e);
+        }
     }
 
     public function deleteImage(string $publicId): void
     {
-        $this->cloudinary->uploadApi()->destroy($publicId);
+        if (empty($publicId)) {
+            return;
+        }
+
+        try {
+            $this->cloudinary->uploadApi()->destroy($publicId);
+        } catch (\Throwable $e) {
+            Log::warning('Cloudinary destroy failed', [
+                'public_id' => $publicId,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }

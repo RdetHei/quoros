@@ -315,40 +315,67 @@
             </div>
         </main>
 
-        <footer class="bg-neutral-900 border-t border-white/10 py-12">
+        <footer class="bg-[#050a12] border-t border-white/10 py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="grid grid-cols-1 gap-10 md:grid-cols-5 mb-10">
                     <div class="md:col-span-2">
                         <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-10 w-auto mb-6 grayscale opacity-80" onerror="this.onerror=null; this.src='/error.png'">
-                        <p class="text-sm text-slate-500 max-w-sm leading-relaxed">
-                            Quoros adalah platform novel premium yang didedikasikan untuk menghadirkan cerita terbaik dari seluruh dunia dengan pengalaman membaca yang nyaman dan berkualitas.
+                        <p class="text-sm text-slate-400 max-w-md leading-relaxed">
+                            Quoros menghadirkan ruang membaca yang nyaman untuk menjelajahi novel favorit, mengikuti update terbaru, dan menemukan cerita yang cocok dengan mood setiap pembaca.
                         </p>
+                        <div class="mt-6 flex items-center gap-3">
+                            <span class="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-300">Reader-first platform</span>
+                        </div>
                     </div>
+
                     <div>
-                        <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-6">Navigation</h4>
-                        <ul class="space-y-4">
-                            <li><a href="{{ route('home') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Home</a></li>
-                            <li><a href="{{ route('novels.updated') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Recently Updated</a></li>
-                            <li><a href="{{ route('genres.index') }}" class="text-sm text-slate-500 hover:text-white transition-colors">All Genres</a></li>
+                        <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-5">Navigasi</h4>
+                        <ul class="space-y-3">
+                            <li><a href="{{ route('home') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a></li>
+                            <li><a href="{{ route('novels.updated') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Rilis Terbaru</a></li>
+                            <li><a href="{{ route('genres.index') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Genre</a></li>
+                            <li><a href="{{ route('tags.index') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Tag</a></li>
                         </ul>
                     </div>
+
                     <div>
-                        <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-6">Community</h4>
-                        <ul class="space-y-4">
-                            <li><a href="{{ route('guides.index') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Guides</a></li>
+                        <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-5">Eksplorasi</h4>
+                        <ul class="space-y-3">
+                            <li><a href="{{ route('novels.trending') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Trending</a></li>
+                            <li><a href="{{ route('guides.index') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Panduan</a></li>
+                            <li><a href="{{ route('novels.search') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Cari Novel</a></li>
                             @guest
-                                <li><a href="{{ route('login') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Join Us</a></li>
+                                <li><a href="{{ route('register') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Daftar Gratis</a></li>
                             @else
-                                <li><a href="{{ route('dashboard') }}" class="text-sm text-slate-500 hover:text-white transition-colors">Writer Workspace</a></li>
+                                <li><a href="{{ route('dashboard') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Dashboard</a></li>
                             @endguest
                         </ul>
                     </div>
+
+                    <div>
+                        <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-5">Komunitas</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Discord</a></li>
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Forum</a></li>
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Support</a></li>
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Privacy</a></li>
+                        </ul>
+                    </div>
                 </div>
+
                 <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">&copy; {{ date('Y') }} Quoros &mdash; Crafted for Readers</p>
-                    <div class="flex items-center gap-6">
-                        <a href="#" class="text-slate-500 hover:text-white transition-colors"><span class="sr-only">Twitter</span><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-1.015-2.174-1.648-3.594-1.648-2.72 0-4.925 2.205-4.925 4.925 0 .386.044.762.128 1.123-4.092-.205-7.719-2.165-10.148-5.144-.424.729-.666 1.576-.666 2.476 0 1.71.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.062c0 2.387 1.699 4.379 3.953 4.83-.414.113-.85.174-1.3.174-.317 0-.626-.03-.926-.086.626 1.956 2.444 3.379 4.6 3.419-1.685 1.321-3.808 2.108-6.115 2.108-.397 0-.79-.023-1.175-.068 2.179 1.397 4.768 2.212 7.548 2.212 9.057 0 13.996-7.502 13.996-13.996 0-.213-.005-.426-.014-.637 1.002-.72 1.815-1.558 2.43-2.527z"/></svg></a>
-                        <a href="#" class="text-slate-500 hover:text-white transition-colors"><span class="sr-only">Discord</span><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.077 0 0 0 .084-.028 14.062 14.062 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.23 10.23 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg></a>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">&copy; {{ date('Y') }} Quoros — Crafted for Readers</p>
+                    <div class="flex items-center gap-5 text-slate-400">
+                        <a href="#" class="hover:text-white transition-colors" aria-label="X / Twitter">
+                            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.9 2h3.68l-8.04 9.19L24 22h-7.32l-5.72-8.39L4.76 22H1.07l8.6-9.83L0 2h7.5l5.17 7.68L18.9 2zm-1.29 18h2.03L7.09 3.9H4.95L17.61 20z"/></svg>
+                        </a>
+                        <a href="#" class="hover:text-white transition-colors" aria-label="Discord">
+                            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.267 18.267 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.062 14.062 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.23 10.23 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                        </a>
+                        <a href="#" class="hover:text-white transition-colors" aria-label="Instagram">
+                            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.583-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.645-.07-4.849 0-3.204.012-3.584.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.07 4.849-.07zm0 1.802c-3.162 0-3.519.013-4.751.068-2.459.112-3.444 1.152-3.556 3.556-.055 1.232-.068 1.589-.068 4.751s.013 3.519.068 4.751c.112 2.404 1.097 3.444 3.556 3.556 1.232.055 1.589.068 4.751.068s3.519-.013 4.751-.068c2.444-.112 3.444-1.152 3.556-3.556.055-1.232.068-1.589.068-4.751s-.013-3.519-.068-4.751c-.112-2.404-1.112-3.444-3.556-3.556-1.232-.055-1.589-.068-4.751-.068zm0 3.647a4.388 4.388 0 1 1 0 8.776 4.388 4.388 0 0 1 0-8.776zm0 1.802a2.586 2.586 0 1 0 0 5.172 2.586 2.586 0 0 0 0-5.172zm5.374-2.585a1.025 1.025 0 1 1 0 2.05 1.025 1.025 0 0 1 0-2.05z"/></svg>
+                        </a>
                     </div>
                 </div>
             </div>

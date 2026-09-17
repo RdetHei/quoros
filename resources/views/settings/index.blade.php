@@ -49,7 +49,11 @@
             initCropper(input, 'profile-photo-img', {
                 aspectRatio: 1,
                 width: 400,
-                height: 400
+                height: 400,
+                onSave: () => {
+                    const form = document.getElementById('settings-profile-form');
+                    if (form) form.submit();
+                }
             });
         }
     }
@@ -72,7 +76,7 @@
         </p>
     </div>
 
-    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form id="settings-profile-form" action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -199,4 +203,5 @@
         </div>
     </form>
 </div>
+@include('partials.cropping-modal')
 @endsection
