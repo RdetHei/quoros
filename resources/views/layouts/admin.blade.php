@@ -46,7 +46,7 @@
         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     >
         <div class="p-8">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 group">
+            <a href="{{ route('welcome') }}" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-white rounded-2xl flex items-center justify-center group-hover:rotate-6 transition-transform shadow-lg shadow-white/10">
                     <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros" class="h-6 w-auto" onerror="this.onerror=null; this.src='/error.png'">
                 </div>
@@ -180,7 +180,7 @@
         </nav>
 
         <div class="p-6 mt-auto">
-            <a href="{{ route('home') }}"
+            <a href="{{ route('welcome') }}"
                class="flex items-center gap-3 px-4 py-4 rounded-[1.5rem] text-xs font-black text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all group border border-white/5 bg-white/5">
                 <div class="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center border border-white/10 shrink-0 group-hover:bg-rose-500 group-hover:text-white transition-colors text-slate-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

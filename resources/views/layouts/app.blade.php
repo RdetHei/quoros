@@ -91,13 +91,13 @@
                         </button>
 
                         <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
-                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-7 w-auto group-hover:opacity-80 transition-opacity" fetchpriority="high">
+                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" onerror="this.onerror=null; this.src='{{ asset('error.png') }}'" alt="Quoros Logo" class="h-7 w-auto group-hover:opacity-80 transition-opacity" fetchpriority="high">
                         </a>
 
                         <div class="hidden lg:flex items-center gap-0.5 ml-1.5">
                             @php
                                 $navLinks = [];
-                                $navLinks[] = ['route' => 'home', 'label' => 'Home', 'active' => request()->routeIs('home')];
+                                $navLinks[] = ['route' => 'welcome', 'label' => 'Home', 'active' => request()->routeIs('welcome')];
                                 $navLinks[] = ['route' => 'novels.updated', 'label' => 'Updated', 'active' => request()->routeIs('novels.updated')];
                                 if (Auth::check()) {
                                     $navLinks[] = ['route' => 'bookmarks.index', 'label' => 'Bookmarks', 'active' => request()->routeIs('bookmarks.index')];
@@ -244,8 +244,8 @@
                     </button>
                 </div>
                 <div class="p-3 space-y-1 flex-grow">
-                    <a href="{{ route('home') }}"
-                       class="h-10 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-colors {{ request()->routeIs('home') ? 'bg-white/5 text-white' : '' }}">
+                          <a href="{{ route('welcome') }}"
+                              class="h-10 flex items-center px-3 text-sm font-semibold text-slate-200 rounded-xl hover:bg-white/5 transition-colors {{ request()->routeIs('welcome') ? 'bg-white/5 text-white' : '' }}">
                         Home
                     </a>
                     <a href="{{ route('novels.updated') }}"
@@ -315,7 +315,7 @@
             </div>
         </main>
 
-        <footer class="bg-[#050a12] border-t border-white/10 py-12">
+        <footer class="bg-slate-950/95 border-t border-white/10 py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-10 md:grid-cols-5 mb-10">
                     <div class="md:col-span-2">
@@ -332,7 +332,7 @@
                     <div>
                         <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-5">Navigasi</h4>
                         <ul class="space-y-3">
-                            <li><a href="{{ route('home') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a></li>
+                            <li><a href="{{ route('welcome') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a></li>
                             <li><a href="{{ route('novels.updated') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Rilis Terbaru</a></li>
                             <li><a href="{{ route('genres.index') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Genre</a></li>
                             <li><a href="{{ route('tags.index') }}" class="text-sm text-slate-400 hover:text-white transition-colors">Tag</a></li>

@@ -20,10 +20,10 @@
         <header class="border-b border-white/10 bg-neutral-950/95 backdrop-blur">
             <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
                 <div class="flex min-w-0 items-center gap-4">
-                    <a href="{{ $settingsBackUrl ?? route('home') }}" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-neutral-700 text-neutral-300 transition-colors hover:border-white hover:bg-white hover:text-black" aria-label="Back">
+                    <a href="{{ $settingsBackUrl ?? route('welcome') }}" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-neutral-700 text-neutral-300 transition-colors hover:border-white hover:bg-white hover:text-black" aria-label="Back">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
                     </a>
-                    <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3">
+                    <a href="{{ route('welcome') }}" class="flex min-w-0 items-center gap-3">
                         <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros" class="h-7 w-auto">
                         <span class="hidden text-sm font-bold tracking-wide text-white sm:block">QUOROS</span>
                     </a>
