@@ -1,90 +1,88 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto mb-12">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+<div class="mx-auto mb-12 max-w-5xl pb-14 pt-8">
+    <div class="mb-8 flex flex-col gap-6 rounded-[28px] border border-neutral-800 bg-[#10161d] p-6 shadow-[0_22px_60px_rgba(0,0,0,0.28)] md:flex-row md:items-end md:justify-between md:p-7">
         <div class="flex items-center gap-4">
-            <div class="w-2 h-10 bg-neutral-400 rounded-full"></div>
+            <div class="h-10 w-1 rounded-full bg-neutral-400"></div>
             <div>
-            <h1 class="text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">Novel Request</h1>
-            <p class="text-neutral-500 dark:text-neutral-400 font-medium">Have a favorite title that's not here yet? Let us know!</p>
+                <p class="mb-2 text-[10px] font-medium uppercase tracking-[0.24em] text-neutral-500">Community</p>
+                <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">Novel Request</h1>
+            </div>
         </div>
-    </div>
-    
-    @auth
-        <button onclick="document.getElementById('request-form').scrollIntoView({behavior: 'smooth'})" class="px-8 py-3 bg-white text-black font-bold rounded-2xl shadow-xl shadow-neutral-200 dark:shadow-none hover:bg-neutral-200 transition-all">Create Request</button>
-    @endauth
+
+        @auth
+            <button onclick="document.getElementById('request-form').scrollIntoView({behavior: 'smooth'})" class="inline-flex items-center justify-center rounded-xl border border-neutral-700 bg-white px-6 py-3 text-sm font-semibold text-neutral-900 transition-colors hover:bg-neutral-200">
+                Create Request
+            </button>
+        @endauth
     </div>
 
-    <div class="grid grid-cols-1 gap-6 mb-16">
+    <div class="mb-16 grid grid-cols-1 gap-5">
         @forelse($requests as $request)
-            <div class="p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                <div class="flex-grow">
-                    <div class="flex items-center gap-3 mb-2">
-                        <h3 class="text-lg font-bold text-neutral-900 dark:text-white uppercase tracking-wide leading-none">{{ $request->title }}</h3>
-                        <span class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full 
-                            {{ $request->status === 'fulfilled' ? 'bg-emerald-50 text-neutral-400 border border-emerald-100 dark:bg-emerald-900/20 dark:text-neutral-400 dark:border-emerald-800' : '' }}
-                            {{ $request->status === 'pending' ? 'bg-amber-50 text-neutral-400 border border-amber-100 dark:bg-amber-900/20 dark:text-neutral-300 dark:border-amber-800' : '' }}
-                            {{ $request->status === 'rejected' ? 'bg-neutral-100 text-neutral-500 border border-neutral-200 dark:bg-neutral-800/40 dark:text-neutral-400 dark:border-neutral-700' : '' }}
+            <div class="flex flex-col items-start justify-between gap-5 rounded-[24px] border border-neutral-800 bg-[#0d1218] p-6 sm:flex-row sm:items-center">
+                <div class="min-w-0 flex-1">
+                    <div class="mb-2 flex flex-wrap items-center gap-3">
+                        <h3 class="text-lg font-semibold uppercase tracking-wide text-white">{{ $request->title }}</h3>
+                        <span class="rounded-full border border-neutral-700 bg-neutral-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-300
+                            {{ $request->status === 'fulfilled' ? 'border-emerald-700/40 bg-emerald-500/10 text-emerald-300' : '' }}
+                            {{ $request->status === 'pending' ? 'border-amber-700/40 bg-amber-500/10 text-amber-300' : '' }}
+                            {{ $request->status === 'rejected' ? 'border-neutral-700 bg-neutral-800 text-neutral-400' : '' }}
                         ">
                             {{ $request->status === 'fulfilled' ? 'Accepted' : ($request->status === 'rejected' ? 'Declined' : 'Pending') }}
                         </span>
                     </div>
-                    <p class="text-sm text-neutral-500 mb-3 italic line-clamp-2">"{{ $request->description ?: 'No description.' }}"</p>
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-400">
+                    <p class="mb-3 text-sm italic text-neutral-400">"{{ $request->description ?: 'No description.' }}"</p>
+                    <div class="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
+                        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-800 text-neutral-300">
                             {{ substr($request->user->name, 0, 1) }}
                         </div>
-                        <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Requested by {{ $request->user->name }} • {{ $request->created_at->diffForHumans() }}</span>
+                        <span>Requested by {{ $request->user->name }} • {{ $request->created_at->diffForHumans() }}</span>
                     </div>
                 </div>
             </div>
         @empty
-            <div class="py-20 text-center bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl border border-dashed border-neutral-200 dark:border-neutral-800">
-                <p class="text-neutral-500 italic">No novel requests yet.</p>
+            <div class="rounded-[24px] border border-dashed border-neutral-700 bg-[#0d1218] px-6 py-20 text-center">
+                <p class="text-neutral-400">No novel requests yet.</p>
             </div>
         @endforelse
 
         @if($requests->hasPages())
-            <div class="mt-4 flex justify-center">
+            <div class="mt-2 flex justify-center">
                 {{ $requests->links() }}
             </div>
         @endif
     </div>
 
     @auth
-        <div id="request-form" class="bg-neutral-900 rounded-[3rem] p-8 md:p-16 text-white shadow-2xl shadow-indigo-200 dark:shadow-none relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-8 md:p-12 opacity-10 rotate-12 transform tranneutral-x-1/4 -tranneutral-y-1/4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-40 w-40 md:h-64 md:w-64" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+        <div id="request-form" class="relative overflow-hidden rounded-[30px] border border-neutral-800 bg-[#111821] p-8 text-white md:p-12">
+            <div class="absolute right-0 top-0 p-8 opacity-10 md:p-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-40 w-40 md:h-64 md:w-64" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
             </div>
-            
+
             <div class="relative z-10 max-w-xl">
-                <h2 class="text-3xl font-black mb-4">Want to Read Something?</h2>
-                <p class="text-neutral-300 mb-10 font-medium">Write down the novel title or author you want, our team will try to find it!</p>
-                
+                <h2 class="mb-4 text-3xl font-bold tracking-tight">Want to read something?</h2>
+                <p class="mb-10 text-neutral-400">Tell us the title or author you want, and we’ll keep an eye out for it.</p>
+
                 <form action="{{ route('requests.store') }}" method="POST" class="space-y-6">
                     @csrf
                     <div>
-                        <label for="title" class="block text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">Novel Title / Author</label>
-                        <input type="text" name="title" id="title" required
-                            class="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all" 
-                            placeholder="Example: Lord of the Mysteries">
+                        <label for="title" class="mb-3 block text-[10px] font-medium uppercase tracking-[0.22em] text-neutral-400">Novel Title / Author</label>
+                        <input type="text" name="title" id="title" required class="w-full rounded-2xl border border-neutral-700 bg-[#0d1218] px-5 py-4 text-sm text-white placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none" placeholder="Example: Lord of the Mysteries">
                     </div>
                     <div>
-                        <label for="description" class="block text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">Additional Notes (Optional)</label>
-                        <textarea name="description" id="description" rows="4"
-                            class="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all" 
-                            placeholder="Why do you recommend this novel?"></textarea>
+                        <label for="description" class="mb-3 block text-[10px] font-medium uppercase tracking-[0.22em] text-neutral-400">Additional Notes (Optional)</label>
+                        <textarea name="description" id="description" rows="4" class="w-full rounded-2xl border border-neutral-700 bg-[#0d1218] px-5 py-4 text-sm text-white placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none" placeholder="Why do you recommend this novel?"></textarea>
                     </div>
-                    <button type="submit" class="w-full py-4 bg-white text-black font-bold rounded-2xl shadow-xl hover:bg-neutral-200 transition-all transform hover:-tranneutral-y-1">Submit Request</button>
+                    <button type="submit" class="w-full rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-neutral-900 transition-colors hover:bg-neutral-200">Submit Request</button>
                 </form>
             </div>
         </div>
     @else
-        <div class="bg-neutral-900 rounded-[3rem] p-12 text-center text-white">
-            <h2 class="text-2xl font-bold mb-4">Want to Request a Novel?</h2>
-            <p class="text-neutral-400 mb-8">You must log in to your account first to make a request.</p>
-            <a href="{{ route('login') }}" class="inline-block px-10 py-4 bg-white text-black font-bold rounded-2xl hover:bg-neutral-200 transition-all">Login Now</a>
+        <div class="rounded-[30px] border border-neutral-800 bg-[#111821] p-12 text-center text-white">
+            <h2 class="mb-4 text-2xl font-bold">Want to request a novel?</h2>
+            <p class="mb-8 text-neutral-400">You need to log in before submitting a request.</p>
+            <a href="{{ route('login') }}" class="inline-block rounded-2xl bg-white px-8 py-4 text-sm font-semibold text-neutral-900 transition-colors hover:bg-neutral-200">Login Now</a>
         </div>
     @endauth
 </div>

@@ -28,14 +28,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-neutral-900 text-neutral-100 min-h-screen" x-data="{ sidebarOpen: false }">
-    <div class="h-screen flex overflow-hidden">
+<body class="font-sans antialiased bg-[#050a13] text-neutral-100 min-h-screen" x-data="{ sidebarOpen: false }" style="background-image: radial-gradient(circle at top left, rgba(139,92,246,0.18), transparent 28%), radial-gradient(circle at bottom right, rgba(59,130,246,0.12), transparent 32%), #050a13;">
+    <div class="flex min-h-screen">
         <!-- Sidebar -->
         <x-writer.sidebar />
 
         <!-- Backdrop for mobile -->
-        <div x-show="sidebarOpen" 
-             @click="sidebarOpen = false" 
+        <div x-show="sidebarOpen"
+             x-cloak
+             @click="sidebarOpen = false"
              x-transition:enter="transition-opacity ease-linear duration-300"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
@@ -45,8 +46,8 @@
              class="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm lg:hidden"></div>
 
         <!-- Main Content Area -->
-        <div class="flex-1 min-w-0 w-full h-full overflow-hidden">
-            <div class="h-full bg-neutral-900 border-l border-neutral-800 overflow-y-auto custom-scrollbar flex flex-col">
+        <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <div class="flex h-full flex-col overflow-y-auto bg-neutral-900 custom-scrollbar">
                 <!-- Mobile Header -->
                 <header class="lg:hidden flex items-center justify-between h-14 px-4 bg-neutral-950 border-b border-neutral-800 sticky top-0 z-40">
                     <div class="flex items-center gap-3">
