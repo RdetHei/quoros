@@ -3,7 +3,7 @@
 <div class="hidden w-[290px] shrink-0 flex-col border-r border-neutral-800 bg-[#0b0e13] shadow-[0_0_0_1px_rgba(255,255,255,0.02)] lg:flex">
     <aside class="flex h-full flex-col" aria-label="Sidebar">
         <div class="border-b border-neutral-800 px-5 pb-5 pt-7">
-            <a href="{{ route('home') }}" class="flex items-center gap-3.5 group">
+            <a href="{{ route('welcome') }}" class="flex items-center gap-3.5 group">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-700 bg-neutral-900 text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -98,7 +98,7 @@
                     </span>
                     <span>Settings</span>
                 </a>
-                <a href="{{ route('home') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:bg-white/5 hover:text-white">
+                <a href="{{ route('welcome') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:bg-white/5 hover:text-white">
                     <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-neutral-800 text-neutral-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-[17px] w-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                     </span>
@@ -111,7 +111,7 @@
 
 <aside x-show="sidebarOpen" x-cloak @click.away="sidebarOpen = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-x-0 opacity-100" x-transition:leave-end="-translate-x-full opacity-0" class="fixed inset-y-0 left-0 z-40 flex w-[290px] flex-col border-r border-neutral-800 bg-[#0b0e13] shadow-[0_0_0_1px_rgba(255,255,255,0.02)] lg:hidden" aria-label="Sidebar mobile">
     <div class="border-b border-neutral-800 px-5 pb-5 pt-7">
-        <a href="{{ route('home') }}" class="flex items-center gap-3.5 group">
+        <a href="{{ route('welcome') }}" class="flex items-center gap-3.5 group">
             <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-700 bg-neutral-900 text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -206,7 +206,7 @@
                 </span>
                 <span>Settings</span>
             </a>
-            <a href="{{ route('home') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:bg-white/5 hover:text-white">
+            <a href="{{ route('welcome') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:bg-white/5 hover:text-white">
                 <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-neutral-800 text-neutral-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-[17px] w-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                 </span>

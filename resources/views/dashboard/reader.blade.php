@@ -24,7 +24,7 @@
     @else
         <h2 class="text-xl font-bold">No active reading session yet</h2>
         <p class="mt-1 text-sm text-slate-300">Start a new story from homepage recommendations.</p>
-        <a href="{{ route('home') }}" class="inline-flex mt-5 px-4 py-2 rounded-xl bg-white text-slate-900 text-sm font-semibold">
+        <a href="{{ route('welcome') }}" class="inline-flex mt-5 px-4 py-2 rounded-xl bg-white text-slate-900 text-sm font-semibold">
             Browse Novels
         </a>
     @endif

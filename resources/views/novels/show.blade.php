@@ -12,7 +12,7 @@
 
 {{-- ===== BREADCRUMB ===== --}}
 <nav class="flex items-center gap-2 text-[10px] md:text-sm text-neutral-400 dark:text-neutral-500 mb-6 md:mb-8 font-medium overflow-x-auto no-scrollbar">
-    <a href="{{ route('home') }}" class="hover:text-neutral-900 dark:hover:text-white transition-colors flex-shrink-0">Catalog</a>
+    <a href="{{ route('welcome') }}" class="hover:text-neutral-900 dark:hover:text-white transition-colors flex-shrink-0">Home</a>
     <svg class="w-3 h-3 md:w-3.5 md:h-3.5 text-neutral-300 dark:text-neutral-700 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
     </svg>
