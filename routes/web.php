@@ -29,7 +29,6 @@ use App\Http\Controllers\Admin\AnnouncementsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [NovelController::class, 'landing'])->name('welcome');
-Route::get('/home', [NovelController::class, 'index'])->name('home');
 
 Route::get('/site.webmanifest', function () {
     $logo = asset('storage/logo/quorosLogo.png');
