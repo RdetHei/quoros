@@ -56,7 +56,7 @@
                 </div>
                 <h3 class="mb-1 text-lg font-semibold text-white">No history yet</h3>
                 <p class="mb-6 text-sm text-neutral-400">Start reading to see your progress here.</p>
-                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 rounded-xl border border-neutral-700 bg-white px-5 py-2.5 text-sm font-semibold text-neutral-900 transition-colors hover:bg-neutral-200">
+                <a href="{{ route('welcome') }}" class="inline-flex items-center gap-2 rounded-xl border border-neutral-700 bg-white px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-neutral-200">
                     Explore Novels
                 </a>
             </div>
