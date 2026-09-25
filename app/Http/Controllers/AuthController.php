@@ -37,7 +37,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             if (Auth::user()->role === 'user') {
-                return redirect()->intended(route('home'));
+                return redirect()->intended(route('welcome'));
             }
 
             return redirect()->intended(route('dashboard'));
@@ -70,7 +70,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('home');
+        return redirect()->route('welcome');
     }
 
     public function logout(Request $request)
