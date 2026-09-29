@@ -30,58 +30,106 @@ class NovelController extends Controller
 
     public function landing()
     {
-        // Featured Novels for Carousel
-        $featuredQuery = Novel::with(['author', 'genres'])
+        $featuredQuery = Novel::with(['author', 'genres', 'chapters' => function ($q) {
+                $q->published()->orderBy('order')->orderBy('id')->take(1);
+            }])
             ->withCount('chapters')
             ->withAvg('reviews', 'rating')
             ->where('is_featured', true)
             ->take(5);
 
         if (Auth::check()) {
-            $featuredQuery->withExists(['bookmarks as is_bookmarked' => function($q) {
+            $featuredQuery->withExists(['bookmarks as is_bookmarked' => function ($q) {
                 $q->where('user_id', Auth::id());
             }]);
         }
 
         $featuredNovels = $featuredQuery->get();
 
-        // Fallback to top viewed if no featured novels selected
         if ($featuredNovels->isEmpty()) {
-            $fallbackQuery = Novel::with(['author', 'genres'])
+            $fallbackQuery = Novel::with(['author', 'genres', 'chapters' => function ($q) {
+                    $q->published()->orderBy('order')->orderBy('id')->take(1);
+                }])
                 ->withCount('chapters')
                 ->withAvg('reviews', 'rating')
                 ->orderByDesc('view_count')
                 ->take(5);
 
             if (Auth::check()) {
-                $fallbackQuery->withExists(['bookmarks as is_bookmarked' => function($q) {
+                $fallbackQuery->withExists(['bookmarks as is_bookmarked' => function ($q) {
                     $q->where('user_id', Auth::id());
                 }]);
             }
             $featuredNovels = $fallbackQuery->get();
         }
 
-        // Recently Updated: Novels with the most recent chapters
-        $recentlyUpdated = Novel::with(['author', 'genres', 'chapters' => function($q) {
+        $projectUpdates = Novel::with(['author', 'genres', 'chapters' => function ($q) {
                 $q->published()->latest()->take(1);
             }])
             ->withCount('chapters')
             ->whereHas('chapters')
             ->withMax('chapters', 'created_at')
             ->orderByDesc('chapters_max_created_at')
-            ->take(8)
+            ->take(10)
             ->get();
 
-        $stats = [
-            'novels' => Novel::count(),
-            'chapters' => Chapter::published()->count(),
-            'genres' => Genre::count(),
-            'updates_week' => Chapter::published()
-                ->where('created_at', '>=', now()->subDays(7))
-                ->count(),
-        ];
+        $popularGenres = Genre::withCount('novels')
+            ->orderByDesc('novels_count')
+            ->orderBy('name')
+            ->take(16)
+            ->get()
+            ->filter(fn ($genre) => $genre->novels_count > 0);
 
-        return view('welcome', compact('recentlyUpdated', 'featuredNovels', 'stats'));
+        $popularTags = Tag::withCount('novels')
+            ->orderByDesc('novels_count')
+            ->orderBy('name')
+            ->take(16)
+            ->get()
+            ->filter(fn ($tag) => $tag->novels_count > 0);
+
+        $monthlyViewed = $this->novelViews->trending(30, 14);
+        if ($monthlyViewed->isEmpty()) {
+            $monthlyViewed = Novel::with(['author', 'genres', 'chapters' => function ($q) {
+                    $q->published()->latest()->take(1);
+                }])
+                ->withCount('chapters')
+                ->orderByDesc('view_count')
+                ->take(14)
+                ->get();
+        } else {
+            $monthlyViewed->load(['chapters' => function ($q) {
+                $q->published()->latest()->take(1);
+            }]);
+        }
+
+        $hotTake = $featuredNovels->skip(1)->first()
+            ?? $projectUpdates->first()
+            ?? Novel::with(['author', 'genres', 'chapters' => function ($q) {
+                $q->published()->orderBy('order')->orderBy('id')->take(1);
+            }])->withCount('chapters')->orderByDesc('view_count')->first();
+
+        $forYou = Novel::with(['author', 'genres', 'chapters' => function ($q) {
+                $q->published()->latest()->take(3);
+            }])
+            ->withCount('chapters')
+            ->whereHas('chapters')
+            ->withMax('chapters', 'created_at')
+            ->orderByDesc('chapters_max_created_at')
+            ->take(4)
+            ->get();
+
+        $marathonNovel = $projectUpdates->skip(2)->first() ?? $featuredNovels->first();
+
+        return view('welcome', compact(
+            'featuredNovels',
+            'projectUpdates',
+            'popularGenres',
+            'popularTags',
+            'monthlyViewed',
+            'hotTake',
+            'forYou',
+            'marathonNovel',
+        ));
     }
 
     public function index(Request $request)

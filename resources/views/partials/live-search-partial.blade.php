@@ -35,11 +35,11 @@
                    spellcheck="false"
                    value="{{ request('q') }}"
                    placeholder="{{ $placeholder }}"
-                   class="live-search-input w-full h-8 pl-8 pr-3 text-[11px] rounded-lg
-                          bg-white/5 text-slate-100 placeholder-slate-500
-                          border border-white/10
-                          focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/40
-                          hover:border-white/20 transition-all">
+                   class="live-search-input w-full h-8 pl-8 pr-3 text-[11px] font-semibold uppercase tracking-[0.1em] rounded-lg
+                          bg-[#101012] text-[#eae5d9] placeholder-[#7a746a]
+                          border border-[#d4af37]/22
+                          focus:outline-none focus:ring-1 focus:ring-[#d4af37]/40 focus:border-[#d4af37]/40
+                          hover:border-[#d4af37]/32 transition-all">
         </div>
     </form>
 
