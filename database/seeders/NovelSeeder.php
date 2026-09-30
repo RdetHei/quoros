@@ -2,135 +2,128 @@
 
 namespace Database\Seeders;
 
-use App\Models\Novel;
-use App\Models\User;
 use App\Models\Genre;
+use App\Models\Chapter;
+use App\Models\Novel;
+use App\Models\NovelCharacter;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class NovelSeeder extends Seeder
 {
-    public function run($count = 50): void
-    {
-        if ($this->command) {
-            $this->command->info("Seeding {$count} novels...");
-        }
+    private const NOVEL_COUNT = 100;
+    private const WRITERS_WITH_NOVELS = 35;
 
-        $writer = User::where('role', 'writer')->first();
-        if (!$writer) {
-            $writer = User::factory()->create(['role' => 'writer']);
+    public function run(): void
+    {
+        $writers = User::where('role', 'writer')->orderBy('username')->get();
+
+        if ($writers->count() < 50) {
+            $this->call(WriterSeeder::class);
+            $writers = User::where('role', 'writer')->orderBy('username')->get();
         }
 
         $genres = Genre::all();
         $tags = Tag::all();
 
         if ($genres->isEmpty()) {
-            (new GenreSeeder())->run(15);
+            $this->call(GenreSeeder::class);
             $genres = Genre::all();
         }
 
         if ($tags->isEmpty()) {
-            (new TagSeeder())->run(20);
+            $this->call(TagSeeder::class);
             $tags = Tag::all();
         }
 
-        $novelTitles = $this->getNovelTitles();
-        $regions = ['Korea', 'Japan', 'China', 'Western'];
-        $types = ['web_novel', 'light_novel'];
-        $statuses = ['ongoing', 'complete', 'hiatus'];
-        $ratings = ['everyone', 'teen', 'mature'];
+        // Pick only 35 writers to guarantee that some writers have no novels.
+        $activeWriters = $writers->shuffle()->take(self::WRITERS_WITH_NOVELS)->values();
+        $assignments = $activeWriters->pluck('id')->all();
 
-        for ($i = 0; $i < $count; $i++) {
-            $title = $novelTitles[$i % count($novelTitles)];
-            $suffix = $i >= count($novelTitles) ? ' ' . ($i - count($novelTitles) + 2) : '';
+        // Give each selected writer at least one novel, then randomize the rest.
+        while (count($assignments) < self::NOVEL_COUNT) {
+            $assignments[] = $activeWriters->random()->id;
+        }
+        shuffle($assignments);
 
-            $novel = Novel::create([
-                'author_id' => $writer->id,
-                'title' => $title . $suffix,
-                'slug' => Str::slug($title . $suffix),
-                'description' => $this->generateDescription(),
-                'status' => $statuses[array_rand($statuses)],
-                'type' => $types[array_rand($types)],
-                'region' => $regions[array_rand($regions)],
-                'language' => 'English',
-                'content_rating' => $ratings[array_rand($ratings)],
-                'cover_image_url' => $this->getRandomUnsplashPhoto('book,novel,anime'),
-                'view_count' => rand(100, 50000),
-                'rating_avg' => rand(30, 50) / 10,
-                'is_featured' => $i < 10,
+        $titleStarts = ['The', 'A', 'Chronicles of', 'Beneath the', 'Beyond the', 'Echoes of', 'The Last', 'Dawn of'];
+        $titleSubjects = ['Azure Moon', 'Silent Kingdom', 'Clockwork Garden', 'Forgotten Star', 'Silver River', 'Hidden Academy', 'Winter Crown', 'Dragon Archive', 'Midnight City', 'Wandering Swordsman'];
+        $genres = $genres->values();
+        $tags = $tags->values();
+
+        foreach ($assignments as $index => $authorId) {
+            $number = $index + 1;
+            $title = $titleStarts[array_rand($titleStarts)] . ' ' . $titleSubjects[array_rand($titleSubjects)] . ' ' . str_pad((string) $number, 3, '0', STR_PAD_LEFT);
+            $slug = 'seed-' . Str::slug($title);
+            $novel = Novel::firstOrCreate(
+                ['slug' => $slug],
+                [
+                    'author_id' => $authorId,
+                    'title' => $title,
+                    'description' => "A serialized story about an unexpected journey, unlikely allies, and the choices that shape a new world. Story entry {$number}.",
+                    'status' => ['ongoing', 'complete', 'hiatus'][array_rand(['ongoing', 'complete', 'hiatus'])],
+                    'type' => ['web_novel', 'light_novel', 'original'][array_rand(['web_novel', 'light_novel', 'original'])],
+                    'region' => ['Indonesia', 'Korea', 'Japan', 'China', 'Western'][array_rand(['Indonesia', 'Korea', 'Japan', 'China', 'Western'])],
+                    'language' => 'English',
+                    'content_rating' => ['everyone', 'teen', 'mature'][array_rand(['everyone', 'teen', 'mature'])],
+                    'view_count' => random_int(0, 50000),
+                    'rating_avg' => random_int(0, 50) / 10,
+                    'is_featured' => random_int(0, 1) === 1,
+                ]
+            );
+
+            if ($novel->wasRecentlyCreated) {
+                $novel->genres()->sync($genres->isEmpty() ? [] : $genres->random(min(random_int(1, 3), $genres->count()))->pluck('id'));
+                $novel->tags()->sync($tags->isEmpty() ? [] : $tags->random(min(random_int(1, 4), $tags->count()))->pluck('id'));
+                $this->createChapters($novel, random_int(3, 10));
+                $this->createCharacters($novel, $number);
+            }
+        }
+
+        $this->command?->info('Seeded 100 novels with random chapters across 35 randomly selected writers.');
+    }
+
+    private function createChapters(Novel $novel, int $count): void
+    {
+        $chapterTitles = [
+            'The First Omen', 'A Door Opens', 'Unexpected Allies', 'The Hidden Map',
+            'Trial by Fire', 'Echoes of the Past', 'Into the Unknown', 'A Price to Pay',
+            'The Truth Revealed', 'A New Beginning',
+        ];
+
+        for ($number = 1; $number <= $count; $number++) {
+            $title = sprintf('Chapter %d: %s', $number, $chapterTitles[($number - 1) % count($chapterTitles)]);
+
+            Chapter::create([
+                'novel_id' => $novel->id,
+                'title' => $title,
+                'slug' => Str::slug($novel->slug . '-' . $title),
+                'content' => "<p>The story of <strong>{$novel->title}</strong> continues.</p><p>New clues and unexpected choices lead the characters toward their next challenge.</p><p>Chapter {$number} brings them one step closer to the truth.</p>",
+                'status' => 'published',
+                'published_at' => now()->subDays($count - $number),
+                'order' => $number,
             ]);
-
-            $novel->genres()->attach($genres->random(rand(2, 4))->pluck('id'));
-            $novel->tags()->attach($tags->random(rand(3, 6))->pluck('id'));
-        }
-
-        if ($this->command) {
-            $this->command->info("Novels seeded successfully!");
         }
     }
 
-    private function getNovelTitles(): array
+    private function createCharacters(Novel $novel, int $number): void
     {
-        return [
-            'The Solo Leveling God',
-            'Reincarnation of the Heavenly Demon',
-            'My S-Rank Skill is Infinite Mana',
-            'The Alchemist of the Eternal Empire',
-            'Shadow Sovereign: Path to Immortality',
-            'That Time I Became a Dungeon Master',
-            'Legend of the Moonlight Sculptor',
-            'Desolate Era: The Beginning of the End',
-            'Sword Art of the Falling Stars',
-            'The Villainess Wants to Live a Peaceful Life',
-            'Necromancer of the Apocalypse',
-            'Rise of the Undead Legion',
-            'The System Makes Me OP',
-            'Cultivation: From Zero to Hero',
-            'The Magic Academy Reborn',
-            'My Life as a Side Character',
-            'The Hidden Blade Master',
-            'Demon King Retires',
-            'The Spirit Tamer',
-            'Isekai: The Slow Life',
-            'Martial Peak',
-            'Battle Through the Heavens',
-            'Perfect World',
-            'The Beginning After the End',
-            'Release That Witch',
-            'The King\'s Avatar',
-            'Quan Zhi Gao Shou',
-            'Soul Land',
-            'Stellar Transformations',
-            'Coiling Dragon',
-        ];
-    }
+        NovelCharacter::create([
+            'novel_id' => $novel->id,
+            'name' => "Ari {$number}",
+            'role' => 'Main Character',
+            'description' => 'A determined protagonist who must learn to trust their companions.',
+            'sort_order' => 1,
+        ]);
 
-    private function generateDescription(): string
-    {
-        $templates = [
-            'In a world where {system} determines one\'s fate, our protagonist discovers a hidden power that will change everything.',
-            'Betrayed and left for dead, {name} awakens in a new world with a second chance at life and revenge.',
-            'When the apocalypse arrived, {name} was given a unique system that allows them to grow stronger with every battle.',
-            'Transported to another world, {name} must use their knowledge from the modern world to survive in a land of magic and monsters.',
-            'The weakest in the academy, {name} discovers a legendary inheritance that will make them the strongest.',
-        ];
-
-        $systems = ['the System', 'levels', 'cultivation', 'magic', 'dungeon gates'];
-        $names = ['he', 'she', 'they', 'our hero'];
-
-        $template = $templates[array_rand($templates)];
-        $system = $systems[array_rand($systems)];
-        $name = $names[array_rand($names)];
-
-        return str_replace(['{system}', '{name}'], [$system, $name], $template) . ' ' . Str::random(200);
-    }
-
-    private function getRandomUnsplashPhoto(string $keyword = 'anime'): string
-    {
-        $keywords = ['anime', 'book', 'fantasy', 'art', 'illustration', 'manga', 'novel'];
-        $keyword = $keywords[array_rand($keywords)];
-        $seed = Str::random(8);
-        return "https://images.unsplash.com/seed-{$seed}/photo?auto=format&fit=crop&w=800&q=80";
+        NovelCharacter::create([
+            'novel_id' => $novel->id,
+            'name' => "Mira {$number}",
+            'role' => 'Companion',
+            'description' => 'A clever companion who brings a different view to every difficult choice.',
+            'sort_order' => 2,
+        ]);
     }
 }
