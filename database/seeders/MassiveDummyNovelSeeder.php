@@ -2,35 +2,35 @@
 
 namespace Database\Seeders;
 
+use App\Models\Chapter;
 use App\Models\Genre;
 use App\Models\Novel;
 use App\Models\NovelCharacter;
-use App\Models\Chapter;
-use App\Models\User;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class MassiveDummyNovelSeeder extends Seeder
 {
+    private const NOVEL_COUNT = 199;
+    private const CHAPTERS_PER_NOVEL = 10;
+
     public function run(): void
     {
-        // 0. Cleanup existing data to avoid duplication and conflicts
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('chapters')->truncate();
-        DB::table('novel_characters')->truncate();
-        DB::table('genre_novel')->truncate();
-        DB::table('novel_tag')->truncate();
-        DB::table('novels')->truncate();
-        DB::table('users')->truncate();
-        DB::table('genres')->truncate();
-        DB::table('tags')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        $this->clearCatalog();
 
-        // 1. Create specific users for each role
-        $admin = User::create([
+        $writer = User::create([
+            'name' => 'Quoros Writer',
+            'username' => 'quoros_writer',
+            'email' => 'writer@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'writer',
+        ]);
+
+        User::create([
             'name' => 'Admin User',
             'username' => 'admin',
             'email' => 'admin@example.com',
@@ -38,173 +38,143 @@ class MassiveDummyNovelSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        $writer = User::create([
-            'name' => 'Pro Writer',
-            'username' => 'writer',
-            'email' => 'writer@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'writer',
-        ]);
-
-        $user = User::create([
+        User::create([
             'name' => 'Regular Reader',
-            'username' => 'user',
-            'email' => 'user@example.com',
+            'username' => 'reader',
+            'email' => 'reader@example.com',
             'password' => Hash::make('password'),
             'role' => 'user',
         ]);
 
-        // 2. Create Genres and Tags
-        $genreNames = ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi', 'Slice of Life', 'Supernatural', 'Thriller', 'Isekai', 'Xianxia', 'Wuxia'];
-        $genres = collect($genreNames)->map(fn($name) => Genre::create(['name' => $name, 'slug' => Str::slug($name)]));
+        $genres = $this->createTaxonomy([
+            'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror',
+            'Mystery', 'Romance', 'Sci-Fi', 'Slice of Life', 'Supernatural',
+            'Thriller', 'Isekai', 'Xianxia', 'Wuxia',
+        ], Genre::class);
 
-        $tagNames = ['System', 'Reincarnation', 'Magic', 'Weak to Strong', 'Cultivation', 'Martial Arts', 'Game Elements', 'Dungeon', 'Urban Fantasy', 'Harem', 'Reverse Harem', 'Overpowered MC', 'Alchemy', 'Demons', 'Academy'];
-        $tags = collect($tagNames)->map(fn($name) => Tag::create(['name' => $name, 'slug' => Str::slug($name)]));
+        $tags = $this->createTaxonomy([
+            'System', 'Reincarnation', 'Magic', 'Weak to Strong', 'Cultivation',
+            'Martial Arts', 'Game Elements', 'Dungeon', 'Urban Fantasy', 'Harem',
+            'Reverse Harem', 'Overpowered MC', 'Alchemy', 'Demons', 'Academy',
+            'Time Travel', 'Found Family', 'Royalty', 'Slow Burn', 'Survival',
+        ], Tag::class);
 
-        // 3. Anime-style Novel Data (English titles for Korean/Japanese/Chinese style novels)
-        $novelsData = [
-            [
-                'title' => 'The Solo Leveling God',
-                'description' => 'In a world where gates connect our world to dungeons, E-rank hunter Sung Jin-Woo is the weakest of them all. But everything changes when he finds a hidden dungeon.',
-                'region' => 'Korea',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1519669556878-63bdad8a1a49?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Reincarnation of the Heavenly Demon',
-                'description' => 'The strongest demonic practitioner is betrayed by his disciples and reincarnates into the body of a weak noble youth. Now, he will rise again.',
-                'region' => 'China',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'My S-Rank Skill is Infinite Mana',
-                'description' => 'After being summoned to another world, Sato receives a seemingly useless skill. However, he soon realizes its potential is limitless.',
-                'region' => 'Japan',
-                'type' => 'light_novel',
-                'cover' => 'https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'The Alchemist of the Eternal Empire',
-                'description' => 'A modern-day genius chemist is transported to a world where alchemy is the foundation of power. He decides to revolutionize the industry.',
-                'region' => 'China',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Shadow Sovereign: Path to Immortality',
-                'description' => 'In a world governed by a mysterious System, one man chooses the path of shadows to protect his family from the impending apocalypse.',
-                'region' => 'Korea',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1560972550-aba3456b5564?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'That Time I Became a Dungeon Master',
-                'description' => 'Dying in a freak accident, our protagonist wakes up as the core of a newly formed dungeon. Now he must build his domain to survive.',
-                'region' => 'Japan',
-                'type' => 'light_novel',
-                'cover' => 'https://images.unsplash.com/photo-1528319725582-ddc0b6a27656?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Legend of the Moonlight Sculptor',
-                'description' => 'Lee Hyun is a legendary gamer who sells his character for billions. But fate has other plans for him in the new VR game, Royal Road.',
-                'region' => 'Korea',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Desolate Era: The Beginning of the End',
-                'description' => 'Ning is born into a world of immortals and monsters. With his past life memories, he seeks to reach the pinnacle of cultivation.',
-                'region' => 'China',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Sword Art of the Falling Stars',
-                'description' => 'A young boy finds a rusty sword that contains the soul of an ancient sword god. His journey to the top begins now.',
-                'region' => 'Japan',
-                'type' => 'light_novel',
-                'cover' => 'https://images.unsplash.com/photo-1519669556878-63bdad8a1a49?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'The Villainess Wants to Live a Peaceful Life',
-                'description' => 'Reincarnated as the villainess of a popular otome game, Katarina decides to avoid all destruction flags by becoming a master of agriculture.',
-                'region' => 'Japan',
-                'type' => 'light_novel',
-                'cover' => 'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Necromancer of the Apocalypse',
-                'description' => 'When the world turns into a game, Han-Seong awakens the hidden class of Necromancer. He will command an army of the dead to survive.',
-                'region' => 'Korea',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1613376023733-0d743d20719b?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Rise of the Undead Legion',
-                'description' => 'Dave is a regular gamer who finds himself trapped in a skeleton body. He must lead his fellow undead to conquer the VR world.',
-                'region' => 'China',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1559981421-3e0c0d712e3b?auto=format&fit=crop&w=800&q=80',
-            ]
-        ];
-
-        foreach ($novelsData as $index => $data) {
+        for ($number = 1; $number <= self::NOVEL_COUNT; $number++) {
+            $title = $this->novelTitle($number);
             $novel = Novel::create([
                 'author_id' => $writer->id,
-                'title' => $data['title'],
-                'slug' => Str::slug($data['title']),
-                'description' => $data['description'],
-                'status' => collect(['ongoing', 'complete', 'hiatus'])->random(),
-                'type' => $data['type'],
-                'region' => $data['region'],
+                'title' => $title,
+                'slug' => Str::slug($title),
+                'description' => "A serialized fantasy adventure about destiny, friendship, and the choices made when an ordinary life meets an extraordinary world. Novel #{$number} follows a new cast through a growing mystery.",
+                'status' => ['ongoing', 'complete', 'hiatus'][$number % 3],
+                'type' => ['web_novel', 'light_novel'][$number % 2],
+                'region' => ['Indonesia', 'Korea', 'Japan', 'China'][$number % 4],
                 'language' => 'English',
-                'content_rating' => collect(['everyone', 'teen', 'mature'])->random(),
-                'cover_image_url' => $data['cover'],
-                'view_count' => rand(1000, 50000),
-                'rating_avg' => rand(35, 50) / 10,
-                'is_featured' => $index < 6,
+                'content_rating' => ['everyone', 'teen', 'mature'][$number % 3],
+                'view_count' => 1000 + ($number * 137),
+                'rating_avg' => 3.5 + (($number % 16) / 10),
+                'is_featured' => $number <= 12,
             ]);
 
-            // Attach random genres and tags
-            $novel->genres()->attach($genres->random(rand(2, 4))->pluck('id'));
-            $novel->tags()->attach($tags->random(rand(3, 6))->pluck('id'));
-
-            // Create chapters for each novel
-            for ($i = 1; $i <= 10; $i++) {
-                Chapter::create([
-                    'novel_id' => $novel->id,
-                    'title' => "Chapter $i: " . ($i === 1 ? 'The Awakening' : ($i === 10 ? 'Conclusion of the Prologue' : 'Development')),
-                    'slug' => Str::slug($data['title'] . " chapter $i"),
-                    'content' => "<p>This is the content for chapter $i of <strong>" . $data['title'] . "</strong>.</p><p>The story continues as our protagonist faces new challenges and grows stronger through the " . $tags->random()->name . " system.</p><p>" . Str::random(500) . "</p>",
-                    'status' => 'published',
-                    'published_at' => now()->subDays(10 - $i),
-                ]);
-            }
-
-            // Create some characters
-            NovelCharacter::create([
-                'novel_id' => $novel->id,
-                'name' => 'Protagonist Name',
-                'role' => 'Main Character',
-                'description' => 'The main lead who possesses a unique system and seeks to reach the top.',
-                'image_url' => 'https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?q=80&w=300&auto=format&fit=crop',
-                'sort_order' => 1,
+            $novel->genres()->attach([
+                $genres[($number - 1) % count($genres)],
+                $genres[$number % count($genres)],
+            ]);
+            $novel->tags()->attach([
+                $tags[($number - 1) % count($tags)],
+                $tags[($number + 4) % count($tags)],
+                $tags[($number + 9) % count($tags)],
             ]);
 
-            NovelCharacter::create([
-                'novel_id' => $novel->id,
-                'name' => 'Support Heroine',
-                'role' => 'Main Heroine',
-                'description' => 'A loyal companion who supports the protagonist throughout their journey.',
-                'image_url' => 'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?q=80&w=300&auto=format&fit=crop',
-                'sort_order' => 2,
-            ]);
+            $this->createChapters($novel, $tags[$number % count($tags)]->name);
+            $this->createCharacters($novel, $number);
         }
 
-        echo "Seeding completed successfully with anime-style LN/Webnovels!\n";
-        echo "Admin: admin@example.com / password\n";
-        echo "Writer: writer@example.com / password\n";
-        echo "User: user@example.com / password\n";
+        $this->command?->info('Seeded 199 novels, 1,990 chapters, genres, tags, and characters.');
+    }
+
+    private function clearCatalog(): void
+    {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        foreach (['chapters', 'novel_characters', 'genre_novel', 'novel_tag', 'novels', 'users', 'genres', 'tags'] as $table) {
+            DB::table($table)->truncate();
+        }
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    }
+
+    private function createTaxonomy(array $names, string $model): array
+    {
+        return collect($names)->map(fn (string $name) => $model::create([
+            'name' => $name,
+            'slug' => Str::slug($name),
+        ]))->all();
+    }
+
+    private function novelTitle(int $number): string
+    {
+        $prefixes = [
+            'The Clockwork', 'Chronicles of the', 'Rebirth of a', 'The Last',
+            'A Scholar in the', 'The Wandering', 'Rise of the', 'My Secret',
+            'The Silent', 'Beyond the', 'The Forgotten', 'Dawn of the',
+            'The Alchemist and the', 'A Promise Beneath the', 'The Unchosen',
+        ];
+        $subjects = [
+            'Moon Kingdom', 'Azure Empire', 'Starbound City', 'Eternal Forest',
+            'Crimson Tower', 'Hidden Academy', 'Fallen Dynasty', 'Glass Sea',
+            'Dragon Archive', 'Midnight Frontier', 'Silver Labyrinth',
+            'Hollow Throne', 'Skyforge Valley', 'Winter Observatory',
+        ];
+
+        return sprintf('%s %s %03d', $prefixes[($number - 1) % count($prefixes)], $subjects[($number - 1) % count($subjects)], $number);
+    }
+
+    private function createChapters(Novel $novel, string $featuredTag): void
+    {
+        for ($number = 1; $number <= self::CHAPTERS_PER_NOVEL; $number++) {
+            Chapter::create([
+                'novel_id' => $novel->id,
+                'title' => sprintf('Chapter %d: %s', $number, $this->chapterTitle($number)),
+                'slug' => Str::slug($novel->slug . '-chapter-' . $number),
+                'content' => "<p>The journey of <strong>{$novel->title}</strong> continues.</p><p>New clues point toward the {$featuredTag} hidden behind the next turning point.</p><p>Chapter {$number} brings the characters closer to the truth.</p>",
+                'status' => 'published',
+                'published_at' => now()->subDays(self::CHAPTERS_PER_NOVEL - $number),
+                'order' => $number,
+            ]);
+        }
+    }
+
+    private function chapterTitle(int $number): string
+    {
+        return [
+            1 => 'The First Omen',
+            2 => 'A Door Opens',
+            3 => 'Unexpected Allies',
+            4 => 'The Hidden Map',
+            5 => 'Trial by Fire',
+            6 => 'Echoes of the Past',
+            7 => 'Into the Unknown',
+            8 => 'A Price to Pay',
+            9 => 'The Truth Revealed',
+            10 => 'A New Beginning',
+        ][$number];
+    }
+
+    private function createCharacters(Novel $novel, int $number): void
+    {
+        NovelCharacter::create([
+            'novel_id' => $novel->id,
+            'name' => "Ari {$number}",
+            'role' => 'Main Character',
+            'description' => 'A determined protagonist who must learn to trust their companions.',
+            'sort_order' => 1,
+        ]);
+
+        NovelCharacter::create([
+            'novel_id' => $novel->id,
+            'name' => "Mira {$number}",
+            'role' => 'Companion',
+            'description' => 'A clever companion who brings a different view to every difficult choice.',
+            'sort_order' => 2,
+        ]);
     }
 }
