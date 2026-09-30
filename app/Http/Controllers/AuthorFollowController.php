@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AuthorFollow;
 use App\Models\User;
+use App\Services\RecommendationService;
 use Illuminate\Support\Facades\Auth;
 
 class AuthorFollowController extends Controller
@@ -25,6 +26,7 @@ class AuthorFollowController extends Controller
 
         if ($existing) {
             $existing->delete();
+            app(RecommendationService::class)->forgetForUser(Auth::id());
 
             return back()->with('success', 'Stopped following '.$user->name.'.');
         }
@@ -33,6 +35,7 @@ class AuthorFollowController extends Controller
             'follower_id' => Auth::id(),
             'author_id' => $user->id,
         ]);
+        app(RecommendationService::class)->forgetForUser(Auth::id());
 
         return back()->with('success', 'You are now following '.$user->name.'.');
     }

@@ -6,6 +6,7 @@ use App\Models\Bookmark;
 use App\Models\Chapter;
 use App\Models\Novel;
 use App\Models\ReadingHistory;
+use App\Services\RecommendationService;
 use Illuminate\Support\Facades\Auth;
 
 class BookmarkController extends Controller
@@ -57,6 +58,7 @@ class BookmarkController extends Controller
 
         if ($bookmark) {
             $bookmark->delete();
+            app(RecommendationService::class)->forgetForUser($user->id);
 
             if (request()->ajax()) {
                 return response()->json([
@@ -72,6 +74,7 @@ class BookmarkController extends Controller
             'user_id' => $user->id,
             'novel_id' => $novel->id,
         ]);
+        app(RecommendationService::class)->forgetForUser($user->id);
 
         if (request()->ajax()) {
             return response()->json([
