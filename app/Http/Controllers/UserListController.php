@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Novel;
 use App\Models\User;
 use App\Models\UserList;
+use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -39,6 +40,7 @@ class UserListController extends Controller
             'description' => $validated['description'] ?? null,
             'is_public' => $request->boolean('is_public'),
         ]);
+        app(RecommendationService::class)->forgetForUser(Auth::id());
 
         return redirect()->route('lists.show', $list)->with('success', 'List berhasil dibuat.');
     }
@@ -99,6 +101,7 @@ class UserListController extends Controller
             'description' => $validated['description'] ?? null,
             'is_public' => $request->boolean('is_public'),
         ]);
+        app(RecommendationService::class)->forgetForUser(Auth::id());
 
         return redirect()->route('lists.show', $list)->with('success', 'List updated.');
     }
@@ -107,6 +110,7 @@ class UserListController extends Controller
     {
         $this->authorizeOwner($list);
         $list->delete();
+        app(RecommendationService::class)->forgetForUser(Auth::id());
 
         return redirect()->route('lists.index')->with('success', 'List deleted successfully.');
     }
@@ -124,6 +128,7 @@ class UserListController extends Controller
         }
 
         $list->novels()->attach($validated['novel_id']);
+        app(RecommendationService::class)->forgetForUser(Auth::id());
 
         return back()->with('success', 'Novel added to list.');
     }
@@ -132,6 +137,7 @@ class UserListController extends Controller
     {
         $this->authorizeOwner($list);
         $list->novels()->detach($novel->id);
+        app(RecommendationService::class)->forgetForUser(Auth::id());
 
         return back()->with('success', 'Novel removed from list.');
     }

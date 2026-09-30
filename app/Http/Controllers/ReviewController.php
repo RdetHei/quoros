@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Novel;
 use App\Models\Review;
+use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,6 +25,7 @@ class ReviewController extends Controller
             'rating' => $request->rating,
             'content' => $request->content,
         ]);
+        app(RecommendationService::class)->forgetForUser(Auth::id());
 
         // Recalculate average rating
         $novel->rating_avg = $novel->reviews()->avg('rating') ?: 0;
@@ -38,6 +40,7 @@ class ReviewController extends Controller
 
         $novel = $review->novel;
         $review->delete();
+        app(RecommendationService::class)->forgetForUser($review->user_id);
 
         // Recalculate average rating
         $novel->rating_avg = $novel->reviews()->avg('rating') ?: 0;

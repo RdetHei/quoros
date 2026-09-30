@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chapter;
 use App\Models\Novel;
 use App\Models\ReadingHistory;
+use App\Services\RecommendationService;
 use App\Services\NovelParserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -196,6 +197,7 @@ class ChapterController extends Controller
                 ['user_id' => Auth::id(), 'novel_id' => $novel->id],
                 ['chapter_id' => $chapter->id]
             );
+            app(RecommendationService::class)->forgetForUser(Auth::id());
         }
 
         $previousChapter = $chapter->previous(! $isAuthorOrAdmin);

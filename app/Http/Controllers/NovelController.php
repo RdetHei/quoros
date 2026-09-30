@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ImageUploadRequest;
 use App\Services\CloudinaryService;
+use App\Services\RecommendationService;
 use App\Services\NovelViewService;
 use App\Models\Chapter;
 use App\Models\Genre;
@@ -23,6 +24,7 @@ class NovelController extends Controller
 
     public function __construct(
         CloudinaryService $cloudinaryService,
+        private RecommendationService $recommendations,
         private NovelViewService $novelViews,
     ) {
         $this->cloudinaryService = $cloudinaryService;
@@ -108,15 +110,9 @@ class NovelController extends Controller
                 $q->published()->orderBy('order')->orderBy('id')->take(1);
             }])->withCount('chapters')->orderByDesc('view_count')->first();
 
-        $forYou = Novel::with(['author', 'genres', 'chapters' => function ($q) {
-                $q->published()->latest()->take(3);
-            }])
-            ->withCount('chapters')
-            ->whereHas('chapters')
-            ->withMax('chapters', 'created_at')
-            ->orderByDesc('chapters_max_created_at')
-            ->take(4)
-            ->get();
+        $forYou = Auth::check()
+            ? $this->recommendations->forUser(Auth::user(), 4)
+            : collect();
 
         $marathonNovel = $projectUpdates->skip(2)->first() ?? $featuredNovels->first();
 
@@ -353,6 +349,23 @@ class NovelController extends Controller
             })
             ->withMax('chapters', 'published_at')
             ->withMax('chapters', 'created_at');
+
+        if (Auth::check()) {
+            $preferredIds = $this->recommendations->discoveryIds(Auth::user());
+
+            if ($preferredIds !== []) {
+                $bindings = [];
+                $priority = collect($preferredIds)->values()->map(function ($novelId, $index) use (&$bindings) {
+                    $bindings[] = $novelId;
+                    $bindings[] = $index;
+
+                    return 'WHEN novels.id = ? THEN ?';
+                })->implode(' ');
+
+                $bindings[] = count($preferredIds);
+                $query->orderByRaw("CASE {$priority} ELSE ? END ASC", $bindings);
+            }
+        }
 
         $query->orderByRaw('COALESCE(chapters_max_published_at, chapters_max_created_at) DESC');
 
