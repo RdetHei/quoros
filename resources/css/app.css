@@ -1278,3 +1278,161 @@ body:has(.landing-page) {
         transition: none !important;
     }
 }
+
+/* =========================================================
+   QUOROS landing – override (taruh PALING BAWAH di CSS landing,
+   atau import setelah file lp-* milikmu).
+   Ukuran dihitung dari desain 1440px.
+   ========================================================= */
+:root {
+    --lp-gap: 1.75rem;
+    --lp-panel-bg: #141414;
+    --lp-panel-border: #2a2a2a;
+    --lp-gold: #c9a24a;
+    --lp-cover-ratio: 6 / 7;
+}
+
+.lp-container {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 1.4rem;
+}
+
+.site-header,
+header.navbar,
+nav.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #0d0d0d !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: 3px solid #2b2b2b;
+}
+.site-header input[type="search"],
+.site-header input[type="text"] {
+    background: #000;
+    border: 1px solid #3a3a3a;
+}
+
+.lp-split {
+    display: grid;
+    grid-template-columns: minmax(0, 2.11fr) minmax(0, 1fr);
+    gap: var(--lp-gap);
+    align-items: stretch;
+}
+.lp-split-main,
+.lp-split-side {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.lp-split-main > .lp-panel { flex: 1; }
+.lp-split-side { gap: var(--lp-gap); }
+.lp-split-side > .lp-side-panel { flex: 1; }
+
+.lp-panel,
+.lp-side-panel {
+    background: var(--lp-panel-bg);
+    border: 1px solid var(--lp-panel-border);
+    border-radius: 6px;
+}
+.lp-panel { padding: 1.6rem 2.3rem 2.2rem; }
+.lp-side-panel { padding: 1.5rem 1.5rem 1.6rem; }
+
+.lp-panel > .lp-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.4rem;
+}
+.lp-panel > .lp-section-head .lp-section-title {
+    display: inline-block;
+    padding: 0 2rem .55rem 0;
+    border-bottom: 1px solid #555;
+    font-size: 1.9rem;
+    font-weight: 400;
+    letter-spacing: .02em;
+}
+.lp-see-all { font-size: .95rem; letter-spacing: .04em; padding-bottom: .6rem; }
+
+.lp-cover-grid { display: grid; gap: 2.6rem 1.45rem; }
+.lp-cover-grid--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.lp-cover-grid--7 { grid-template-columns: repeat(7, minmax(0, 1fr)); padding-inline: 1.9rem; }
+
+.lp-cover-frame {
+    aspect-ratio: var(--lp-cover-ratio);
+    overflow: hidden;
+    border-radius: 3px;
+    background: #1c1c1c;
+}
+.lp-cover-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.lp-cover-title {
+    margin: .55rem 0 .4rem;
+    font-size: .8rem;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.lp-cover-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .4rem;
+    padding: .35rem .55rem;
+    border: 1px solid #3a3a3a;
+    background: #1a1a1a;
+    font-size: .62rem;
+    letter-spacing: .05em;
+    color: #b5b5b5;
+}
+.lp-cover-meta-time { font-size: .45rem; }
+
+.lp-side-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.lp-side-head .lp-section-title { font-size: 1.35rem; font-weight: 400; margin: 0; }
+.lp-see-all-pill {
+    padding: .3rem .8rem;
+    border: 1px solid #5a4a22;
+    border-radius: 999px;
+    font-size: .65rem;
+    letter-spacing: .05em;
+    color: var(--lp-gold);
+}
+.lp-side-head-sub {
+    margin: .3rem 0 1rem;
+    padding-bottom: .9rem;
+    border-bottom: 1px solid #2f2f2f;
+    font-size: .68rem;
+    letter-spacing: .03em;
+    color: #b0b0b0;
+}
+.lp-pill-cloud { display: flex; flex-wrap: wrap; gap: .75rem .65rem; }
+.lp-pill {
+    padding: .5rem .95rem;
+    border: 1px solid #6b5626;
+    border-radius: 2px;
+    font-size: .72rem;
+    letter-spacing: .04em;
+    color: var(--lp-gold);
+    background: transparent;
+    transition: background .15s;
+}
+.lp-pill:hover { background: rgba(201, 162, 74, .12); }
+
+@media (max-width: 1100px) {
+    .lp-split { grid-template-columns: 1fr; }
+    .lp-cover-grid--5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .lp-cover-grid--7 { grid-template-columns: repeat(4, minmax(0, 1fr)); padding-inline: 0; }
+}
+@media (max-width: 600px) {
+    .lp-panel { padding: 1.2rem; }
+    .lp-cover-grid--5,
+    .lp-cover-grid--7 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

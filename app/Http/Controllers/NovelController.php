@@ -70,7 +70,7 @@ class NovelController extends Controller
             ->whereHas('chapters')
             ->withMax('chapters', 'created_at')
             ->orderByDesc('chapters_max_created_at')
-            ->take(10)
+            ->take(15)
             ->get();
 
         $popularGenres = Genre::withCount('novels')

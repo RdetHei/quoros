@@ -17,7 +17,8 @@
 
                     @if($projectUpdates->isNotEmpty())
                         <div class="lp-cover-grid lp-cover-grid--5">
-                            @foreach($projectUpdates as $novel)
+                            {{-- desain: 5 kolom x 3 baris = 15 item --}}
+                            @foreach($projectUpdates->take(15) as $novel)
                                 @php
                                     $cover = $coverOf($novel);
                                     $latest = $novel->chapters->first();
@@ -36,7 +37,7 @@
                                             <img src="{{ $cover }}" alt="{{ $novel->title }}" loading="lazy" onerror="this.src='/error.png'">
                                         @endif
                                     </div>
-                                    <h3 class="lp-cover-title">{{ Str::limit($novel->title, 28) }}</h3>
+                                    <h3 class="lp-cover-title">{{ Str::limit($novel->title, 22) }}</h3>
                                     <p class="lp-cover-meta">
                                         <span class="lp-cover-meta-chapter">{{ $chapterLabel }}</span>
                                         @if($ago)
@@ -53,7 +54,7 @@
             </div>
 
             <aside class="lp-split-side">
-                <div class="lp-side-block lp-side-panel">
+                <div class="lp-side-panel">
                     <div class="lp-side-head">
                         <h2 class="lp-section-title">POPULAR GENRE</h2>
                         <a href="{{ route('genres.index') }}" class="lp-see-all-pill">SEE ALL</a>
@@ -61,14 +62,14 @@
                     <p class="lp-side-head-sub">We take the most popular genre lately</p>
                     <div class="lp-pill-cloud">
                         @forelse($popularGenres as $genre)
-                            <a href="{{ route('novels.search', ['genre' => $genre->slug]) }}" class="lp-pill">{{ $genre->name }}</a>
+                            <a href="{{ route('novels.search', ['genre' => $genre->slug]) }}" class="lp-pill">{{ strtoupper($genre->name) }}</a>
                         @empty
                             <span class="lp-empty">No genres yet</span>
                         @endforelse
                     </div>
                 </div>
 
-                <div class="lp-side-block lp-side-panel">
+                <div class="lp-side-panel">
                     <div class="lp-side-head">
                         <h2 class="lp-section-title">POPULAR TAG</h2>
                         <a href="{{ route('tags.index') }}" class="lp-see-all-pill">SEE ALL</a>

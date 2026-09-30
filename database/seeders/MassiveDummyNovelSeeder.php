@@ -61,148 +61,91 @@ class MassiveDummyNovelSeeder extends Seeder
         $tagNames = ['System', 'Reincarnation', 'Magic', 'Weak to Strong', 'Cultivation', 'Martial Arts', 'Game Elements', 'Dungeon', 'Urban Fantasy', 'Harem', 'Reverse Harem', 'Overpowered MC', 'Alchemy', 'Demons', 'Academy'];
         $tags = collect($tagNames)->map(fn($name) => Tag::create(['name' => $name, 'slug' => Str::slug($name)]));
 
-        // 3. Anime-style Novel Data (English titles for Korean/Japanese/Chinese style novels)
-        $novelsData = [
-            [
-                'title' => 'The Solo Leveling God',
-                'description' => 'In a world where gates connect our world to dungeons, E-rank hunter Sung Jin-Woo is the weakest of them all. But everything changes when he finds a hidden dungeon.',
-                'region' => 'Korea',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1519669556878-63bdad8a1a49?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Reincarnation of the Heavenly Demon',
-                'description' => 'The strongest demonic practitioner is betrayed by his disciples and reincarnates into the body of a weak noble youth. Now, he will rise again.',
-                'region' => 'China',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'My S-Rank Skill is Infinite Mana',
-                'description' => 'After being summoned to another world, Sato receives a seemingly useless skill. However, he soon realizes its potential is limitless.',
-                'region' => 'Japan',
-                'type' => 'light_novel',
-                'cover' => 'https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'The Alchemist of the Eternal Empire',
-                'description' => 'A modern-day genius chemist is transported to a world where alchemy is the foundation of power. He decides to revolutionize the industry.',
-                'region' => 'China',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Shadow Sovereign: Path to Immortality',
-                'description' => 'In a world governed by a mysterious System, one man chooses the path of shadows to protect his family from the impending apocalypse.',
-                'region' => 'Korea',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1560972550-aba3456b5564?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'That Time I Became a Dungeon Master',
-                'description' => 'Dying in a freak accident, our protagonist wakes up as the core of a newly formed dungeon. Now he must build his domain to survive.',
-                'region' => 'Japan',
-                'type' => 'light_novel',
-                'cover' => 'https://images.unsplash.com/photo-1528319725582-ddc0b6a27656?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Legend of the Moonlight Sculptor',
-                'description' => 'Lee Hyun is a legendary gamer who sells his character for billions. But fate has other plans for him in the new VR game, Royal Road.',
-                'region' => 'Korea',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Desolate Era: The Beginning of the End',
-                'description' => 'Ning is born into a world of immortals and monsters. With his past life memories, he seeks to reach the pinnacle of cultivation.',
-                'region' => 'China',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Sword Art of the Falling Stars',
-                'description' => 'A young boy finds a rusty sword that contains the soul of an ancient sword god. His journey to the top begins now.',
-                'region' => 'Japan',
-                'type' => 'light_novel',
-                'cover' => 'https://images.unsplash.com/photo-1519669556878-63bdad8a1a49?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'The Villainess Wants to Live a Peaceful Life',
-                'description' => 'Reincarnated as the villainess of a popular otome game, Katarina decides to avoid all destruction flags by becoming a master of agriculture.',
-                'region' => 'Japan',
-                'type' => 'light_novel',
-                'cover' => 'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Necromancer of the Apocalypse',
-                'description' => 'When the world turns into a game, Han-Seong awakens the hidden class of Necromancer. He will command an army of the dead to survive.',
-                'region' => 'Korea',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1613376023733-0d743d20719b?auto=format&fit=crop&w=800&q=80',
-            ],
-            [
-                'title' => 'Rise of the Undead Legion',
-                'description' => 'Dave is a regular gamer who finds himself trapped in a skeleton body. He must lead his fellow undead to conquer the VR world.',
-                'region' => 'China',
-                'type' => 'web_novel',
-                'cover' => 'https://images.unsplash.com/photo-1559981421-3e0c0d712e3b?auto=format&fit=crop&w=800&q=80',
-            ]
+        // 3. Generate 100 dummy novels so landing and project-update have plenty of data
+        $titlePrefixes = ['Eclipse', 'Crimson', 'Moonlit', 'Iron', 'Arcane', 'Celestial', 'Shadow', 'Storm', 'Ember', 'Silver', 'Velvet', 'Obsidian', 'Nova', 'Raven', 'Golden', 'Dawn', 'Frost', 'Blazing', 'Thunder', 'Horizon'];
+        $titleSuffixes = ['Ascension', 'Reborn', 'Legacy', 'Oath', 'Veil', 'Empire', 'Gate', 'Warden', 'Chronicle', 'Eclipse', 'Dawn', 'Hollow', 'Reign', 'Pact', 'Crown', 'Drift', 'Rift', 'Mirage', 'Bastion', 'Forge'];
+        $coverUrls = [
+            'https://images.unsplash.com/photo-1519669556878-63bdad8a1a49?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1560972550-aba3456b5564?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1528319725582-ddc0b6a27656?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1613376023733-0d743d20719b?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1559981421-3e0c0d712e3b?auto=format&fit=crop&w=800&q=80',
         ];
+        $regions = ['Korea', 'Japan', 'China', 'Indonesia', 'Global'];
+        $types = ['web_novel', 'light_novel', 'original'];
+        $statuses = ['ongoing', 'complete', 'hiatus'];
+        $usedSlugs = [];
 
-        foreach ($novelsData as $index => $data) {
+        for ($i = 1; $i <= 100; $i++) {
+            $prefix = $titlePrefixes[($i - 1) % count($titlePrefixes)];
+            $suffix = $titleSuffixes[(int) floor(($i - 1) / count($titlePrefixes)) % count($titleSuffixes)];
+            $title = sprintf('%s %s %s', $prefix, $suffix, $i);
+            $description = 'A young protagonist rises through impossible odds, fights against destiny, and carves out a future that no one thought was possible. The story blends action, mystery, and emotional growth in a vivid world shaped by power, betrayal, and redemption.';
+            $baseSlug = Str::slug($title);
+            $slug = $baseSlug;
+            $slugCounter = 2;
+            while (isset($usedSlugs[$slug])) {
+                $slug = $baseSlug . '-' . $slugCounter;
+                $slugCounter++;
+            }
+            $usedSlugs[$slug] = true;
+
             $novel = Novel::create([
                 'author_id' => $writer->id,
-                'title' => $data['title'],
-                'slug' => Str::slug($data['title']),
-                'description' => $data['description'],
-                'status' => collect(['ongoing', 'complete', 'hiatus'])->random(),
-                'type' => $data['type'],
-                'region' => $data['region'],
+                'title' => $title,
+                'slug' => $slug,
+                'description' => $description,
+                'status' => $statuses[$i % count($statuses)],
+                'type' => $types[$i % count($types)],
+                'region' => $regions[$i % count($regions)],
                 'language' => 'English',
-                'content_rating' => collect(['everyone', 'teen', 'mature'])->random(),
-                'cover_image_url' => $data['cover'],
-                'view_count' => rand(1000, 50000),
+                'content_rating' => ['everyone', 'teen', 'mature'][$i % 3],
+                'cover_image_url' => $coverUrls[$i % count($coverUrls)],
+                'view_count' => rand(1500, 95000),
                 'rating_avg' => rand(35, 50) / 10,
-                'is_featured' => $index < 6,
+                'is_featured' => $i <= 15,
             ]);
 
-            // Attach random genres and tags
             $novel->genres()->attach($genres->random(rand(2, 4))->pluck('id'));
             $novel->tags()->attach($tags->random(rand(3, 6))->pluck('id'));
 
-            // Create chapters for each novel
-            for ($i = 1; $i <= 10; $i++) {
+            for ($chapterNo = 1; $chapterNo <= rand(8, 14); $chapterNo++) {
+                $chapterTitle = 'Chapter ' . $chapterNo . ': ' . ['Awakening', 'Trial', 'Rising', 'Breakthrough', 'Abyss', 'Vow', 'Confrontation', 'Revelation', 'Battle', 'Ascension'][($chapterNo - 1) % 10];
                 Chapter::create([
                     'novel_id' => $novel->id,
-                    'title' => "Chapter $i: " . ($i === 1 ? 'The Awakening' : ($i === 10 ? 'Conclusion of the Prologue' : 'Development')),
-                    'slug' => Str::slug($data['title'] . " chapter $i"),
-                    'content' => "<p>This is the content for chapter $i of <strong>" . $data['title'] . "</strong>.</p><p>The story continues as our protagonist faces new challenges and grows stronger through the " . $tags->random()->name . " system.</p><p>" . Str::random(500) . "</p>",
+                    'title' => $chapterTitle,
+                    'slug' => Str::slug($title . ' chapter ' . $chapterNo),
+                    'content' => '<p>' . $title . ' continues with a new turning point for the protagonist.</p><p>The world grows darker, the stakes rise, and every decision matters more than before.</p><p>' . Str::random(800) . '</p>',
                     'status' => 'published',
-                    'published_at' => now()->subDays(10 - $i),
+                    'published_at' => now()->subDays(rand(1, 90)),
                 ]);
             }
 
-            // Create some characters
             NovelCharacter::create([
                 'novel_id' => $novel->id,
-                'name' => 'Protagonist Name',
+                'name' => 'Aster Vale',
                 'role' => 'Main Character',
-                'description' => 'The main lead who possesses a unique system and seeks to reach the top.',
+                'description' => 'The lead character begins a dangerous journey to challenge fate and rise above the strongest forces in the world.',
                 'image_url' => 'https://images.unsplash.com/photo-1578632738980-422cc36e2ec9?q=80&w=300&auto=format&fit=crop',
                 'sort_order' => 1,
             ]);
 
             NovelCharacter::create([
                 'novel_id' => $novel->id,
-                'name' => 'Support Heroine',
+                'name' => 'Liora Dusk',
                 'role' => 'Main Heroine',
-                'description' => 'A loyal companion who supports the protagonist throughout their journey.',
+                'description' => 'A brilliant strategist whose perspective and loyalty give the protagonist the strength to carry on.',
                 'image_url' => 'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?q=80&w=300&auto=format&fit=crop',
                 'sort_order' => 2,
             ]);
         }
 
-        echo "Seeding completed successfully with anime-style LN/Webnovels!\n";
+        echo "Seeding completed successfully with 100 dummy novels!\n";
         echo "Admin: admin@example.com / password\n";
         echo "Writer: writer@example.com / password\n";
         echo "User: user@example.com / password\n";
