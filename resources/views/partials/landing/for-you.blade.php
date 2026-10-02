@@ -5,7 +5,7 @@
     };
 @endphp
 
-@if($forYou->isNotEmpty())
+@if(isset($forYou) && $forYou->isNotEmpty())
 <section class="lp-section lp-section--for-you">
     <div class="lp-container">
         <div class="lp-section-head">
@@ -20,9 +20,7 @@
                 @endphp
                 <article class="lp-for-you-card">
                     <a href="{{ route('novels.show', $novel->slug) }}" class="lp-for-you-cover">
-                        @if($cover)
-                            <img src="{{ $cover }}" alt="{{ $novel->title }}" loading="lazy" onerror="this.src='/error.png'">
-                        @endif
+                        <img src="{{ $cover ?: '/error.png' }}" alt="{{ $novel->title }}" loading="lazy" onerror="this.src='/error.png'">
                     </a>
                     <div class="lp-for-you-body">
                         <div class="lp-for-you-title-wrap">

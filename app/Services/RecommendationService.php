@@ -17,29 +17,83 @@ class RecommendationService
         $key = $this->cacheKey($user->id);
         $novelIds = Cache::get($key);
 
-        if (! is_array($novelIds)) {
+        if (! is_array($novelIds) || empty($novelIds)) {
             Cache::forget($key);
-            $novelIds = Cache::remember(
-                $key,
-                now()->addMinutes(20),
-                fn () => $this->buildRecommendations($user, $limit)
-                    ->pluck('id')
-                    ->values()
-                    ->all(),
-            );
+            $novelIds = $this->buildRecommendations($user, $limit)
+                ->pluck('id')
+                ->values()
+                ->all();
+
+            if (! empty($novelIds)) {
+                Cache::put($key, $novelIds, now()->addMinutes(20));
+            }
         }
 
-        if (! is_array($novelIds) || $novelIds === []) {
+        if (empty($novelIds)) {
+            return $this->forGuest($limit);
+        }
+
+        $position = array_flip($novelIds);
+
+        $results = $this->availableNovelsQuery()
+            ->whereIn('novels.id', $novelIds)
+            ->get()
+            ->sortBy(fn (Novel $novel) => $position[$novel->id] ?? PHP_INT_MAX)
+            ->values();
+
+        if ($results->count() < $limit) {
+            $existingIds = $results->pluck('id')->all();
+            $more = $this->fallback($limit - $results->count(), [], $existingIds);
+            $results = $results->concat($more)->unique('id')->take($limit)->values();
+        }
+
+        return $results;
+    }
+
+    public function forGuest(int $limit = 4): Collection
+    {
+        $key = 'fyp:guest:' . self::CACHE_VERSION;
+        $novelIds = Cache::get($key);
+
+        if (! is_array($novelIds) || empty($novelIds)) {
+            Cache::forget($key);
+            $novelIds = $this->fallback($limit)
+                ->pluck('id')
+                ->values()
+                ->all();
+
+            if (! empty($novelIds)) {
+                Cache::put($key, $novelIds, now()->addMinutes(20));
+            }
+        }
+
+        if (empty($novelIds)) {
+            $novelIds = $this->availableNovelsQuery()
+                ->latest('id')
+                ->limit($limit)
+                ->pluck('id')
+                ->all();
+        }
+
+        if (empty($novelIds)) {
             return collect();
         }
 
         $position = array_flip($novelIds);
 
-        return $this->availableNovelsQuery()
+        $results = $this->availableNovelsQuery()
             ->whereIn('novels.id', $novelIds)
             ->get()
             ->sortBy(fn (Novel $novel) => $position[$novel->id] ?? PHP_INT_MAX)
             ->values();
+
+        if ($results->count() < $limit) {
+            $existingIds = $results->pluck('id')->all();
+            $more = $this->fallback($limit - $results->count(), [], $existingIds);
+            $results = $results->concat($more)->unique('id')->take($limit)->values();
+        }
+
+        return $results;
     }
 
     public function forgetForUser(int $userId): void
@@ -83,7 +137,13 @@ class RecommendationService
         $confidence = count($signals['signal_novel_ids']);
 
         if ($confidence === 0) {
-            return $this->fallback($limit, $historyIds);
+            $fallback = $this->fallback($limit, $historyIds);
+            if ($fallback->count() < $limit) {
+                $more = $this->fallback($limit - $fallback->count(), [], $fallback->pluck('id')->all());
+                $fallback = $fallback->concat($more)->unique('id')->take($limit)->values();
+            }
+
+            return $fallback;
         }
 
         $candidates = $this->candidateQuery(
@@ -95,7 +155,13 @@ class RecommendationService
         $personalized = $this->rank($candidates, $preferences, $signals['followed_author_scores']);
 
         if ($personalized->isEmpty()) {
-            return $this->fallback($limit, $historyIds);
+            $fallback = $this->fallback($limit, $historyIds);
+            if ($fallback->count() < $limit) {
+                $more = $this->fallback($limit - $fallback->count(), [], $fallback->pluck('id')->all());
+                $fallback = $fallback->concat($more)->unique('id')->take($limit)->values();
+            }
+
+            return $fallback;
         }
 
         $personalizedRatio = match (true) {
@@ -104,13 +170,17 @@ class RecommendationService
             default => 0.90,
         };
         $personalizedLimit = max(1, (int) ceil($limit * $personalizedRatio));
-        $fallbackLimit = max(0, $limit - $personalizedLimit);
 
         $results = $this->diversify($personalized, $personalizedLimit);
 
-        if ($fallbackLimit > 0 && $results->count() < $limit) {
-            $fallback = $this->fallback($fallbackLimit, $historyIds, $results->pluck('id')->all());
-            $results = $results->concat($fallback);
+        if ($results->count() < $limit) {
+            $fallback = $this->fallback($limit - $results->count(), $historyIds, $results->pluck('id')->all());
+            $results = $results->concat($fallback)->unique('id')->values();
+        }
+
+        if ($results->count() < $limit) {
+            $fallback = $this->fallback($limit - $results->count(), [], $results->pluck('id')->all());
+            $results = $results->concat($fallback)->unique('id')->values();
         }
 
         return $results->take($limit)->values();
@@ -307,13 +377,13 @@ class RecommendationService
         return $selected;
     }
 
-    private function fallback(int $limit, array $excludedIds = [], array $additionalExcludedIds = []): Collection
+    public function fallback(int $limit, array $excludedIds = [], array $additionalExcludedIds = []): Collection
     {
         $excluded = array_unique(array_merge($excludedIds, $additionalExcludedIds));
         $query = fn () => $this->availableNovelsQuery()->whereNotIn('novels.id', $excluded ?: [0]);
 
         $recent = $query()
-            ->orderByDesc('latest_published_at')
+            ->orderByRaw('COALESCE(latest_published_at, latest_chapter_created_at, novels.updated_at) DESC')
             ->limit(max(1, (int) ceil($limit * 0.4)))
             ->get();
         $trending = $query()
@@ -330,10 +400,21 @@ class RecommendationService
             ->limit(max(1, (int) ceil($limit * 0.1)))
             ->get();
 
-        return $recent->concat($trending)->concat($featured)->concat($rated)
+        $results = $recent->concat($trending)->concat($featured)->concat($rated)
             ->unique('id')
             ->take($limit)
             ->values();
+
+        if ($results->count() < $limit) {
+            $more = $query()
+                ->whereNotIn('novels.id', array_unique(array_merge($excluded, $results->pluck('id')->all())) ?: [0])
+                ->latest('id')
+                ->limit($limit - $results->count())
+                ->get();
+            $results = $results->concat($more)->unique('id')->take($limit)->values();
+        }
+
+        return $results;
     }
 
     private function availableNovelsQuery()
@@ -347,6 +428,7 @@ class RecommendationService
             }])
             ->whereHas('chapters', fn ($query) => $query->published())
             ->withMax(['chapters as latest_published_at' => fn ($query) => $query->published()], 'published_at')
+            ->withMax(['chapters as latest_chapter_created_at' => fn ($query) => $query->published()], 'created_at')
             ->withSum(['viewLogs as recent_views' => fn ($query) => $query->where('viewed_on', '>=', $since)], 'views');
     }
 

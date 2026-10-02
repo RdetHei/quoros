@@ -97,8 +97,7 @@
                         </button>
 
                         <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
-                            <img src="{{ asset('storage/logo/quorosLogo.png') }}" onerror="this.onerror=null; this.src='{{ asset('error.png') }}'" alt="Quoros Logo" class="h-[30px] w-auto group-hover:opacity-85 transition-opacity" fetchpriority="high">
-                            <span class="site-brand text-[11px] sm:text-[12px] tracking-[0.28em]">QUOROS</span>
+                            <span class="site-brand text-[13px] sm:text-[14px] tracking-[0.28em] font-[600]">QUOROS</span>
                         </a>
                     </div>
 

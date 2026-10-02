@@ -112,7 +112,23 @@ class NovelController extends Controller
 
         $forYou = Auth::check()
             ? $this->recommendations->forUser(Auth::user(), 4)
-            : collect();
+            : $this->recommendations->forGuest(4);
+
+        if ($forYou->isEmpty()) {
+            $forYou = $this->recommendations->forGuest(4);
+        }
+
+        if ($forYou->isEmpty()) {
+            $forYou = Novel::with(['author', 'genres', 'chapters' => function ($q) {
+                    $q->published()->latest()->take(3);
+                }])
+                ->withCount('chapters')
+                ->whereHas('chapters')
+                ->withMax('chapters', 'created_at')
+                ->orderByDesc('chapters_max_created_at')
+                ->take(4)
+                ->get();
+        }
 
         $marathonNovel = $projectUpdates->skip(2)->first() ?? $featuredNovels->first();
 
