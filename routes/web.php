@@ -22,6 +22,7 @@ use App\Http\Controllers\NovelController;
 use App\Http\Controllers\NovelCharacterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\ReadingSessionController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -95,6 +96,9 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
     // Bookmark & History dedicated views
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
     Route::get('/history', [NovelController::class, 'history'])->name('history.index');
+    Route::post('/novels/{novel}/reading-session', [ReadingSessionController::class, 'heartbeat'])
+        ->middleware('throttle:120,1')
+        ->name('reading-sessions.heartbeat');
 
     // Request Novel
     Route::get('/requests', [NovelController::class, 'requests'])->name('requests.index');

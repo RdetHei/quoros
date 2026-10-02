@@ -669,6 +669,7 @@
     'currentChapterSlug' => $chapter->slug,
     'allChapters'        => $allChapters,
     'novelSlug'          => $novel->slug,
+    'readingSessionUrl'  => auth()->check() ? route('reading-sessions.heartbeat', $novel->id) : null,
     'novelTitle'         => $novel->title,
     'baseUrl'            => url('/'),
     'protectChapter'      => $protectContent ?? false,
@@ -1184,6 +1185,9 @@ window.reader = function (config = {}) {
         nextChapterSlug:     config.nextChapterSlug     || '',
         prevChapterSlug:     config.prevChapterSlug     || '',
         currentChapterSlug:  config.currentChapterSlug  || '',
+        readingSessionUrl:   config.readingSessionUrl || null,
+        readingSessionUuid:  null,
+        readingHeartbeat:    null,
         currentChapterTitle: '',
         allChapters:         config.allChapters         || [],
         isLoading:           false,
@@ -1221,6 +1225,8 @@ window.reader = function (config = {}) {
             if (this.autoLoadChapters) this.setupAutoloadObserver();
             this.setupTouchGestures();
 
+            if (this.readingSessionUrl) this.startReadingSessionTracking();
+
             if (this.protectChapter) {
                 const zone = document.getElementById('chapters-container');
                 if (zone) {
@@ -1229,6 +1235,54 @@ window.reader = function (config = {}) {
                     );
                 }
             }
+        },
+
+        startReadingSessionTracking() {
+            this.readingSessionUuid = this.newReadingSessionUuid();
+            const sendHeartbeat = (ended = false, useBeacon = false) => {
+                const payload = new URLSearchParams({
+                    _token: document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    session_uuid: this.readingSessionUuid,
+                    ...(ended ? { ended: '1' } : {}),
+                });
+                if (useBeacon && navigator.sendBeacon) {
+                    navigator.sendBeacon(this.readingSessionUrl, new Blob([payload.toString()], {
+                        type: 'application/x-www-form-urlencoded;charset=UTF-8',
+                    }));
+                    return;
+                }
+                fetch(this.readingSessionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: payload.toString(),
+                    keepalive: ended,
+                }).catch(() => {});
+            };
+
+            // Create the session immediately so short visits are recorded too.
+            sendHeartbeat();
+
+            this.readingHeartbeat = window.setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    sendHeartbeat();
+                }
+            }, 20000);
+
+            window.addEventListener('pagehide', () => {
+                window.clearInterval(this.readingHeartbeat);
+                sendHeartbeat(true, true);
+            }, { once: true });
+        },
+
+        newReadingSessionUuid() {
+            const randomHex = length => Array.from({ length }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+            return (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `${randomHex(8)}-${randomHex(4)}-4${randomHex(3)}-${(8 + Math.floor(Math.random() * 4)).toString(16)}${randomHex(3)}-${randomHex(12)}`;
         },
 
         setupScrollProgress() {

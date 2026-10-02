@@ -343,7 +343,7 @@ class NovelController extends Controller
             $period = 'all';
         }
 
-        $query = Novel::with(['chapters' => function ($q) {
+        $query = Novel::with(['author:id,name', 'genres:id,name', 'tags:id,name', 'chapters' => function ($q) {
                 $q->published()->latest('published_at')->latest('id')->take(3);
             }])
             ->whereHas('chapters', function ($q) use ($periods, $period) {

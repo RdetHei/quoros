@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Novel;
+use App\Models\ReadingSession;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -201,6 +202,42 @@ class RecommendationService
                     'weight' => 1.0,
                     'at' => $history->updated_at,
                 ]);
+            }
+        }
+
+        $readingTimeByNovel = ReadingSession::query()
+            ->where('user_id', $user->id)
+            ->selectRaw('novel_id, SUM(active_seconds) as active_seconds, MAX(last_active_at) as last_active_at')
+            ->groupBy('novel_id')
+            ->get();
+
+        $readingNovels = Novel::with(['genres', 'tags'])
+            ->whereIn('id', $readingTimeByNovel->pluck('novel_id'))
+            ->get()
+            ->keyBy('id');
+
+        foreach ($readingTimeByNovel as $readingTime) {
+            // The stored reading time is unlimited; FYP influence is capped at 20 minutes.
+            $minutes = (int) floor(min(1200, (int) $readingTime->active_seconds) / 60);
+            $durationWeight = match (true) {
+                $minutes >= 20 => 2.0,
+                $minutes >= 15 => 1.5,
+                $minutes >= 10 => 1.25,
+                $minutes >= 5 => 1.0,
+                $minutes >= 2 => 0.5,
+                $minutes >= 1 => 0.25,
+                default => 0.0,
+            };
+
+            if ($durationWeight > 0) {
+                $novel = $readingNovels->get($readingTime->novel_id);
+                if ($novel) {
+                    $items->push([
+                        'novel' => $novel,
+                        'weight' => $durationWeight,
+                        'at' => $readingTime->last_active_at ? Carbon::parse($readingTime->last_active_at) : null,
+                    ]);
+                }
             }
         }
 
