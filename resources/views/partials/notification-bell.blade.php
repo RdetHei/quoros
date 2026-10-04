@@ -3,12 +3,13 @@
     <button type="button"
             @click="open = !open"
             aria-label="Toggle notifications"
-            class="relative h-8 w-8 inline-flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors ring-1 ring-white/5">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            class="relative h-8 w-8 inline-flex items-center justify-center text-[#f5f1e8] hover:text-white hover:bg-white/5 rounded-md transition-colors">
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
         </svg>
         @if(($unreadNotificationsCount ?? 0) > 0)
-            <span class="absolute -top-1 -right-1 min-w-[1rem] h-[1rem] px-0.5 flex items-center justify-center text-[8px] font-bold text-white bg-rose-500 rounded-full ring-2 ring-slate-950">
+            <span class="absolute -top-[3px] -right-[3px] min-w-[15px] h-[15px] px-1 flex items-center justify-center text-[8px] font-bold text-[#0e0c0a] bg-[#c7a64a] rounded-full ring-2 ring-[#0a0a0a]">
                 {{ $unreadNotificationsCount > 9 ? '9+' : $unreadNotificationsCount }}
             </span>
         @endif
@@ -16,51 +17,111 @@
 
     <div x-show="open"
          @click.away="open = false"
-         x-transition:enter="transition ease-out duration-100"
-         x-transition:enter-start="transform opacity-0 scale-95 translate-y-1"
+         x-transition:enter="transition ease-out duration-120"
+         x-transition:enter-start="transform opacity-0 scale-[0.985] translate-y-1"
          x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-75"
+         x-transition:leave="transition ease-in duration-70"
          x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
-         x-transition:leave-end="transform opacity-0 scale-95 translate-y-1"
-         class="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-[#05070b] rounded-2xl border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.45)] z-50 overflow-hidden"
+         x-transition:leave-end="transform opacity-0 scale-[0.985] translate-y-1"
+         class="absolute right-0 top-full mt-2 w-[340px] sm:w-[380px] bg-[#111111] rounded-lg border border-white/[0.08] shadow-[0_20px_44px_-20px_rgba(0,0,0,0.9)] z-50 overflow-hidden"
          style="display: none;">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/[0.02]">
-            <p class="text-sm font-bold text-white">Notifikasi</p>
+
+        {{-- Header --}}
+        <div class="flex items-center justify-between px-4 py-3.5 border-b border-white/[0.06] bg-[#0d0d0d]">
+            <div class="flex items-center gap-2.5">
+                <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 text-[#c7a64a]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                </svg>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#eeeae1]">Notifications</p>
+                @if(($unreadNotificationsCount ?? 0) > 0)
+                    <span class="inline-flex min-w-[16px] h-[15px] px-1 items-center justify-center text-[8px] font-bold text-[#0e0c0a] bg-[#c7a64a] rounded-sm">
+                        {{ $unreadNotificationsCount > 9 ? '9+' : $unreadNotificationsCount }}
+                    </span>
+                @endif
+            </div>
             @if(($unreadNotificationsCount ?? 0) > 0)
                 <form action="{{ route('notifications.read-all') }}" method="POST">
                     @csrf
-                    <button type="submit" class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300 hover:text-white transition-colors">
-                        Baca semua
+                    <button type="submit" class="text-[8.5px] font-semibold uppercase tracking-[0.16em] text-[#a3a3a3] hover:text-[#e8d39a] transition-colors whitespace-nowrap">
+                        Read all
                     </button>
                 </form>
             @endif
         </div>
 
-        <div class="max-h-80 overflow-y-auto bg-[#070b12]">
-            @forelse($recentNotifications ?? [] as $notification)
-                <a href="{{ route('notifications.show', $notification) }}" class="block px-4 py-3 border-b border-white/5 transition-colors {{ $notification->isUnread() ? 'bg-white/[0.03]' : 'bg-transparent' }} hover:bg-white/[0.04]">
+        {{-- List --}}
+        <div class="max-h-[340px] overflow-y-auto bg-[#121212]">
+            @forelse($recentNotifications ?? [] as $n)
+                @php
+                    $isUnread = $n->isUnread();
+                    $nType = $n->type->value ?? 'general';
+                    $nLabel = match(strtolower($nType)) {
+                        'announcement' => 'Announcement',
+                        'comment' => 'Comment',
+                        'reply' => 'Reply',
+                        'review' => 'Review',
+                        'follow' => 'Follow',
+                        'bookmark' => 'Bookmark',
+                        'chapter' => 'New Chapter',
+                        default => ucfirst($nType),
+                    };
+                @endphp
+                <a href="{{ route('notifications.show', $n) }}"
+                   class="block px-4 py-3 border-b border-white/[0.04] transition-colors {{ $isUnread ? 'bg-[#c7a64a]/[0.04]' : 'bg-transparent' }} hover:bg-[#171717]">
                     <div class="flex items-start gap-3">
-                        <span class="mt-1 h-2.5 w-2.5 rounded-full {{ $notification->isUnread() ? 'bg-indigo-400 shadow-[0_0_14px_rgba(129,140,248,0.8)]' : 'bg-slate-600' }}"></span>
+                        {{-- Status dot --}}
+                        <span class="mt-2 shrink-0 {{ $isUnread ? '' : '' }}">
+                            @if($isUnread)
+                                <span class="block w-[7px] h-[7px] rounded-full bg-[#c7a64a] shadow-[0_0_10px_rgba(199,166,74,0.65)]"></span>
+                            @else
+                                <span class="block w-[7px] h-[7px] rounded-full border border-[#2f2f2f] bg-transparent"></span>
+                            @endif
+                        </span>
+
                         <div class="min-w-0 flex-1">
-                            <p class="text-sm font-semibold text-white line-clamp-1">{{ $notification->title() }}</p>
-                            <p class="text-xs text-slate-400 mt-1 line-clamp-2">{{ $notification->body() }}</p>
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="text-[7.5px] font-semibold uppercase tracking-[0.16em] text-[#c7a64a]">
+                                    {{ $nLabel }}
+                                </span>
+                                @if($isUnread)
+                                    <span class="text-[7px] font-semibold uppercase tracking-[0.16em] text-[#c7a64a]/80">
+                                        · New
+                                    </span>
+                                @endif
+                            </div>
+                            <p class="text-[12px] font-semibold text-[#eeeae1] line-clamp-1 leading-snug">{{ $n->title() }}</p>
+                            <p class="text-[11px] text-[#8b857d] mt-1 line-clamp-2 leading-relaxed">{{ $n->body() }}</p>
                             <div class="mt-2 flex items-center justify-between gap-2">
-                                <span class="text-[10px] text-slate-500">{{ $notification->created_at->diffForHumans() }}</span>
-                                @if($notification->type === \App\Enums\NotificationType::Announcement && $notification->url())
-                                    <span class="text-[9px] uppercase tracking-[0.14em] text-indigo-300">Detail</span>
+                                <span class="text-[8.5px] font-medium text-[#6f6b63] uppercase tracking-[0.06em]">{{ $n->created_at->diffForHumans(null, true) }}</span>
+                                @if($n->url())
+                                    <span class="inline-flex items-center gap-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-[#c7a64a]">
+                                        Open
+                                        <svg viewBox="0 0 24 24" class="h-2 w-2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                    </span>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </a>
             @empty
-                <p class="px-4 py-8 text-center text-sm text-slate-400">Belum ada notifikasi.</p>
+                <div class="px-4 py-12 text-center">
+                    <div class="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.08] bg-[#0d0d0d] text-[#c7a64a]/70">
+                        <svg viewBox="0 0 24 24" class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                        </svg>
+                    </div>
+                    <p class="text-[11.5px] font-semibold text-[#d4d4d4]">Inbox is quiet</p>
+                    <p class="mt-1.5 text-[10.5px] text-[#737373]">New updates will surface here.</p>
+                </div>
             @endforelse
         </div>
 
-        <div class="p-2 border-t border-white/10 bg-[#080d14]">
-            <a href="{{ route('notifications.index') }}" class="block text-center text-xs font-bold text-slate-300 py-2 rounded-xl hover:bg-white/5 transition-colors">
-                Lihat semua
+        {{-- Footer CTA --}}
+        <div class="px-3 py-2.5 border-t border-white/[0.06] bg-[#0d0d0d]">
+            <a href="{{ route('notifications.index') }}" class="block text-center text-[9.5px] font-semibold uppercase tracking-[0.16em] text-[#c7a64a] py-2 rounded-sm border border-[#c7a64a]/30 hover:bg-[#c7a64a]/[0.08] hover:border-[#c7a64a]/60 transition-colors">
+                View All Notifications
             </a>
         </div>
     </div>

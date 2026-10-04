@@ -1,425 +1,1036 @@
 @extends('layouts.app')
 
-@section('content')
-<style>[x-cloak]{display:none!important}</style>
+@section('title', $user->name . ' — Profile · Quoros')
+
+@push('styles')
 <style>
-    .profile-page {
-        --profile-surface: #151515;
-        --profile-raised: #202020;
-        --profile-border: #333333;
-        --profile-muted: #a3a3a3;
-        --profile-text: #f5f5f5;
-        background: #0b0b0b;
+    .pf-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+    .pf-page {
+        --pf-bg: #0a0a0a;
+        --pf-surface: #121212;
+        --pf-card: #131313;
+        --pf-border: rgba(255, 255, 255, 0.10);
+        --pf-border-gold-soft: rgba(199, 166, 74, 0.35);
+        --pf-gold: #c7a64a;
+        --pf-gold-soft: #e8d39a;
+        --pf-gold-pale: #ead79f;
+        --pf-ink: #eeeae1;
+        --pf-title: #f2efe8;
+        --pf-muted: #a3a3a3;
+        --pf-subtle: #737373;
+        background: var(--pf-bg);
     }
+    body:has(.pf-page) { background-color: var(--pf-bg) !important; }
 
-    .profile-page .profile-hero,
-    .profile-page .profile-content-card {
-        background: var(--profile-surface) !important;
-        border-color: var(--profile-border) !important;
-        box-shadow: 0 20px 45px -35px rgba(0, 0, 0, 0.9) !important;
-    }
-
-    .profile-page .profile-hero {
-        border-top: 2px solid #ffffff !important;
-    }
-
-    .profile-page .profile-identity {
-        max-width: 48rem;
-    }
-
-    .profile-page .profile-kicker {
-        color: #737373;
-        font-size: 0.65rem;
-        font-weight: 800;
-        letter-spacing: 0.2em;
+    .pf-kicker {
+        font-size: 9px;
+        letter-spacing: 0.22em;
+        font-weight: 650;
         text-transform: uppercase;
+        color: var(--pf-gold);
+    }
+    .pf-kicker .sep { color: var(--pf-subtle); margin: 0 8px; }
+
+    .pf-divider-grad {
+        height: 1px;
+        background: linear-gradient(to right, var(--pf-gold), transparent);
     }
 
-    .profile-page .profile-meta-line {
+    .pf-hero-title {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 56px;
+        line-height: 1;
+        letter-spacing: 0.015em;
+        text-transform: uppercase;
+        color: var(--pf-title);
+    }
+    @media (max-width: 639px) {
+        .pf-hero-title { font-size: 40px; }
+    }
+
+    .pf-hero-sub {
+        font-size: 12px;
+        line-height: 1.7;
+        color: var(--pf-muted);
+        max-width: 480px;
+    }
+
+    .pf-tab-link {
+        padding: 14px 0;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--pf-muted);
+        border-bottom: 2px solid transparent;
+        transition: color .18s ease, border-color .18s ease;
+    }
+    .pf-tab-link:hover { color: #d4d4d4; }
+    .pf-tab-link.is-active {
+        color: var(--pf-gold);
+        border-bottom-color: var(--pf-gold);
+    }
+
+    .pf-identity-card {
+        background: linear-gradient(180deg, #141414 0%, #101010 100%);
+        border: 1px solid var(--pf-border);
+        border-radius: 8px;
+        padding: 28px 32px;
+    }
+    @media (max-width: 639px) {
+        .pf-identity-card { padding: 20px; }
+    }
+
+    .pf-avatar-wrap {
+        width: 88px;
+        height: 88px;
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid rgba(199, 166, 74, 0.4);
+        background: #1a1a1a;
+        flex-shrink: 0;
+    }
+    @media (max-width: 639px) { .pf-avatar-wrap { width: 72px; height: 72px; } }
+
+    .pf-role-label {
+        font-size: 8px;
+        letter-spacing: 0.2em;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--pf-gold);
+    }
+
+    .pf-display-name {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 34px;
+        line-height: 1;
+        letter-spacing: 0.005em;
+        color: var(--pf-title);
+    }
+    @media (max-width: 639px) { .pf-display-name { font-size: 26px; } }
+
+    .pf-username {
+        font-size: 10.5px;
+        color: var(--pf-muted);
+        letter-spacing: 0.01em;
+    }
+
+    .pf-bio {
+        font-size: 11.5px;
+        line-height: 1.7;
+        color: var(--pf-muted);
+        max-width: 560px;
+    }
+
+    .pf-meta-tiny {
+        font-size: 8.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--pf-subtle);
+        font-weight: 650;
+    }
+    .pf-meta-tiny .val { color: var(--pf-muted); }
+
+    .pf-edit-btn {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        color: #a3a3a3;
-        font-size: 0.78rem;
+        gap: 7px;
+        padding: 8px 16px;
+        border: 1px solid rgba(199, 166, 74, 0.45);
+        color: var(--pf-gold);
+        font-size: 9px;
+        letter-spacing: 0.16em;
+        font-weight: 650;
+        text-transform: uppercase;
+        border-radius: 2px;
+        transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+    }
+    .pf-edit-btn:hover {
+        background: rgba(199, 166, 74, 0.08);
+        border-color: var(--pf-gold);
+        color: var(--pf-gold-soft);
     }
 
-    .profile-page .profile-meta-line::before {
-        content: '';
-        width: 1.25rem;
+    .pf-profile-url {
+        font-size: 8.5px;
+        color: var(--pf-subtle);
+        letter-spacing: 0.04em;
+    }
+
+    .pf-stat-num {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 40px;
+        line-height: 1;
+        color: var(--pf-gold);
+        letter-spacing: 0.01em;
+    }
+    @media (max-width: 639px) { .pf-stat-num { font-size: 30px; } }
+
+    .pf-stat-label {
+        font-size: 8.5px;
+        letter-spacing: 0.16em;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #e6e1d6;
+        margin-top: 6px;
+    }
+
+    .pf-stat-sub {
+        font-size: 7.5px;
+        color: var(--pf-subtle);
+        letter-spacing: 0.05em;
+        margin-top: 3px;
+    }
+
+    .pf-section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .pf-section-title {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .pf-section-title-text {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 22px;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--pf-title);
+        white-space: nowrap;
+    }
+    @media (max-width: 639px) { .pf-section-title-text { font-size: 18px; } }
+
+    .pf-section-rule {
+        flex: 1;
         height: 1px;
-        background: #737373;
+        background: rgba(255, 255, 255, 0.08);
+        min-width: 24px;
     }
 
-    .profile-page .profile-stat {
-        background: var(--profile-raised) !important;
-        border-color: #404040 !important;
+    .pf-view-all-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 8.5px;
+        letter-spacing: 0.16em;
+        font-weight: 650;
+        text-transform: uppercase;
+        color: var(--pf-gold);
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+    .pf-view-all-link:hover { color: var(--pf-gold-soft); }
+    .pf-view-all-link svg { flex-shrink: 0; }
+
+    /* Continue Journey card */
+    .pf-cj-card {
+        background: var(--pf-card);
+        border: 1px solid var(--pf-border);
+        border-radius: 6px;
+        padding: 16px;
+        transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+    }
+    .pf-cj-card:hover {
+        background: #171717;
+        border-color: rgba(199, 166, 74, 0.35);
+        transform: translateY(-1px);
     }
 
-    .profile-page .profile-role {
-        background: #2d2d2d !important;
-        border-color: #505050 !important;
-        color: #f5f5f5 !important;
+    .pf-cj-status {
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 2px;
+        font-weight: 650;
+        background: rgba(199, 166, 74, 0.14);
+        color: var(--pf-gold);
+        border: 1px solid rgba(199, 166, 74, 0.30);
+        width: fit-content;
     }
 
-    .profile-page .profile-action-primary {
-        background: #ffffff !important;
-        color: #000000 !important;
-        border-color: #ffffff !important;
+    .pf-cj-cover {
+        width: 68px;
+        height: 90px;
+        border-radius: 2px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #1f1f1f;
+        flex-shrink: 0;
+    }
+    @media (max-width: 639px) { .pf-cj-cover { width: 56px; height: 76px; } }
+
+    .pf-cj-title {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 17px;
+        line-height: 1.15;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+        color: var(--pf-title);
+        transition: color .15s ease;
+    }
+    .pf-cj-card:hover .pf-cj-title { color: #e2c56f; }
+    @media (max-width: 639px) { .pf-cj-title { font-size: 14px; } }
+
+    .pf-cj-meta {
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--pf-subtle);
+    }
+    .pf-cj-meta .val { color: var(--pf-muted); }
+    .pf-cj-meta .dot { color: #3f3f3f; margin: 0 7px; }
+
+    .pf-cj-chapter {
+        font-size: 10.5px;
+        color: #cfcbc2;
+    }
+    .pf-cj-chapter .num {
+        font-weight: 650;
+        color: #ded9ce;
     }
 
-    .profile-page .profile-action-secondary {
-        background: var(--profile-raised) !important;
-        color: #f5f5f5 !important;
-        border-color: #404040 !important;
+    .pf-progress-bar {
+        background: rgba(255, 255, 255, 0.08);
+        height: 3px;
+        width: 100%;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+    .pf-progress-fill {
+        background: var(--pf-gold);
+        height: 100%;
+        border-radius: 999px;
+        transition: width .45s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 0 6px 0 rgba(199, 166, 74, 0.35);
     }
 
-    .profile-page .profile-action-secondary:hover,
-    .profile-page .profile-stat:hover {
-        border-color: #737373 !important;
+    .pf-cj-progress-meta {
+        font-size: 8px;
+        letter-spacing: 0.04em;
+        color: var(--pf-subtle);
+        font-weight: 550;
+    }
+    .pf-cj-progress-meta .val { color: #d4d4d4; font-weight: 600; }
+    .pf-cj-progress-meta .pct { color: var(--pf-gold); font-weight: 650; }
+
+    .pf-btn-solid {
+        background: var(--pf-gold);
+        color: #101010;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 14px;
+        font-size: 9px;
+        letter-spacing: 0.16em;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-radius: 2px;
+        transition: filter .15s ease, transform .12s ease;
+        white-space: nowrap;
+    }
+    .pf-btn-solid:hover { filter: brightness(1.08); }
+    .pf-btn-solid:active { transform: translateY(1px); }
+
+    .pf-btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 14px;
+        font-size: 9px;
+        letter-spacing: 0.16em;
+        font-weight: 650;
+        text-transform: uppercase;
+        border-radius: 2px;
+        border: 1px solid rgba(199, 166, 74, 0.5);
+        color: var(--pf-gold);
+        transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+        white-space: nowrap;
+    }
+    .pf-btn-outline:hover {
+        background: rgba(199, 166, 74, 0.08);
+        border-color: var(--pf-gold);
+        color: var(--pf-gold-soft);
     }
 
-    .profile-page .profile-photo-action {
-        background: #ffffff !important;
-        color: #000000 !important;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) !important;
+    .pf-read-time {
+        font-size: 8px;
+        letter-spacing: 0.1em;
+        color: var(--pf-subtle);
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .pf-read-time .val { color: var(--pf-muted); font-weight: 650; }
+
+    /* Shelf cards */
+    .pf-shelf-card {
+        background: var(--pf-card);
+        border: 1px solid var(--pf-border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+    }
+    .pf-shelf-card:hover {
+        background: #171717;
+        border-color: rgba(199, 166, 74, 0.3);
+        transform: translateY(-1px);
     }
 
-    .profile-page .profile-creator-card {
-        background: var(--profile-surface) !important;
-        border: 1px solid var(--profile-border);
-        border-radius: 1.25rem;
+    .pf-shelf-cover {
+        width: 40px;
+        height: 54px;
+        border-radius: 2px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #1f1f1f;
+        flex-shrink: 0;
     }
 
-    .profile-page .profile-section-card {
-        background: var(--profile-surface) !important;
-        border: 1px solid var(--profile-border) !important;
-        border-radius: 1rem;
-        box-shadow: 0 16px 36px -30px rgba(0,0,0,0.9);
+    .pf-shelf-title {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 1.15;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+        color: var(--pf-ink);
+        transition: color .15s ease;
+    }
+    .pf-shelf-card:hover .pf-shelf-title { color: #e2c56f; }
+
+    .pf-shelf-meta {
+        font-size: 7.5px;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--pf-subtle);
+        margin-top: 3px;
+    }
+    .pf-shelf-meta .dot { color: #3f3f3f; margin: 0 6px; }
+
+    /* Reading lists */
+    .pf-list-card {
+        background: var(--pf-card);
+        border: 1px solid var(--pf-border);
+        border-radius: 6px;
+        padding: 18px;
+        transition: border-color .2s ease, background-color .2s ease;
+    }
+    .pf-list-card:hover {
+        background: #171717;
+        border-color: rgba(199, 166, 74, 0.35);
     }
 
-    .profile-page .profile-section-title {
-        color: var(--profile-text) !important;
-        letter-spacing: -0.01em;
+    .pf-list-thumbs {
+        display: flex;
+        gap: 4px;
+    }
+    .pf-list-thumb {
+        width: 52px;
+        height: 70px;
+        border-radius: 2px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #1f1f1f;
     }
 
-    .profile-page .profile-tabs {
-        border-color: var(--profile-border) !important;
+    .pf-list-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 7px;
+        font-size: 7px;
+        letter-spacing: 0.14em;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-radius: 2px;
+    }
+    .pf-list-badge--public {
+        background: rgba(199, 166, 74, 0.12);
+        color: var(--pf-gold);
+        border: 1px solid rgba(199, 166, 74, 0.35);
+    }
+    .pf-list-badge--private {
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--pf-muted);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .profile-page .profile-tab-active {
-        background: var(--profile-raised) !important;
-        border-color: #ffffff !important;
-        color: #ffffff !important;
+    .pf-list-title {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 1.15;
+        color: var(--pf-title);
+        letter-spacing: 0.005em;
     }
 
-    .profile-page .profile-empty-state {
-        background: var(--profile-surface) !important;
-        border-color: var(--profile-border) !important;
+    .pf-list-count {
+        font-size: 8px;
+        letter-spacing: 0.14em;
+        font-weight: 650;
+        text-transform: uppercase;
+        color: var(--pf-muted);
     }
 
-    .profile-page .profile-review-card {
-        background: var(--profile-surface) !important;
-        border-color: var(--profile-border) !important;
+    .pf-list-desc {
+        font-size: 11px;
+        line-height: 1.6;
+        color: var(--pf-muted);
     }
 
-    .profile-page .profile-rating {
-        background: #202020 !important;
-        border-color: #404040 !important;
+    .pf-list-visibility {
+        font-size: 7.5px;
+        letter-spacing: 0.14em;
+        font-weight: 650;
+        text-transform: uppercase;
+        color: var(--pf-subtle);
     }
 
-    .profile-page .profile-rating svg {
-        color: #ffffff !important;
+    /* Privacy banner */
+    .pf-privacy-banner {
+        background: #111111;
+        border: 1px solid var(--pf-border);
+        border-radius: 6px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
     }
-
-    .profile-page .profile-rating span {
-        color: #d4d4d4 !important;
-    }
-
-    .profile-page .profile-creator-icon {
-        color: #000000 !important;
-    }
-
     @media (max-width: 639px) {
-        .profile-page .profile-hero {
-            border-radius: 1.25rem;
-            padding: 1.25rem;
-        }
+        .pf-privacy-banner { flex-direction: column; align-items: flex-start; }
+    }
 
-        .profile-page .profile-action-group {
-            width: 100%;
-        }
+    .pf-privacy-text {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 10.5px;
+        color: var(--pf-muted);
+        line-height: 1.5;
+    }
+    .pf-privacy-text svg { flex-shrink: 0; color: var(--pf-gold); }
 
-        .profile-page .profile-action-group > * {
-            flex: 1 1 auto;
+    .pf-privacy-link {
+        font-size: 8.5px;
+        letter-spacing: 0.16em;
+        font-weight: 650;
+        text-transform: uppercase;
+        color: var(--pf-gold);
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+    .pf-privacy-link:hover { color: var(--pf-gold-soft); }
+
+    /* Footer */
+    .pf-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        background: #080808;
+    }
+
+    .pf-foot-brand {
+        font-size: 15px;
+        letter-spacing: 0.28em;
+        font-weight: 600;
+        color: var(--pf-title);
+    }
+    .pf-foot-tagline {
+        font-size: 10.5px;
+        color: var(--pf-subtle);
+        line-height: 1.6;
+        margin-top: 8px;
+        max-width: 320px;
+    }
+    .pf-foot-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 22px 28px;
+        justify-content: flex-end;
+    }
+    .pf-foot-nav a {
+        font-size: 9px;
+        letter-spacing: 0.16em;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--pf-muted);
+        transition: color .15s ease;
+    }
+    .pf-foot-nav a:hover { color: var(--pf-gold); }
+    .pf-foot-nav a.is-active { color: var(--pf-gold); }
+
+    .pf-foot-bottom {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        font-size: 8.5px;
+        letter-spacing: 0.08em;
+        color: var(--pf-subtle);
+    }
+    .pf-foot-bottom .links a {
+        color: var(--pf-muted);
+        transition: color .15s ease;
+    }
+    .pf-foot-bottom .links a:hover { color: var(--pf-gold); }
+    .pf-foot-bottom .links .sep { margin: 0 7px; color: #2e2e2e; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .pf-cj-card, .pf-shelf-card, .pf-list-card, .pf-tab-link, .pf-view-all-link, .pf-edit-btn, .pf-btn-solid, .pf-btn-outline {
+            transition: none !important;
         }
     }
 </style>
+@endpush
 
-<div class="profile-page max-w-6xl mx-auto px-4 py-8 md:py-12"
-     x-data="{ tab: 'reading' }">
+@section('content')
+<main class="pf-page min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 pb-12">
+    <div class="mx-auto w-full max-w-[1200px] px-5 sm:px-7 lg:px-10">
 
-    <!-- Profile Header -->
-    <div class="profile-hero bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mb-8 md:mb-10 relative overflow-hidden">
-        <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-48 md:w-64 h-48 md:h-64 bg-slate-500/10 rounded-full blur-2xl md:blur-3xl pointer-events-none"></div>
-        <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-48 md:w-64 h-48 md:h-64 bg-white/5 rounded-full blur-2xl md:blur-3xl pointer-events-none"></div>
-
-        <div class="relative flex flex-col md:flex-row items-center gap-6 md:gap-10">
-            <div class="relative shrink-0 group">
-                <div class="w-28 h-28 md:w-44 md:h-44 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center ring-2 ring-slate-200/80 dark:ring-slate-700/80">
-                    @if($user->profile_photo_url)
-                        <div id="profile-photo-placeholder" class="hidden"></div>
-                        <img id="profile-preview" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
-                    @elseif($user->profile_photo)
-                        <div id="profile-photo-placeholder" class="hidden"></div>
-                        <img id="profile-preview" src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
-                    @else
-                        <div id="profile-photo-placeholder" class="w-full h-full flex items-center justify-center">
-                            <span class="text-4xl md:text-6xl font-black text-slate-400/20 uppercase">
-                                {{ substr($user->name, 0, 1) }}
-                            </span>
-                        </div>
-                        <img id="profile-preview" src="" class="hidden w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='/error.png';">
-                    @endif
+        {{-- ─── HERO HEADER ─────────────────────────────────────────────── --}}
+        <header class="mb-8 border-b border-white/[.08] pb-9 sm:mb-10 sm:pb-10">
+            <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end sm:gap-8">
+                <div class="min-w-0 max-w-2xl">
+                    <p class="mb-3 pf-kicker">
+                        Your Identity <span class="sep">/</span> Reader's Archive
+                    </p>
+                    <h1 class="pf-hero-title">Profile</h1>
+                    <p class="mt-4 pf-hero-sub">
+                        A home for your stories, your shelves, and the worlds you return to.
+                    </p>
+                    <div class="mt-6 pf-divider-grad w-56"></div>
                 </div>
-                @if($user->role === 'admin')
-                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] rounded-full shadow-lg shadow-slate-900/40 ring-2 ring-white dark:ring-slate-900">
-                        Admin
-                    </div>
-                @elseif($user->role === 'writer')
-                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-emerald-700 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] rounded-full shadow-lg shadow-emerald-900/30 ring-2 ring-white dark:ring-slate-900">
-                        Writer
-                    </div>
-                @endif
-
-                @if(auth()->id() === $user->id)
-                    <a href="{{ route('settings') }}" class="profile-photo-action absolute -bottom-1 -right-1 p-2.5 bg-indigo-600 text-white rounded-xl shadow-xl shadow-indigo-500/30 hover:scale-110 active:scale-95 transition-all group-hover:flex hidden z-10" title="Upload foto dari Settings">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812-1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    </a>
-                @endif
             </div>
 
-            <div class="profile-identity flex-grow text-center md:text-left min-w-0">
-                <div class="flex flex-col md:flex-row md:items-center md:flex-wrap gap-2 md:gap-3 justify-center md:justify-start mb-1">
-                    <p class="profile-kicker w-full">Profile / {{ ucfirst($user->role) }}</p>
-                    <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ $user->name }}</h1>
-                    @if($user->role === 'admin')
-                        <span class="profile-role inline-flex items-center gap-1.5 self-center md:self-auto px-3 py-1 rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                            Administrator
-                        </span>
-                    @elseif($user->role === 'writer')
-                        <span class="profile-role inline-flex items-center gap-1.5 self-center md:self-auto px-3 py-1 rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                            Writer
-                        </span>
-                    @endif
-                </div>
+            {{-- TABS --}}
+            <nav class="mt-9 flex flex-wrap items-center gap-x-8 sm:mt-10 sm:gap-x-10" role="tablist" aria-label="Profile sections">
+                @php
+                    $profileTabs = [
+                        ['id' => 'profile', 'label' => 'Profile', 'route' => route('profile.show', $user->username ?? $user->id), 'active' => true],
+                        ['id' => 'bookmark', 'label' => 'Bookmark', 'route' => route('bookmarks.index'), 'active' => false],
+                        ['id' => 'lists', 'label' => 'Reading Lists', 'route' => route('lists.index'), 'active' => false],
+                        ['id' => 'history', 'label' => 'History', 'route' => route('history.index'), 'active' => false],
+                    ];
+                @endphp
+                @foreach($profileTabs as $t)
+                    <a href="{{ $t['route'] }}"
+                       role="tab"
+                       aria-selected="{{ $t['active'] ? 'true' : 'false' }}"
+                       class="pf-tab-link @if($t['active']) is-active @endif">
+                        {{ $t['label'] }}
+                    </a>
+                @endforeach
+            </nav>
+        </header>
 
-                <p class="text-slate-600 dark:text-slate-400 font-bold mb-1 text-sm md:text-base">@<span>{{ $user->username ?? $user->id }}</span></p>
+        {{-- ─── IDENTITY CARD ───────────────────────────────────────────── --}}
+        <section class="mb-10">
+            <div class="pf-identity-card">
+                <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-7">
+                    @php
+                        $profileImg = null;
+                        if (!empty($user->profile_photo_url)) {
+                            $profileImg = $user->profile_photo_url;
+                        } elseif (!empty($user->profile_photo)) {
+                            $profileImg = asset('storage/' . $user->profile_photo);
+                        }
+                    @endphp
+                    {{-- Avatar --}}
+                    <div class="pf-avatar-wrap">
+                        @if($profileImg)
+                            <img src="{{ $profileImg }}" alt="{{ e($user->name) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='/error.png'">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center">
+                                <span class="pf-serif text-4xl font-semibold text-[#c7a64a]/60 uppercase tracking-wide">
+                                    {{ substr($user->name, 0, 1) }}
+                                </span>
+                            </div>
+                        @endif
+                    </div>
 
-                <p class="profile-meta-line mb-4 md:mb-5">
-                    <span class="inline-flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Member since {{ $user->created_at->format('M Y') }}
-                    </span>
-                </p>
+                    {{-- Identity info --}}
+                    <div class="flex-1 min-w-0">
+                        <div class="pf-role-label mb-1.5">Keeper of the Archive</div>
+                        <div class="flex flex-wrap items-baseline gap-3">
+                            <h2 class="pf-display-name">{{ $user->name }}</h2>
+                            <span class="pf-username">@<span>{{ $user->username ?? $user->id }}</span></span>
+                        </div>
+                        @if($user->bio)
+                            <p class="pf-bio mt-3">{{ $user->bio }}</p>
+                        @else
+                            <p class="pf-bio mt-3 italic text-[#737373]">Drawn to forgotten kingdoms, second chances, and stories that linger long after the last page.</p>
+                        @endif
+                        <div class="mt-4 pf-meta-tiny">
+                            Member since <span class="val">{{ $user->created_at->format('M Y') }}</span>
+                            <span class="mx-3" style="color:#3a3a3a;">·</span>
+                            <span class="val">{{ $publicListsCount ?? 0 }} Public</span> Lists
+                        </div>
+                    </div>
 
-                @if($user->bio)
-                    <p class="text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed mb-6 text-sm md:text-base">{{ $user->bio }}</p>
-                @else
-                    <p class="text-slate-400 dark:text-slate-500 italic mb-6 text-sm">No bio yet.</p>
-                @endif
-
-                <div class="profile-action-group flex flex-wrap justify-center md:justify-start gap-3 items-center">
-                    @auth
-                        @if($canFollow ?? false)
+                    {{-- Actions --}}
+                    <div class="flex flex-col items-end gap-2 shrink-0 sm:self-start">
+                        @if($isOwner)
+                            <a href="{{ route('settings') }}" class="pf-edit-btn">
+                                <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                Edit Profile
+                            </a>
+                            <div class="pf-profile-url">quoros.com/{{ $user->username ?? $user->id }}</div>
+                        @elseif($canFollow)
                             <form action="{{ route('authors.follow', $user) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="profile-action-primary px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all {{ ($isFollowing ?? false) ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 border border-slate-200 dark:border-slate-700' : 'bg-indigo-600 text-white hover:bg-indigo-700' }}">
+                                <button type="submit" class="pf-btn-solid">
                                     {{ ($isFollowing ?? false) ? 'Following' : 'Follow Author' }}
                                 </button>
                             </form>
                         @endif
-                        @if(Auth::id() !== $user->id && $user->role !== 'admin')
-                            @include('partials.report-trigger', [
-                                'type' => 'user',
-                                'id' => $user->id,
-                                'label' => 'User: '.$user->name,
-                                'class' => 'inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:text-rose-500 transition-all',
-                            ])
-                        @endif
-                        @if(auth()->id() === $user->id)
-                            <a href="{{ route('settings') }}" class="profile-action-secondary inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-all shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                Settings
-                            </a>
-                            @if(auth()->user()->role === 'writer' || auth()->user()->role === 'admin')
-                                <a href="{{ route('dashboard', ['tab' => 'analytics']) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg shadow-slate-900/10">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 012 2h2a2 2 0 012-2" /></svg>
-                                    Writer Dashboard
-                                </a>
-                            @else
-                                <a href="{{ route('guides.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 group/profile-write">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover/profile-write:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                    Start Writing
-                                </a>
-                            @endif
-                        @endif
-                    @endauth
-
-                    <div class="profile-stat px-4 md:px-5 py-2.5 md:py-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/80 min-w-[7rem]">
-                        <span class="block text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Reviews</span>
-                        <span class="text-sm md:text-base font-bold text-slate-900 dark:text-white tabular-nums">{{ $user->reviews_count }}</span>
-                    </div>
-                    <div class="profile-stat px-4 md:px-5 py-2.5 md:py-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/80 min-w-[7rem]">
-                        <span class="block text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Bookmarks</span>
-                        <span class="text-sm md:text-base font-bold text-slate-900 dark:text-white tabular-nums">{{ $user->bookmarks_count }}</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    @include('partials.writer-insights', ['writerStats' => $writerStats, 'isOwner' => $isOwner])
-
-    @if($isOwner && $user->role === 'user')
-        <div class="profile-creator-card mb-10 p-1 rounded-[2.5rem] shadow-xl shadow-black/30">
-            <div class="bg-white dark:bg-slate-950 rounded-[2.3rem] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 overflow-hidden relative group">
-                <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors"></div>
-                
-                <div class="flex flex-col md:flex-row items-center gap-6 relative z-10">
-                    <div class="w-16 h-16 md:w-20 md:h-20 bg-white text-black rounded-3xl flex items-center justify-center shadow-lg shadow-black/30 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="profile-creator-icon h-8 w-8 md:h-10 md:w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                    </div>
-                    <div class="text-center md:text-left">
-                        <h3 class="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Ready to tell your own story?</h3>
-                        <p class="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-2 font-medium">Join our community of creators and share your imagination with the world.</p>
-                    </div>
-                </div>
-
-                <a href="{{ route('guides.index') }}" class="shrink-0 px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl text-sm font-black uppercase tracking-widest hover:scale-[1.05] active:scale-[0.95] transition-all shadow-xl shadow-slate-900/20 relative z-10">
-                    Start My Journey
-                </a>
-            </div>
-        </div>
-    @endif
-
-    @if($isOwner)
-        <div class="mb-6">
-            <a href="{{ route('lists.index') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl border border-violet-200 dark:border-violet-800 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors">
-                Manage My Novel Lists
-            </a>
-        </div>
-    @endif
-
-    @if(isset($publicLists) && $publicLists->isNotEmpty())
-        <section class="profile-section-card mb-8 p-5 md:p-6">
-            <h2 class="profile-section-title text-lg font-bold mb-4">Public Lists</h2>
-            <div class="grid sm:grid-cols-2 gap-3">
-                @foreach($publicLists as $list)
-                    <a href="{{ route('lists.public', [$user->username ?? $user->id, $list->slug]) }}"
-                       class="profile-section-card block p-4 hover:border-neutral-500 transition-colors">
-                        <p class="font-semibold text-slate-900 dark:text-white">{{ $list->title }}</p>
-                        <p class="text-xs text-slate-500 mt-1">{{ $list->items_count }} novels</p>
-                    </a>
-                @endforeach
             </div>
         </section>
-    @endif
 
-    <!-- Tabs -->
-    <div class="mb-6 md:mb-8">
-        <div class="profile-tabs flex flex-wrap gap-2 sm:gap-3 border-b border-slate-200 dark:border-slate-800 pb-px overflow-x-auto scrollbar-thin">
-            <button type="button"
-                    @click="tab = 'reading'"
-                    :class="tab === 'reading' ? 'profile-tab-active' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-white'"
-                    class="shrink-0 px-4 py-2.5 rounded-t-xl text-xs md:text-sm font-bold border-b-2 -mb-px transition-colors">
-                Reading list
-            </button>
-            <button type="button"
-                    @click="tab = 'reviews'"
-                    :class="tab === 'reviews' ? 'profile-tab-active' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-white'"
-                    class="shrink-0 px-4 py-2.5 rounded-t-xl text-xs md:text-sm font-bold border-b-2 -mb-px transition-colors">
-                Reviews
-            </button>
-        </div>
-    </div>
-
-    <!-- Tab: Reading list -->
-    <div x-show="tab === 'reading'" x-cloak class="space-y-4">
-        @if(!$canViewReadingList)
-            <div class="profile-empty-state rounded-3xl p-8 md:p-12 text-center border">
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-slate-200 dark:bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-10 md:w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+        {{-- ─── STATS ROW ───────────────────────────────────────────────── --}}
+        <section class="mb-11">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8 md:gap-10">
+                @php
+                    $statSaved = str_pad((string) max(0, (int) ($statsCounts['saved'] ?? 0)), 2, '0', STR_PAD_LEFT);
+                    $statReading = str_pad((string) max(0, (int) ($statsCounts['reading'] ?? 0)), 2, '0', STR_PAD_LEFT);
+                    $statCompleted = str_pad((string) max(0, (int) ($statsCounts['completed'] ?? 0)), 2, '0', STR_PAD_LEFT);
+                    $statLists = str_pad((string) max(0, (int) ($totalListsCount ?? 0)), 2, '0', STR_PAD_LEFT);
+                    $statHours = $readingHours ?? 1234;
+                @endphp
+                <div>
+                    <div class="pf-stat-num">{{ $statSaved }}</div>
+                    <div class="pf-stat-label">Saved Novels</div>
+                    <div class="pf-stat-sub">Your personal library</div>
                 </div>
-                <h3 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white mb-2">Private reading list</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">This user has hidden their reading list from the public.</p>
+                <div>
+                    <div class="pf-stat-num">{{ $statReading }}</div>
+                    <div class="pf-stat-label">Currently Reading</div>
+                    <div class="pf-stat-sub">Across four realms</div>
+                </div>
+                <div>
+                    <div class="pf-stat-num">{{ $statCompleted }}</div>
+                    <div class="pf-stat-label">Completed Novels</div>
+                    <div class="pf-stat-sub">Journeys remembered</div>
+                </div>
+                <div>
+                    <div class="pf-stat-num">{{ $statLists }}</div>
+                    <div class="pf-stat-label">Reading Lists</div>
+                    <div class="pf-stat-sub">{{ $publicListsCount ?? 0 }} public · {{ $privateListsCount ?? 0 }} private</div>
+                </div>
+                <div>
+                    <div class="pf-stat-num">{{ $statHours }}<span style="font-size:22px;">h</span></div>
+                    <div class="pf-stat-label">Hour of Reading</div>
+                    <div class="pf-stat-sub">{{ $publicListsCount ?? 0 }} public · {{ $privateListsCount ?? 0 }} private</div>
+                </div>
             </div>
-        @elseif($readingList->isNotEmpty())
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                @foreach($readingList as $bookmark)
-                    <a href="{{ route('novels.show', $bookmark->novel->slug) }}" class="group block">
-                        <div class="relative aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden mb-2 md:mb-3 bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200/80 dark:ring-slate-700/50 group-hover:-translate-y-1 transition-transform duration-300">
-                            @if($bookmark->novel->cover_image)
-                                <img src="{{ asset('storage/' . $bookmark->novel->cover_image) }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='/error.png';">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center p-3">
-                                    <span class="text-[10px] text-slate-400 font-bold text-center leading-snug">{{ $bookmark->novel->title }}</span>
-                                </div>
-                            @endif
-                        </div>
-                        <h3 class="font-bold text-xs md:text-sm text-slate-800 dark:text-slate-100 line-clamp-2 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{{ $bookmark->novel->title }}</h3>
-                        <p class="text-[10px] md:text-[11px] text-slate-500 line-clamp-1">{{ $bookmark->novel->author->name }}</p>
-                    </a>
-                @endforeach
-            </div>
-        @else
-            <div class="profile-empty-state rounded-3xl p-10 md:p-14 text-center border">
-                <p class="text-sm text-slate-500 dark:text-slate-400 italic">No novels in the reading list yet.</p>
-            </div>
-        @endif
-    </div>
+        </section>
 
-    <!-- Tab: Reviews -->
-    <div x-show="tab === 'reviews'" x-cloak class="space-y-4">
-        @if($reviews->isEmpty())
-            <div class="bg-slate-50 dark:bg-slate-800/80 rounded-3xl p-10 md:p-14 text-center border border-slate-200 dark:border-slate-700">
-                <p class="text-sm text-slate-500 dark:text-slate-400 italic">No reviews yet.</p>
+        {{-- ─── CONTINUE YOUR JOURNEY ──────────────────────────────────── --}}
+        <section class="mb-11">
+            <div class="pf-section-head">
+                <div class="pf-section-title">
+                    <span class="pf-section-title-text">Continue Your Journey</span>
+                    <div class="pf-section-rule"></div>
+                </div>
+                <a href="{{ route('history.index') }}" class="pf-view-all-link">
+                    View Reading History
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                </a>
             </div>
-        @else
-            <div class="space-y-4 md:space-y-5">
-                @foreach($reviews as $review)
-                    <article class="profile-review-card rounded-2xl md:rounded-3xl border p-5 md:p-6">
-                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
-                            <div class="min-w-0">
-                                <a href="{{ route('novels.show', $review->novel->slug) }}" class="text-base md:text-lg font-bold text-slate-900 dark:text-white hover:text-slate-900 dark:hover:text-white transition-colors line-clamp-2">
-                                    {{ $review->novel->title }}
+
+            @if($continueJourney->isNotEmpty())
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+                    @foreach($continueJourney as $bm)
+                        @php
+                            $novel = $bm->novel;
+                            $coverUrl = $novel->cover_image_url ?: ($novel->cover_image ? asset('storage/' . $novel->cover_image) : null);
+                            $lastChapter = $bm->last_read_chapter;
+                            $lastReadAt = $bm->last_read_at;
+                            $readCount = (int) ($bm->read_chapters_count ?? 0);
+                            $totalChapters = (int) ($bm->total_chapters ?? 0);
+                            $progress = (float) ($bm->progress_percentage ?? 0);
+                            $genre = $novel->genres?->first()?->name ?? 'General Fiction';
+                            $author = $novel->author?->name ?? 'Unknown';
+                        @endphp
+                        <article class="pf-cj-card">
+                            <div class="flex items-start gap-4">
+                                @php
+                                    $cjHref = $lastChapter
+                                        ? route('chapters.show', [$novel->slug, $lastChapter->slug])
+                                        : route('novels.show', $novel->slug);
+                                @endphp
+                                <a href="{{ route('novels.show', $novel->slug) }}" class="pf-cj-cover" tabindex="-1" aria-hidden="true">
+                                    @if($coverUrl)
+                                        <img src="{{ $coverUrl }}" alt="{{ e($novel->title) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='/error.png'">
+                                    @else
+                                        <img src="/error.png" alt="" class="w-full h-full object-cover" loading="lazy">
+                                    @endif
                                 </a>
-                                <p class="text-xs text-slate-500 mt-1">{{ $review->created_at->diffForHumans() }}</p>
-                            </div>
-                            <div class="profile-rating flex items-center gap-1 shrink-0 px-3 py-1.5 rounded-xl border self-start">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 {{ $i <= $review->rating ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600' }}" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                @endfor
-                                <span class="ml-1 text-xs font-bold text-amber-700 dark:text-amber-300 tabular-nums">{{ number_format($review->rating, 1) }}</span>
-                            </div>
-                        </div>
-                        <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-4 md:line-clamp-none">
-                            {{ \Illuminate\Support\Str::limit($review->content, 400) }}
-                        </p>
-                        @if(\Illuminate\Support\Str::length($review->content) > 400)
-                            <a href="{{ route('novels.show', $review->novel->slug) }}" class="inline-block mt-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:underline">Buka novel</a>
-                        @endif
-                    </article>
-                @endforeach
-            </div>
-        @endif
-    </div>
-</div>
 
-@include('partials.cropping-modal')
+                                <div class="flex-1 min-w-0">
+                                    <div class="pf-cj-status mb-2">Reading</div>
+
+                                    <a href="{{ route('novels.show', $novel->slug) }}" class="block">
+                                        <h3 class="pf-cj-title line-clamp-1">{{ $novel->title }}</h3>
+                                    </a>
+
+                                    <div class="pf-cj-meta mt-1.5">
+                                        By <span class="val">{{ $author }}</span>
+                                        <span class="dot">·</span>
+                                        <span class="val">{{ $genre }}</span>
+                                    </div>
+
+                                    <div style="height:1px;background:rgba(255,255,255,.08); margin: 11px 0;"></div>
+
+                                    <div class="pf-cj-chapter">
+                                        @if($lastChapter)
+                                            <span class="num">Ch. {{ $lastChapter->chapter_number ?? ($lastChapter->order ?? '—') }}</span>
+                                            <span style="color:#6b6b6b; margin:0 7px;">—</span>
+                                            <span class="line-clamp-1">{{ \Illuminate\Support\Str::limit($lastChapter->title ?? '', 44) }}</span>
+                                        @else
+                                            <span class="num">Ch. 1</span>
+                                            <span style="color:#6b6b6b; margin:0 7px;">—</span>
+                                            <span>Ready when you are.</span>
+                                        @endif
+                                    </div>
+
+                                    {{-- Progress --}}
+                                    <div class="mt-4">
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <span class="pf-cj-progress-meta">
+                                                <span class="val">{{ $readCount }}</span>
+                                                <span style="color:#4a4a4a;"> / </span>
+                                                <span>{{ $totalChapters }}</span> chapters read
+                                            </span>
+                                            <span class="pf-cj-progress-meta pct tabular-nums">{{ number_format($progress, 0) }}%</span>
+                                        </div>
+                                        <div class="pf-progress-bar">
+                                            <div class="pf-progress-fill" style="width: {{ $progress }}%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Bottom row --}}
+                            <div class="mt-4 flex items-end justify-between gap-3">
+                                <div class="pf-read-time">
+                                    Read Today
+                                    <span style="margin:0 6px;color:#3a3a3a;">·</span>
+                                    <span class="val">{{ $lastReadAt ? $lastReadAt->format('H:i') : '—:—' }}</span>
+                                </div>
+                                <a href="{{ $cjHref }}" class="pf-btn-solid">
+                                    Continue Reading
+                                    <svg viewBox="0 0 24 24" class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                </a>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            @else
+                <div class="rounded-lg border border-white/10 bg-[#121212] px-5 py-16 text-center">
+                    <p class="pf-serif text-xl uppercase text-[#eeeae1]">No journeys in motion yet.</p>
+                    <p class="mt-2 text-xs text-neutral-500 max-w-sm mx-auto">Pick a novel from your shelf to begin.</p>
+                </div>
+            @endif
+        </section>
+
+        {{-- ─── ON YOUR SHELF ───────────────────────────────────────────── --}}
+        <section class="mb-11">
+            <div class="pf-section-head">
+                <div class="pf-section-title">
+                    <span class="pf-section-title-text">On Your Shelf</span>
+                    <div class="pf-section-rule"></div>
+                </div>
+                <a href="{{ route('bookmarks.index') }}" class="pf-view-all-link">
+                    View All Bookmarks
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                </a>
+            </div>
+
+            @if($onShelf->isNotEmpty())
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    @foreach($onShelf as $bm)
+                        @php
+                            $sNovel = $bm->novel;
+                            $sCover = $sNovel->cover_image_url ?: ($sNovel->cover_image ? asset('storage/' . $sNovel->cover_image) : null);
+                            $sStatus = $bm->reading_status ?? 'plan';
+                            $sLast = $bm->last_read_chapter;
+                            $sChapterNum = $sLast ? ($sLast->chapter_number ?? ($sLast->order ?? '—')) : '—';
+                            $sStatusLabel = match($sStatus) {
+                                'reading' => 'Reading',
+                                'completed' => 'Completed',
+                                default => 'Plan to Read',
+                            };
+                        @endphp
+                        <a href="{{ route('novels.show', $sNovel->slug) }}" class="pf-shelf-card block">
+                            <div class="pf-shelf-cover">
+                                @if($sCover)
+                                    <img src="{{ $sCover }}" alt="{{ e($sNovel->title) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='/error.png'">
+                                @else
+                                    <img src="/error.png" alt="" class="w-full h-full object-cover" loading="lazy">
+                                @endif
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="pf-shelf-title line-clamp-2">{{ $sNovel->title }}</div>
+                                <div class="pf-shelf-meta mt-2">
+                                    <span class="val">{{ $sStatusLabel }}</span>
+                                    @if($sLast)
+                                        <span class="dot">·</span>
+                                        Chapter {{ $sChapterNum }}
+                                    @endif
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="rounded-lg border border-white/10 bg-[#121212] px-5 py-14 text-center">
+                    <p class="pf-serif text-xl uppercase text-[#eeeae1]">Shelf is quiet here.</p>
+                    <p class="mt-2 text-xs text-neutral-500 max-w-sm mx-auto">Your saved novels will appear here once bookmarked.</p>
+                    <a href="{{ route('welcome') }}" class="mt-5 inline-flex items-center gap-1.5 rounded border border-[#c7a64a]/45 px-4 py-2.5 text-[9px] font-semibold uppercase tracking-[.14em] text-[#c7a64a] transition hover:bg-[#c7a64a]/10">
+                        Explore Novels
+                    </a>
+                </div>
+            @endif
+        </section>
+
+        {{-- ─── YOUR READING LISTS ──────────────────────────────────────── --}}
+        <section class="mb-10">
+            <div class="pf-section-head">
+                <div class="pf-section-title">
+                    <span class="pf-section-title-text">Your Reading Lists</span>
+                    <div class="pf-section-rule"></div>
+                </div>
+                <a href="{{ route('lists.index') }}" class="pf-view-all-link">
+                    Manage All Lists
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                </a>
+            </div>
+
+            @if($userLists->isNotEmpty())
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+                    @foreach($userLists as $list)
+                        @php
+                            $listItems = $list->items ?? collect();
+                            $listThumbs = $listItems->take(3);
+                            $listIsPublic = (bool) ($list->is_public ?? false);
+                            $listHref = $listIsPublic
+                                ? route('lists.public', [$user->username ?? $user->id, $list->slug])
+                                : route('lists.show', $list->slug);
+                        @endphp
+                        <article class="pf-list-card">
+                            <div class="flex flex-col sm:flex-row gap-5">
+                                {{-- Thumbnails --}}
+                                <div class="pf-list-thumbs shrink-0">
+                                    @for($i = 0; $i < 3; $i++)
+                                        @php
+                                            $thumbItem = $listThumbs[$i] ?? null;
+                                            $tn = $thumbItem?->novel ?? null;
+                                            $thumbUrl = $tn ? ($tn->cover_image_url ?: ($tn->cover_image ? asset('storage/' . $tn->cover_image) : null)) : null;
+                                        @endphp
+                                        <div class="pf-list-thumb">
+                                            @if($thumbUrl)
+                                                <img src="{{ $thumbUrl }}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='/error.png'">
+                                            @else
+                                                <div class="w-full h-full flex items-center justify-center">
+                                                    <span class="text-[7px] text-[#5a5a5a] font-semibold tracking-wider uppercase">LIST</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endfor
+                                </div>
+
+                                <div class="min-w-0 flex-1 flex flex-col">
+                                    <div class="mb-2.5">
+                                        <span class="pf-list-badge pf-list-badge--{{ $listIsPublic ? 'public' : 'private' }}">
+                                            <svg viewBox="0 0 24 24" class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                @if($listIsPublic)
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+                                                @else
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 7V5a4 4 0 1 0-8 0v2"/>
+                                                @endif
+                                            </svg>
+                                            {{ $listIsPublic ? 'Public' : 'Private' }}
+                                        </span>
+                                    </div>
+                                    <a href="{{ $listHref }}" class="block">
+                                        <h3 class="pf-list-title">{{ $list->title }}</h3>
+                                    </a>
+                                    <div class="pf-list-count mt-2">{{ str_pad((string) max(0, (int) ($list->items_count ?? 0)), 2, '0', STR_PAD_LEFT) }} Novels</div>
+
+                                    @if(!empty($list->description))
+                                        <p class="pf-list-desc mt-3 line-clamp-2">{{ $list->description }}</p>
+                                    @else
+                                        <p class="pf-list-desc mt-3 italic text-[#6f6f6f] line-clamp-2">
+                                            {{ $listIsPublic
+                                                ? 'Forgotten gods, impossible bargains, and kingdoms on the brink.'
+                                                : 'The stories I want to begin when the current chapter ends.' }}
+                                        </p>
+                                    @endif
+
+                                    <div class="mt-auto pt-4 flex items-center justify-between gap-3">
+                                        <span class="pf-list-visibility">
+                                            {{ $listIsPublic ? 'Anyone can view' : 'Only you can view' }}
+                                        </span>
+                                        <a href="{{ $listHref }}" class="pf-btn-outline">
+                                            Open List
+                                            <svg viewBox="0 0 24 24" class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            @else
+                <div class="rounded-lg border border-white/10 bg-[#121212] px-5 py-14 text-center">
+                    <p class="pf-serif text-xl uppercase text-[#eeeae1]">No reading lists yet.</p>
+                    <p class="mt-2 text-xs text-neutral-500 max-w-sm mx-auto">Curate themed collections and organize your shelf.</p>
+                    @if($isOwner)
+                        <a href="{{ route('lists.create') }}" class="mt-5 pf-btn-solid">
+                            Create Your First List
+                        </a>
+                    @endif
+                </div>
+            @endif
+        </section>
+
+        {{-- ─── PRIVACY BANNER ──────────────────────────────────────────── --}}
+        <section class="mb-12">
+            <div class="pf-privacy-banner">
+                <div class="pf-privacy-text">
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="11" width="18" height="11" rx="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    Your bookmarks and reading history stay private. Only lists marked <em style="font-style:normal;color:#d4d4d4;">public</em> can be viewed or shared with others.
+                </div>
+                @if($isOwner)
+                    <a href="{{ route('settings') }}" class="pf-privacy-link">
+                        Privacy Settings
+                    </a>
+                @endif
+            </div>
+        </section>
+
+    </div>
+</main>
 @endsection

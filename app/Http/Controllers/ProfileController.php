@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImageUploadRequest;
+use App\Models\Bookmark;
+use App\Models\Chapter;
+use App\Models\ReadingHistory;
 use App\Models\User;
+use App\Models\UserList;
 use App\Services\CloudinaryService;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,11 +27,6 @@ class ProfileController extends Controller
         $canFollow = $user->canBeFollowed() && ! $isOwner;
         $canViewReadingList = $user->is_public_reading_list || $isOwner || ($viewer && $viewer->role === 'admin');
 
-        $readingList = collect();
-        if ($canViewReadingList) {
-            $readingList = $user->bookmarks()->with(['novel.author'])->latest()->get();
-        }
-
         $reviews = $user->reviews()->with('novel')->latest()->get();
 
         $writerStats = null;
@@ -41,22 +40,114 @@ class ProfileController extends Controller
             ];
         }
 
-        $publicLists = $user->userLists()
-            ->where('is_public', true)
+        $readingList = collect();
+        $enrichedBookmarks = collect();
+        $statsCounts = [
+            'saved' => 0,
+            'reading' => 0,
+            'completed' => 0,
+        ];
+        $continueJourney = collect();
+        $onShelf = collect();
+
+        if ($canViewReadingList) {
+            $rawBookmarks = $user->bookmarks()
+                ->whereHas('novel')
+                ->with([
+                    'novel.author',
+                    'novel.genres:id,name,slug',
+                ])
+                ->withCount('novel as total_chapters')
+                ->latest('bookmarks.updated_at')
+                ->get();
+
+            $statsCounts['saved'] = $rawBookmarks->count();
+
+            foreach ($rawBookmarks as $bm) {
+                $lastRead = ReadingHistory::where('user_id', $user->id)
+                    ->where('novel_id', $bm->novel_id)
+                    ->latest()
+                    ->first();
+
+                $readChaptersCount = ReadingHistory::where('user_id', $user->id)
+                    ->where('novel_id', $bm->novel_id)
+                    ->distinct('chapter_id')
+                    ->count('chapter_id');
+
+                $totalChapters = (int) ($bm->total_chapters ?? Chapter::where('novel_id', $bm->novel_id)->count());
+                $progress = $totalChapters > 0 ? min(($readChaptersCount / $totalChapters) * 100, 100) : 0;
+                $novelStatus = (string) ($bm->novel->status ?? '');
+
+                if ($progress >= 100 || ($novelStatus === 'completed' && $progress >= 95)) {
+                    $readingStatus = 'completed';
+                    $statsCounts['completed']++;
+                } elseif ($readChaptersCount > 0) {
+                    $readingStatus = 'reading';
+                    $statsCounts['reading']++;
+                } else {
+                    $readingStatus = 'plan';
+                }
+
+                $bm->reading_status = $readingStatus;
+                $bm->read_chapters_count = $readChaptersCount;
+                $bm->total_chapters = $totalChapters;
+                $bm->progress_percentage = $progress;
+                $bm->last_read_chapter = $lastRead ? $lastRead->chapter : null;
+                $bm->last_read_at = $lastRead ? $lastRead->created_at : null;
+
+                $enrichedBookmarks->push($bm);
+            }
+
+            $continueJourney = $enrichedBookmarks
+                ->where('reading_status', 'reading')
+                ->sortByDesc(fn ($b) => $b->last_read_at?->timestamp ?? 0)
+                ->take(4)
+                ->values();
+
+            $onShelf = $enrichedBookmarks->take(8)->values();
+            $readingList = $enrichedBookmarks;
+        }
+
+        $userListsQuery = $user->userLists()
             ->withCount('items')
-            ->latest()
-            ->get();
+            ->with(['items' => function ($q) {
+                $q->with(['novel' => function ($qn) {
+                    $qn->select('id', 'title', 'cover_image', 'cover_image_url');
+                }])->latest()->limit(3);
+            }])
+            ->latest();
+
+        if (! $isOwner) {
+            $userListsQuery->where('is_public', true);
+        }
+        $userLists = $userListsQuery->get();
+
+        $publicListsCount = $user->userLists()->where('is_public', true)->count();
+        $privateListsCount = $userLists->where('is_public', false)->count();
+        $totalListsCount = $userLists->count();
+
+        $historyCount = ReadingHistory::where('user_id', $user->id)->count();
+        $totalHistoryMinutes = $historyCount * 12;
+        $readingHours = (int) floor($totalHistoryMinutes / 60);
 
         return view('profile.show', compact(
             'user',
             'readingList',
+            'enrichedBookmarks',
             'reviews',
             'canViewReadingList',
             'writerStats',
             'isOwner',
             'isFollowing',
             'canFollow',
-            'publicLists',
+            'statsCounts',
+            'continueJourney',
+            'onShelf',
+            'userLists',
+            'publicListsCount',
+            'privateListsCount',
+            'totalListsCount',
+            'readingHours',
         ));
     }
 

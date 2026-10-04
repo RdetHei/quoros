@@ -51,7 +51,27 @@ class UserListController extends Controller
 
         $list->load(['novels.author', 'novels.genres']);
 
-        return view('user.lists.show', compact('list'));
+        $isOwner = Auth::check() && (int) Auth::id() === (int) $list->user_id;
+
+        $pickableNovels = collect();
+        if ($isOwner) {
+            $excludedIds = $list->novels->pluck('id')->all();
+            $bookmarkQ = Auth::user()->bookmarks()->with('novel:id,title,slug,cover_image,cover_image_url,author_id')->latest();
+            if (count($excludedIds) > 0) {
+                $bookmarkQ->whereNotIn('novel_id', $excludedIds);
+            }
+            $bookmarked = $bookmarkQ->limit(30)->get()->pluck('novel')->filter();
+
+            $recentsQ = Novel::with(['author:id,name'])->select(['id', 'title', 'slug', 'cover_image', 'cover_image_url', 'author_id'])->latest();
+            if (count($excludedIds) > 0) {
+                $recentsQ->whereNotIn('id', $excludedIds);
+            }
+            $recents = $recentsQ->limit(20)->get();
+
+            $pickableNovels = $bookmarked->merge($recents)->unique('id')->take(50)->values();
+        }
+
+        return view('user.lists.show', compact('list', 'isOwner', 'pickableNovels'));
     }
 
     public function showPublic(string $username, UserList $list)
@@ -65,11 +85,30 @@ class UserListController extends Controller
 
         $list->load(['user', 'novels.author', 'novels.genres']);
 
-        $isOwner = Auth::check() && Auth::id() === $owner->id;
+        $isOwner = Auth::check() && (int) Auth::id() === (int) $owner->id;
+
+        $pickableNovels = collect();
+        if ($isOwner) {
+            $excludedIds = $list->novels->pluck('id')->all();
+            $bookmarkQ = Auth::user()->bookmarks()->with('novel:id,title,slug,cover_image,cover_image_url,author_id')->latest();
+            if (count($excludedIds) > 0) {
+                $bookmarkQ->whereNotIn('novel_id', $excludedIds);
+            }
+            $bookmarked = $bookmarkQ->limit(30)->get()->pluck('novel')->filter();
+
+            $recentsQ = Novel::with(['author:id,name'])->select(['id','title','slug','cover_image','cover_image_url','author_id'])->latest();
+            if (count($excludedIds) > 0) {
+                $recentsQ->whereNotIn('id', $excludedIds);
+            }
+            $recents = $recentsQ->limit(20)->get();
+
+            $pickableNovels = $bookmarked->merge($recents)->unique('id')->take(50)->values();
+        }
 
         return view('user.lists.show', [
             'list' => $list,
             'isOwner' => $isOwner,
+            'pickableNovels' => $pickableNovels,
         ]);
     }
 
@@ -115,29 +154,64 @@ class UserListController extends Controller
         return redirect()->route('lists.index')->with('success', 'List deleted successfully.');
     }
 
-    public function addNovel(Request $request, UserList $list)
+    public function addNovel(Request $request, UserList $list, ?Novel $novel = null)
     {
         $this->authorizeOwner($list);
 
-        $validated = $request->validate([
-            'novel_id' => ['required', 'exists:novels,id'],
-        ]);
+        $provided = $request->input('novel_id')
+            ?? $request->input('novel')
+            ?? (isset($novel->id) ? $novel->id : null);
 
-        if ($list->novels()->where('novel_id', $validated['novel_id'])->exists()) {
-            return back()->with('error', 'Novel is already in this list.');
+        if ($provided === null) {
+            return back()->with('error', 'Please choose a novel to add.');
         }
 
-        $list->novels()->attach($validated['novel_id']);
+        $resolved = null;
+        if (is_numeric($provided)) {
+            $resolved = Novel::find((int) $provided);
+        } elseif (is_string($provided) && trim($provided) !== '') {
+            $resolved = Novel::where('slug', trim($provided))->first()
+                ?? Novel::find((int) $provided);
+        }
+
+        if (! $resolved) {
+            return back()->with('error', 'Novel not found.');
+        }
+
+        if ($list->novels()->where('novel_id', $resolved->id)->exists()) {
+            return back()->with('error', $resolved->title . ' is already in this list.');
+        }
+
+        $list->novels()->attach($resolved->id);
         app(RecommendationService::class)->forgetForUser(Auth::id());
 
-        return back()->with('success', 'Novel added to list.');
+        return back()->with('success', '"' . $resolved->title . '" added to your list.');
     }
 
-    public function removeNovel(UserList $list, Novel $novel)
+    public function removeNovel(UserList $list, $novel = null)
     {
         $this->authorizeOwner($list);
-        $list->novels()->detach($novel->id);
+
+        $resolved = null;
+        if ($novel instanceof Novel) {
+            $resolved = $novel;
+        } elseif (is_numeric($novel)) {
+            $resolved = Novel::find((int) $novel);
+        } elseif (is_string($novel) && trim($novel) !== '') {
+            $resolved = Novel::where('slug', trim($novel))->first();
+        }
+
+        if (! $resolved) {
+            return back()->with('error', 'Novel not found.');
+        }
+
+        $existed = $list->novels()->where('novel_id', $resolved->id)->exists();
+        $list->novels()->detach($resolved->id);
         app(RecommendationService::class)->forgetForUser(Auth::id());
+
+        if (! $existed) {
+            return back()->with('info', 'Novel was not in this list.');
+        }
 
         return back()->with('success', 'Novel removed from list.');
     }
