@@ -11,7 +11,7 @@
             'slug'        => $n->slug,
             'url'         => route('novels.show', $n->slug),
             'read_url'    => $firstChapter
-                ? route('chapters.show', [$n->slug, $firstChapter->slug])
+                ? route('chapters.show', [$n->slug, $firstChapter->route_identifier])
                 : route('novels.show', $n->slug),
             'title'       => $n->title,
             'author'      => $n->author->name ?? 'Unknown',

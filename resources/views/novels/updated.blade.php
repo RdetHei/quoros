@@ -138,7 +138,7 @@
                                 </div>
                                 <p class="mt-1 truncate text-[8px] uppercase tracking-[.13em] text-neutral-500">By {{ $authorName }}</p>
                                 <div class="mt-2 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5">
-                                    <a href="{{ route('chapters.show', [$novel->slug, $latestChapter->slug]) }}" class="shrink-0 text-[9px] font-semibold uppercase tracking-[.08em] text-[#c7a64a] hover:text-[#ead79f]">Chapter {{ $latestChapter->order ?: $latestChapter->id }}</a>
+                                    <a href="{{ route('chapters.show', [$novel->slug, $latestChapter->route_identifier]) }}" class="shrink-0 text-[9px] font-semibold uppercase tracking-[.08em] text-[#c7a64a] hover:text-[#ead79f]">Chapter {{ $latestChapter->order ?: $latestChapter->id }}</a>
                                     <span class="h-px w-5 shrink-0 bg-white/20"></span>
                                     <span class="min-w-0 truncate text-[10px] text-neutral-400">{{ $latestChapter->title }}</span>
                                 </div>
@@ -151,12 +151,12 @@
                             <div class="hidden shrink-0 flex-col items-end gap-1.5 text-right sm:flex">
                                 <time class="font-mono text-xs font-semibold tabular-nums text-[#e5d7ac]" datetime="{{ $releaseCarbon?->toIso8601String() }}">{{ $releaseCarbon?->format('H:i') ?? '—' }}</time>
                                 <span class="text-[8px] uppercase tracking-[.1em] text-neutral-600" data-relative-label="{{ $releaseCarbon?->timestamp ?? 0 }}">{{ $releaseCarbon?->diffForHumans() ?? '' }}</span>
-                                <a href="{{ route('chapters.show', [$novel->slug, $latestChapter->slug]) }}" class="mt-0.5 inline-flex items-center gap-1 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-400 transition-colors hover:text-[#d8bb62]">Read chapter <span aria-hidden="true">→</span></a>
+                                <a href="{{ route('chapters.show', [$novel->slug, $latestChapter->route_identifier]) }}" class="mt-0.5 inline-flex items-center gap-1 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-400 transition-colors hover:text-[#d8bb62]">Read chapter <span aria-hidden="true">→</span></a>
                             </div>
                         </div>
                         <div class="mt-2 flex items-center justify-between border-t border-white/[.06] pt-2 sm:hidden">
                             <span class="text-[8px] text-neutral-600" data-relative-label="{{ $releaseCarbon?->timestamp ?? 0 }}">{{ $releaseCarbon?->diffForHumans() ?? '' }}</span>
-                            <a href="{{ route('chapters.show', [$novel->slug, $latestChapter->slug]) }}" class="inline-flex items-center gap-1 text-[8px] font-medium uppercase tracking-[.1em] text-[#c7a64a]">Read chapter <span aria-hidden="true">→</span></a>
+                            <a href="{{ route('chapters.show', [$novel->slug, $latestChapter->route_identifier]) }}" class="inline-flex items-center gap-1 text-[8px] font-medium uppercase tracking-[.1em] text-[#c7a64a]">Read chapter <span aria-hidden="true">→</span></a>
                         </div>
                     </article>
                 @endif

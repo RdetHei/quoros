@@ -20,7 +20,7 @@
         <div class="fresh-picks">
             @if($featureNovel)
             <div class="fresh-feature">
-                <a href="{{ $featureLatestCh ? route('chapters.show', [$featureNovel->slug, $featureLatestCh->slug]) : route('novels.show', $featureNovel->slug) }}" class="block h-full w-full">
+                <a href="{{ $featureLatestCh ? route('chapters.show', [$featureNovel->slug, $featureLatestCh->route_identifier]) : route('novels.show', $featureNovel->slug) }}" class="block h-full w-full">
                     @if($featureCover)<img src="{{ $featureCover }}" alt="{{ $featureNovel->title }}" loading="lazy" onerror="this.src='/error.png'">@endif
                     <div class="fresh-feature-content">
                         <span class="fresh-kicker">Rilis baru</span>
@@ -41,7 +41,7 @@
                     $latestCh = $novel->chapters->first();
                     $latestAgo = $latestCh ? \Illuminate\Support\Carbon::parse($latestCh->published_at ?? $latestCh->created_at)->diffForHumans(null, true) : null;
                 @endphp
-                <a href="{{ $latestCh ? route('chapters.show', [$novel->slug, $latestCh->slug]) : route('novels.show', $novel->slug) }}" class="fresh-item">
+                <a href="{{ $latestCh ? route('chapters.show', [$novel->slug, $latestCh->route_identifier]) : route('novels.show', $novel->slug) }}" class="fresh-item">
                     <div class="fresh-item-cover">@if($coverUrl)<img src="{{ $coverUrl }}" alt="{{ $novel->title }}" loading="lazy" onerror="this.src='/error.png'">@endif</div>
                     <div class="fresh-item-info">
                         <span class="fresh-item-tag">Update</span>

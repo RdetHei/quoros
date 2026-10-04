@@ -57,6 +57,11 @@ class Chapter extends Model
         return $this->hasMany(ReadingHistory::class);
     }
 
+    public function getRouteIdentifierAttribute()
+    {
+        return $this->order > 0 ? $this->order : $this->id;
+    }
+
     /**
      * Get the previous chapter in the same novel.
      */

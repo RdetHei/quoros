@@ -192,7 +192,7 @@
                 {{-- CTA Buttons --}}
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-2.5">
                     @if($novel->chapters->isNotEmpty())
-                    <a href="{{ route('chapters.show', [$novel->slug, $novel->chapters->first()->slug]) }}"
+                    <a href="{{ route('chapters.show', [$novel->slug, $novel->chapters->first()->route_identifier]) }}"
                        class="flex-grow sm:flex-grow-0 inline-flex items-center justify-center gap-1.5 px-5 sm:px-6 py-2.5 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-neutral-900 font-bold rounded-lg text-xs transition-all shadow-lg shadow-neutral-900/20 dark:shadow-none active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
@@ -372,7 +372,7 @@
         </div>
 
         @if($lastReading && $lastReading->chapter)
-        <a href="{{ route('chapters.show', [$novel->slug, $lastReading->chapter->slug]) }}" 
+        <a href="{{ route('chapters.show', [$novel->slug, $lastReading->chapter->route_identifier]) }}" 
            class="flex items-center justify-between mx-5 mt-4 px-5 py-3.5 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 rounded-2xl text-white dark:text-neutral-900 shadow-lg shadow-neutral-900/10 transition-all group">
             <div class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -595,7 +595,7 @@
 
     {{-- Floating "Continue Reading" Button --}}
     @if($lastReading && $lastReading->chapter)
-    <a href="{{ route('chapters.show', [$novel->slug, $lastReading->chapter->slug]) }}" 
+    <a href="{{ route('chapters.show', [$novel->slug, $lastReading->chapter->route_identifier]) }}" 
        class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-2xl shadow-2xl shadow-neutral-900/40 transition-all hover:-tranneutral-y-1 group md:hidden">
         <div class="flex flex-col">
             <span class="text-[10px] font-black uppercase tracking-widest opacity-70 leading-none mb-1">Continue</span>
@@ -660,6 +660,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'id' => $c->id,
                     'title' => $c->title,
                     'slug' => $c->slug,
+                    'order' => $c->order ?: 0,
                     'status' => $c->status,
                     'published_at' => $c->published_at ? $c->published_at->format('d/m/y H:i') : null,
                 ];
@@ -730,7 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const div = document.createElement('div');
                 div.className = 'chapter-row group flex items-center justify-between px-6 py-3.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors';
                 
-                const readUrl = `/novels/${novelSlug}/read/${chapter.slug}`;
+                const readUrl = `/novels/${novelSlug}/read/${chapter.order > 0 ? chapter.order : chapter.id}`;
                 
                 div.innerHTML = `
                     <a href="${readUrl}" class="flex-grow flex items-center gap-3 min-w-0">

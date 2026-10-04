@@ -18,7 +18,7 @@
                 <div class="h-2 bg-indigo-400 rounded-full" style="width: {{ $lastRead->progress ?? 0 }}%"></div>
             </div>
         </div>
-        <a href="{{ route('chapters.show', [$lastRead->novel->slug, $lastRead->chapter->slug]) }}" class="inline-flex mt-5 px-4 py-2 rounded-xl bg-white text-slate-900 text-sm font-semibold">
+        <a href="{{ route('chapters.show', [$lastRead->novel->slug, $lastRead->chapter->route_identifier]) }}" class="inline-flex mt-5 px-4 py-2 rounded-xl bg-white text-slate-900 text-sm font-semibold">
             Continue
         </a>
     @else

@@ -863,11 +863,11 @@ class NovelController extends Controller
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
 
         $novel->load(['author', 'genres', 'tags', 'characters', 'reviews.user', 'chapters' => function ($query) use ($isAuthorOrAdmin) {
-            $query->select('id', 'novel_id', 'title', 'slug', 'status', 'published_at', 'created_at');
+            $query->select('id', 'novel_id', 'title', 'slug', 'status', 'published_at', 'created_at', 'order');
             if (! $isAuthorOrAdmin) {
                 $query->published();
             }
-            $query->orderBy('created_at', 'asc')->orderBy('id', 'asc');
+            $query->orderByRaw('COALESCE(NULLIF(`order`, 0), id) asc')->orderBy('id', 'asc');
         }]);
 
         $lastReading = null;

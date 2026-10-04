@@ -236,7 +236,7 @@ class DashboardController extends Controller
 
     private function readerDashboard(User $user)
     {
-        $totalReadingHours = round($user->readingHistories()->count() * 0.5, 1);
+        $totalReadingHours = round($user->readingSessions()->sum('active_seconds') / 3600, 1);
 
         $lastRead = $user->readingHistories()
             ->whereHas('novel')

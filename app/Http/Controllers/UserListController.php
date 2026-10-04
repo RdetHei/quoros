@@ -14,7 +14,15 @@ class UserListController extends Controller
 {
     public function index()
     {
-        $lists = Auth::user()->userLists()->withCount('items')->latest()->get();
+        $lists = Auth::user()
+            ->userLists()
+            ->withCount('novels')
+            ->with(['novels' => function ($query) {
+                $query->select(['novels.id', 'novels.title', 'novels.cover_image', 'novels.cover_image_url'])
+                    ->limit(3);
+            }])
+            ->latest()
+            ->get();
 
         return view('user.lists.index', compact('lists'));
     }

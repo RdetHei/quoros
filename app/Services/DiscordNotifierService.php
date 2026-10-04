@@ -35,7 +35,7 @@ class DiscordNotifierService
         $payload = [
             'title' => $chapter->novel->title . ' - ' . $chapter->title,
             'summary' => $summary,
-            'url' => url('/novels/' . $chapter->novel->slug . '/read/' . $chapter->slug),
+            'url' => url('/novels/' . $chapter->novel->slug . '/read/' . $chapter->route_identifier),
         ];
 
         try {

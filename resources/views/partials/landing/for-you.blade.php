@@ -38,7 +38,7 @@
                                     $label = 'CHAPTER '.$chapterNo;
                                 @endphp
                                 <li>
-                                    <a href="{{ route('chapters.show', [$novel->slug, $chapter->slug]) }}">
+                                    <a href="{{ route('chapters.show', [$novel->slug, $chapter->route_identifier]) }}">
                                         <span>{{ $label }}</span>
                                         <span class="lp-chapter-ago">{{ strtoupper($ago) }}</span>
                                     </a>

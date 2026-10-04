@@ -321,13 +321,16 @@
             $owner = $list->user;
             $shareUrl = $list->is_public && $owner ? route('lists.public', [$owner->username ?? $owner->id, $list->slug]) : null;
             $novelsCount = $list->novels->count();
+            $backHref = $isOwner ? route('lists.index') : route('profile.show', $owner?->username ?? $list->user_id);
+            $backLabel = $isOwner ? 'Back to Reading Lists' : 'Back to Profile';
+            $archiveLabel = $isOwner ? 'Your Archive' : ($owner?->name ?? 'Reader') . "'s Profile";
         @endphp
 
         {{-- Breadcrumb --}}
-        <a href="{{ route('lists.index') }}" class="inline-flex items-center gap-6 text-[9px] uppercase tracking-[.16em] font-semibold text-[#a3a3a3] mb-6 hover:text-[#e8d39a] transition-colors">
+        <a href="{{ $backHref }}" class="inline-flex items-center gap-6 text-[9px] uppercase tracking-[.16em] font-semibold text-[#a3a3a3] mb-6 hover:text-[#e8d39a] transition-colors">
             <span class="inline-flex items-center gap-1.5">
                 <svg viewBox="0 0 24 24" class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-                Back to Reading Lists
+                {{ $backLabel }}
             </span>
         </a>
 
@@ -345,7 +348,7 @@
             <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between md:gap-10">
                 <div class="min-w-0 max-w-3xl">
                     <p class="mb-3 ul-kicker">
-                        Your Archive <span class="sep">/</span> Reading List
+                        {{ $archiveLabel }} <span class="sep">/</span> Reading List
                         <span class="sep">/</span>
                         <span style="color: var(--ul-subtle); letter-spacing:0.14em;">{{ $owner?->name ?? 'Reader' }}</span>
                     </p>

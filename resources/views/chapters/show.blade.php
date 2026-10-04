@@ -532,22 +532,34 @@
         border-color: #333333;
     }
 
-    /* Reader monochrome surfaces */
+    /* Quoros charcoal and gold reader theme */
+    :root {
+        --reader-accent: #d4af37;
+        --reader-accent-bright: #f0d56b;
+        --reader-accent-wash: rgba(212, 175, 55, 0.12);
+        --reader-surface: #11110f;
+        --reader-surface-raised: #191813;
+        --reader-line: rgba(219, 204, 143,  0.16);
+        --reader-muted: #a9a391;
+        --reader-copy: #ddd9cf;
+    }
+
     #scroll-progress {
-        background: #ffffff;
-        box-shadow: 0 0 12px rgba(255,255,255,0.35);
+        background: linear-gradient(90deg, #a77c23, var(--reader-accent-bright));
+        box-shadow: 0 0 14px rgba(212, 175, 55, 0.42);
     }
 
     .reader-sidebar,
     .sidebar-panel,
     .mobile-drawer {
-        background: rgba(21,21,21,0.96);
-        border-color: #333333;
+        background: rgba(17, 17, 15, 0.97);
+        border-color: var(--reader-line);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.035);
     }
 
     .sidebar-btn,
     .mobile-nav-btn {
-        color: #a3a3a3;
+        color: var(--reader-muted);
     }
 
     .sidebar-btn:hover,
@@ -555,9 +567,11 @@
     .panel-close-btn:hover,
     .chapter-list-item:hover,
     .font-size-btn:hover,
-    .font-family-btn:hover {
-        background: #2d2d2d;
-        color: #f5f5f5;
+    .font-family-btn:hover,
+    .drawer-btn:hover {
+        background: var(--reader-accent-wash);
+        color: var(--reader-accent-bright);
+        border-color: rgba(212, 175, 55, 0.24);
         box-shadow: none;
     }
 
@@ -566,95 +580,121 @@
     .font-size-btn.active,
     .font-family-btn.active,
     .mobile-fab {
-        background: #ffffff;
-        color: #000000;
-        border-color: #ffffff;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+        background: var(--reader-accent);
+        color: #17150d;
+        border-color: var(--reader-accent);
+        box-shadow: 0 8px 22px rgba(212, 175, 55, 0.2);
     }
 
     .sidebar-btn::after {
-        background: #202020;
-        color: #f5f5f5;
-        border-color: #404040;
+        background: var(--reader-surface-raised);
+        color: #f1eddf;
+        border-color: var(--reader-line);
     }
 
     .sidebar-divider,
     .drawer-handle {
-        background: #404040;
+        background: var(--reader-line);
     }
 
     .sidebar-panel-title,
     .drawer-section-title {
-        color: #f5f5f5;
+        color: var(--reader-accent-bright);
     }
 
     .panel-close-btn,
     .chapter-list-item,
     .font-size-btn,
     .font-family-btn {
-        color: #a3a3a3;
-        background: #202020;
-        border-color: #333333;
+        color: var(--reader-muted);
+        background: var(--reader-surface-raised);
+        border-color: var(--reader-line);
     }
 
     .settings-label {
-        color: #d4d4d4;
+        color: #d7d1bd;
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #404040;
+        background: #514a35;
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #737373;
+        background: var(--reader-accent);
     }
 
     .mobile-nav-btn {
-        background: rgba(32,32,32,0.92);
-        border-color: #333333;
+        background: rgba(25, 24, 19, 0.94);
+        border-color: var(--reader-line);
     }
 
     .mobile-fab:hover {
-        background: #e5e5e5;
-        color: #000000;
+        background: var(--reader-accent-bright);
+        color: #17150d;
     }
 
     .mobile-drawer-overlay {
-        background: rgba(0,0,0,0.78);
+        background: rgba(5, 5, 4, 0.78);
     }
 
     .drawer-btn {
-        color: #d4d4d4;
-        background: #202020;
-        border-color: #333333;
+        color: #d7d1bd;
+        background: var(--reader-surface-raised);
+        border-color: var(--reader-line);
     }
 
-    .drawer-btn:hover,
     .drawer-btn .icon-wrap {
-        background: #2d2d2d;
-        color: #ffffff;
+        background: #29261d;
+        color: var(--reader-accent-bright);
     }
 
     .chapter-card,
     .comments-section,
     .dark .chapter-card,
     .dark .comments-section {
-        background: #151515;
-        border-color: #333333;
-        box-shadow: 0 16px 40px -30px rgba(0,0,0,0.9);
+        background: linear-gradient(145deg, #171612 0%, #11110f 68%, #14130f 100%);
+        border-color: var(--reader-line);
+        box-shadow: 0 20px 55px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+    }
+
+    .chapter-card .prose {
+        --tw-prose-body: var(--reader-copy);
+        --tw-prose-headings: #f1eddf;
+        --tw-prose-lead: #c7c0ad;
+        --tw-prose-links: var(--reader-accent-bright);
+        --tw-prose-bold: #f1eddf;
+        --tw-prose-counters: #b9b19d;
+        --tw-prose-bullets: #b9b19d;
+        --tw-prose-hr: var(--reader-line);
+        --tw-prose-quotes: #e3ddcd;
+        --tw-prose-quote-borders: #8c722b;
+        --tw-prose-captions: #aaa391;
+        --tw-prose-code: var(--reader-accent-bright);
+        --tw-prose-pre-code: #e3ddcd;
+        --tw-prose-pre-bg: #0a0a09;
+        --tw-prose-th-borders: var(--reader-line);
+        --tw-prose-td-borders: rgba(219, 204, 143, 0.1);
+    }
+
+    .chapter-divider {
+        color: var(--reader-accent-bright);
     }
 
     .chapter-divider::before,
     .chapter-divider::after {
-        background: linear-gradient(to right, transparent, #404040, transparent);
+        background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.38), transparent);
     }
 
     .autoload-indicator {
-        color: #737373;
+        color: var(--reader-muted);
     }
 
     .autoload-dots span {
-        background: #ffffff;
+        background: var(--reader-accent-bright);
+    }
+
+    .mobile-chapter-indicator {
+        color: var(--reader-accent-bright);
     }
 
 
@@ -664,8 +704,9 @@
 @section('content')
 <div x-data="reader(@js([
 
-    'nextChapterSlug'    => $nextChapter    ? $nextChapter->slug    : '',
-    'prevChapterSlug'    => $previousChapter ? $previousChapter->slug : '',
+    'nextChapterOrder'   => $nextChapter     ? $nextChapter->route_identifier     : '',
+    'prevChapterOrder'   => $previousChapter ? $previousChapter->route_identifier : '',
+    'currentChapterOrder'=> $chapter->route_identifier,
     'currentChapterSlug' => $chapter->slug,
     'allChapters'        => $allChapters,
     'novelSlug'          => $novel->slug,
@@ -697,8 +738,8 @@
 
         {{-- Prev chapter --}}
         <a id="sidebar-prev-link"
-           href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}"
-           class="sidebar-btn" :class="!prevChapterSlug ? 'disabled' : ''" title="Chapter Sebelumnya">
+           href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->route_identifier]) : '#' }}"
+           class="sidebar-btn" :class="!prevChapterOrder ? 'disabled' : ''" title="Chapter Sebelumnya">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
@@ -714,8 +755,8 @@
 
         {{-- Next chapter --}}
         <a id="sidebar-next-link"
-           href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}"
-           class="sidebar-btn" :class="!nextChapterSlug ? 'disabled' : ''" title="Chapter Berikutnya">
+           href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->route_identifier]) : '#' }}"
+           class="sidebar-btn" :class="!nextChapterOrder ? 'disabled' : ''" title="Chapter Berikutnya">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
@@ -750,9 +791,9 @@
             </div>
             <div class="custom-scrollbar pr-1">
                 <div class="grid gap-1">
-                    <template x-for="ch in allChapters" :key="ch.slug">
-                        <a :href="'{{ url('/novels/' . $novel->slug . '/read') }}/' + ch.slug"
-                           class="chapter-list-item" :class="currentChapterSlug === ch.slug ? 'active' : ''">
+                    <template x-for="ch in allChapters" :key="ch.order || ch.id">
+                        <a :href="'{{ url('/novels/' . $novel->slug . '/read') }}/' + (ch.order > 0 ? ch.order : ch.id)"
+                           class="chapter-list-item" :class="(ch.order > 0 ? ch.order : ch.id) == currentChapterOrder ? 'active' : ''">
                             <span x-text="ch.title"></span>
                         </a>
                     </template>
@@ -829,8 +870,8 @@
     ════════════════════════════════════════════════ --}}
     <div class="mobile-bottom-nav">
         <a id="mobile-prev-link"
-           href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}"
-           class="mobile-nav-btn" :class="!prevChapterSlug ? 'disabled' : ''">
+           href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->route_identifier]) : '#' }}"
+           class="mobile-nav-btn" :class="!prevChapterOrder ? 'disabled' : ''">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
             </svg>
@@ -840,8 +881,8 @@
         <div class="mobile-chapter-indicator" x-text="currentChapterTitle || '...'"></div>
 
         <a id="mobile-next-link"
-           href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}"
-           class="mobile-nav-btn" :class="!nextChapterSlug ? 'disabled' : ''">
+           href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->route_identifier]) : '#' }}"
+           class="mobile-nav-btn" :class="!nextChapterOrder ? 'disabled' : ''">
             Berikutnya
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
@@ -908,8 +949,8 @@
                     {{-- Navigation Buttons --}}
                     <div>
                         <a id="sidebar-mobile-prev-link"
-                           href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->slug]) : '#' }}"
-                           class="drawer-btn" :class="!prevChapterSlug ? 'opacity-30 pointer-events-none' : ''">
+                           href="{{ $previousChapter ? route('chapters.show', [$novel->slug, $previousChapter->route_identifier]) : '#' }}"
+                           class="drawer-btn" :class="!prevChapterOrder ? 'opacity-30 pointer-events-none' : ''">
                             <span class="icon-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
@@ -918,8 +959,8 @@
                             Sebelumnya
                         </a>
                         <a id="sidebar-mobile-next-link"
-                           href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->slug]) : '#' }}"
-                           class="drawer-btn" :class="!nextChapterSlug ? 'opacity-30 pointer-events-none' : ''">
+                           href="{{ $nextChapter ? route('chapters.show', [$novel->slug, $nextChapter->route_identifier]) : '#' }}"
+                           class="drawer-btn" :class="!nextChapterOrder ? 'opacity-30 pointer-events-none' : ''">
                             <span class="icon-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
@@ -985,9 +1026,9 @@
                     <div class="border-t border-slate-800/80 pt-5">
                         <label class="settings-label mb-3">Daftar Chapter</label>
                         <div class="grid gap-1 max-h-[30vh] overflow-y-auto custom-scrollbar pr-1">
-                            <template x-for="ch in allChapters" :key="ch.slug">
-                                <a :href="'{{ url('/novels/' . $novel->slug . '/read') }}/' + ch.slug"
-                                   class="chapter-list-item" :class="currentChapterSlug === ch.slug ? 'active' : ''">
+                            <template x-for="ch in allChapters" :key="ch.order || ch.id">
+                                <a :href="'{{ url('/novels/' . $novel->slug . '/read') }}/' + (ch.order > 0 ? ch.order : ch.id)"
+                                   class="chapter-list-item" :class="(ch.order > 0 ? ch.order : ch.id) == currentChapterOrder ? 'active' : ''">
                                     <span x-text="ch.title"></span>
                                 </a>
                             </template>
@@ -1016,7 +1057,10 @@
     ════════════════════════════════════════════════ --}}
     <div id="chapters-container">
         <div data-slug="{{ $chapter->slug }}"
+             data-order="{{ $chapter->route_identifier }}"
              data-title="{{ $chapter->title }}"
+             data-prev-order="{{ $previousChapter ? $previousChapter->route_identifier : '' }}"
+             data-next-order="{{ $nextChapter ? $nextChapter->route_identifier : '' }}"
              data-prev-slug="{{ $previousChapter ? $previousChapter->slug : '' }}"
              data-next-slug="{{ $nextChapter ? $nextChapter->slug : '' }}">
 
@@ -1054,10 +1098,10 @@
                 <div class="autoload-dots">
                     <span></span><span></span><span></span>
                 </div>
-                <p class="autoload-text text-indigo-400">Memuat chapter berikutnya…</p>
+                <p class="autoload-text text-amber-300">Memuat chapter berikutnya…</p>
             </div>
         </template>
-        <template x-if="!isLoading && nextChapterSlug">
+        <template x-if="!isLoading && nextChapterOrder">
             <div class="autoload-indicator">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/>
@@ -1065,7 +1109,7 @@
                 <p class="autoload-text">Scroll untuk lanjut baca</p>
             </div>
         </template>
-        <template x-if="!isLoading && !nextChapterSlug">
+        <template x-if="!isLoading && !nextChapterOrder">
             <div class="autoload-indicator">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -1093,11 +1137,11 @@
                 {{-- Reply form --}}
                 <form x-show="replyParentId" x-cloak
                       action="{{ route('comments.store', $chapter->id) }}" method="POST"
-                      class="mb-5 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30">
+                      class="mb-5 p-4 rounded-2xl bg-amber-50 dark:bg-amber-400/10 border border-amber-200 dark:border-amber-400/20">
                     @csrf
                     <input type="hidden" name="parent_id" x-model="replyParentId">
-                    <p class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-2">
-                        Membalas <span x-text="replyName" class="text-indigo-500"></span>
+                    <p class="text-xs font-bold text-amber-700 dark:text-amber-300 mb-2">
+                        Membalas <span x-text="replyName" class="text-amber-600 dark:text-amber-200"></span>
                     </p>
                     <textarea name="content" rows="2" required
                               class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -1108,7 +1152,7 @@
                             Batal
                         </button>
                         <button type="submit"
-                                class="px-5 py-2 text-xs font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                class="px-5 py-2 text-xs font-bold bg-amber-600 text-neutral-950 rounded-lg hover:bg-amber-500 transition-colors">
                             Kirim Balasan
                         </button>
                     </div>
@@ -1182,9 +1226,11 @@ window.reader = function (config = {}) {
         sidebarOpen:         false,
         drawerOpen:          false,
         drawerTab:           'nav',
-        nextChapterSlug:     config.nextChapterSlug     || '',
         prevChapterSlug:     config.prevChapterSlug     || '',
         currentChapterSlug:  config.currentChapterSlug  || '',
+        prevChapterOrder:    config.prevChapterOrder    || '',
+        nextChapterOrder:    config.nextChapterOrder    || '',
+        currentChapterOrder: config.currentChapterOrder || '',
         readingSessionUrl:   config.readingSessionUrl || null,
         readingSessionUuid:  null,
         readingHeartbeat:    null,
@@ -1302,7 +1348,7 @@ window.reader = function (config = {}) {
             if (!trigger) return;
             if (this.autoloadObserver) this.autoloadObserver.disconnect();
             this.autoloadObserver = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && !this.isLoading && this.nextChapterSlug) {
+                if (entries[0].isIntersecting && !this.isLoading && this.nextChapterOrder) {
                     this.loadNextChapter();
                 }
             }, { rootMargin: '400px' });
@@ -1352,24 +1398,30 @@ window.reader = function (config = {}) {
         },
 
         async loadNextChapter() {
-            if (!this.nextChapterSlug || this.isLoading) return;
+            if (!this.nextChapterOrder || this.isLoading) return;
             this.isLoading = true;
+            let loadedChapter = false;
             try {
-                const url      = `${this.baseUrl}/novels/${this.novelSlug}/read/${this.nextChapterSlug}`;
+                const url      = `${this.baseUrl}/novels/${this.novelSlug}/read/${this.nextChapterOrder}`;
                 const response = await fetch(url, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
                 });
                 if (!response.ok) {
-                    if (response.status === 404) this.nextChapterSlug = null;
+                    if (response.status === 404) this.nextChapterOrder = null;
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                if (!data.chapter?.content) { this.nextChapterSlug = null; return; }
+                if (!data.chapter?.content) { this.nextChapterOrder = null; return; }
+
+                const nextOrder = data.chapter.order > 0 ? data.chapter.order : data.chapter.id;
 
                 const div = document.createElement('div');
                 div.className = 'chapter-section';
                 div.dataset.slug     = data.chapter.slug;
+                div.dataset.order    = nextOrder;
                 div.dataset.title    = data.chapter.title;
+                div.dataset.prevOrder = (data.chapter.prev_chapter_order ?? '') ;
+                div.dataset.nextOrder = (data.chapter.next_chapter_order ?? '') ;
                 div.dataset.prevSlug = data.chapter.prev_chapter_slug || '';
                 div.dataset.nextSlug = data.chapter.next_chapter_slug || '';
 
@@ -1387,7 +1439,7 @@ window.reader = function (config = {}) {
                         <article class="${this.fontSize} ${this.fontFamily} prose prose-slate dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 transition-all duration-300 chapter-content-article"></article>
                         ${shellClose}
                         <div class="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800">
-                            <a href="${url}" class="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-500 transition-colors">
+                            <a href="${url}" class="inline-flex items-center gap-2 text-sm font-bold text-amber-300 hover:text-amber-200 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
                                 Diskusi (${data.chapter.comments_count})
                             </a>
@@ -1398,14 +1450,18 @@ window.reader = function (config = {}) {
                 div.querySelector('.chapter-content-article').innerHTML = data.chapter.content;
                 document.getElementById('chapters-container').appendChild(div);
 
-                this.nextChapterSlug = data.chapter.next_chapter_slug;
+                this.nextChapterOrder = data.chapter.next_chapter_order
+                    ? (data.chapter.next_chapter_order > 0 ? data.chapter.next_chapter_order : (data.chapter.next_chapter_slug ? null : null))
+                    : null;
                 if (data.all_chapters) this.allChapters = data.all_chapters;
                 if (this.scrollObserver) this.scrollObserver.observe(div);
+                loadedChapter = true;
 
             } catch (error) {
                 console.error('Failed to load next chapter:', error);
             } finally {
                 this.isLoading = false;
+                if (loadedChapter && this.autoLoadChapters) this.setupAutoloadObserver();
             }
         },
 
@@ -1413,19 +1469,21 @@ window.reader = function (config = {}) {
             this.scrollObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
-                        const { slug, title, prevSlug, nextSlug } = entry.target.dataset;
-                        if (!slug) return;
+                        const { slug, order, title, prevOrder, nextOrder, prevSlug, nextSlug } = entry.target.dataset;
+                        if (!order) return;
 
-                        const newUrl = `${this.baseUrl}/novels/${this.novelSlug}/read/${slug}`;
-                        if (!window.location.pathname.includes(slug)) {
-                            window.history.pushState({ slug }, '', newUrl);
+                        const newUrl = `${this.baseUrl}/novels/${this.novelSlug}/read/${order}`;
+                        const currentPathId = window.location.pathname.split('/').pop();
+                        if (currentPathId != order) {
+                            window.history.pushState({ order }, '', newUrl);
                         }
 
                         document.title = `${this.novelTitle} - ${title} | {{ config('app.name') }}`;
+                        this.currentChapterOrder = order;
                         this.currentChapterSlug  = slug;
                         this.currentChapterTitle = title;
-                        this.prevChapterSlug     = prevSlug || '';
-                        this.nextChapterSlug     = nextSlug || '';
+                        this.prevChapterOrder    = prevOrder || '';
+                        this.nextChapterOrder    = nextOrder || '';
 
                         const prevLink             = document.getElementById('sidebar-prev-link');
                         const nextLink             = document.getElementById('sidebar-next-link');
@@ -1434,12 +1492,12 @@ window.reader = function (config = {}) {
                         const sidebarMobilePrevLink = document.getElementById('sidebar-mobile-prev-link');
                         const sidebarMobileNextLink = document.getElementById('sidebar-mobile-next-link');
 
-                        if (prevLink && prevSlug) prevLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${prevSlug}`;
-                        if (nextLink && nextSlug) nextLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${nextSlug}`;
-                        if (mobilePrevLink && prevSlug) mobilePrevLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${prevSlug}`;
-                        if (mobileNextLink && nextSlug) mobileNextLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${nextSlug}`;
-                        if (sidebarMobilePrevLink && prevSlug) sidebarMobilePrevLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${prevSlug}`;
-                        if (sidebarMobileNextLink && nextSlug) sidebarMobileNextLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${nextSlug}`;
+                        if (prevLink && prevOrder) prevLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${prevOrder}`;
+                        if (nextLink && nextOrder) nextLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${nextOrder}`;
+                        if (mobilePrevLink && prevOrder) mobilePrevLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${prevOrder}`;
+                        if (mobileNextLink && nextOrder) mobileNextLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${nextOrder}`;
+                        if (sidebarMobilePrevLink && prevOrder) sidebarMobilePrevLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${prevOrder}`;
+                        if (sidebarMobileNextLink && nextOrder) sidebarMobileNextLink.href = `${this.baseUrl}/novels/${this.novelSlug}/read/${nextOrder}`;
                     }
                 });
             }, { threshold: [0.1, 0.5] });

@@ -71,7 +71,7 @@ Route::get('/search', [NovelController::class, 'search'])->name('novels.search')
 Route::get('/novels/{novel:slug}', [NovelController::class, 'show'])->name('novels.show');
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
 Route::get('/profile/{username}/lists/{list:slug}', [UserListController::class, 'showPublic'])->name('lists.public');
-Route::get('/novels/{novel:slug}/read/{chapterSlug}', [ChapterController::class, 'show'])
+Route::get('/novels/{novel:slug}/read/{chapter}', [ChapterController::class, 'show'])
     ->middleware('throttle:chapter-read')
     ->name('chapters.show');
 Route::get('/updated', [NovelController::class, 'updated'])->name('novels.updated');
@@ -131,7 +131,7 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
     Route::get('/lists/{list:slug}/edit', [UserListController::class, 'edit'])->name('lists.edit');
     Route::put('/lists/{list:slug}', [UserListController::class, 'update'])->name('lists.update');
     Route::delete('/lists/{list:slug}', [UserListController::class, 'destroy'])->name('lists.destroy');
-    Route::post('/lists/{list:slug}/novels/{novel}', [UserListController::class, 'addNovel'])->name('lists.novels.add');
+    Route::post('/lists/{list:slug}/novels/{novel?}', [UserListController::class, 'addNovel'])->name('lists.novels.add');
     Route::delete('/lists/{list:slug}/novels/{novel}', [UserListController::class, 'removeNovel'])->name('lists.novels.remove');
 
     // Writer & Admin Routes (Workspace)

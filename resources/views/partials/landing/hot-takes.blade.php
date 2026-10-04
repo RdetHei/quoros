@@ -5,7 +5,7 @@
     $firstChapter = $hotTake->chapters->sortBy('order')->first()
         ?? $hotTake->chapters->first();
     $readUrl = $firstChapter
-        ? route('chapters.show', [$hotTake->slug, $firstChapter->slug])
+        ? route('chapters.show', [$hotTake->slug, $firstChapter->route_identifier])
         : route('novels.show', $hotTake->slug);
     $genre = $hotTake->genres->first()?->name;
 

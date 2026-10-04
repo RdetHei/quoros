@@ -187,6 +187,7 @@
 
     .pf-section-head {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 16px;
@@ -433,34 +434,42 @@
         background: var(--pf-card);
         border: 1px solid var(--pf-border);
         border-radius: 6px;
-        padding: 18px;
-        transition: border-color .2s ease, background-color .2s ease;
+        padding: 16px 18px;
+        transition: border-color .2s ease, background-color .2s ease, transform .18s ease;
     }
     .pf-list-card:hover {
         background: #171717;
         border-color: rgba(199, 166, 74, 0.35);
+        transform: translateY(-1px);
     }
 
     .pf-list-thumbs {
         display: flex;
-        gap: 4px;
+        align-items: stretch;
+        gap: 0;
+        width: 104px;
     }
     .pf-list-thumb {
-        width: 52px;
-        height: 70px;
-        border-radius: 2px;
+        flex: 1;
+        height: 132px;
+        background: #1a1a1a;
+        border: 1px solid rgba(255,255,255,0.08);
         overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: #1f1f1f;
+        border-radius: 2px;
     }
+    .pf-list-thumb + .pf-list-thumb { margin-left: -1px; }
+    .pf-list-thumb:nth-child(1) { z-index: 3; transform: rotate(-2deg) translateY(2px); }
+    .pf-list-thumb:nth-child(2) { z-index: 2; }
+    .pf-list-thumb:nth-child(3) { z-index: 1; transform: rotate(2deg) translateY(2px); }
+    .pf-list-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .pf-list-badge {
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        padding: 2px 7px;
-        font-size: 7px;
-        letter-spacing: 0.14em;
+        padding: 2.5px 8px;
+        font-size: 7.5px;
+        letter-spacing: 0.2em;
         font-weight: 700;
         text-transform: uppercase;
         border-radius: 2px;
@@ -468,7 +477,7 @@
     .pf-list-badge--public {
         background: rgba(199, 166, 74, 0.12);
         color: var(--pf-gold);
-        border: 1px solid rgba(199, 166, 74, 0.35);
+        border: 1px solid rgba(199, 166, 74, 0.4);
     }
     .pf-list-badge--private {
         background: rgba(255, 255, 255, 0.04);
@@ -478,31 +487,34 @@
 
     .pf-list-title {
         font-family: 'Cormorant Garamond', Georgia, serif;
-        font-weight: 500;
-        font-size: 20px;
+        font-weight: 600;
+        font-size: 18px;
         line-height: 1.15;
+        letter-spacing: 0.015em;
+        text-transform: uppercase;
         color: var(--pf-title);
-        letter-spacing: 0.005em;
+        transition: color .15s ease;
     }
+    .pf-list-card:hover .pf-list-title { color: #e2c56f; }
 
     .pf-list-count {
-        font-size: 8px;
+        font-size: 8.5px;
         letter-spacing: 0.14em;
-        font-weight: 650;
+        font-weight: 700;
         text-transform: uppercase;
-        color: var(--pf-muted);
+        color: var(--pf-gold);
     }
 
     .pf-list-desc {
         font-size: 11px;
-        line-height: 1.6;
+        line-height: 1.65;
         color: var(--pf-muted);
     }
 
     .pf-list-visibility {
         font-size: 7.5px;
         letter-spacing: 0.14em;
-        font-weight: 650;
+        font-weight: 600;
         text-transform: uppercase;
         color: var(--pf-subtle);
     }
@@ -774,7 +786,7 @@
                             <div class="flex items-start gap-4">
                                 @php
                                     $cjHref = $lastChapter
-                                        ? route('chapters.show', [$novel->slug, $lastChapter->slug])
+                                        ? route('chapters.show', [$novel->slug, $lastChapter->route_identifier])
                                         : route('novels.show', $novel->slug);
                                 @endphp
                                 <a href="{{ route('novels.show', $novel->slug) }}" class="pf-cj-cover" tabindex="-1" aria-hidden="true">
@@ -916,25 +928,33 @@
         <section class="mb-10">
             <div class="pf-section-head">
                 <div class="pf-section-title">
-                    <span class="pf-section-title-text">Your Reading Lists</span>
+                    <span class="pf-section-title-text">{{ $isOwner ? 'Your Reading Lists' : 'Public Reading Lists' }}</span>
                     <div class="pf-section-rule"></div>
                 </div>
-                <a href="{{ route('lists.index') }}" class="pf-view-all-link">
-                    Manage All Lists
-                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
-                </a>
+                @if($isOwner)
+                    <div class="flex flex-wrap items-center justify-end gap-4">
+                        <a href="{{ route('lists.create') }}" class="pf-btn-solid">
+                            <svg viewBox="0 0 24 24" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                            Create List
+                        </a>
+                        <a href="{{ route('lists.index') }}" class="pf-view-all-link">
+                            Manage All Lists
+                            <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                        </a>
+                    </div>
+                @endif
             </div>
 
             @if($userLists->isNotEmpty())
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
                     @foreach($userLists as $list)
                         @php
-                            $listItems = $list->items ?? collect();
-                            $listThumbs = $listItems->take(3);
+                            $listNovels = $list->novels ?? collect();
+                            $listThumbs = $listNovels->take(3);
                             $listIsPublic = (bool) ($list->is_public ?? false);
                             $listHref = $listIsPublic
-                                ? route('lists.public', [$user->username ?? $user->id, $list->slug])
-                                : route('lists.show', $list->slug);
+                                ? route('lists.public', [$user->username ?? $user->id, $list])
+                                : route('lists.show', $list);
                         @endphp
                         <article class="pf-list-card">
                             <div class="flex flex-col sm:flex-row gap-5">
@@ -942,8 +962,7 @@
                                 <div class="pf-list-thumbs shrink-0">
                                     @for($i = 0; $i < 3; $i++)
                                         @php
-                                            $thumbItem = $listThumbs[$i] ?? null;
-                                            $tn = $thumbItem?->novel ?? null;
+                                            $tn = $listThumbs[$i] ?? null;
                                             $thumbUrl = $tn ? ($tn->cover_image_url ?: ($tn->cover_image ? asset('storage/' . $tn->cover_image) : null)) : null;
                                         @endphp
                                         <div class="pf-list-thumb">
@@ -974,7 +993,7 @@
                                     <a href="{{ $listHref }}" class="block">
                                         <h3 class="pf-list-title">{{ $list->title }}</h3>
                                     </a>
-                                    <div class="pf-list-count mt-2">{{ str_pad((string) max(0, (int) ($list->items_count ?? 0)), 2, '0', STR_PAD_LEFT) }} Novels</div>
+                                    <div class="pf-list-count mt-2">{{ str_pad((string) max(0, (int) ($list->novels_count ?? 0)), 2, '0', STR_PAD_LEFT) }} Novels</div>
 
                                     @if(!empty($list->description))
                                         <p class="pf-list-desc mt-3 line-clamp-2">{{ $list->description }}</p>

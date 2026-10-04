@@ -99,7 +99,7 @@ class NovelSeeder extends Seeder
             Chapter::create([
                 'novel_id' => $novel->id,
                 'title' => $title,
-                'slug' => Str::slug($novel->slug . '-' . $title),
+                'slug' => Str::slug($title),
                 'content' => "<p>The story of <strong>{$novel->title}</strong> continues.</p><p>New clues and unexpected choices lead the characters toward their next challenge.</p><p>Chapter {$number} brings them one step closer to the truth.</p>",
                 'status' => 'published',
                 'published_at' => now()->subDays($count - $number),

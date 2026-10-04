@@ -42,7 +42,7 @@ class ChapterSeeder extends Seeder
                 Chapter::create([
                     'novel_id' => $novel->id,
                     'title' => $title,
-                    'slug' => Str::slug($novel->title . ' ' . $title),
+                    'slug' => Str::slug($title),
                     'content' => $this->generateChapterContent($novel->title, $i),
                     'status' => 'published',
                     'published_at' => now()->subDays($chaptersPerNovel - $i),

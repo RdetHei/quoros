@@ -109,11 +109,10 @@ class ProfileController extends Controller
         }
 
         $userListsQuery = $user->userLists()
-            ->withCount('items')
-            ->with(['items' => function ($q) {
-                $q->with(['novel' => function ($qn) {
-                    $qn->select('id', 'title', 'cover_image', 'cover_image_url');
-                }])->latest()->limit(3);
+            ->withCount('novels')
+            ->with(['novels' => function ($query) {
+                $query->select(['novels.id', 'novels.title', 'novels.cover_image', 'novels.cover_image_url'])
+                    ->limit(3);
             }])
             ->latest();
 

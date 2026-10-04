@@ -24,7 +24,7 @@ class InAppNotificationService
 
         $url = route('chapters.show', [
             'novel' => $novel->slug,
-            'chapterSlug' => $chapter->slug,
+            'chapter' => $chapter->route_identifier,
         ]);
 
         $bookmarkUserIds = Bookmark::query()
@@ -85,7 +85,7 @@ class InAppNotificationService
         $novel = $reply->chapter->novel;
         $url = route('chapters.show', [
             'novel' => $novel->slug,
-            'chapterSlug' => $reply->chapter->slug,
+            'chapter' => $reply->chapter->route_identifier,
         ]);
 
         InAppNotification::create([

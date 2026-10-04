@@ -641,7 +641,7 @@
                             $isLastReadOfDay = $idx === 0;
                             $resumeCh = $nextCh ?? $chapter;
                             $resumeHref = $resumeCh
-                                ? route('chapters.show', [$novel->slug, $resumeCh->slug])
+                                ? route('chapters.show', [$novel->slug, $resumeCh->route_identifier])
                                 : route('novels.show', $novel->slug);
                             $isSolidResume = $idx === 0 && $gLabel === 'TODAY';
                         @endphp

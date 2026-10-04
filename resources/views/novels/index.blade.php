@@ -165,7 +165,7 @@
                         @if($novel->chapters->count() > 0)
                         <div class="mt-2 space-y-0.5 pt-1.5 border-t border-neutral-100 dark:border-neutral-800/50">
                             @foreach($novel->chapters->take(2) as $chapter)
-                                <a href="{{ route('chapters.show', [$novel->slug, $chapter->slug]) }}" class="flex items-center justify-between gap-2 group/ch">
+                                <a href="{{ route('chapters.show', [$novel->slug, $chapter->route_identifier]) }}" class="flex items-center justify-between gap-2 group/ch">
                                     <span class="text-[10px] font-medium text-neutral-500 dark:text-neutral-400 group-hover/ch:text-white dark:group-hover/ch:text-white truncate transition-colors">{{ $chapter->title }}</span>
                                     <span class="text-[9px] text-neutral-400 dark:text-neutral-500 shrink-0">{{ $chapter->created_at->diffForHumans(null, true) }}</span>
                                 </a>

@@ -165,11 +165,22 @@ class ChapterController extends Controller
         ]);
     }
 
-    public function show(Novel $novel, $chapterSlug)
+    public function show(Novel $novel, $chapter)
     {
-        $chapter = Chapter::where('novel_id', $novel->id)
-            ->where('slug', $chapterSlug)
-            ->firstOrFail();
+        $identifier = $chapter;
+        $query = Chapter::where('novel_id', $novel->id);
+
+        if (is_numeric($identifier)) {
+            $query->where('order', (int) $identifier);
+        } else {
+            $query->where('slug', $identifier);
+        }
+
+        $chapter = $query->firstOrFail();
+
+        if (!is_numeric($identifier) && $chapter->order > 0) {
+            return redirect()->route('chapters.show', [$novel->slug, $chapter->order], 301);
+        }
 
         // Check if user is author or admin to see non-published chapters
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
@@ -211,8 +222,8 @@ class ChapterController extends Controller
                             ->orWhere('published_at', '<=', now());
                     });
             })
-            ->orderBy('created_at', 'asc') // or however they are ordered
-            ->get(['title', 'slug']);
+            ->orderByRaw('COALESCE(NULLIF(`order`, 0), id) asc')
+            ->get(['id', 'title', 'slug', 'order']);
 
         $protectContent = ! $isAuthorOrAdmin;
         $chapterBodyHtml = $this->formatChapterBodyForDisplay(
@@ -230,7 +241,10 @@ class ChapterController extends Controller
                     'id' => $chapter->id,
                     'title' => $chapter->title,
                     'slug' => $chapter->slug,
+                    'order' => $chapter->order,
                     'content' => $chapterBodyHtml,
+                    'prev_chapter_order' => $previousChapter ? ($previousChapter->order ?: null) : null,
+                    'next_chapter_order' => $nextChapter ? ($nextChapter->order ?: null) : null,
                     'prev_chapter_slug' => $previousChapter ? $previousChapter->slug : null,
                     'next_chapter_slug' => $nextChapter ? $nextChapter->slug : null,
                     'comments_count' => $chapter->comments->count(),
