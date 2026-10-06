@@ -22,6 +22,15 @@ class ChapterController extends Controller
         return view('writer.chapters.create', compact('novel'));
     }
 
+    public function bulkCreate(Novel $novel)
+    {
+        Gate::authorize('manageChapters', $novel);
+
+        $existingChapters = $novel->chapters()->orderByRaw('COALESCE(NULLIF(`order`, 0), id) asc')->get(['id', 'title', 'order', 'status']);
+
+        return view('writer.chapters.bulk', compact('novel', 'existingChapters'));
+    }
+
     public function store(Request $request, Novel $novel)
     {
         Gate::authorize('manageChapters', $novel);
@@ -361,6 +370,24 @@ class ChapterController extends Controller
         $chapter->save();
 
         return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Chapter updated successfully!');
+    }
+
+    public function reorder(Request $request, Novel $novel)
+    {
+        Gate::authorize('manageChapters', $novel);
+
+        $validated = $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'integer|exists:chapters,id',
+        ]);
+
+        foreach ($validated['order'] as $index => $chapterId) {
+            Chapter::where('id', $chapterId)
+                ->where('novel_id', $novel->id)
+                ->update(['order' => $index + 1]);
+        }
+
+        return back()->with('success', 'Urutan chapter berhasil diperbarui.');
     }
 
     public function destroy(Novel $novel, Chapter $chapter)

@@ -62,6 +62,24 @@ class Chapter extends Model
         return $this->order > 0 ? $this->order : $this->id;
     }
 
+    public function getWordCountAttribute(): int
+    {
+        if (empty($this->content)) {
+            return 0;
+        }
+
+        $text = trim(strip_tags($this->content));
+        if (empty($text)) {
+            return 0;
+        }
+
+        if (preg_match('/[\x{4e00}-\x{9fff}\x{3040}-\x{30ff}\x{ac00}-\x{d7af}]/u', $text)) {
+            return (int) ceil(mb_strlen($text) / 2);
+        }
+
+        return (int) str_word_count($text);
+    }
+
     /**
      * Get the previous chapter in the same novel.
      */

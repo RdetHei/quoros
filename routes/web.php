@@ -137,9 +137,19 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
     // Writer & Admin Routes (Workspace)
     Route::middleware('role:writer,admin')->prefix('writer')->name('writer.')->group(function () {
 
+        // Author Studio Top-Level Pages
+        Route::get('/', [DashboardController::class, 'writerDashboardPage'])->name('dashboard');
+        Route::get('/analytics', [DashboardController::class, 'writerAnalytics'])->name('analytics');
+        Route::get('/earnings', [DashboardController::class, 'writerEarnings'])->name('earnings');
+        Route::get('/novels', [DashboardController::class, 'writerNovels'])->name('novels');
+        Route::get('/chapters', [DashboardController::class, 'writerChapters'])->name('chapters');
+        Route::get('/reader', [DashboardController::class, 'writerReaderPreview'])->name('reader');
+        Route::get('/codex', [DashboardController::class, 'writerCodex'])->name('codex');
+        Route::get('/comments', [DashboardController::class, 'writerComments'])->name('comments');
+        Route::get('/plot', [DashboardController::class, 'writerPlotNotes'])->name('plot');
+
         // Novel Management
         Route::prefix('novels')->name('novels.')->group(function () {
-            Route::get('/', function() { return redirect()->route('dashboard', ['tab' => 'library']); })->name('index');
             Route::get('/create', [NovelController::class, 'create'])->name('create');
             Route::get('/create/step-1', [NovelController::class, 'createStep1'])->name('create.step-1');
             Route::post('/create/step-1', [NovelController::class, 'storeStep1'])->name('store.step-1');

@@ -76,4 +76,9 @@ class Novel extends Model
     {
         return $this->hasMany(NovelViewLog::class);
     }
+
+    public function getCoverUrlAttribute(): ?string
+    {
+        return $this->cover_image_url;
+    }
 }
