@@ -1,217 +1,29 @@
-<div class="max-w-7xl mx-auto space-y-8">
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-            <div class="flex items-center gap-2 mb-2">
-                <span class="px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest">
-                    Control Panel
-                </span>
-                <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">v2.4.0 Stable</p>
-            </div>
-            <h2 class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-                Command <span class="text-indigo-600 dark:text-indigo-400">Center</span>
-            </h2>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-                Platform-wide overview. Monitoring activity, moderation queues, and catalog health in real-time.
-            </p>
-        </div>
-
-        <div class="flex items-center gap-3 flex-wrap">
-            <a href="{{ route('admin.announcements.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 hover:-translate-y-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14m-7-7v14"/>
-                </svg>
-                Announcement
-            </a>
-            <a href="{{ route('admin.reports.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-                </svg>
-                Moderation
-            </a>
-            <a href="{{ route('admin.genres.create') }}" class="inline-flex items-center justify-center h-10 w-10 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5" title="Add New Genre">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 5v14m-7-7h14"/>
-                </svg>
-            </a>
-        </div>
+<div class="admin-console mx-auto max-w-[1600px] space-y-6">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div><p class="admin-kicker">Control tower / live archive</p><h2 class="admin-display">Main Console</h2></div>
+        <div class="text-right"><p class="text-[10px] font-bold uppercase tracking-widest text-emerald-400">● All systems operational</p><p class="mt-1 text-[9px] uppercase tracking-widest text-zinc-600">{{ now()->format('d M Y · H:i') }} UTC</p></div>
     </div>
 
-    <!-- Top Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-        <x-admin.admin-card class="p-6 relative overflow-hidden group">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-2xl group-hover:bg-indigo-100 transition-colors"></div>
-            <div class="relative z-10">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                        </svg>
-                    </div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Revenue</p>
-                </div>
-                <p class="text-3xl font-black text-slate-900 dark:text-slate-100">
-                    {{ number_format($totalRevenuePoints) }}
-                </p>
-                <div class="mt-2 flex items-center gap-1.5">
-                    <span class="flex items-center text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded-lg italic">
-                        POINTS
-                    </span>
-                    <p class="text-[10px] font-medium text-slate-500">Platform earnings placeholder</p>
-                </div>
-            </div>
-        </x-admin.admin-card>
-
-        <x-admin.admin-card class="p-6 relative overflow-hidden group">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-2xl group-hover:bg-blue-100 transition-colors"></div>
-            <div class="relative z-10">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                    </div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Active Users</p>
-                </div>
-                <p class="text-3xl font-black text-slate-900 dark:text-slate-100">
-                    {{ number_format($totalActiveUsers) }}
-                </p>
-                <p class="mt-2 text-[10px] font-medium text-slate-500">Non-banned registered users</p>
-            </div>
-        </x-admin.admin-card>
-
-        <x-admin.admin-card class="p-6 relative overflow-hidden group">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-900/10 rounded-full blur-2xl group-hover:bg-emerald-100 transition-colors"></div>
-            <div class="relative z-10">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                        </svg>
-                    </div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Total Novels</p>
-                </div>
-                <p class="text-3xl font-black text-slate-900 dark:text-slate-100">
-                    {{ number_format($totalNovels) }}
-                </p>
-                <p class="mt-2 text-[10px] font-medium text-slate-500">Catalogued works across genres</p>
-            </div>
-        </x-admin.admin-card>
-
-        <x-admin.admin-card class="p-6 relative overflow-hidden group">
-            <div @class([
-                'absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl transition-colors',
-                'bg-rose-50 dark:bg-rose-900/10 group-hover:bg-rose-100' => $pendingReports > 0,
-                'bg-emerald-50 dark:bg-emerald-900/10 group-hover:bg-emerald-100' => $pendingReports <= 0,
-            ])></div>
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-4">
-                    <div @class([
-                        'p-2 rounded-xl',
-                        'bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400' => $pendingReports > 0,
-                        'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' => $pendingReports <= 0,
-                    ])>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        </svg>
-                    </div>
-                    @if($pendingReports > 0)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-[10px] font-black uppercase">
-                            Action Needed
-                        </span>
-                    @else
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase">
-                            Secure
-                        </span>
-                    @endif
-                </div>
-                <p class="text-3xl font-black text-slate-900 dark:text-slate-100">
-                    {{ number_format($pendingReports) }}
-                </p>
-                <p class="mt-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">Pending Reports</p>
-            </div>
-        </x-admin.admin-card>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        @foreach ([['Active readers', number_format($totalActiveUsers), 'users'], ['Total novels', number_format($totalNovels), 'books'], ['Pending requests', number_format($pendingReports), 'queue'], ['Revenue points', number_format($totalRevenuePoints), 'points']] as [$label, $value, $hint])
+            <section class="console-card p-5"><div class="flex items-start justify-between"><p class="admin-kicker">{{ $label }}</p><span class="metric-icon">{{ $hint === 'users' ? '♙' : ($hint === 'books' ? '▣' : ($hint === 'queue' ? '⇧' : '◇')) }}</span></div><p class="admin-display mt-3 !text-3xl">{{ $value }}</p><p class="mt-2 text-[9px] uppercase tracking-widest" style="color:{{ $hint === 'queue' ? '#c79a42' : '#73b58c' }}">● {{ $hint === 'queue' ? 'Review required' : 'Platform overview' }}</p></section>
+        @endforeach
     </div>
 
-    <!-- Activity Feed -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <x-admin.admin-card class="p-0 overflow-hidden">
-            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/20">
-                <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                    <h3 class="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-slate-100">Recent Registrations</h3>
-                </div>
-                <a href="{{ route('admin.users.index') }}" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline">View All</a>
-            </div>
-
-            <div class="divide-y divide-slate-100 dark:divide-slate-800">
-                @forelse($latestUsers as $u)
-                    <div class="px-6 py-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors flex items-center justify-between group">
-                        <div class="flex items-center gap-4 min-w-0">
-                            <div class="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 font-bold text-slate-500 group-hover:border-indigo-200 dark:group-hover:border-indigo-900/50 transition-colors">
-                                {{ strtoupper(substr($u->name, 0, 1)) }}
-                            </div>
-                            <div class="min-w-0">
-                                <p class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $u->name }}</p>
-                                <div class="flex items-center gap-2 mt-0.5">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{{ $u->role }}</span>
-                                    <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
-                                    <span class="text-[10px] font-medium text-slate-500 italic">{{ $u->email }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-[10px] font-bold text-slate-400 whitespace-nowrap bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
-                            {{ $u->created_at->diffForHumans(null, true) }}
-                        </p>
-                    </div>
-                @empty
-                    <div class="px-6 py-12 text-center">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">No recent activity found.</p>
-                    </div>
-                @endforelse
-            </div>
-        </x-admin.admin-card>
-
-        <x-admin.admin-card class="p-0 overflow-hidden">
-            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/20">
-                <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <h3 class="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-slate-100">Latest Updates</h3>
-                </div>
-                <a href="{{ route('admin.content-logs.index') }}" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline">Full Logs</a>
-            </div>
-
-            <div class="divide-y divide-slate-100 dark:divide-slate-800">
-                @forelse($latestNovelUpdates as $chapter)
-                    <div class="px-6 py-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors flex items-center justify-between group">
-                        <div class="flex items-center gap-4 min-w-0">
-                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center shrink-0 text-emerald-600 dark:text-emerald-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                                </svg>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                    {{ $chapter->title }}
-                                </p>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-0.5">
-                                    {{ $chapter->novel?->title ?? 'Unknown' }}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="text-right whitespace-nowrap">
-                            <p class="text-[10px] font-bold text-slate-800 dark:text-slate-200">{{ $chapter->novel?->author?->name ?? 'System' }}</p>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{{ $chapter->created_at->diffForHumans() }}</p>
-                        </div>
-                    </div>
-                @empty
-                    <div class="px-6 py-12 text-center">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">No recent updates found.</p>
-                    </div>
-                @endforelse
-            </div>
-        </x-admin.admin-card>
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <section class="console-card p-5 xl:col-span-8">
+            <div class="flex items-start justify-between"><div><p class="admin-kicker">Platform activity</p><h3 class="admin-section-title">Reader engagement</h3></div><span class="text-[9px] text-zinc-500">LIVE OVERVIEW</span></div>
+            <div class="mt-5 grid grid-cols-3 gap-3 border-b border-white/5 pb-5"><div><p class="admin-display !text-2xl">{{ number_format($totalActiveUsers / 1000, 1) }}k</p><p class="admin-kicker mt-1">Active readers</p></div><div><p class="admin-display !text-2xl">{{ number_format($totalNovels) }}</p><p class="admin-kicker mt-1">Published novels</p></div><div><p class="admin-display !text-2xl">{{ number_format($latestNovelUpdates->count()) }}</p><p class="admin-kicker mt-1">Recent chapters</p></div></div>
+            <div class="activity-chart mt-5" aria-label="Reader engagement overview"><div class="chart-lines"></div><svg viewBox="0 0 800 180" preserveAspectRatio="none" class="h-full w-full"><path d="M0 145 C80 130 90 140 150 110 S250 128 320 88 S410 115 475 72 S570 95 635 52 S720 80 800 25" fill="none" stroke="#c7a13b" stroke-width="2.5"/><path d="M0 155 C70 150 100 128 160 132 S260 112 330 116 S410 92 480 105 S570 82 640 88 S740 58 800 48" fill="none" stroke="#53677a" stroke-width="2"/></svg></div>
+            <div class="mt-2 flex justify-between text-[9px] uppercase tracking-widest text-zinc-600"><span>Catalog activity</span><span>Recent updates</span><span>Today</span></div>
+        </section>
+        <section class="console-card p-5 xl:col-span-4"><div class="flex items-center justify-between"><div><p class="admin-kicker">Moderation</p><h3 class="admin-section-title">Approval queue</h3></div><a class="admin-link" href="{{ route('admin.requests.index') }}">View queue →</a></div><p class="admin-display mt-5 !text-3xl">{{ number_format($pendingReports) }}</p><p class="admin-kicker mt-1">Pending reports</p><div class="mt-5 divide-y divide-white/5">@forelse($latestNovelUpdates->take(3) as $chapter)<div class="flex items-center justify-between gap-3 py-3"><div class="min-w-0"><p class="truncate font-serif text-sm text-zinc-200">{{ $chapter->novel?->title ?? $chapter->title }}</p><p class="admin-kicker mt-1">{{ $chapter->novel?->author?->name ?? 'Recent update' }}</p></div><span class="badge">NEW</span></div>@empty<p class="py-4 text-xs text-zinc-500">No recent submissions.</p>@endforelse</div></section>
     </div>
+
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <section class="console-card p-5 xl:col-span-8"><div class="flex items-center justify-between"><div><p class="admin-kicker">Audit stream</p><h3 class="admin-section-title">Recent global activity</h3></div><a class="admin-link" href="{{ route('admin.content-logs.index') }}">Open all logs →</a></div><div class="mt-5 overflow-x-auto"><table class="console-table w-full text-left"><thead><tr><th>Account</th><th>Role</th><th>Joined</th><th>Status</th></tr></thead><tbody>@forelse($latestUsers as $user)<tr><td>{{ $user->name }}</td><td>{{ $user->role }}</td><td>{{ $user->created_at?->diffForHumans() }}</td><td><span class="status-dot">● Active</span></td></tr>@empty<tr><td colspan="4" class="py-8 text-center text-zinc-500">No recent account activity.</td></tr>@endforelse</tbody></table></div></section>
+        <section class="console-card p-5 xl:col-span-4"><div><p class="admin-kicker">Infrastructure</p><h3 class="admin-section-title">System health</h3></div><p class="admin-display mt-5 !text-3xl">Operational</p><p class="admin-kicker mt-1">Application status</p><div class="mt-5 space-y-4">@foreach(['Core application', 'Reading delivery', 'Search index'] as $service)<div><div class="flex justify-between text-xs"><span class="font-serif text-zinc-300">{{ $service }}</span><span class="text-emerald-400">Operational</span></div><div class="health-line mt-2"></div></div>@endforeach</div><a href="{{ route('admin.maintenance') }}" class="maintenance-link mt-6 block">›　Maintenance settings <span class="float-right">↗</span></a></section>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-12"><section class="console-card p-5 xl:col-span-8"><div class="flex items-center justify-between"><div><p class="admin-kicker">Discovery operations</p><h3 class="admin-section-title">Curation snapshot</h3></div><a class="admin-link" href="{{ route('admin.genres.index') }}">Open curation →</a></div><div class="mt-5 grid grid-cols-1 divide-y divide-white/5 md:grid-cols-3 md:divide-x md:divide-y-0"><div class="py-3 md:pr-5"><p class="font-serif text-sm">Top genres</p><a class="admin-link mt-4 block" href="{{ route('admin.genres.index') }}">Manage genres →</a></div><div class="py-3 md:px-5"><p class="font-serif text-sm">Trending tags</p><a class="admin-link mt-4 block" href="{{ route('admin.tags.index') }}">Manage tags →</a></div><div class="py-3 md:pl-5"><p class="font-serif text-sm">Spotlight slider</p><a class="admin-link mt-4 block" href="{{ route('admin.carousel.index') }}">Edit order →</a></div></div></section><section class="console-card p-5 xl:col-span-4"><div class="flex items-center justify-between"><div><p class="admin-kicker">Communications</p><h3 class="admin-section-title">Announcements</h3></div><a class="admin-link" href="{{ route('admin.announcements.index') }}">Manage →</a></div><p class="mt-5 text-sm text-zinc-400">Publish updates for your readers and authors.</p><a href="{{ route('admin.announcements.create') }}" class="maintenance-link mt-5 block text-center">＋　New announcement</a></section></div>
 </div>
-
-
