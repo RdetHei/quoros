@@ -35,17 +35,19 @@ class NovelCharacterController extends Controller
     {
         Gate::authorize('update', $novel);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'role' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $validated = $this->validateCharacter($request);
 
         $payload = [
             'name' => $validated['name'],
+            'tagline' => $validated['tagline'] ?? null,
             'role' => $validated['role'] ?? null,
+            'cast_type' => $validated['cast_type'] ?? 'supporting',
             'description' => $validated['description'] ?? null,
+            'tags' => $this->parseTags($validated['tags'] ?? null),
+            'anchor' => $validated['anchor'] ?? null,
+            'current_chapter' => $validated['current_chapter'] ?? null,
+            'wants' => $validated['wants'] ?? null,
+            'fears' => $validated['fears'] ?? null,
             'sort_order' => ((int) $novel->characters()->max('sort_order')) + 1,
         ];
 
@@ -76,17 +78,19 @@ class NovelCharacterController extends Controller
         Gate::authorize('update', $novel);
         $this->ensureCharacterBelongsToNovel($novel, $character);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'role' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $validated = $this->validateCharacter($request);
 
         $payload = [
             'name' => $validated['name'],
+            'tagline' => $validated['tagline'] ?? null,
             'role' => $validated['role'] ?? null,
+            'cast_type' => $validated['cast_type'] ?? 'supporting',
             'description' => $validated['description'] ?? null,
+            'tags' => $this->parseTags($validated['tags'] ?? null),
+            'anchor' => $validated['anchor'] ?? null,
+            'current_chapter' => $validated['current_chapter'] ?? null,
+            'wants' => $validated['wants'] ?? null,
+            'fears' => $validated['fears'] ?? null,
         ];
 
         if ($request->hasFile('photo')) {
@@ -121,6 +125,34 @@ class NovelCharacterController extends Controller
         return redirect()
             ->route('writer.novels.characters.index', $novel)
             ->with('success', 'Karakter berhasil dihapus.');
+    }
+
+    private function validateCharacter(Request $request): array
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'tagline' => 'nullable|string|max:255',
+            'role' => 'nullable|string|max:255',
+            'cast_type' => 'nullable|in:main,supporting',
+            'description' => 'nullable|string|max:2000',
+            'tags' => 'nullable|string|max:500',
+            'anchor' => 'nullable|string|max:255',
+            'current_chapter' => 'nullable|string|max:255',
+            'wants' => 'nullable|string|max:2000',
+            'fears' => 'nullable|string|max:2000',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+    }
+
+    private function parseTags(?string $raw): ?array
+    {
+        if (! $raw) {
+            return null;
+        }
+
+        $tags = array_values(array_filter(array_map('trim', explode(',', $raw))));
+
+        return $tags ?: null;
     }
 
     private function ensureCharacterBelongsToNovel(Novel $novel, NovelCharacter $character): void

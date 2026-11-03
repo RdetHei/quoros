@@ -6,6 +6,8 @@
     'dashboardTitle' => $dashboardTitle ?? null,
     'dashboardSubtitle' => $dashboardSubtitle ?? null,
     'currentNovel' => $currentNovel ?? null,
+    'currentNovelId' => $currentNovelId ?? null,
+    'novels' => $novels ?? null,
     'showCreateBtn' => $showCreateBtn ?? true,
 ])
 

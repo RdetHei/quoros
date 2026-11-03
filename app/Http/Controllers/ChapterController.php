@@ -71,7 +71,7 @@ class ChapterController extends Controller
 
         $chapter->save();
 
-        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Chapter added successfully!');
+        return redirect()->route('writer.chapters', ['novel_id' => $novel->id])->with('success', 'Chapter added successfully!');
     }
 
     public function bulkStore(Request $request, Novel $novel, NovelParserService $parser)
@@ -109,7 +109,7 @@ class ChapterController extends Controller
                 ]);
             }
 
-            return redirect()->route('dashboard', ['tab' => 'library'])
+            return redirect()->route('writer.chapters', ['novel_id' => $novel->id])
                 ->with('success', count($chapters).' chapters successfully imported!');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to process file: '.$e->getMessage());
@@ -369,7 +369,7 @@ class ChapterController extends Controller
 
         $chapter->save();
 
-        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Chapter updated successfully!');
+        return redirect()->route('writer.chapters', ['novel_id' => $novel->id])->with('success', 'Chapter updated successfully!');
     }
 
     public function reorder(Request $request, Novel $novel)
@@ -400,6 +400,6 @@ class ChapterController extends Controller
 
         $chapter->delete();
 
-        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Chapter deleted successfully!');
+        return redirect()->route('writer.chapters', ['novel_id' => $novel->id])->with('success', 'Chapter deleted successfully!');
     }
 }

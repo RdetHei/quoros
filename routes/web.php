@@ -20,11 +20,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NovelController;
 use App\Http\Controllers\NovelCharacterController;
+use App\Http\Controllers\PlotNoteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\ReadingSessionController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\WriterEarningController;
+use App\Http\Controllers\WriterRelationshipController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AnnouncementsController;
 use Illuminate\Support\Facades\Route;
@@ -148,6 +151,16 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
         Route::get('/comments', [DashboardController::class, 'writerComments'])->name('comments');
         Route::get('/plot', [DashboardController::class, 'writerPlotNotes'])->name('plot');
 
+        // Plot Notes (CRUD)
+        Route::post('/plot', [PlotNoteController::class, 'store'])->name('plot.store');
+        Route::put('/plot/{plotNote}', [PlotNoteController::class, 'update'])->name('plot.update');
+        Route::delete('/plot/{plotNote}', [PlotNoteController::class, 'destroy'])->name('plot.destroy');
+        Route::post('/plot/{plotNote}/pin', [PlotNoteController::class, 'togglePin'])->name('plot.pin');
+
+        // Earnings & Payout
+        Route::put('/earnings/payout', [WriterEarningController::class, 'updatePayout'])->name('earnings.payout');
+        Route::get('/earnings/statement', [WriterEarningController::class, 'statement'])->name('earnings.statement');
+
         // Novel Management
         Route::prefix('novels')->name('novels.')->group(function () {
             Route::get('/create', [NovelController::class, 'create'])->name('create');
@@ -162,6 +175,10 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
             Route::put('/{novel}', [NovelController::class, 'update'])->name('update');
             Route::delete('/{novel}', [NovelController::class, 'destroy'])->name('destroy');
             Route::get('/{novel}/workspace', [NovelController::class, 'workspace'])->name('workspace');
+
+            // Character Relationships
+            Route::post('/{novel}/relationships', [WriterRelationshipController::class, 'store'])->name('relationships.store');
+            Route::delete('/{novel}/relationships/{relationship}', [WriterRelationshipController::class, 'destroy'])->name('relationships.destroy');
 
             Route::resource('{novel}/characters', NovelCharacterController::class)
                 ->except(['show'])

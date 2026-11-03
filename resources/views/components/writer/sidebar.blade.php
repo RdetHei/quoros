@@ -1,5 +1,17 @@
 @props(['active' => 'dashboard', 'novel' => null])
 
+@php
+    $writerUnreadComments = 0;
+    if (auth()->check()) {
+        $writerUnreadComments = \App\Models\Comment::query()
+            ->whereHas('chapter.novel', fn ($q) => $q->where('author_id', auth()->id()))
+            ->where('user_id', '!=', auth()->id())
+            ->whereNull('parent_id')
+            ->whereDoesntHave('replies', fn ($q) => $q->where('user_id', auth()->id()))
+            ->count();
+    }
+@endphp
+
 <div class="hidden w-[260px] shrink-0 flex-col border-r border-white/5 bg-[#0a0a0a] lg:flex">
     <aside class="flex h-full flex-col" aria-label="Sidebar">
         <div class="border-b border-white/5 px-5 pb-5 pt-6">
@@ -121,7 +133,9 @@
                         </svg>
                     </span>
                     <span>Comments</span>
-                    <span class="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full border border-[#c7a64a]/30 bg-[#c7a64a]/10 text-[10px] font-semibold text-[#c7a64a]">8</span>
+                    @if($writerUnreadComments > 0)
+                        <span class="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full border border-[#c7a64a]/30 bg-[#c7a64a]/10 text-[10px] font-semibold text-[#c7a64a]">{{ $writerUnreadComments }}</span>
+                    @endif
                     @if($active === 'comments')<span class="ml-1 h-1.5 w-1.5 rounded-full bg-[#c7a64a]"></span>@endif
                 </a>
 

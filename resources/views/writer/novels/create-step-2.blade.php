@@ -1,56 +1,62 @@
 @extends('layouts.writer', [
+    'active' => 'novels',
+    'breadcrumbs' => ['Author Studio', 'My Novels', $novel->title, 'Synopsis & Cover'],
     'title' => 'Synopsis & Visuals',
-    'subtitle' => 'Step 2: Tell us what your story is about and upload a cover.'
+    'subtitle' => 'Step 2: Tell us what your story is about and upload a cover.',
+    'currentNovel' => $novel->title,
+    'currentNovelId' => $novel->id,
+    'showCreateBtn' => false,
 ])
 
 @section('content')
 <div class="space-y-6">
-    @include('writer.novels._wizard-steps', ['currentStep' => 2])
+    @include('writer.novels._wizard-steps', ['currentStep' => 2, 'novel' => $novel])
 
-    <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800">
+    <div class="rounded-md border border-white/5 bg-[#121212] p-6 sm:p-8">
         <form action="{{ route('writer.novels.update.step-2', $novel->id) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
             @csrf
             @method('PUT')
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 space-y-3">
-                    <label for="description" class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">Synopsis / Description</label>
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                <div class="space-y-3 lg:col-span-2">
+                    <label for="description" class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#a3a3a3]">Synopsis / Description</label>
                     <textarea name="description" id="description" rows="12"
-                        class="w-full px-5 py-4 bg-black border border-neutral-700 rounded-lg focus:ring-1 focus:ring-white focus:border-white transition-all text-neutral-200 leading-relaxed placeholder:text-neutral-600"
-                        placeholder="Write a compelling summary to attract readers..." required>{{ old('description', $novel->description) }}</textarea>
-                    @error('description') <p class="text-neutral-400 text-xs mt-1">{{ $message }}</p> @enderror
-                    <p class="text-[10px] text-neutral-600 uppercase tracking-wider">Recommended: 200–500 words for best engagement.</p>
+                        class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-5 py-4 text-[13px] leading-relaxed text-[#f2efe8] placeholder:text-[#5f5f5f] transition-all focus:border-[#c7a64a]/50 focus:outline-none focus:ring-1 focus:ring-[#c7a64a]/40"
+                        placeholder="Write a compelling summary to attract readers...">{{ old('description', $novel->description) }}</textarea>
+                    @error('description') <p class="mt-1.5 text-[11px] text-red-400/90">{{ $message }}</p> @enderror
+                    <p class="text-[10px] uppercase tracking-[0.18em] text-[#5f5f5f]">Recommended: 200–500 words for best engagement.</p>
                 </div>
 
                 <div class="space-y-3">
-                    <label class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">Novel Cover</label>
-                    <div class="relative group">
-                        <div class="aspect-[3/4] rounded-lg overflow-hidden bg-neutral-800 border border-dashed border-neutral-700 flex flex-col items-center justify-center relative">
+                    <label class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#a3a3a3]">Novel Cover</label>
+                    <div class="group relative">
+                        <div class="relative flex aspect-[3/4] flex-col items-center justify-center overflow-hidden rounded-md border border-dashed border-white/10 bg-[#0a0a0a]">
                             @if($novel->cover_image_url)
-                                <img src="{{ $novel->cover_image_url }}" id="cover-preview" class="w-full h-full object-cover" alt="">
+                                <img src="{{ $novel->cover_image_url }}" id="cover-preview" class="h-full w-full object-cover" alt="">
                             @else
-                                <div id="cover-placeholder" class="flex flex-col items-center justify-center h-full text-neutral-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    <p class="text-[10px] font-medium uppercase tracking-wider">Upload Artwork</p>
+                                <div id="cover-placeholder" class="flex h-full flex-col items-center justify-center text-[#5f5f5f]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="mb-3 h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <p class="text-[10px] font-semibold uppercase tracking-[0.18em]">Upload Artwork</p>
                                 </div>
-                                <img src="" id="cover-preview" class="hidden w-full h-full object-cover" alt="">
+                                <img id="cover-preview" class="hidden h-full w-full object-cover" alt="">
                             @endif
-                            <label class="absolute inset-0 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 flex items-center justify-center">
-                                <input type="file" name="cover_image" class="hidden" onchange="initCropper(this, 'cover-preview', {aspectRatio: 3/4, placeholderId: 'cover-placeholder'})">
-                                <span class="px-4 py-2 bg-white text-black rounded-lg text-xs font-medium uppercase tracking-wider">Choose File</span>
+                            <label class="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
+                                <input type="file" name="cover_image" accept="image/*" class="hidden" onchange="initCropper(this, 'cover-preview', {aspectRatio: 3/4, placeholderId: 'cover-placeholder'})">
+                                <span class="rounded-md bg-[#c7a64a] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-black">Choose File</span>
                             </label>
                         </div>
                     </div>
-                    <p class="text-[10px] text-neutral-600 uppercase tracking-wider text-center">Ratio 3:4, Max 2MB (JPG/PNG)</p>
+                    @error('cover_image') <p class="mt-1.5 text-[11px] text-red-400/90">{{ $message }}</p> @enderror
+                    <p class="text-center text-[10px] uppercase tracking-[0.18em] text-[#5f5f5f]">Ratio 3:4, Max 2MB (JPG/PNG)</p>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between pt-6 border-t border-neutral-800">
-                <a href="{{ route('writer.novels.create.step-1') }}" class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-neutral-500 hover:text-white transition-colors flex items-center gap-2">
+            <div class="flex items-center justify-between border-t border-white/5 pt-6">
+                <a href="{{ route('writer.novels.create.step-1', ['novel' => $novel->id]) }}" class="flex items-center gap-2 rounded-md border border-white/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a3a3a3] transition-all hover:border-white/20 hover:text-[#f2efe8]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                     Previous
                 </a>
-                <button type="submit" class="px-8 py-3 bg-white text-black text-xs font-medium uppercase tracking-wider rounded-lg hover:bg-neutral-200 transition-all">Next Step</button>
+                <button type="submit" class="rounded-md bg-[#c7a64a] px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-black transition-all hover:bg-[#d4b55a]">Next Step</button>
             </div>
         </form>
     </div>

@@ -72,6 +72,16 @@ class Novel extends Model
         return $this->hasMany(NovelCharacter::class)->orderBy('sort_order')->orderBy('id');
     }
 
+    public function characterRelationships(): HasMany
+    {
+        return $this->hasMany(CharacterRelationship::class);
+    }
+
+    public function plotNotes(): HasMany
+    {
+        return $this->hasMany(PlotNote::class);
+    }
+
     public function viewLogs(): HasMany
     {
         return $this->hasMany(NovelViewLog::class);

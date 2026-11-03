@@ -682,9 +682,18 @@ class NovelController extends Controller
         return redirect()->route('writer.novels.create.step-1');
     }
 
-    public function createStep1()
+    public function createStep1(Request $request)
     {
-        return view('writer.novels.create-step-1');
+        $novel = null;
+
+        if ($request->filled('novel')) {
+            $novel = Novel::findOrFail((int) $request->query('novel'));
+            Gate::authorize('update', $novel);
+        }
+
+        $novels = Auth::user()->novels()->select('id', 'title', 'cover_image_url')->latest()->get();
+
+        return view('writer.novels.create-step-1', compact('novel', 'novels'));
     }
 
     public function storeStep1(Request $request)
@@ -697,19 +706,28 @@ class NovelController extends Controller
             'region' => 'nullable|string|max:255',
             'language' => 'nullable|string|max:255',
             'content_rating' => 'required|in:everyone,teen,mature',
+            'novel_id' => 'nullable|integer',
         ]);
 
-        $novel = new Novel;
+        // Jika wizard dibuka kembali dari step berikutnya, perbarui novel yang sama
+        // agar tidak membuat data duplikat.
+        if (! empty($validated['novel_id'])) {
+            $novel = Novel::findOrFail($validated['novel_id']);
+            Gate::authorize('update', $novel);
+        } else {
+            $novel = new Novel;
+            $novel->slug = $this->generateUniqueSlug($validated['title']);
+            $novel->author_id = Auth::id();
+        }
+
         $novel->title = $validated['title'];
         $novel->alternative_title = $validated['alternative_title'] ?? null;
-        $novel->slug = $this->generateUniqueSlug($validated['title']);
         $novel->status = $validated['status'];
         $novel->type = $validated['type'];
         $novel->region = $validated['region'] ?? null;
         $novel->language = $validated['language'] ?? null;
         $novel->content_rating = $validated['content_rating'];
-        $novel->author_id = Auth::id();
-        $novel->creation_step = 1;
+        $novel->creation_step = max(1, (int) $novel->creation_step);
         $novel->save();
 
         return redirect()
@@ -721,7 +739,9 @@ class NovelController extends Controller
     {
         Gate::authorize('update', $novel);
 
-        return view('writer.novels.create-step-2', compact('novel'));
+        $novels = Auth::user()->novels()->select('id', 'title', 'cover_image_url')->latest()->get();
+
+        return view('writer.novels.create-step-2', compact('novel', 'novels'));
     }
 
     public function updateStep2(Request $request, Novel $novel)
@@ -761,7 +781,9 @@ class NovelController extends Controller
         $tags = Tag::all();
         $novel->load(['genres:id', 'tags:id']);
 
-        return view('writer.novels.create-step-3', compact('novel', 'genres', 'tags'));
+        $novels = Auth::user()->novels()->select('id', 'title', 'cover_image_url')->latest()->get();
+
+        return view('writer.novels.create-step-3', compact('novel', 'genres', 'tags', 'novels'));
     }
 
     public function updateStep3(Request $request, Novel $novel)
@@ -769,7 +791,7 @@ class NovelController extends Controller
         Gate::authorize('update', $novel);
 
         $validated = $request->validate([
-            'genres' => 'required|array|min:1',
+            'genres' => 'required|array|min:1|max:3',
             'genres.*' => 'exists:genres,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
@@ -781,7 +803,7 @@ class NovelController extends Controller
         $novel->save();
 
         return redirect()
-            ->route('dashboard', ['tab' => 'library'])
+            ->route('writer.novels')
             ->with('success', 'Novel berhasil dibuat. Kamu bisa lanjut kelola karakter dari halaman novel.');
     }
 
@@ -828,7 +850,7 @@ class NovelController extends Controller
             $novel->tags()->sync($request->tags);
         }
 
-        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Novel created successfully!');
+        return redirect()->route('writer.novels')->with('success', 'Novel created successfully!');
     }
 
     public function trending(Request $request)
@@ -914,7 +936,9 @@ class NovelController extends Controller
         $genres = Genre::all();
         $tags = Tag::all();
 
-        return view('writer.novels.edit', compact('novel', 'genres', 'tags'));
+        $novels = Auth::user()->novels()->select('id', 'title', 'cover_image_url')->latest()->get();
+
+        return view('writer.novels.edit', compact('novel', 'genres', 'tags', 'novels'));
     }
 
     public function update(Request $request, Novel $novel)
@@ -958,7 +982,7 @@ class NovelController extends Controller
         $novel->genres()->sync($request->genres);
         $novel->tags()->sync($request->tags ?? []);
 
-        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Novel updated successfully!');
+        return redirect()->route('writer.novels')->with('success', 'Novel updated successfully!');
     }
 
     public function destroy(Novel $novel)
@@ -977,7 +1001,7 @@ class NovelController extends Controller
 
         $novel->delete();
 
-        return redirect()->route('dashboard', ['tab' => 'library'])->with('success', 'Novel deleted successfully!');
+        return redirect()->route('writer.novels')->with('success', 'Novel deleted successfully!');
     }
 
     private function generateUniqueSlug(string $title): string

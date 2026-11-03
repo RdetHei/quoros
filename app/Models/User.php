@@ -56,6 +56,21 @@ class User extends Authenticatable
         return $this->hasMany(Novel::class, 'author_id');
     }
 
+    public function plotNotes(): HasMany
+    {
+        return $this->hasMany(PlotNote::class);
+    }
+
+    public function writerEarnings(): HasMany
+    {
+        return $this->hasMany(WriterEarning::class);
+    }
+
+    public function payoutSetting(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PayoutSetting::class);
+    }
+
     public function novelRequests(): HasMany
     {
         return $this->hasMany(NovelRequest::class);

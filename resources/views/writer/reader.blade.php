@@ -1,15 +1,35 @@
 @extends('layouts.writer')
 
 @section('dashboard-content')
+@php
+    $chaptersRoute = route('writer.chapters', $selectedNovel ? ['novel_id' => $selectedNovel->id] : []);
+    $plotRoute = route('writer.plot', $selectedNovel ? ['novel_id' => $selectedNovel->id] : []);
+@endphp
+
+@if(is_null($readerChapter))
+    <div class="flex items-center justify-center min-h-[64vh]">
+        <div class="w-full max-w-xl rounded-sm border border-white/10 bg-[#121212] p-10 md:p-14 text-center">
+            <div class="w-12 h-12 rounded-full border border-[#c7a64a]/30 bg-[#c7a64a]/5 flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#c7a64a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+            </div>
+            <h2 class="font-serif text-[28px] md:text-[32px] text-[#f2efe8] leading-tight mb-3">Nothing to preview yet.</h2>
+            <p class="text-sm text-[#a3a3a3] leading-relaxed mb-8 max-w-md mx-auto">Write your first chapter to see it rendered here in Reader Mode. The draft preview shows exactly how your prose will read on the page.</p>
+            <a href="{{ $chaptersRoute }}" class="inline-flex items-center gap-2 rounded-sm bg-[#c7a64a] px-6 py-3 text-[11px] font-bold uppercase tracking-[0.15em] text-black transition-colors hover:bg-[#d4b55a]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" /></svg>
+                Go to Write Chapter
+            </a>
+        </div>
+    </div>
+@else
 <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-6">
     <div class="space-y-6">
         <div class="flex items-center gap-3 flex-wrap">
-            <button class="flex items-center gap-2 px-4 py-2 rounded-sm border border-white/10 bg-[#121212] text-[#f2efe8] text-sm hover:bg-white/5 transition-colors">
+            <a href="{{ $chaptersRoute }}" class="flex items-center gap-2 px-4 py-2 rounded-sm border border-white/10 bg-[#121212] text-[#f2efe8] text-sm hover:bg-white/5 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
                 CONTENTS
-            </button>
+            </a>
             <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3] rounded-sm border border-[#c7a64a]/25 px-3 py-1.5 bg-[#121212]">
-                <span class="text-[#c7a64a]">CHAPTER 12 OF 24</span>
+                <span class="text-[#c7a64a]">{{ $chapterPosition }}</span>
             </div>
             <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3] rounded-sm border border-[#c7a64a]/40 px-3 py-1.5 bg-[#121212]">
                 <span class="text-[#c7a64a]">DRAFT PREVIEW</span>
@@ -54,27 +74,45 @@
         </div>
 
         <div class="rounded-sm border border-white/10 bg-[#121212] px-5 py-4 grid grid-cols-12 items-center gap-4">
-            <a href="{{ route('writer.chapters') }}" class="col-span-12 md:col-span-4 flex items-center gap-3 group hover:opacity-100 opacity-70 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#a3a3a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-                <div>
-                    <p class="text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">{{ $readerChapter['prev']['label'] }}</p>
-                    <p class="font-serif text-[15px] text-[#f2efe8] group-hover:text-[#c7a64a] transition-colors">{{ $readerChapter['prev']['title'] }}</p>
+            @if($readerChapter['prev'])
+                <a href="{{ $chaptersRoute }}" class="col-span-12 md:col-span-4 flex items-center gap-3 group hover:opacity-100 opacity-70 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#a3a3a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">{{ $readerChapter['prev']['label'] }}</p>
+                        <p class="font-serif text-[15px] text-[#f2efe8] group-hover:text-[#c7a64a] transition-colors">{{ $readerChapter['prev']['title'] }}</p>
+                    </div>
+                </a>
+            @else
+                <div class="col-span-12 md:col-span-4 flex items-center gap-3 opacity-40 cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#a3a3a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">NO PREVIOUS CHAPTER</p>
+                    </div>
                 </div>
-            </a>
+            @endif
             <div class="col-span-12 md:col-span-4 text-center">
                 <p class="text-[11px] uppercase tracking-[0.2em] text-[#c7a64a] mb-1">{{ $readerChapter['word_count'] }}</p>
-                <a href="{{ route('writer.chapters') }}" class="text-xs text-[#a3a3a3] hover:text-[#f2efe8] transition-colors inline-flex items-center gap-1">
+                <a href="{{ $chaptersRoute }}" class="text-xs text-[#a3a3a3] hover:text-[#f2efe8] transition-colors inline-flex items-center gap-1">
                     Return to writing
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
                 </a>
             </div>
-            <a href="{{ route('writer.chapters') }}" class="col-span-12 md:col-span-4 flex items-center justify-end gap-3 group hover:opacity-100 opacity-70 transition-opacity">
-                <div class="text-right">
-                    <p class="text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">{{ $readerChapter['next']['label'] }}</p>
-                    <p class="font-serif text-[15px] text-[#f2efe8] group-hover:text-[#c7a64a] transition-colors">{{ $readerChapter['next']['title'] }}</p>
+            @if($readerChapter['next'])
+                <a href="{{ $chaptersRoute }}" class="col-span-12 md:col-span-4 flex items-center justify-end gap-3 group hover:opacity-100 opacity-70 transition-opacity">
+                    <div class="text-right">
+                        <p class="text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">{{ $readerChapter['next']['label'] }}</p>
+                        <p class="font-serif text-[15px] text-[#f2efe8] group-hover:text-[#c7a64a] transition-colors">{{ $readerChapter['next']['title'] }}</p>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#a3a3a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                </a>
+            @else
+                <div class="col-span-12 md:col-span-4 flex items-center justify-end gap-3 opacity-40 cursor-not-allowed">
+                    <div class="text-right">
+                        <p class="text-[10px] uppercase tracking-[0.18em] text-[#a3a3a3]">NO NEXT CHAPTER</p>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#a3a3a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#a3a3a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-            </a>
+            @endif
         </div>
     </div>
 
@@ -83,14 +121,15 @@
             <p class="text-[10px] uppercase tracking-[0.18em] text-[#c7a64a] mb-4">Focus Preview</p>
             <div class="space-y-2">
                 <div class="h-2 w-full rounded-full bg-white/5 overflow-hidden"><div class="h-full w-2/3 bg-[#c7a64a]/40"></div></div>
-                <p class="text-xs text-[#a3a3a3]">Reading progress · 66% of chapter</p>
+                <p class="text-xs text-[#a3a3a3]">Reading progress · Preview only</p>
             </div>
         </div>
         <div class="rounded-sm border border-[#c7a64a]/25 bg-[#c7a64a]/5 p-5">
             <p class="text-[10px] uppercase tracking-[0.18em] text-[#c7a64a] mb-3">Reader Mode</p>
             <p class="font-serif text-[14px] text-[#f2efe8] italic leading-relaxed mb-4">"The first light on the brass key should be where the exchange ends, not begins."</p>
-            <a href="{{ route('writer.plot') }}" class="text-[10px] uppercase tracking-[0.2em] text-[#c7a64a] hover:underline">View linked note →</a>
+            <a href="{{ $plotRoute }}" class="text-[10px] uppercase tracking-[0.2em] text-[#c7a64a] hover:underline">View linked note →</a>
         </div>
     </div>
 </div>
+@endif
 @endsection
