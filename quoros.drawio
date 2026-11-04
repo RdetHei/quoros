@@ -1,0 +1,264 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="XYq-8EDXInmV6vj4E2F8" name="ERD">
+    <mxGraphModel dx="5409" dy="3317" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="announcements" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; title : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; content : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; type : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; is_active : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; link : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-announcements">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="172" width="182" x="2798.63" y="20" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="author_follows" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; follower_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; author_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-author_follows">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="122" width="182" x="1174.1" y="705.66" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="bookmarks" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-bookmarks">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="122" width="182" x="2826.95" y="1922.8" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="chapters" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; title : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; slug : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; content : longtext&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; file_path : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; order : int&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; status : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; published_at : timestamp" placeholders="1" id="csvimport-chapters">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="212" width="192" x="951.21" y="1747.69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="character_relationships" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; character_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; related_character_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; related_name : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; note : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; status : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-character_relationships">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="182" width="212" x="1992.76" y="408.11" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="comments" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; chapter_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; parent_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; content : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-comments">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="152" width="182" x="715.89" y="1531.96" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="genres" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; name : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; slug : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-genres">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="122" width="182" x="20" y="2713.94" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="genre_novel" columns="&lt;b&gt;FK&lt;/b&gt; genre_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint" placeholders="1" id="csvimport-genre_novel">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="82" width="152" x="951" y="2770.06" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="guide_articles" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; guide_category_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; title : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; slug : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; content : longtext&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; video_url : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; order : int&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; is_published : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-guide_articles">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="202" width="202" x="2204.76" y="20" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="guide_categories" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; name : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; slug : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; icon : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; description : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; order : int&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-guide_categories">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="172" width="182" x="2556.63" y="377.39" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="notifications" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; type : varchar(50)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; data : json&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; read_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-notifications">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="152" width="182" x="1160.24" y="20" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="novels" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; author_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; title : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; alternative_title : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; slug : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; description : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; status : enum&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; is_featured : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; type : enum&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; region : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; language : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; content_rating : enum&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; creation_step : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; view_count : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; rating_avg : decimal(3,2)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; cover_image : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; cover_image_url : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; cover_public_id : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-novels">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="342" width="222" x="1439.95" y="1394.46" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="novel_characters" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; name : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; tagline : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; role : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; cast_type : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; description : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; tags : json&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; anchor : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; current_chapter : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; wants : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; fears : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; image : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; image_url : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; image_public_id : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; sort_order : int&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-novel_characters">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="312" width="222" x="1615.82" y="701.34" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="novel_requests" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; title : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; description : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; status : enum&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-novel_requests">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="152" width="182" x="1632.84" y="2767.87" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="novel_tag" columns="&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; tag_id : bigint" placeholders="1" id="csvimport-novel_tag">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="82" width="152" x="2179.17" y="954.94" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="novel_view_logs" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; viewed_on : date&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; views : int&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-novel_view_logs">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="142" width="182" x="1746.19" y="1750.11" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="payout_settings" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; method : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; account_name : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; account_number : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; currency : varchar(8)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; auto_payout : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; min_payout : decimal(12,2)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-payout_settings">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="202" width="222" x="2626.33" y="2792.65" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="plot_notes" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; title : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; category : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; content : longtext&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; tags : json&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; is_pinned : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; is_open_question : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-plot_notes">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="212" width="192" x="1304.92" y="2135.53" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="reactions" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; reactable_type : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; reactable_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; type : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-reactions">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="152" width="212" x="2249.1" y="1966.39" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="reading_histories" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; chapter_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-reading_histories">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="142" width="182" x="968.28" y="2151.54" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="reading_sessions" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; session_uuid : char(36)&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; started_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; last_active_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; ended_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; active_seconds : int&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-reading_sessions">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="202" width="192" x="2520.16" y="2153.68" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="reports" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; reporter_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; reportable_type : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; reportable_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; reason : varchar(50)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; details : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; status : varchar(20)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; admin_notes : text&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; reviewed_by : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; reviewed_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-reports">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="222" width="222" x="2896.81" y="1296.99" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="reviews" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; rating : int&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; content : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-reviews">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="152" width="182" x="1604.37" y="2012.6" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="tags" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; name : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; slug : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-tags">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="122" width="182" x="1960.14" y="2174.85" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="users" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; name : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; username : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; email : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; profile_photo : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; profile_photo_url : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; profile_photo_public_id : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; bio : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; is_public_reading_list : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; auto_load_chapters : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; email_verified_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; password : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; role : enum&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; is_banned : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; banned_until : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; ban_reason : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; remember_token : varchar(100)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-users">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="332" width="262" x="1878.05" y="1312.76" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="user_lists" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; title : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; slug : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; description : text&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; is_public : tinyint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-user_lists">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="172" width="182" x="1692.71" y="293.04" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="user_list_items" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_list_id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; novel_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-user_list_items">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="122" width="182" x="2391.78" y="1323.68" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;%name%&lt;/b&gt;&lt;hr&gt;%columns%" name="writer_earnings" columns="&lt;b&gt;PK&lt;/b&gt; id : bigint&lt;br&gt;&lt;b&gt;FK&lt;/b&gt; user_id : bigint&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; type : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; amount : decimal(12,2)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; status : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; description : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; source : varchar(255)&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; period_start : date&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; period_end : date&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; created_at : timestamp&lt;br&gt;&lt;b&gt;&amp;nbsp;&amp;nbsp;&lt;/b&gt; updated_at : timestamp" placeholders="1" id="csvimport-writer_earnings">
+          <mxCell parent="1" style="shape=label;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;rounded=1;arcSize=4;fontSize=12;labelBackgroundColor=none;" vertex="1">
+            <mxGeometry height="212" width="192" x="3372.5" y="700.72" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-1" edge="1" parent="1" source="csvimport-author_follows" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-2" edge="1" parent="1" source="csvimport-bookmarks" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-3" edge="1" parent="1" source="csvimport-chapters" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-4" edge="1" parent="1" source="csvimport-character_relationships" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novel_characters" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-5" edge="1" parent="1" source="csvimport-comments" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-chapters" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-6" edge="1" parent="1" source="csvimport-genre_novel" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-genres" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-7" edge="1" parent="1" source="csvimport-guide_articles" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-guide_categories" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-8" edge="1" parent="1" source="csvimport-notifications" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-9" edge="1" parent="1" source="csvimport-novels" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-10" edge="1" parent="1" source="csvimport-novel_characters" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-11" edge="1" parent="1" source="csvimport-novel_requests" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-12" edge="1" parent="1" source="csvimport-novel_tag" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-13" edge="1" parent="1" source="csvimport-novel_view_logs" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-14" edge="1" parent="1" source="csvimport-payout_settings" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-15" edge="1" parent="1" source="csvimport-plot_notes" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-16" edge="1" parent="1" source="csvimport-reactions" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-17" edge="1" parent="1" source="csvimport-reading_histories" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-chapters" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-18" edge="1" parent="1" source="csvimport-reading_sessions" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-19" edge="1" parent="1" source="csvimport-reports" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-20" edge="1" parent="1" source="csvimport-reviews" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-21" edge="1" parent="1" source="csvimport-user_lists" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-22" edge="1" parent="1" source="csvimport-user_list_items" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-23" edge="1" parent="1" source="csvimport-writer_earnings" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-24" edge="1" parent="1" source="csvimport-author_follows" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-25" edge="1" parent="1" source="csvimport-bookmarks" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-26" edge="1" parent="1" source="csvimport-character_relationships" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-27" edge="1" parent="1" source="csvimport-comments" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-comments" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-28" edge="1" parent="1" source="csvimport-genre_novel" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-29" edge="1" parent="1" source="csvimport-novel_tag" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-tags" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-30" edge="1" parent="1" source="csvimport-plot_notes" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-31" edge="1" parent="1" source="csvimport-reading_histories" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novels" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-32" edge="1" parent="1" source="csvimport-reading_sessions" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-33" edge="1" parent="1" source="csvimport-reports" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-34" edge="1" parent="1" source="csvimport-reviews" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-35" edge="1" parent="1" source="csvimport-user_list_items" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-user_lists" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-36" edge="1" parent="1" source="csvimport-character_relationships" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-novel_characters" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-37" edge="1" parent="1" source="csvimport-comments" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cbb0LGzCZUm1VuAm9tXR-38" edge="1" parent="1" source="csvimport-reading_histories" style="endArrow=ERone;startArrow=ERmany;endFill=0;startFill=0;edgeStyle=orthogonalEdgeStyle;rounded=1;labelBackgroundColor=none;fontColor=default;" target="csvimport-users" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
