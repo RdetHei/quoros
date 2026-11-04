@@ -1,0 +1,19 @@
+{
+	frankenphp
+	order php_server before file_server
+}
+
+# Caddy mengikuti kontrak port Vercel ($PORT), default 80 untuk lokal.
+:{$PORT:80} {
+	# Document root dibatasi ke public/ agar config, .env, dan source
+	# Laravel tidak bisa diakses dari luar.
+	root * /app/public
+
+	encode zstd gzip
+
+	# File statis (aset Vite, /storage, dsb.) dilayani langsung;
+	# sisanya diteruskan ke public/index.php.
+	php_server {
+		try_files {path} index.php
+	}
+}

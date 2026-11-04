@@ -1,0 +1,29 @@
+# File yang tidak perlu diunggah saat `vercel deploy`.
+# Daftar ini tetap harus berisi semua yang dibutuhkan Dockerfile,
+# jadi jangan menambahkan folder seperti storage/app/public (aset statis).
+
+.git
+.github
+.vercel
+.vscode
+.editorconfig
+
+.env
+.env.*
+
+node_modules
+vendor
+public/build
+public/hot
+
+storage/framework/cache/data
+storage/framework/sessions
+storage/framework/testing
+storage/framework/views
+storage/logs
+
+tests
+phpunit.xml
+discord-bot
+quoros.drawio
+README.md

@@ -6,6 +6,7 @@ use Cloudinary\Cloudinary;
 use Cloudinary\Transformation\Resize;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CloudinaryService
 {
@@ -72,6 +73,78 @@ class CloudinaryService
 
             throw new \RuntimeException('Upload gagal ke Cloudinary. Periksa kredensial Cloudinary dan koneksi API.', 0, $e);
         }
+    }
+
+    /**
+     * Upload file chapter (PDF/EPUB/DOCX) sebagai resource "raw".
+     * Diperlukan di Vercel karena filesystem container tidak persisten.
+     */
+    public function uploadChapterFile(UploadedFile $file): array
+    {
+        try {
+            $result = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                'folder' => 'chapters',
+                'resource_type' => 'raw',
+                'use_filename' => true,
+                'unique_filename' => true,
+            ]);
+
+            return [
+                'url' => $result['secure_url'] ?? $result['url'],
+                'public_id' => $result['public_id'] ?? null,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Cloudinary raw upload failed', [
+                'message' => $e->getMessage(),
+                'file' => $file->getClientOriginalName(),
+            ]);
+
+            throw new \RuntimeException('Upload file chapter gagal ke Cloudinary. Periksa kredensial Cloudinary dan koneksi API.', 0, $e);
+        }
+    }
+
+    /**
+     * Hapus file chapter. Menerima URL Cloudinary penuh maupun path lokal
+     * lama (mis. "chapters/foo.pdf") supaya data sebelum migrasi tetap bersih.
+     */
+    public function deleteChapterFile(?string $stored): void
+    {
+        if (empty($stored)) {
+            return;
+        }
+
+        $publicId = $this->publicIdFromUrl($stored);
+
+        if ($publicId === null) {
+            Storage::disk('public')->delete($stored);
+
+            return;
+        }
+
+        try {
+            $this->cloudinary->uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
+        } catch (\Throwable $e) {
+            Log::warning('Cloudinary raw destroy failed', [
+                'public_id' => $publicId,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Ambil public_id dari URL Cloudinary. Null jika bukan URL Cloudinary.
+     */
+    protected function publicIdFromUrl(string $url): ?string
+    {
+        if (! str_contains($url, 'res.cloudinary.com')) {
+            return null;
+        }
+
+        if (preg_match('#/(?:raw|image|video)/upload/(?:v\d+/)?(.+)$#', $url, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 
     public function deleteImage(string $publicId): void

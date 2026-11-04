@@ -1,0 +1,37 @@
+# Konteks build Docker untuk Vercel.
+# Hal yang di-ignore TIDAK dikirim ke daemon Docker, sehingga image lebih kecil.
+
+# --- Version control & tooling ---
+.git
+.github
+.gitignore
+.editorconfig
+.vercel
+.vscode
+
+# --- Rahasia: jangan pernah masuk ke image ---
+# Vercel menyuntikkan environment variables saat container start.
+.env
+.env.*
+!.env.example
+
+# --- Artefak lokal (dibangun ulang di dalam image) ---
+node_modules
+vendor
+public/build
+public/hot
+public/storage
+
+# --- Cache & log runtime ---
+storage/framework/cache/data
+storage/framework/sessions
+storage/framework/testing
+storage/framework/views
+storage/logs
+
+# --- Tidak diperlukan saat runtime ---
+tests
+phpunit.xml
+discord-bot
+quoros.drawio
+README.md

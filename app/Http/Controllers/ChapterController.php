@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Chapter;
 use App\Models\Novel;
 use App\Models\ReadingHistory;
+use App\Services\CloudinaryService;
 use App\Services\RecommendationService;
 use App\Services\NovelParserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ChapterController extends Controller
@@ -31,7 +31,7 @@ class ChapterController extends Controller
         return view('writer.chapters.bulk', compact('novel', 'existingChapters'));
     }
 
-    public function store(Request $request, Novel $novel)
+    public function store(Request $request, Novel $novel, CloudinaryService $cloudinary)
     {
         Gate::authorize('manageChapters', $novel);
 
@@ -65,8 +65,7 @@ class ChapterController extends Controller
         $chapter->published_at = $request->status === 'scheduled' ? $request->published_at : ($request->status === 'published' ? now() : null);
 
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('chapters', 'public');
-            $chapter->file_path = $path;
+            $chapter->file_path = $cloudinary->uploadChapterFile($request->file('file'))['url'];
         }
 
         $chapter->save();
@@ -313,7 +312,7 @@ class ChapterController extends Controller
         return view('writer.chapters.edit', compact('novel', 'chapter'));
     }
 
-    public function update(Request $request, Novel $novel, Chapter $chapter)
+    public function update(Request $request, Novel $novel, Chapter $chapter, CloudinaryService $cloudinary)
     {
         Gate::authorize('update', $chapter);
 
@@ -366,11 +365,8 @@ class ChapterController extends Controller
         }
 
         if ($request->hasFile('file')) {
-            if ($chapter->file_path) {
-                Storage::disk('public')->delete($chapter->file_path);
-            }
-            $path = $request->file('file')->store('chapters', 'public');
-            $chapter->file_path = $path;
+            $cloudinary->deleteChapterFile($chapter->file_path);
+            $chapter->file_path = $cloudinary->uploadChapterFile($request->file('file'))['url'];
         }
 
         $chapter->save();
@@ -396,13 +392,11 @@ class ChapterController extends Controller
         return back()->with('success', 'Urutan chapter berhasil diperbarui.');
     }
 
-    public function destroy(Novel $novel, Chapter $chapter)
+    public function destroy(Novel $novel, Chapter $chapter, CloudinaryService $cloudinary)
     {
         Gate::authorize('delete', $chapter);
 
-        if ($chapter->file_path) {
-            Storage::disk('public')->delete($chapter->file_path);
-        }
+        $cloudinary->deleteChapterFile($chapter->file_path);
 
         $chapter->delete();
 

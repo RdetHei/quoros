@@ -1075,7 +1075,7 @@
 
                 @if($chapter->file_path)
                     <div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-                        <a href="{{ asset('storage/' . $chapter->file_path) }}"
+                        <a href="{{ str_starts_with($chapter->file_path, 'http') ? $chapter->file_path : asset('storage/' . $chapter->file_path) }}"
                            target="_blank"
                            class="inline-flex items-center gap-3 w-full sm:w-auto justify-center px-8 py-4 bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-bold rounded-2xl hover:opacity-90 transition-opacity shadow-xl shadow-slate-950/10">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

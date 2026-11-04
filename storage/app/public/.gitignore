@@ -1,2 +1,10 @@
 *
 !.gitignore
+
+# Aset statis yang ikut ke dalam repo (dipakai lewat asset('storage/...')).
+# Folder lain (covers/, profiles/, chapters/) tetap di-ignore karena berisi
+# hasil upload pengguna.
+!logo/
+!logo/**
+!banners/
+!banners/**
