@@ -318,6 +318,22 @@ Jika memakai Git: import repo di dashboard Vercel. Pastikan `Dockerfile.vercel`,
 
 ## 12. Troubleshooting
 
+**`Error: [STATIC_BUILD_NO_OUT_DIR] No Output Directory named "dist" found`**
+
+Vercel tidak membangun container, melainkan menjalankan build static/Vite.
+Penyebab paling umum:
+1. **`vercel.json` belum ikut ter-push** ke branch yang di-deploy. Vercel
+   membaca konfigurasi dari *commit* yang di-clone GitHub, bukan dari working
+   tree lokal. Pastikan `vercel.json`, `Dockerfile.vercel`, dan `Caddyfile`
+   sudah ada di commit yang di-push.
+2. Vercel mendeteksi project ini sebagai framework **Vite** (karena
+   `package.json` memuat `vite`), sehingga framework tersebut menang.
+   Solusinya `"framework": "container"` di dalam `services.app` pada
+   `vercel.json` — sudah diterapkan di repo ini.
+3. Kalau masih terjadi juga, buka **Project Settings → Build and Deployment**,
+   set **Framework Preset** ke `Container`, kosongkan *Build Command* dan
+   *Output Directory*, lalu redeploy.
+
 **HTTP 502 / container gagal start**
 Cek `vercel logs`. Pastikan `Caddyfile` tetap memakai `:{$PORT:80}` — Vercel
 menentukan port lewat env `PORT`.
