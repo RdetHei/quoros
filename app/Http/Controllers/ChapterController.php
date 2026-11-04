@@ -176,16 +176,22 @@ class ChapterController extends Controller
 
     public function show(Novel $novel, $chapter)
     {
+        // InfinityFree tidak punya cron job, jadi chapter terjadwal yang sudah
+        // waktunya diterbitkan saat diakses.
+        Chapter::publishScheduledDue($novel->id);
+
         $identifier = $chapter;
         $query = Chapter::where('novel_id', $novel->id);
 
         if (is_numeric($identifier)) {
-            $query->where('order', (int) $identifier);
+            // Identifier numerik bisa berupa nomor urut (order) atau id chapter.
+            // Chapter dengan order 0 memakai id sebagai identifier kanonik.
+            $chapter = (clone $query)->where('order', (int) $identifier)->first()
+                ?? (clone $query)->where('id', (int) $identifier)->first()
+                ?? abort(404);
         } else {
-            $query->where('slug', $identifier);
+            $chapter = $query->where('slug', $identifier)->firstOrFail();
         }
-
-        $chapter = $query->firstOrFail();
 
         if (!is_numeric($identifier) && $chapter->order > 0) {
             return redirect()->route('chapters.show', [$novel->slug, $chapter->order], 301);

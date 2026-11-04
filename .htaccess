@@ -1,0 +1,17 @@
+# .htaccess untuk root htdocs di InfinityFree.
+# InfinityFree tidak bisa mengubah document root (selalu htdocs) dan tidak
+# mendukung symlink, jadi seluruh request diarahkan ke folder public/ dan
+# /storage/ dipetakan langsung ke storage/app/public/
+# (pengganti `php artisan storage:link`).
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # [END] wajib: menghentikan seluruh proses rewrite agar hasilnya tidak
+    # ikut ditangkap oleh rule catch-all di bawah.
+    RewriteRule ^storage/(.*)$ /storage/app/public/$1 [END]
+
+    # Semua request lain diarahkan ke folder public/.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule (.*) /public/$1 [L]
+</IfModule>

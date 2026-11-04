@@ -878,6 +878,10 @@ class NovelController extends Controller
     {
         $this->novelViews->recordView($novel);
 
+        // InfinityFree tidak punya cron job, jadi chapter terjadwal yang sudah
+        // waktunya diterbitkan saat halaman novel diakses.
+        Chapter::publishScheduledDue($novel->id);
+
         $userLists = Auth::check()
             ? Auth::user()->userLists()->orderBy('title')->get(['id', 'slug', 'title'])
             : collect();

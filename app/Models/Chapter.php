@@ -42,6 +42,25 @@ class Chapter extends Model
         return true;
     }
 
+    /**
+     * Terbitkan chapter berstatus "scheduled" yang waktunya sudah lewat.
+     * Dipakai sebagai pengganti scheduled task karena InfinityFree
+     * tidak menyediakan cron job.
+     */
+    public static function publishScheduledDue(?int $novelId = null): int
+    {
+        $query = static::query()
+            ->where('status', 'scheduled')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+
+        if ($novelId !== null) {
+            $query->where('novel_id', $novelId);
+        }
+
+        return $query->update(['status' => 'published']);
+    }
+
     public function novel(): BelongsTo
     {
         return $this->belongsTo(Novel::class);

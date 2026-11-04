@@ -16,19 +16,21 @@ class NovelCharacterController extends Controller
         private CloudinaryService $cloudinaryService,
     ) {}
 
-    public function index(Novel $novel): View
+    public function index(Novel $novel): RedirectResponse
     {
         Gate::authorize('update', $novel);
-        $novel->load('characters');
 
-        return view('writer.novels.characters.index', compact('novel'));
+        return redirect()->route('writer.codex', ['novel_id' => $novel->id]);
     }
 
     public function create(Novel $novel): View
     {
         Gate::authorize('update', $novel);
 
-        return view('writer.novels.characters.create', compact('novel'));
+        return view('writer.novels.characters.create', array_merge(
+            $this->navShared($novel, 'Give them a name.', ['Author Studio', 'Character Codex', 'New Character']),
+            compact('novel'),
+        ));
     }
 
     public function store(Request $request, Novel $novel): RedirectResponse
@@ -58,10 +60,10 @@ class NovelCharacterController extends Controller
             $payload['image'] = null;
         }
 
-        $novel->characters()->create($payload);
+        $character = $novel->characters()->create($payload);
 
         return redirect()
-            ->route('writer.novels.characters.index', $novel)
+            ->route('writer.codex', ['novel_id' => $novel->id, 'character_id' => $character->id])
             ->with('success', 'Karakter berhasil ditambahkan.');
     }
 
@@ -70,7 +72,10 @@ class NovelCharacterController extends Controller
         Gate::authorize('update', $novel);
         $this->ensureCharacterBelongsToNovel($novel, $character);
 
-        return view('writer.novels.characters.edit', compact('novel', 'character'));
+        return view('writer.novels.characters.edit', array_merge(
+            $this->navShared($novel, 'Refine the profile.', ['Author Studio', 'Character Codex', 'Edit Profile']),
+            compact('novel', 'character'),
+        ));
     }
 
     public function update(Request $request, Novel $novel, NovelCharacter $character): RedirectResponse
@@ -107,7 +112,7 @@ class NovelCharacterController extends Controller
         $character->update($payload);
 
         return redirect()
-            ->route('writer.novels.characters.index', $novel)
+            ->route('writer.codex', ['novel_id' => $novel->id, 'character_id' => $character->id])
             ->with('success', 'Data karakter berhasil diperbarui.');
     }
 
@@ -123,7 +128,7 @@ class NovelCharacterController extends Controller
         $character->delete();
 
         return redirect()
-            ->route('writer.novels.characters.index', $novel)
+            ->route('writer.codex', ['novel_id' => $novel->id])
             ->with('success', 'Karakter berhasil dihapus.');
     }
 
@@ -158,5 +163,26 @@ class NovelCharacterController extends Controller
     private function ensureCharacterBelongsToNovel(Novel $novel, NovelCharacter $character): void
     {
         abort_unless($character->novel_id === $novel->id, 404);
+    }
+
+    /**
+     * Build the shared navigation payload so the character create/edit
+     * pages render inside the Chapterly Gold shell (breadcrumb, active
+     * sidebar state, and the current-novel selector).
+     */
+    private function navShared(Novel $novel, string $title, array $breadcrumbs): array
+    {
+        return [
+            'active' => 'codex',
+            'breadcrumbs' => $breadcrumbs,
+            'dashboardTitle' => $title,
+            'dashboardSubtitle' => null,
+            'currentNovel' => $novel->title,
+            'currentNovelId' => $novel->id,
+            'novels' => request()->user()->novels()
+                ->select('id', 'title', 'cover_image_url')
+                ->latest()
+                ->get(),
+        ];
     }
 }
