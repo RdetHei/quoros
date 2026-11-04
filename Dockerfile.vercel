@@ -14,8 +14,9 @@
 # ---------- Stage 1: base (PHP + ekstensi) ----------
 FROM dunglas/frankenphp:1-php8.4-bookworm AS base
 
+# gd wajib: phpoffice/phpword (dipakai fitur impor dokumen) mensyaratkan ext-gd.
 RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && install-php-extensions intl zip pdo_mysql
+    && install-php-extensions intl zip pdo_mysql gd
 
 WORKDIR /app
 
