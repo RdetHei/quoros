@@ -16,4 +16,14 @@ class Genre extends Model
     {
         return $this->belongsToMany(Novel::class);
     }
+
+    /**
+     * TiDB tidak menegakkan FOREIGN KEY, jadi baris pivot dibersihkan manual.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Genre $genre) {
+            $genre->novels()->detach();
+        });
+    }
 }

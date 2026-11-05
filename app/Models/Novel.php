@@ -91,4 +91,39 @@ class Novel extends Model
     {
         return $this->cover_image_url;
     }
+
+    /**
+     * TiDB tidak menegakkan FOREIGN KEY (sintaksnya hanya di-parse), jadi
+     * cascade "onDelete" diulang di level aplikasi agar tidak ada baris yatim.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Novel $novel) {
+            $novel->genres()->detach();
+            $novel->tags()->detach();
+
+            foreach ($novel->chapters as $chapter) {
+                $chapter->delete();
+            }
+
+            foreach ($novel->characters as $character) {
+                $character->delete();
+            }
+
+            // Sudah habis saat karakter dihapus di atas, tetapi tetap dipanggil
+            // untuk relasi yang salah satu sisinya bukan karakter milik novel ini.
+            $novel->characterRelationships()->delete();
+
+            $novel->reviews()->delete();
+            $novel->bookmarks()->delete();
+            $novel->readingHistories()->delete();
+            $novel->viewLogs()->delete();
+
+            ReadingSession::where('novel_id', $novel->id)->delete();
+            UserListItem::where('novel_id', $novel->id)->delete();
+
+            // Kolom ini memakai nullOnDelete: dikosongkan, bukan dihapus.
+            $novel->plotNotes()->update(['novel_id' => null]);
+        });
+    }
 }

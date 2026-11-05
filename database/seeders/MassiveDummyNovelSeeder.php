@@ -17,16 +17,53 @@ class MassiveDummyNovelSeeder extends Seeder
 {
     public function run(): void
     {
-        // 0. Cleanup existing data to avoid duplication and conflicts
+        // 0. Bersihkan data lama.
+        //
+        // TiDB tidak menegakkan FOREIGN KEY, jadi `SET FOREIGN_KEY_CHECKS` tidak
+        // berpengaruh dan setiap tabel harus di-truncate manual — anak lebih dulu,
+        // induk belakangan, supaya tidak ada baris yatim. Urutan ini juga aman
+        // untuk MySQL lokal (statement SET di bawah dipertahankan untuk itu,
+        // khususnya karena `comments` punya self-reference parent_id).
+        //
+        // `truncate()` sengaja dipakai (bukan delete per model) karena mem-bypass
+        // model event; jauh lebih cepat untuk volume data sebesar ini.
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('chapters')->truncate();
-        DB::table('novel_characters')->truncate();
-        DB::table('genre_novel')->truncate();
-        DB::table('novel_tag')->truncate();
-        DB::table('novels')->truncate();
-        DB::table('users')->truncate();
-        DB::table('genres')->truncate();
-        DB::table('tags')->truncate();
+
+        $tables = [
+            // anak terdalam
+            'reactions',
+            'comments',
+            'reading_histories',
+            'bookmarks',
+            'reviews',
+            'novel_view_logs',
+            'reading_sessions',
+            'user_list_items',
+            'character_relationships',
+            'novel_characters',
+            'plot_notes',
+            'novel_requests',
+            'writer_earnings',
+            'payout_settings',
+            'reports',
+            'author_follows',
+            'notifications',
+            // tabel pivot
+            'genre_novel',
+            'novel_tag',
+            // induk
+            'chapters',
+            'user_lists',
+            'novels',
+            'genres',
+            'tags',
+            'users',
+        ];
+
+        foreach ($tables as $table) {
+            DB::table($table)->truncate();
+        }
+
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // 1. Create specific users for each role

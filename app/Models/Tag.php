@@ -16,4 +16,14 @@ class Tag extends Model
     {
         return $this->belongsToMany(Novel::class);
     }
+
+    /**
+     * TiDB tidak menegakkan FOREIGN KEY, jadi baris pivot dibersihkan manual.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Tag $tag) {
+            $tag->novels()->detach();
+        });
+    }
 }

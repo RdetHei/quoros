@@ -45,4 +45,14 @@ class UserList extends Model
     {
         return 'slug';
     }
+
+    /**
+     * TiDB tidak menegakkan FOREIGN KEY, jadi cascade diulang di level aplikasi.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (UserList $list) {
+            $list->items()->delete();
+        });
+    }
 }

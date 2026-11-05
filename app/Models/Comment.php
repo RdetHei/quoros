@@ -52,4 +52,18 @@ class Comment extends Model
     {
         return $this->reactions()->where('type', 'dislike');
     }
+
+    /**
+     * TiDB tidak menegakkan FOREIGN KEY, jadi cascade diulang di level aplikasi.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Comment $comment) {
+            foreach ($comment->replies as $reply) {
+                $reply->delete();
+            }
+
+            $comment->reactions()->delete();
+        });
+    }
 }

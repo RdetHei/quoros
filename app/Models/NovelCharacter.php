@@ -52,4 +52,20 @@ class NovelCharacter extends Model
     {
         return $this->hasMany(CharacterRelationship::class, 'character_id');
     }
+
+    /**
+     * TiDB tidak menegakkan FOREIGN KEY, jadi cascade diulang di level aplikasi.
+     * Karakter bisa muncul di kolom character_id maupun related_character_id.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (NovelCharacter $character) {
+            CharacterRelationship::where('novel_id', $character->novel_id)
+                ->where(function ($query) use ($character) {
+                    $query->where('character_id', $character->id)
+                        ->orWhere('related_character_id', $character->id);
+                })
+                ->delete();
+        });
+    }
 }

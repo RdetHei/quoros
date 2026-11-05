@@ -100,6 +100,20 @@ class Chapter extends Model
     }
 
     /**
+     * TiDB tidak menegakkan FOREIGN KEY, jadi cascade diulang di level aplikasi.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Chapter $chapter) {
+            foreach ($chapter->comments as $comment) {
+                $comment->delete();
+            }
+
+            $chapter->readingHistories()->delete();
+        });
+    }
+
+    /**
      * Get the previous chapter in the same novel.
      */
     public function previous($onlyPublished = true)

@@ -16,6 +16,7 @@ use App\Models\NovelViewLog;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -1003,7 +1004,9 @@ class NovelController extends Controller
             }
         }
 
-        $novel->delete();
+        // Cascade-nya sekarang dijalankan di level aplikasi (lihat Novel::booted),
+        // jadi dibungkus transaksi agar tidak ada penghapusan parsial saat gagal.
+        DB::transaction(fn () => $novel->delete());
 
         return redirect()->route('writer.novels')->with('success', 'Novel deleted successfully!');
     }
