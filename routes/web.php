@@ -35,7 +35,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [NovelController::class, 'landing'])->name('welcome');
 
 Route::get('/site.webmanifest', function () {
-    $logo = asset('storage/logo/quorosLogo.png');
+    $icon192 = asset('storage/logo/icon-192.png');
+    $icon512 = asset('storage/logo/icon-512.png');
 
     return response()->json([
         'name' => config('app.name', 'Quoros'),
@@ -48,8 +49,9 @@ Route::get('/site.webmanifest', function () {
         'theme_color' => '#0f172a',
         'lang' => 'id',
         'icons' => [
-            ['src' => $logo, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
-            ['src' => $logo, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any maskable'],
+            ['src' => $icon192, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => $icon512, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => $icon512, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
         ],
     ], 200, ['Content-Type' => 'application/manifest+json'], JSON_UNESCAPED_SLASHES);
 })->name('pwa.manifest');

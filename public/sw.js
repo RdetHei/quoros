@@ -1,5 +1,5 @@
-/* Quoros PWA — cache bab (HTML & JSON infinite-scroll) + aset /build & /storage */
-const VERSION = 'quoros-sw-2026-05-01';
+/* Quoros PWA — cache bab (HTML & JSON infinite-scroll) + aset /build */
+const VERSION = 'quoros-sw-2026-11-09';
 const CHAPTER_CACHE = `${VERSION}-chapter`;
 const STATIC_CACHE = `${VERSION}-static`;
 
@@ -63,7 +63,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (url.pathname.startsWith('/build/') || url.pathname.startsWith('/storage/')) {
+  // Hanya aset Vite yang ber-hash yang di-cache. /storage TIDAK diintersep:
+  // file di sana sudah dikirim dengan Cache-Control dari server, jadi cache
+  // HTTP browser yang menanganinya — menghindari cache ganda yang bisa
+  // menyajikan respons rusak/kedaluwarsa.
+  if (url.pathname.startsWith('/build/')) {
     event.respondWith(
       caches.match(req).then(
         (cached) =>
@@ -71,7 +75,10 @@ self.addEventListener('fetch', (event) => {
           fetch(req).then((res) => {
             if (res.ok) {
               const copy = res.clone();
-              caches.open(STATIC_CACHE).then((cache) => cache.put(req, copy));
+              caches
+                .open(STATIC_CACHE)
+                .then((cache) => cache.put(req, copy))
+                .catch(() => {});
             }
             return res;
           }),
