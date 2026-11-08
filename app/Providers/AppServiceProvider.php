@@ -79,7 +79,7 @@ class AppServiceProvider extends ServiceProvider
                 return Limit::perMinute(600)->by('chapter-author-'.$user->id);
             }
 
-            $perMinute = max(5, min(200, (int) env('CHAPTER_READ_PER_MINUTE', 45)));
+            $perMinute = max(5, min(200, (int) config('quoros.chapter_read_per_minute', 45)));
 
             return Limit::perMinute($perMinute)->by($request->ip());
         });

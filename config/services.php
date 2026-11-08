@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'cloudinary' => [
+        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+        'key' => env('CLOUDINARY_KEY'),
+        'secret' => env('CLOUDINARY_SECRET'),
+    ],
+
+    'discord' => [
+        'bot_url' => env('DISCORD_BOT_URL'),
+        'secret_token' => env('DISCORD_SECRET_TOKEN'),
+    ],
+
 ];

@@ -20,8 +20,8 @@ class DiscordNotifierService
      */
     public function sendNewChapterNotification(Chapter $chapter): void
     {
-        $botUrl = env('DISCORD_BOT_URL');
-        $secretToken = env('DISCORD_SECRET_TOKEN');
+        $botUrl = config('services.discord.bot_url');
+        $secretToken = config('services.discord.secret_token');
 
         if (!$botUrl || !$secretToken) {
             Log::warning('Discord notification skipped: DISCORD_BOT_URL or DISCORD_SECRET_TOKEN not set.');

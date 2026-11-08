@@ -64,6 +64,14 @@ RUN mkdir -p \
     && php artisan storage:link \
     && composer dump-autoload --no-dev --classmap-authoritative
 
+# Cache rute, event, dan view DI DALAM image supaya container dingin tidak
+# perlu mendaftarkan rute atau mengompilasi Blade dari awal.
+# config:cache TIDAK dijalankan di sini: .env di-ignore dan rahasia
+# (APP_KEY, DB_*) baru disuntikkan Vercel saat container start (lihat CMD).
+RUN php artisan route:cache \
+    && php artisan event:cache \
+    && php artisan view:cache
+
 # ---------- Stage 4: runtime ----------
 FROM base AS runtime
 
@@ -85,4 +93,7 @@ ENV PORT=80 \
 
 USER www-data
 
-CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
+# config:cache hanya bisa dijalankan saat ini karena APP_KEY/DB_* baru ada
+# pada runtime. Kalau filesystem tidak bisa ditulis, perintah gagal dan
+# aplikasi tetap jalan tanpa config cache (tidak fatal).
+CMD ["/bin/sh", "-c", "php artisan config:cache || true; exec frankenphp run --config /etc/frankenphp/Caddyfile"]

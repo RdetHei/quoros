@@ -23,9 +23,9 @@ class CloudinaryService
             return $this->cloudinary;
         }
 
-        $cloudName = env('CLOUDINARY_CLOUD_NAME');
-        $apiKey = env('CLOUDINARY_KEY');
-        $apiSecret = env('CLOUDINARY_SECRET');
+        $cloudName = config('services.cloudinary.cloud_name');
+        $apiKey = config('services.cloudinary.key');
+        $apiSecret = config('services.cloudinary.secret');
 
         if (empty($cloudName) || empty($apiKey) || empty($apiSecret)) {
             throw new \RuntimeException('Cloudinary credentials are not configured. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_KEY, and CLOUDINARY_SECRET in the .env file.');
