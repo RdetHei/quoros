@@ -11,6 +11,15 @@
 
 	encode zstd gzip
 
+	# Cache header untuk aset statis. Tanpa ini Caddy/Vercel memakai
+	# "max-age=0, must-revalidate" sehingga browser revalidasi tiap navigasi.
+	# Aset Vite sudah ber-hash -> aman di-cache selamanya.
+	header /build/* Cache-Control "public, max-age=31536000, immutable"
+	# Aset /storage & gambar statis root: nama file tidak ber-hash, cache 7 hari.
+	header /storage/* Cache-Control "public, max-age=604800"
+	header /error.png Cache-Control "public, max-age=604800"
+	header /favicon.ico Cache-Control "public, max-age=604800"
+
 	# File statis (aset Vite, /storage, dsb.) dilayani langsung;
 	# sisanya diteruskan ke public/index.php.
 	php_server {

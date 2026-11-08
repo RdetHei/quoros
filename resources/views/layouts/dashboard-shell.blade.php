@@ -47,7 +47,7 @@
             <div class="flex h-full flex-col overflow-y-auto bg-[#0a0a0a] custom-scrollbar">
                 <header class="lg:hidden flex items-center justify-between h-14 px-4 bg-[#0a0a0a] border-b border-white/5 sticky top-0 z-40">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros Logo" class="h-7 w-auto">
+                        <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros Logo" width="132" height="80" class="h-7 w-auto">
                         <span class="text-base font-semibold tracking-tight text-[#f2efe8]">Quoros</span>
                     </div>
                     <button @click="sidebarOpen = !sidebarOpen" class="p-2 text-[#a3a3a3] hover:text-[#f2efe8] transition-colors">

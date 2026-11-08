@@ -24,7 +24,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
                     </a>
                     <a href="{{ route('welcome') }}" class="flex min-w-0 items-center gap-3">
-                        <img src="{{ asset('storage/logo/quorosLogo.png') }}" alt="Quoros" class="h-7 w-auto">
+                        <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros" width="132" height="80" class="h-7 w-auto">
                         <span class="hidden text-sm font-bold tracking-wide text-white sm:block">QUOROS</span>
                     </a>
                     <span class="hidden h-5 w-px bg-neutral-700 sm:block"></span>
