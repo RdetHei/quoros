@@ -297,7 +297,7 @@
                         </p>
                     </div>
                     <div class="md:col-span-2">
-                        <h4 class="footer-title">Browse</h4>
+                        <h2 class="footer-title">Browse</h2>
                         <ul class="space-y-3 mt-4">
                             <li><a href="{{ route('welcome') }}" class="text-sm">Home</a></li>
                             <li><a href="{{ route('novels.updated') }}" class="text-sm">Updates</a></li>
@@ -306,7 +306,7 @@
                         </ul>
                     </div>
                     <div class="md:col-span-2">
-                        <h4 class="footer-title">Discover</h4>
+                        <h2 class="footer-title">Discover</h2>
                         <ul class="space-y-3 mt-4">
                             <li><a href="{{ route('genres.index') }}" class="text-sm">Genres</a></li>
                             <li><a href="{{ route('tags.index') }}" class="text-sm">Tags</a></li>
@@ -319,7 +319,7 @@
                         </ul>
                     </div>
                     <div class="md:col-span-3">
-                        <h4 class="footer-title">Community</h4>
+                        <h2 class="footer-title">Community</h2>
                         <ul class="space-y-3 mt-4">
                             <li><a href="#" class="text-sm">Discord</a></li>
                             <li><a href="#" class="text-sm">Support</a></li>
@@ -329,7 +329,7 @@
                     </div>
                 </div>
                 <div class="pt-8 border-t border-[#d4af37]/10 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p class="text-[11px] text-[#6f6a62] font-medium uppercase tracking-[0.2em]">&copy; {{ date('Y') }} Quoros</p>
+                    <p class="text-[11px] text-[#948e86] font-medium uppercase tracking-[0.2em]">&copy; {{ date('Y') }} Quoros</p>
                     <div class="flex items-center gap-5 text-[#9a9488]">
                         <a href="#" class="hover:text-[#d4af37] transition-colors" aria-label="X / Twitter"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.9 2h3.68l-8.04 9.19L24 22h-7.32l-5.72-8.39L4.76 22H1.07l8.6-9.83L0 2h7.5l5.17 7.68L18.9 2zm-1.29 18h2.03L7.09 3.9H4.95L17.61 20z"/></svg></a>
                         <a href="#" class="hover:text-[#d4af37] transition-colors" aria-label="Discord"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.267 18.267 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.062 14.062 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.23 10.23 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg></a>

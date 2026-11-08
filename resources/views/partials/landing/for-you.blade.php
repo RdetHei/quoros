@@ -53,7 +53,7 @@
         </div>
 
         <div class="lp-see-more-wrap">
-            <a href="{{ route('novels.updated') }}" class="lp-see-more">SEE MORE</a>
+            <a href="{{ route('novels.updated') }}" class="lp-see-more">SEE MORE UPDATES</a>
         </div>
     </div>
 </section>
