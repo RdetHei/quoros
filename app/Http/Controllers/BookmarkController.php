@@ -10,6 +10,7 @@ use App\Models\ReadingHistory;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BookmarkController extends Controller
 {
@@ -36,7 +37,6 @@ class BookmarkController extends Controller
                 'novel.genres:id,name,slug',
                 'novel.tags:id,name,slug',
             ])
-            ->withCount('novel as total_chapters')
             ->latest('bookmarks.updated_at');
 
         if ($search) {
@@ -69,18 +69,35 @@ class BookmarkController extends Controller
         $lastReadAt = [];
         $savedAt = [];
 
+        // Pre-load agregat per novel sekali saja (hindari N+1 di dalam loop).
+        $novelIds = $tempItems->pluck('novel_id')->unique()->values();
+
+        $readCountsByNovel = ReadingHistory::where('user_id', $user->id)
+            ->whereIn('novel_id', $novelIds)
+            ->select('novel_id', DB::raw('COUNT(DISTINCT chapter_id) as cnt'))
+            ->groupBy('novel_id')
+            ->pluck('cnt', 'novel_id');
+
+        $totalChaptersByNovel = Chapter::whereIn('novel_id', $novelIds)
+            ->select('novel_id', DB::raw('COUNT(*) as cnt'))
+            ->groupBy('novel_id')
+            ->pluck('cnt', 'novel_id');
+
+        $lastReadByNovel = ReadingHistory::where('user_id', $user->id)
+            ->whereIn('novel_id', $novelIds)
+            ->with('chapter')
+            ->latest()
+            ->get()
+            ->groupBy('novel_id')
+            ->map(fn ($rows) => $rows->first());
+
+        $newChaptersCache = [];
+
         foreach ($tempItems as $bm) {
-            $lastRead = ReadingHistory::where('user_id', $user->id)
-                ->where('novel_id', $bm->novel_id)
-                ->latest()
-                ->first();
+            $lastRead = $lastReadByNovel->get($bm->novel_id);
 
-            $readChaptersCount = ReadingHistory::where('user_id', $user->id)
-                ->where('novel_id', $bm->novel_id)
-                ->distinct('chapter_id')
-                ->count('chapter_id');
-
-            $totalChapters = (int) ($bm->total_chapters ?? Chapter::where('novel_id', $bm->novel_id)->count());
+            $readChaptersCount = (int) ($readCountsByNovel[$bm->novel_id] ?? 0);
+            $totalChapters = (int) ($totalChaptersByNovel[$bm->novel_id] ?? 0);
             $progress = $totalChapters > 0 ? min(($readChaptersCount / $totalChapters) * 100, 100) : 0;
             $novelStatus = (string) ($bm->novel->status ?? '');
 
@@ -90,6 +107,15 @@ class BookmarkController extends Controller
                 $readingStatus = 'reading';
             } else {
                 $readingStatus = 'plan';
+            }
+
+            $newChaptersKey = $bm->novel_id.':'.($lastRead?->created_at?->timestamp ?? 0);
+            if (! array_key_exists($newChaptersKey, $newChaptersCache)) {
+                $newChaptersCache[$newChaptersKey] = $lastRead
+                    ? Chapter::where('novel_id', $bm->novel_id)
+                        ->where('created_at', '>', $lastRead->created_at)
+                        ->count()
+                    : $totalChapters;
             }
 
             $bookmarkIdsWithStatus[$bm->id] = [
@@ -102,9 +128,7 @@ class BookmarkController extends Controller
                 'saved_at' => $bm->created_at,
                 'novel_created_at' => $bm->novel?->created_at ?? $bm->created_at,
                 'rating_avg' => (float) ($bm->novel?->rating_avg ?? 0),
-                'new_chapters' => $lastRead ? Chapter::where('novel_id', $bm->novel_id)
-                    ->where('created_at', '>', $lastRead->created_at)
-                    ->count() : Chapter::where('novel_id', $bm->novel_id)->count(),
+                'new_chapters' => $newChaptersCache[$newChaptersKey],
             ];
 
             $lastReadAt[$bm->id] = $lastRead ? $lastRead->created_at->timestamp : 0;

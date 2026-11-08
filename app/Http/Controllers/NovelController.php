@@ -175,7 +175,7 @@ class NovelController extends Controller
             $landingHtml = view('partials.landing.body', $data)->render();
             Cache::put($cacheKey, ['html' => $landingHtml, 'hero' => $heroImage], now()->addMinutes(5));
 
-            return view('welcome', ['landingHtml' => $landingHtml, 'heroImage' => $heroImage]);
+            return view('welcome', array_merge($data, ['landingHtml' => $landingHtml]));
         }
 
         return view('welcome', $data);
@@ -572,23 +572,42 @@ class NovelController extends Controller
 
         $bookmarkedNovelIds = Bookmark::where('user_id', $userId)->pluck('novel_id')->flip();
 
+        // Pre-load agregat per novel sekali saja (hindari N+1 di dalam loop).
+        $novelIds = $historiesRaw->pluck('novel_id')->unique()->values();
+
+        $readCountsByNovel = ReadingHistory::where('user_id', $userId)
+            ->whereIn('novel_id', $novelIds)
+            ->select('novel_id', DB::raw('COUNT(DISTINCT chapter_id) as cnt'))
+            ->groupBy('novel_id')
+            ->pluck('cnt', 'novel_id');
+
+        $totalChaptersByNovel = Chapter::whereIn('novel_id', $novelIds)
+            ->select('novel_id', DB::raw('COUNT(*) as cnt'))
+            ->groupBy('novel_id')
+            ->pluck('cnt', 'novel_id');
+
+        // Cache bab berikutnya per (novel, order) agar tidak query berulang.
+        $nextChapterCache = [];
+
         foreach ($historiesRaw as $history) {
             $dateKey = $history->created_at->toDateString();
 
             $novel = $history->novel;
             $chapter = $history->chapter;
 
-            $readChaptersCount = ReadingHistory::where('user_id', $userId)
-                ->where('novel_id', $novel->id)
-                ->distinct('chapter_id')
-                ->count('chapter_id');
-            $totalChapters = (int) ($novel->chapters_count ?? Chapter::where('novel_id', $novel->id)->count());
+            $readChaptersCount = (int) ($readCountsByNovel[$novel->id] ?? 0);
+            $totalChapters = (int) ($totalChaptersByNovel[$novel->id] ?? 0);
             $progress = $totalChapters > 0 ? min(($readChaptersCount / $totalChapters) * 100, 100) : 0;
 
-            $nextChapter = Chapter::where('novel_id', $novel->id)
-                ->where('order', '>', ($chapter->order ?? 0))
-                ->orderBy('order')
-                ->first();
+            $currentOrder = $chapter->order ?? 0;
+            $nextKey = $novel->id.':'.$currentOrder;
+            if (! array_key_exists($nextKey, $nextChapterCache)) {
+                $nextChapterCache[$nextKey] = Chapter::where('novel_id', $novel->id)
+                    ->where('order', '>', $currentOrder)
+                    ->orderBy('order')
+                    ->first();
+            }
+            $nextChapter = $nextChapterCache[$nextKey];
 
             $isBookmarked = isset($bookmarkedNovelIds[$novel->id]);
 

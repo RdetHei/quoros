@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ImageUploadRequest;
 use App\Models\Bookmark;
 use App\Models\Chapter;
+use App\Models\Comment;
 use App\Models\ReadingHistory;
 use App\Models\User;
 use App\Models\UserList;
 use App\Services\CloudinaryService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
@@ -31,10 +33,14 @@ class ProfileController extends Controller
 
         $writerStats = null;
         if (in_array($user->role, ['writer', 'admin'], true)) {
-            $myNovels = $user->novels()->with(['chapters.comments'])->get();
+            $myNovels = $user->novels()->withCount('chapters')->get();
+            $myNovelIds = $myNovels->pluck('id');
+            $totalComments = $myNovelIds->isEmpty() ? 0 : Comment::whereHas('chapter', function ($q) use ($myNovelIds) {
+                $q->whereIn('novel_id', $myNovelIds);
+            })->count();
             $writerStats = [
                 'total_views' => $myNovels->sum('view_count'),
-                'total_comments' => $myNovels->sum(fn ($n) => $n->chapters->sum(fn ($c) => $c->comments->count())),
+                'total_comments' => $totalComments,
                 'avg_rating' => $myNovels->avg('rating_avg') ?? 0,
                 'novel_count' => $myNovels->count(),
             ];
@@ -57,24 +63,38 @@ class ProfileController extends Controller
                     'novel.author',
                     'novel.genres:id,name,slug',
                 ])
-                ->withCount('novel as total_chapters')
                 ->latest('bookmarks.updated_at')
                 ->get();
 
             $statsCounts['saved'] = $rawBookmarks->count();
 
+            // Pre-load agregat per novel sekali saja (hindari N+1 di dalam loop).
+            $novelIds = $rawBookmarks->pluck('novel_id')->unique()->values();
+
+            $readCountsByNovel = ReadingHistory::where('user_id', $user->id)
+                ->whereIn('novel_id', $novelIds)
+                ->select('novel_id', DB::raw('COUNT(DISTINCT chapter_id) as cnt'))
+                ->groupBy('novel_id')
+                ->pluck('cnt', 'novel_id');
+
+            $totalChaptersByNovel = Chapter::whereIn('novel_id', $novelIds)
+                ->select('novel_id', DB::raw('COUNT(*) as cnt'))
+                ->groupBy('novel_id')
+                ->pluck('cnt', 'novel_id');
+
+            $lastReadByNovel = ReadingHistory::where('user_id', $user->id)
+                ->whereIn('novel_id', $novelIds)
+                ->with('chapter')
+                ->latest()
+                ->get()
+                ->groupBy('novel_id')
+                ->map(fn ($rows) => $rows->first());
+
             foreach ($rawBookmarks as $bm) {
-                $lastRead = ReadingHistory::where('user_id', $user->id)
-                    ->where('novel_id', $bm->novel_id)
-                    ->latest()
-                    ->first();
+                $lastRead = $lastReadByNovel->get($bm->novel_id);
 
-                $readChaptersCount = ReadingHistory::where('user_id', $user->id)
-                    ->where('novel_id', $bm->novel_id)
-                    ->distinct('chapter_id')
-                    ->count('chapter_id');
-
-                $totalChapters = (int) ($bm->total_chapters ?? Chapter::where('novel_id', $bm->novel_id)->count());
+                $readChaptersCount = (int) ($readCountsByNovel[$bm->novel_id] ?? 0);
+                $totalChapters = (int) ($totalChaptersByNovel[$bm->novel_id] ?? 0);
                 $progress = $totalChapters > 0 ? min(($readChaptersCount / $totalChapters) * 100, 100) : 0;
                 $novelStatus = (string) ($bm->novel->status ?? '');
 

@@ -147,7 +147,7 @@ class ChapterController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
         ]);
 
         $slug = Str::slug($request->title);

@@ -4,7 +4,7 @@
 ])
 
 @section('content')
-<div class="space-y-6" x-data="bulkChapterManager()">
+<div class="space-y-6" x-data="bulkChapterManager(@js($existingChapters->pluck('id')->values()))">
     <div class="bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden">
         <div class="flex items-center justify-between px-8 py-5 border-b border-neutral-800">
             <div>
@@ -21,26 +21,31 @@
             </div>
         </div>
 
+        {{-- ── Import ────────────────────────────────────────────── --}}
         <div class="px-8 py-7 border-b border-neutral-800">
-            <form action="{{ route('writer.novels.chapters.bulk-store', $novel) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form action="{{ route('writer.novels.chapters.bulk-upload', $novel) }}" method="POST" enctype="multipart/form-data" class="space-y-6" x-show="!chapters.length" x-transition>
                 @csrf
                 <div class="p-8 bg-black/40 rounded-xl border border-neutral-800 text-center max-w-3xl mx-auto">
                     <div class="w-16 h-16 bg-[#c7a64a]/10 rounded-xl flex items-center justify-center text-[#c7a64a] mx-auto mb-5 border border-[#c7a64a]/20">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                     </div>
                     <h3 class="text-xl font-semibold text-white mb-2">Multi-Chapter Document Import</h3>
-                    <p class="text-sm text-neutral-400 mb-8 leading-relaxed">Upload EPUB, DOCX, PDF, or ZIP. Chapters are auto-split by heading and appended to your library.</p>
+                    <p class="text-sm text-neutral-400 mb-8 leading-relaxed">Upload EPUB, DOCX, or PDF. Chapters are auto-split by heading and saved to your library.</p>
 
                     <label class="relative group cursor-pointer block">
                         <div class="p-8 border border-dashed border-neutral-700 rounded-xl bg-neutral-900 group-hover:border-[#c7a64a]/40 transition-all">
-                            <p class="text-sm font-medium text-white uppercase tracking-wider" x-text="docFile ? docFile.name : 'Choose file or drag &amp; drop here'"></p>
-                            <p class="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mt-2">EPUB · DOCX · PDF · ZIP — Max 50MB</p>
+                            <p class="text-sm font-medium text-white uppercase tracking-wider" x-text="docFile ? docFile.name : 'Choose file or drag & drop here'"></p>
+                            <p class="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mt-2">EPUB · DOCX · PDF — Max 50MB</p>
                         </div>
-                        <input type="file" name="file" accept=".epub,.docx,.pdf,.zip" class="hidden" @change="docFile = $event.target.files[0]" />
+                        <input type="file" name="file" accept=".epub,.docx,.pdf" class="hidden" @change="docFile = $event.target.files[0]" />
                     </label>
+
+                    @error('file')
+                        <p class="mt-4 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="flex items-center justify-center gap-3">
+                <div class="flex flex-wrap items-center justify-center gap-3">
                     <button type="submit" :disabled="!docFile" class="px-8 py-3 bg-white text-black text-xs font-medium uppercase tracking-wider rounded-lg hover:bg-neutral-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                         Import Chapters
@@ -53,17 +58,70 @@
                     </button>
                 </div>
             </form>
+
+            {{-- ── Preview / Edit before save ────────────────────── --}}
+            <div x-show="chapters.length" x-cloak x-transition class="space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-base font-semibold text-white">Review Extracted Chapters</h3>
+                        <p class="text-xs text-neutral-500 uppercase tracking-[0.2em] mt-1">
+                            <span x-text="chapters.length"></span> chapters detected · edit titles or remove before saving
+                        </p>
+                    </div>
+                    <button type="button" @click="resetPreview()" class="px-4 py-2.5 text-xs font-medium uppercase tracking-wider text-neutral-400 hover:text-white border border-neutral-700 rounded-lg transition-colors">
+                        Start Over
+                    </button>
+                </div>
+
+                <div class="max-h-[32rem] overflow-y-auto pr-1 space-y-3 custom-scrollbar">
+                    <template x-for="(chapter, index) in chapters" :key="index">
+                        <div class="p-4 bg-black/40 rounded-xl border border-neutral-800 space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-center h-7 w-7 rounded-md border border-neutral-800 bg-neutral-900 text-[11px] font-semibold text-neutral-400 tabular-nums shrink-0" x-text="index + 1"></div>
+                                <input type="text" x-model="chapter.title" placeholder="Chapter title"
+                                    class="flex-1 min-w-0 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#c7a64a] focus:border-[#c7a64a] transition-all">
+                                <button type="button" @click="removeChapter(index)" class="p-2 rounded-md text-neutral-500 hover:text-red-400 hover:bg-red-500/5 transition-colors shrink-0" title="Remove chapter">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                                </button>
+                            </div>
+                            <textarea x-model="chapter.content" rows="4" placeholder="Chapter content"
+                                class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs text-neutral-300 leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#c7a64a] focus:border-[#c7a64a] transition-all custom-scrollbar"></textarea>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-4 pt-5 border-t border-neutral-800">
+                    <div class="flex-1 min-w-[12rem] max-w-sm" x-show="isSaving" x-cloak>
+                        <div class="flex items-center justify-between text-[11px] font-medium uppercase tracking-wider text-neutral-400 mb-2">
+                            <span>Saving chapters</span>
+                            <span class="tabular-nums" x-text="progress + '%'"></span>
+                        </div>
+                        <div class="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-[#c7a64a] transition-all duration-300" :style="`width: ${progress}%`"></div>
+                        </div>
+                    </div>
+                    <button type="button" @click="saveAll()" :disabled="isSaving || !chapters.length" class="px-8 py-3 bg-[#c7a64a] text-black text-xs font-semibold uppercase tracking-wider rounded-lg hover:bg-[#d4b356] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3">
+                        <template x-if="isSaving">
+                            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </template>
+                        <span x-text="isSaving ? 'Saving...' : `Save ${chapters.length} Chapters`"></span>
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <form action="{{ route('writer.novels.chapters.reorder', $novel) }}" method="POST" class="px-8 py-7" x-data="{ chapterOrder: @js($existingChapters->pluck('id')->values()) }">
+        {{-- ── Reorder ───────────────────────────────────────────── --}}
+        <form action="{{ route('writer.novels.chapters.reorder', $novel) }}" method="POST" class="px-8 py-7">
             @csrf
-            <input type="hidden" name="order" x-bind:value="JSON.stringify(chapterOrder)">
+            <template x-for="(id, index) in chapterOrder" :key="id">
+                <input type="hidden" :name="`order[${index}]`" :value="id">
+            </template>
 
             <div class="flex items-center justify-between mb-5">
                 <div>
                     <h3 class="text-base font-semibold text-white">Current Chapter Order</h3>
                     <p class="text-xs text-neutral-500 uppercase tracking-[0.2em] mt-1">
-                        {{ $existingChapters->count() }} {{ Str::plural('chapter', $existingChapters->count()) }} · Drag handles or use arrows
+                        {{ $existingChapters->count() }} {{ Str::plural('chapter', $existingChapters->count()) }} · Use arrows to reorder
                     </p>
                 </div>
                 <button type="submit" :disabled="!isDirty()" class="px-6 py-2.5 bg-[#c7a64a] text-black text-[11px] font-semibold uppercase tracking-[0.2em] rounded-md hover:bg-[#d4b356] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
@@ -90,25 +148,18 @@
                                 default => 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20',
                             };
                         @endphp
-                        <li class="group flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.02] transition-colors"
-                            x-bind:data-id="{{ $chap->id }}">
-                            <button type="button" class="flex flex-col gap-0.5 text-neutral-600 hover:text-neutral-300 transition-colors shrink-0 p-1"
-                                @click="moveItem({{ $loop->index }}, -1)"
-                                :disabled="{{ $loop->first ? 'true' : 'false' }}"
-                                :class="{{ $loop->first ? "'opacity-20 cursor-not-allowed'" : "''" }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
-                            </button>
-                            <button type="button" class="flex flex-col gap-0.5 text-neutral-600 hover:text-neutral-300 transition-colors shrink-0 p-1"
-                                @click="moveItem({{ $loop->index }}, 1)"
-                                :disabled="{{ $loop->last ? 'true' : 'false' }}"
-                                :class="{{ $loop->last ? "'opacity-20 cursor-not-allowed'" : "''" }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                            </button>
-
-                            <div class="cursor-grab text-neutral-600 hover:text-neutral-300 shrink-0 p-1 select-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
-                                </svg>
+                        <li class="group flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.02] transition-colors">
+                            <div class="flex flex-col shrink-0">
+                                <button type="button" class="text-neutral-600 hover:text-neutral-300 transition-colors p-0.5 disabled:opacity-20 disabled:cursor-not-allowed"
+                                    @click="moveItem({{ $loop->index }}, -1)"
+                                    @if($loop->first) disabled @endif>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
+                                </button>
+                                <button type="button" class="text-neutral-600 hover:text-neutral-300 transition-colors p-0.5 disabled:opacity-20 disabled:cursor-not-allowed"
+                                    @click="moveItem({{ $loop->index }}, 1)"
+                                    @if($loop->last) disabled @endif>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                                </button>
                             </div>
 
                             <div class="flex items-center justify-center h-8 w-8 rounded-md border border-neutral-800 bg-neutral-900 text-[11px] font-semibold text-neutral-400 tabular-nums shrink-0">
@@ -139,51 +190,95 @@
                     @endforeach
                 </ul>
             @endif
-
-            <script>
-                function bulkChapterManager() {
-                    return {
-                        docFile: null,
-                        isParsing: false,
-                        chapters: [],
-                        initialOrder: @json($existingChapters->pluck('id')->values()),
-                        isDirty() {
-                            if (typeof this.chapterOrder === 'undefined') return false;
-                            return JSON.stringify(this.chapterOrder) !== JSON.stringify(this.initialOrder);
-                        },
-                        moveItem(index, direction) {
-                            const target = index + direction;
-                            if (target < 0 || target >= this.chapterOrder.length) return;
-                            const tmp = this.chapterOrder[index];
-                            this.chapterOrder.splice(index, 1);
-                            this.chapterOrder.splice(target, 0, tmp);
-                        },
-                        async startParsing() {
-                            if (!this.docFile) return;
-                            this.isParsing = true;
-                            const formData = new FormData();
-                            formData.append('file', this.docFile);
-                            formData.append('_token', '{{ csrf_token() }}');
-                            try {
-                                const res = await fetch('{{ route('writer.novels.chapters.bulk-parse', $novel->id) }}', {
-                                    method: 'POST',
-                                    body: formData,
-                                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-                                });
-                                const data = await res.json();
-                                if (!res.ok) throw new Error(data.error || 'Failed to parse');
-                                this.chapters = data.chapters;
-                                alert(data.chapters.length + ' chapters detected. Use Import to save them.');
-                            } catch (err) {
-                                alert(err.message);
-                            } finally {
-                                this.isParsing = false;
-                            }
-                        }
-                    }
-                }
-            </script>
         </form>
     </div>
 </div>
+
+<script>
+    function bulkChapterManager(initialOrder) {
+        return {
+            docFile: null,
+            isParsing: false,
+            isSaving: false,
+            progress: 0,
+            chapters: [],
+            chapterOrder: initialOrder,
+            initialOrder: initialOrder,
+
+            isDirty() {
+                return JSON.stringify(this.chapterOrder) !== JSON.stringify(this.initialOrder);
+            },
+            moveItem(index, direction) {
+                const target = index + direction;
+                if (target < 0 || target >= this.chapterOrder.length) return;
+                const tmp = this.chapterOrder[index];
+                this.chapterOrder.splice(index, 1);
+                this.chapterOrder.splice(target, 0, tmp);
+            },
+            removeChapter(index) {
+                this.chapters.splice(index, 1);
+            },
+            resetPreview() {
+                this.chapters = [];
+                this.progress = 0;
+            },
+            async startParsing() {
+                if (!this.docFile) return;
+                this.isParsing = true;
+                const formData = new FormData();
+                formData.append('file', this.docFile);
+                formData.append('_token', '{{ csrf_token() }}');
+                try {
+                    const res = await fetch('{{ route('writer.novels.chapters.bulk-parse', $novel->id) }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Failed to parse document');
+                    this.chapters = data.chapters.map(c => ({ title: c.title, content: c.content ?? '' }));
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    this.isParsing = false;
+                }
+            },
+            async saveAll() {
+                if (!this.chapters.length || this.isSaving) return;
+                this.isSaving = true;
+                this.progress = 0;
+                try {
+                    for (let i = 0; i < this.chapters.length; i++) {
+                        const res = await fetch('{{ route('writer.novels.chapters.store-bulk', $novel->id) }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                title: this.chapters[i].title,
+                                content: this.chapters[i].content
+                            })
+                        });
+                        if (!res.ok) throw new Error('Failed to save chapter ' + (i + 1));
+                        this.progress = Math.round(((i + 1) / this.chapters.length) * 100);
+                    }
+                    window.location.href = '{{ route('writer.chapters', ['novel_id' => $novel->id]) }}';
+                } catch (err) {
+                    alert(err.message);
+                    this.isSaving = false;
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    [x-cloak] { display: none !important; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #404040; border-radius: 10px; }
+</style>
 @endsection
