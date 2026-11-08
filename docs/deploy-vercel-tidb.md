@@ -121,9 +121,9 @@ CACHE_STORE=database
 QUEUE_CONNECTION=sync
 LOG_CHANNEL=stack
 
-CLOUDINARY_CLOUD_NAME=dwndwprdr
-CLOUDINARY_KEY=648897635468459
-CLOUDINARY_SECRET=dLq8zl-DGWSQ27i1zuhbHjZXtjc
+CLOUDINARY_CLOUD_NAME=<cloud_name_akun_kamu>
+CLOUDINARY_KEY=<api_key_akun_kamu>
+CLOUDINARY_SECRET=<api_secret_akun_kamu>
 CLOUDINARY_SECURE=true
 ```
 
@@ -214,9 +214,9 @@ vercel env add DB_HOST production
 | `QUEUE_CONNECTION` | `sync` | Tidak ada worker di Vercel. |
 | `FILESYSTEM_DISK` | `local` | Tidak ada upload yang memakai disk default. |
 | `SESSION_SECURE_COOKIE` | `true` | Opsional, memperketat cookie. |
-| `CLOUDINARY_CLOUD_NAME` | `dwndwprdr` | |
-| `CLOUDINARY_KEY` | `648897635468459` | |
-| `CLOUDINARY_SECRET` | `...` | |
+| `CLOUDINARY_CLOUD_NAME` | `<cloud_name>` | Ambil dari dashboard Cloudinary. Jangan pakai nilai contoh. |
+| `CLOUDINARY_KEY` | `<api_key>` | Samakan persis dengan `.env` lokal yang sudah terbukti bisa upload. |
+| `CLOUDINARY_SECRET` | `<api_secret>` | Tanpa tanda kutip dan tanpa spasi di ujung. |
 | `CLOUDINARY_SECURE` | `true` | |
 | `CLOUDINARY_URL` | `cloudinary://key:secret@cloud` | Opsional, dipakai SDK sebagai fallback. |
 
