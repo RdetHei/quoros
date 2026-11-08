@@ -15,9 +15,15 @@
 	# "max-age=0, must-revalidate" sehingga browser revalidasi tiap navigasi.
 	# Aset Vite sudah ber-hash -> aman di-cache selamanya.
 	header /build/* Cache-Control "public, max-age=31536000, immutable"
-	# Aset /storage & gambar statis root: nama file tidak ber-hash, cache 7 hari.
+	# Aset /storage hasil upload pengguna (cover, avatar, bab): nama file tidak
+	# ber-hash, jadi cache 7 hari saja.
 	header /storage/* Cache-Control "public, max-age=604800"
-	header /error.png Cache-Control "public, max-age=604800"
+	# Aset statis milik repo dengan nama file tetap. Ditulis setelah /storage/*
+	# supaya menang untuk path logo. Cache 1 tahun agar lolos audit
+	# "efficient cache lifetime". Kalau isinya diganti, ganti juga nama filenya
+	# supaya cache lama tidak terus dipakai.
+	header /storage/logo/* Cache-Control "public, max-age=31536000, immutable"
+	header /error.png Cache-Control "public, max-age=31536000, immutable"
 	header /favicon.ico Cache-Control "public, max-age=604800"
 
 	# File statis (aset Vite, /storage, dsb.) dilayani langsung;

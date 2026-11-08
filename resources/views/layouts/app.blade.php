@@ -226,7 +226,7 @@
                  class="mobile-menu-panel relative w-[84vw] max-w-[340px] h-full shadow-2xl flex flex-col overflow-y-auto">
                 <div class="px-5 py-5 border-b border-[#d4af37]/12 flex items-center justify-between sticky top-0 bg-[#0c0c0c]/95 backdrop-blur z-10">
                     <div class="flex items-center gap-2.5">
-                        <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros Logo" width="132" height="80" class="h-8 w-auto">
+                        <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros Logo" width="132" height="80" class="h-8 w-auto" loading="lazy" decoding="async">
                         <span class="text-xs font-bold uppercase tracking-[0.28em] text-[#f5f1e8]">QUOROS</span>
                     </div>
                     <button @click="closeMobileMenu()" class="h-9 w-9 inline-flex items-center justify-center rounded-md text-[#f5f1e8] hover:bg-white/5 transition-colors" aria-label="Close menu">
@@ -289,7 +289,7 @@
                 <div class="grid grid-cols-1 gap-10 md:grid-cols-12 mb-12">
                     <div class="md:col-span-5">
                         <div class="flex items-center gap-3 mb-5">
-                            <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros Logo" width="132" height="80" class="h-10 w-auto" onerror="this.onerror=null; this.src='/error.png'">
+                            <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros Logo" width="132" height="80" class="h-10 w-auto" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/error.png'">
                             <span class="footer-brand">QUOROS</span>
                         </div>
                         <p class="text-sm text-[#9a9488] max-w-sm leading-relaxed">
