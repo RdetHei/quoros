@@ -1646,7 +1646,9 @@ nav.navbar {
     border-bottom: 1px solid rgba(255,255,255,0.06);
     font-size: .68rem;
     letter-spacing: .03em;
-    color: #737373;
+    /* Pakai token --lp-subtle (#8a8a8a) supaya kontras >= 4.5:1 di atas
+       panel gelap; #737373 hanya 3.95:1 dan gagal audit color-contrast. */
+    color: var(--lp-subtle);
 }
 .lp-pill-cloud { display: flex; flex-wrap: wrap; gap: .75rem .65rem; }
 .lp-pill {

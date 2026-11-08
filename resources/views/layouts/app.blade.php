@@ -21,8 +21,8 @@
     <meta property="twitter:description" content="@yield('meta_description', 'Quoros adalah platform novel premium.')">
     <meta property="twitter:image" content="{{ asset('storage/logo/quorosLogo.png') }}">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
+    <!-- Favicon: pakai ikon square kecil (7.8 KB), bukan logo 132x80 (85 KB). -->
+    <link rel="icon" type="image/png" href="{{ asset('storage/logo/icon-192.png') }}">
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
