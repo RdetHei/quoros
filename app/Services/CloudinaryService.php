@@ -12,6 +12,43 @@ class CloudinaryService
 {
     protected ?Cloudinary $cloudinary = null;
 
+    /** Transformasi Cloudinary untuk banner hero (landscape lebar). */
+    public const HERO_TRANSFORMATION = 'w_1600,h_720,c_fill,g_north,f_auto,q_auto';
+
+    /** Transformasi Cloudinary untuk cover grid/thumbnail (rasio 2:3, kecil). */
+    public const THUMB_TRANSFORMATION = 'w_240,h_360,c_fill,f_auto,q_auto';
+
+    /**
+     * Sisipkan transformasi Cloudinary ke URL yang sudah ada, mengganti rantai
+     * transformasi lama (mis. hasil resize 600x800 saat upload) supaya tidak
+     * bertumpuk. URL non-Cloudinary (mis. storage lokal) dikembalikan apa adanya.
+     */
+    public static function transform(?string $url, string $transformation): ?string
+    {
+        if (empty($url) || ! str_contains($url, 'res.cloudinary.com') || ! str_contains($url, '/upload/')) {
+            return $url;
+        }
+
+        [$prefix, $rest] = explode('/upload/', $url, 2);
+
+        // Pertahankan segmen versi (v123/) sebagai pemisah transformasi & public_id.
+        if (preg_match('#^(?:.*?/)?(v\d+/.*)$#', $rest, $matches)) {
+            $rest = $matches[1];
+        }
+
+        return $prefix.'/upload/'.$transformation.'/'.$rest;
+    }
+
+    public static function hero(?string $url): ?string
+    {
+        return self::transform($url, self::HERO_TRANSFORMATION);
+    }
+
+    public static function thumb(?string $url): ?string
+    {
+        return self::transform($url, self::THUMB_TRANSFORMATION);
+    }
+
     /**
      * Bangun client Cloudinary hanya saat dibutuhkan. Sengaja lazy supaya
      * halaman yang tidak mengunggah apa pun (mis. beranda) tetap dapat

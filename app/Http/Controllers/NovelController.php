@@ -16,12 +16,16 @@ use App\Models\NovelViewLog;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class NovelController extends Controller
 {
+    /** Naikkan versi ini saat struktur data landing berubah agar cache lama tidak dipakai. */
+    private const LANDING_CACHE_VERSION = 'v1';
+
     protected $cloudinaryService;
 
     public function __construct(
@@ -34,6 +38,19 @@ class NovelController extends Controller
 
     public function landing()
     {
+        $isGuest = ! Auth::check();
+        // Link di dalam HTML memakai host request, jadi cache dipisah per host.
+        $cacheKey = 'landing:body:guest:'.request()->getHost().':'.self::LANDING_CACHE_VERSION;
+
+        // Tamu melihat halaman yang identik, jadi sajikan hasil cache lebih dulu
+        // agar query berat di bawah tidak dijalankan sama sekali.
+        if ($isGuest && is_array($cached = Cache::get($cacheKey))) {
+            return view('welcome', [
+                'landingHtml' => $cached['html'],
+                'heroImage' => $cached['hero'] ?? null,
+            ]);
+        }
+
         $featuredQuery = Novel::with(['author', 'genres', 'chapters' => function ($q) {
                 $q->published()->orderBy('order')->orderBy('id')->take(1);
             }])
@@ -134,7 +151,13 @@ class NovelController extends Controller
 
         $marathonNovel = $projectUpdates->skip(2)->first() ?? $featuredNovels->first();
 
-        return view('welcome', compact(
+        $heroNovel = $featuredNovels->first();
+        $heroCover = $heroNovel
+            ? ($heroNovel->cover_image_url ?: ($heroNovel->cover_image ? asset('storage/'.$heroNovel->cover_image) : null))
+            : null;
+        $heroImage = CloudinaryService::hero($heroCover);
+
+        $data = compact(
             'featuredNovels',
             'projectUpdates',
             'popularGenres',
@@ -143,7 +166,19 @@ class NovelController extends Controller
             'hotTake',
             'forYou',
             'marathonNovel',
-        ));
+            'heroImage',
+        );
+
+        // Simpan HTML body + gambar hero (dua-duanya string, aman untuk cache
+        // store yang tidak mengizinkan unserialize objek).
+        if ($isGuest) {
+            $landingHtml = view('partials.landing.body', $data)->render();
+            Cache::put($cacheKey, ['html' => $landingHtml, 'hero' => $heroImage], now()->addMinutes(5));
+
+            return view('welcome', ['landingHtml' => $landingHtml, 'heroImage' => $heroImage]);
+        }
+
+        return view('welcome', $data);
     }
 
     public function index(Request $request)

@@ -1,9 +1,13 @@
 @php
     $heroFirst = $featuredCarouselData->first();
+    $heroBg = ($heroImage ?? null)
+        ?: ($heroFirst['cover_wide'] ?? null)
+        ?: ($heroFirst['cover'] ?? null)
+        ?: '/error.png';
 @endphp
 <section class="lp-hero"
          @if($heroFirst)
-             style="background-image: url('{{ $heroFirst['cover'] ?: '/error.png' }}');"
+             style="background-image: url('{{ $heroBg }}');"
              x-data="landingHero(@js($featuredCarouselData))"
              @mouseenter="paused = true"
              @mouseleave="paused = false"
@@ -19,7 +23,7 @@
                  x-transition:leave="transition ease-in duration-400"
                  x-transition:leave-start="opacity-100"
                  x-transition:leave-end="opacity-0"
-                 :style="`background-image: url('${novel.cover || '/error.png'}');`"></div>
+                 :style="`background-image: url('${novel.cover_wide || novel.cover || '/error.png'}');`"></div>
         </template>
     @else
         <div class="lp-hero-bg lp-hero-bg--fallback"></div>

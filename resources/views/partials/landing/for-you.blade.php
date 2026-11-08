@@ -15,7 +15,7 @@
         <div class="lp-for-you-grid">
             @foreach($forYou as $novel)
                 @php
-                    $cover = $coverOf($novel);
+                    $cover = \App\Services\CloudinaryService::thumb($coverOf($novel));
                     $recentChapters = $novel->chapters->take(3);
                 @endphp
                 <article class="lp-for-you-card">

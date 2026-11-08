@@ -1,7 +1,9 @@
 @if($hotTake)
 @php
-    $cover = $hotTake->cover_image_url
+    $coverRaw = $hotTake->cover_image_url
         ?: ($hotTake->cover_image ? asset('storage/' . $hotTake->cover_image) : null);
+    $cover = \App\Services\CloudinaryService::thumb($coverRaw);
+    $coverWide = \App\Services\CloudinaryService::hero($coverRaw);
     $firstChapter = $hotTake->chapters->sortBy('order')->first()
         ?? $hotTake->chapters->first();
     $readUrl = $firstChapter
@@ -21,7 +23,7 @@
 <section class="lp-section" style="padding-top: 1.65rem;">
     <div class="lp-container">
         <div class="lp-hot-takes">
-            <div class="lp-hot-takes-bg" @if($cover) style="background-image: url('{{ $cover }}');" @endif></div>
+            <div class="lp-hot-takes-bg" @if($coverWide) style="background-image: url('{{ $coverWide }}');" @endif></div>
             <div class="lp-hot-takes-shade"></div>
             <div class="lp-hot-takes-inner">
                 <a href="{{ route('novels.show', $hotTake->slug) }}" class="lp-hot-cover">

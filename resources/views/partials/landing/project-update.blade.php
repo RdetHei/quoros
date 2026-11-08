@@ -20,7 +20,7 @@
                             {{-- desain: 5 kolom x 3 baris = 15 item --}}
                             @foreach($projectUpdates->take(15) as $novel)
                                 @php
-                                    $cover = $coverOf($novel);
+                                    $cover = \App\Services\CloudinaryService::thumb($coverOf($novel));
                                     $latest = $novel->chapters->first();
                                     $ago = $latest
                                         ? \Illuminate\Support\Carbon::parse($latest->published_at ?? $latest->created_at)->diffForHumans(null, true)

@@ -17,7 +17,7 @@
             <div class="lp-cover-grid lp-cover-grid--7">
                 @foreach($monthlyViewed as $novel)
                     @php
-                        $cover = $coverOf($novel);
+                        $cover = \App\Services\CloudinaryService::thumb($coverOf($novel));
                         $latest = $novel->chapters->first() ?? null;
                         $ago = $latest
                             ? \Illuminate\Support\Carbon::parse($latest->published_at ?? $latest->created_at)->diffForHumans(null, true)

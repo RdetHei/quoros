@@ -36,8 +36,10 @@ class SecurityHeadersMiddleware
             if ($request->routeIs('pwa.manifest') || $request->is('build/*') || $request->is('storage/*')) {
                 $response->headers->set('Cache-Control', 'public, max-age=31536000, immutable');
             } else {
-                $response->headers->set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
-                $response->headers->set('Pragma', 'no-cache');
+                // HTML dinamis: hindari "no-store" supaya bfcache tetap aktif
+                // (dinilai Lighthouse), cukup minta revalidasi tiap kali.
+                $response->headers->set('Cache-Control', 'private, no-cache, max-age=0, must-revalidate');
+                $response->headers->remove('Pragma');
             }
         }
 
