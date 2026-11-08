@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class GenreController extends Controller
@@ -77,7 +78,8 @@ class GenreController extends Controller
             return back()->with('error', 'Genre cannot be deleted because it still has novels!');
         }
 
-        $genre->delete();
+        // Cascade di level aplikasi (lihat Genre::booted) → bungkus transaksi.
+        DB::transaction(fn () => $genre->delete());
         return redirect()->route('admin.genres.index')->with('success', 'Genre deleted successfully!');
     }
 }

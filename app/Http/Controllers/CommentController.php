@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Services\InAppNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller
@@ -51,7 +52,8 @@ class CommentController extends Controller
     {
         Gate::authorize('delete', $comment);
 
-        $comment->delete();
+        // Cascade di level aplikasi (lihat Comment::booted) → bungkus transaksi.
+        DB::transaction(fn () => $comment->delete());
 
         return back()->with('success', 'Comment deleted.');
     }

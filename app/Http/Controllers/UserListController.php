@@ -8,6 +8,7 @@ use App\Models\UserList;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class UserListController extends Controller
@@ -156,7 +157,10 @@ class UserListController extends Controller
     public function destroy(UserList $list)
     {
         $this->authorizeOwner($list);
-        $list->delete();
+
+        // Cascade di level aplikasi (lihat UserList::booted) → bungkus transaksi.
+        DB::transaction(fn () => $list->delete());
+
         app(RecommendationService::class)->forgetForUser(Auth::id());
 
         return redirect()->route('lists.index')->with('success', 'List deleted successfully.');

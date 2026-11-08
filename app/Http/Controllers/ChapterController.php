@@ -10,6 +10,7 @@ use App\Services\RecommendationService;
 use App\Services\NovelParserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -398,7 +399,8 @@ class ChapterController extends Controller
 
         $cloudinary->deleteChapterFile($chapter->file_path);
 
-        $chapter->delete();
+        // Cascade di level aplikasi (lihat Chapter::booted) → bungkus transaksi.
+        DB::transaction(fn () => $chapter->delete());
 
         return redirect()->route('writer.chapters', ['novel_id' => $novel->id])->with('success', 'Chapter deleted successfully!');
     }

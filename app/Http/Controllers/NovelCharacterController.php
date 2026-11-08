@@ -7,6 +7,7 @@ use App\Models\Novel;
 use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -125,7 +126,8 @@ class NovelCharacterController extends Controller
             $this->cloudinaryService->deleteImage($character->image_public_id);
         }
 
-        $character->delete();
+        // Cascade di level aplikasi (lihat NovelCharacter::booted) → bungkus transaksi.
+        DB::transaction(fn () => $character->delete());
 
         return redirect()
             ->route('writer.codex', ['novel_id' => $novel->id])

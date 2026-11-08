@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class TagController extends Controller
@@ -77,7 +78,8 @@ class TagController extends Controller
             return back()->with('error', 'Tag cannot be deleted because it still has novels!');
         }
 
-        $tag->delete();
+        // Cascade di level aplikasi (lihat Tag::booted) → bungkus transaksi.
+        DB::transaction(fn () => $tag->delete());
         return redirect()->route('admin.tags.index')->with('success', 'Tag deleted successfully!');
     }
 }
