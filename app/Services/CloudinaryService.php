@@ -10,10 +10,19 @@ use Illuminate\Support\Facades\Storage;
 
 class CloudinaryService
 {
-    protected $cloudinary;
+    protected ?Cloudinary $cloudinary = null;
 
-    public function __construct()
+    /**
+     * Bangun client Cloudinary hanya saat dibutuhkan. Sengaja lazy supaya
+     * halaman yang tidak mengunggah apa pun (mis. beranda) tetap dapat
+     * diakses meskipun kredensial Cloudinary belum dikonfigurasi.
+     */
+    protected function cloudinary(): Cloudinary
     {
+        if ($this->cloudinary instanceof Cloudinary) {
+            return $this->cloudinary;
+        }
+
         $cloudName = env('CLOUDINARY_CLOUD_NAME');
         $apiKey = env('CLOUDINARY_KEY');
         $apiSecret = env('CLOUDINARY_SECRET');
@@ -22,7 +31,7 @@ class CloudinaryService
             throw new \RuntimeException('Cloudinary credentials are not configured. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_KEY, and CLOUDINARY_SECRET in the .env file.');
         }
 
-        $this->cloudinary = new Cloudinary([
+        return $this->cloudinary = new Cloudinary([
             'cloud' => [
                 'cloud_name' => $cloudName,
                 'api_key' => $apiKey,
@@ -50,11 +59,11 @@ class CloudinaryService
     protected function upload(UploadedFile $file, string $folder, $resizeAction): array
     {
         try {
-            $result = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+            $result = $this->cloudinary()->uploadApi()->upload($file->getRealPath(), [
                 'folder' => $folder,
             ]);
 
-            $url = $this->cloudinary->image($result['public_id'])
+            $url = $this->cloudinary()->image($result['public_id'])
                 ->resize($resizeAction)
                 ->format('auto')
                 ->quality('auto')
@@ -82,7 +91,7 @@ class CloudinaryService
     public function uploadChapterFile(UploadedFile $file): array
     {
         try {
-            $result = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+            $result = $this->cloudinary()->uploadApi()->upload($file->getRealPath(), [
                 'folder' => 'chapters',
                 'resource_type' => 'raw',
                 'use_filename' => true,
@@ -122,7 +131,7 @@ class CloudinaryService
         }
 
         try {
-            $this->cloudinary->uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
+            $this->cloudinary()->uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
         } catch (\Throwable $e) {
             Log::warning('Cloudinary raw destroy failed', [
                 'public_id' => $publicId,
@@ -154,7 +163,7 @@ class CloudinaryService
         }
 
         try {
-            $this->cloudinary->uploadApi()->destroy($publicId);
+            $this->cloudinary()->uploadApi()->destroy($publicId);
         } catch (\Throwable $e) {
             Log::warning('Cloudinary destroy failed', [
                 'public_id' => $publicId,
