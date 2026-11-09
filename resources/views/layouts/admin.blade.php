@@ -14,7 +14,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Quoros') }} - Admin</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('storage/logo/icon-192.png') }}">
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -75,6 +75,40 @@
         .admin-user-role {display:block;color:#777;font:8px 'DM Mono',monospace;text-transform:uppercase;}
         .admin-sidebar-footer {padding-bottom:8px!important;}
         .admin-main-content {padding:22px 14px!important;background:#0d0d0e!important;min-height:calc(100vh - 36px)!important;}
+        /* ===== Shared console design system (dipakai semua halaman admin) ===== */
+        .console-input,.console-select,.console-textarea {width:100%;border:1px solid #29292b;border-radius:4px;background:#101012;color:#d8d4cc;padding:9px 12px;font:12px 'DM Mono',monospace;outline:none;}
+        .console-textarea {min-height:96px;resize:vertical;font:13px 'Playfair Display',serif;line-height:1.5;}
+        .console-input:focus,.console-select:focus,.console-textarea:focus {border-color:#806a2d;}
+        .console-input::placeholder,.console-textarea::placeholder {color:#6a675f;}
+        .console-select option {background:#19191b;color:#e2ded6;}
+        .console-input.is-invalid,.console-textarea.is-invalid {border-color:#754145;}
+        .console-input.inline,.console-select.inline {width:auto;min-width:190px;}
+        .console-label {display:block;color:#77746e;font:500 10px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;}
+        .console-btn {display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #66541f;border-radius:4px;background:#c6a541;color:#15130e;padding:10px 14px;font:600 10px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:background .15s;}
+        .console-btn:hover {background:#d4b455;}
+        .console-btn.ghost {background:transparent;color:#c6a541;}
+        .console-btn.ghost:hover {background:#211e16;}
+        .console-btn.neutral {border-color:#3a3937;background:#19191b;color:#cfcbc3;}
+        .console-btn.neutral:hover {background:#232325;}
+        .console-btn.danger {border-color:#754145;background:#2a1d20;color:#d47b7b;}
+        .console-btn.danger:hover {background:#3a2427;}
+        .console-btn.sm {padding:7px 10px;font-size:9px;}
+        .console-btn:disabled {opacity:.5;cursor:not-allowed;}
+        .console-chip {display:inline-flex;align-items:center;gap:6px;border:1px solid #3a3937;border-radius:999px;background:#19191b;padding:7px 12px;color:#cfcbc3;font:10px 'DM Mono',monospace;text-transform:uppercase;}
+        .console-chip:hover {border-color:#5b5442;color:#e2ded6;}
+        .console-chip.is-active {border-color:#806a2d;background:#292316;color:#e2bd54;}
+        .console-alert {border:1px solid #242426;border-radius:5px;padding:12px 14px;font:12px 'DM Mono',monospace;}
+        .console-alert.success {border-color:#325a42;color:#7fc79b;background:#12211a;}
+        .console-alert.error {border-color:#6e3738;color:#e09191;background:#211417;}
+        .console-alert.warning {border-color:#65501f;color:#d7b255;background:#211d13;}
+        .console-empty {padding:46px 16px;text-align:center;color:#77746e;font:13px 'Playfair Display',serif;}
+        .console-pager a,.console-pager span {border:1px solid #3a3937;border-radius:4px;background:#19191b;padding:7px 10px;color:#cfcbc3;font:10px 'DM Mono',monospace;text-transform:uppercase;}
+        .console-pager a:hover {border-color:#66541f;color:#e2bd54;}
+        .console-badge {display:inline-block;border:1px solid #325a42;border-radius:3px;padding:4px 7px;color:#70b58a;font:9px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.04em;}
+        .console-badge.warn {border-color:#725a28;color:#c6a048;}
+        .console-badge.danger {border-color:#6e3738;color:#d27676;}
+        .console-badge.info {border-color:#344f66;color:#8db5d0;}
+        .console-badge.muted {border-color:#3a3937;color:#a9a59d;}
     </style>
 
     <!-- Styles & Scripts -->
@@ -154,6 +188,17 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6l4 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         Novel Approval Queue
+                    </a>
+                    <a href="{{ route('admin.moderation.index') }}"
+                       @class([
+                           'flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group relative overflow-hidden',
+                           'admin-nav-active' => request()->routeIs('admin.moderation.*'),
+                           'text-slate-400 hover:text-white hover:bg-white/5' => !request()->routeIs('admin.moderation.*'),
+                       ])>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        Content Moderation
                     </a>
                     <a href="{{ route('admin.content-logs.index') }}"
                        @class([
@@ -325,6 +370,12 @@
 
         <!-- Content -->
         <main class="admin-main-content px-4 sm:px-6 lg:px-8 py-8 bg-slate-800 dark:bg-slate-950 min-h-[calc(100vh-80px)]">
+            @if(session('success') || session('status'))
+                <div class="console-alert success mx-auto mb-4 max-w-[1600px]">{{ session('success') ?? session('status') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="console-alert error mx-auto mb-4 max-w-[1600px]">{{ session('error') }}</div>
+            @endif
             @yield('content')
         </main>
     </div>

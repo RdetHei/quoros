@@ -40,7 +40,7 @@ class ReportController extends Controller
         ]);
 
         if ($validated['status'] === ReportStatus::Pending->value) {
-            return back()->with('error', 'Status cannot be returned to pending.');
+            return back()->with('error', 'Status tidak dapat dikembalikan ke pending.');
         }
 
         $report->update([
@@ -50,13 +50,13 @@ class ReportController extends Controller
             'reviewed_at' => now(),
         ]);
 
-        return back()->with('success', 'Report updated successfully.');
+        return back()->with('success', 'Laporan berhasil diperbarui.');
     }
 
     public function banUser(Request $request, User $user)
     {
         if ($user->role === 'admin') {
-            return back()->with('error', 'Admin cannot be banned.');
+            return back()->with('error', 'Admin tidak dapat dibatasi.');
         }
 
         $validated = $request->validate([
@@ -72,15 +72,15 @@ class ReportController extends Controller
             'ban_reason' => $validated['ban_reason'] ?? null,
         ]);
 
-        $label = 'banned';
+        $label = $hasExpiry ? 'dibatasi sementara' : 'diblokir permanen';
 
-        return back()->with('success', "User {$user->name} has been {$label}.");
+        return back()->with('success', "Pengguna {$user->name} berhasil {$label}.");
     }
 
     public function unban(User $user)
     {
         if ($user->role === 'admin') {
-            return back()->with('error', 'Admin cannot be banned.');
+            return back()->with('error', 'Admin tidak dapat dibatasi.');
         }
 
         $user->update([
@@ -89,6 +89,6 @@ class ReportController extends Controller
             'ban_reason' => null,
         ]);
 
-        return back()->with('success', "Ban on {$user->name} has been lifted.");
+        return back()->with('success', "Pembatasan pada {$user->name} telah dicabut.");
     }
 }

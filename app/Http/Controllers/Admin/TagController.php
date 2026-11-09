@@ -13,10 +13,17 @@ class TagController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tags = Tag::withCount('novels')->orderBy('name')->get();
-        return view('admin.tags.index', compact('tags'));
+        $search = trim((string) $request->get('q'));
+
+        $tags = Tag::withCount('novels')
+            ->when($search !== '', fn ($query) => $query->where('name', 'like', "%{$search}%"))
+            ->orderBy('name')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.tags.index', compact('tags', 'search'));
     }
 
     /**
@@ -75,11 +82,11 @@ class TagController extends Controller
     public function destroy(Tag $tag)
     {
         if ($tag->novels()->count() > 0) {
-            return back()->with('error', 'Tag cannot be deleted because it still has novels!');
+            return back()->with('error', 'Tag tidak bisa dihapus karena masih dipakai oleh novel.');
         }
 
         // Cascade di level aplikasi (lihat Tag::booted) → bungkus transaksi.
         DB::transaction(fn () => $tag->delete());
-        return redirect()->route('admin.tags.index')->with('success', 'Tag deleted successfully!');
+        return redirect()->route('admin.tags.index')->with('success', 'Tag berhasil dihapus!');
     }
 }

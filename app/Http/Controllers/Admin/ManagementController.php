@@ -79,24 +79,40 @@ class ManagementController extends Controller
         return view('admin.users.index', compact('users', 'role', 'status', 'search', 'sort', 'selectedUser', 'userStats', 'memberActivity'));
     }
 
-    public function moderation()
+    public function moderation(Request $request)
     {
+        $status = $request->string('status')->value() ?: 'all';
+        $search = trim($request->string('q')->value());
+
         $novels = Novel::with('author:id,name')
+            ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('author', fn ($author) => $author->where('name', 'like', "%{$search}%"));
+            }))
+            ->when(in_array($status, ['ongoing', 'hiatus', 'complete'], true), fn ($query) => $query->where('status', $status))
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         $pendingReports = \App\Models\Report::where('status', ReportStatus::Pending->value)->count();
 
-        return view('admin.moderation.index', compact('novels', 'pendingReports'));
+        return view('admin.moderation.index', compact('novels', 'pendingReports', 'status', 'search'));
     }
 
-    public function contentLogs()
+    public function contentLogs(Request $request)
     {
-        $recentChapters = Chapter::with('novel:id,title,author_id', 'novel.author:id,name')
-            ->latest()
-            ->paginate(25);
+        $search = trim($request->string('q')->value());
 
-        return view('admin.content-logs.index', compact('recentChapters'));
+        $recentChapters = Chapter::with('novel:id,title,author_id', 'novel.author:id,name')
+            ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('novel', fn ($novel) => $novel->where('title', 'like', "%{$search}%"));
+            }))
+            ->latest()
+            ->paginate(25)
+            ->withQueryString();
+
+        return view('admin.content-logs.index', compact('recentChapters', 'search'));
     }
 
     public function updateRole(Request $request, User $user)

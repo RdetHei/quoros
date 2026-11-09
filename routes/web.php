@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Api\ChapterController as ApiChapterController;
@@ -208,8 +209,8 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
         Route::get('/novels', [NovelController::class, 'index'])->name('admin.novels.index');
-        Route::resource('genres', AdminGenreController::class, ['as' => 'admin']);
-        Route::resource('tags', AdminTagController::class, ['as' => 'admin']);
+        Route::resource('genres', AdminGenreController::class, ['as' => 'admin'])->except(['show']);
+        Route::resource('tags', AdminTagController::class, ['as' => 'admin'])->except(['show']);
 
         // Novel Requests Management (Novel Moderation: Approve/Reject)
         Route::get('/requests', [AdminNovelRequestController::class, 'index'])->name('admin.requests.index');
@@ -238,10 +239,13 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
         Route::get('/announcements', [AnnouncementsController::class, 'index'])->name('admin.announcements.index');
         Route::get('/announcements/create', [AnnouncementsController::class, 'create'])->name('admin.announcements.create');
         Route::post('/announcements', [AnnouncementsController::class, 'store'])->name('admin.announcements.store');
+        Route::get('/announcements/{announcement}/edit', [AnnouncementsController::class, 'edit'])->name('admin.announcements.edit');
+        Route::put('/announcements/{announcement}', [AnnouncementsController::class, 'update'])->name('admin.announcements.update');
+        Route::patch('/announcements/{announcement}/toggle', [AnnouncementsController::class, 'toggle'])->name('admin.announcements.toggle');
+        Route::delete('/announcements/{announcement}', [AnnouncementsController::class, 'destroy'])->name('admin.announcements.destroy');
 
         // System
-        Route::get('/maintenance', function () {
-            return view('admin.maintenance');
-        })->name('admin.maintenance');
+        Route::get('/maintenance', [SystemController::class, 'maintenance'])->name('admin.maintenance');
+        Route::patch('/maintenance', [SystemController::class, 'toggleMaintenance'])->name('admin.maintenance.toggle');
     });
 });

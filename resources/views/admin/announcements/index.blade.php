@@ -6,44 +6,65 @@
 @endphp
 
 @section('content')
-    <div class="max-w-5xl mx-auto space-y-6">
-        <div class="flex items-start justify-between gap-4">
-            <div>
-                <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100">Announcements</h2>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Manage announcements shown across the platform.</p>
-            </div>
-            <a href="{{ route('admin.announcements.create') }}"
-               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                Create
-            </a>
+<div class="admin-console mx-auto max-w-[1600px] space-y-5">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <p class="admin-kicker">Communications / broadcasts</p>
+            <h2 class="admin-display mt-1">Announcements</h2>
+            <p class="mt-2 text-sm text-slate-400">Kelola pengumuman yang tampil di seluruh platform.</p>
         </div>
+        <a href="{{ route('admin.announcements.create') }}" class="console-btn">＋ New announcement</a>
+    </div>
 
-        <div class="grid grid-cols-1 gap-4">
-            @foreach($announcements as $a)
-                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="min-w-0">
-                            <p class="font-bold text-slate-900 dark:text-slate-100 truncate">{{ $a->title }}</p>
-                            <p class="text-xs text-slate-500 dark:text-slate-300 mt-1">
-                                {{ $a->created_at->format('d M Y H:i') }} · {{ $a->type ?? 'General' }}
-                            </p>
-                            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300 line-clamp-3">{{ $a->content }}</p>
+    <div class="grid grid-cols-1 gap-4">
+        @forelse($announcements as $announcement)
+            <section class="console-card p-5">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h3 class="font-serif text-lg text-zinc-100">{{ $announcement->title }}</h3>
+                            <span class="console-badge {{ $announcement->is_active ? '' : 'muted' }}">{{ $announcement->is_active ? 'Active' : 'Inactive' }}</span>
+                            @if($announcement->type)
+                                <span class="console-badge info">{{ $announcement->type }}</span>
+                            @endif
                         </div>
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black tracking-widest border
-                            {{ $a->is_active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200/60' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 border-slate-200/60' }}">
-                            {{ $a->is_active ? 'Active' : 'Inactive' }}
-                        </span>
+                        <p class="admin-kicker mt-2">{{ $announcement->created_at->format('d M Y H:i') }}</p>
+                        <p class="mt-3 whitespace-pre-line text-sm text-zinc-400">{{ $announcement->content }}</p>
+                        @if($announcement->link)
+                            <a href="{{ $announcement->link }}" target="_blank" rel="noopener" class="admin-link mt-3 inline-block">Buka tautan →</a>
+                        @endif
+                    </div>
+
+                    <div class="flex shrink-0 flex-col gap-2 sm:w-44">
+                        <a href="{{ route('admin.announcements.edit', $announcement) }}" class="console-btn sm neutral w-full">Edit</a>
+                        <form action="{{ route('admin.announcements.toggle', $announcement) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="console-btn sm ghost w-full">{{ $announcement->is_active ? 'Deactivate' : 'Activate' }}</button>
+                        </form>
+                        <form action="{{ route('admin.announcements.destroy', $announcement) }}" method="POST" onsubmit="return confirm('Hapus pengumuman ini secara permanen?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="console-btn sm danger w-full">Delete</button>
+                        </form>
                     </div>
                 </div>
-            @endforeach
-        </div>
-
-        <div class="pt-2">
-            {{ $announcements->links() }}
-        </div>
+            </section>
+        @empty
+            <section class="console-card">
+                <p class="console-empty">Belum ada pengumuman. Buat yang pertama untuk pembaca kamu.</p>
+            </section>
+        @endforelse
     </div>
-@endsection
 
+    @if($announcements->hasPages())
+        <div class="console-pager flex items-center justify-between gap-3">
+            <span class="admin-kicker">Halaman {{ $announcements->currentPage() }} / {{ $announcements->lastPage() }}</span>
+            <div class="flex gap-2">
+                @if($announcements->previousPageUrl())<a href="{{ $announcements->previousPageUrl() }}">Prev</a>@endif
+                @if($announcements->nextPageUrl())<a href="{{ $announcements->nextPageUrl() }}">Next</a>@endif
+            </div>
+        </div>
+    @endif
+</div>
+@endsection

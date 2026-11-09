@@ -126,6 +126,17 @@
                         @endif
                     @endif
                 </div>
+                <p class="um-kicker mt-3">Account role</p>
+                <form action="{{ route('admin.users.role.update', $selectedUser) }}" method="POST" class="mt-2 grid gap-2">
+                    @csrf
+                    @method('PATCH')
+                    <select name="role" class="um-input w-full">
+                        <option value="user" @selected($selectedUser->role === 'user')>Reader</option>
+                        <option value="writer" @selected($selectedUser->role === 'writer')>Author</option>
+                        <option value="admin" @selected($selectedUser->role === 'admin')>Admin</option>
+                    </select>
+                    <button type="submit" class="um-action secondary">Update role</button>
+                </form>
             @else
                 <p class="um-kicker">Selected identity</p><p class="mt-4 text-sm text-zinc-500">Select an account from the list to inspect its details.</p>
             @endif

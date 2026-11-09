@@ -13,10 +13,17 @@ class GenreController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $genres = Genre::withCount('novels')->orderBy('name')->get();
-        return view('admin.genres.index', compact('genres'));
+        $search = trim((string) $request->get('q'));
+
+        $genres = Genre::withCount('novels')
+            ->when($search !== '', fn ($query) => $query->where('name', 'like', "%{$search}%"))
+            ->orderBy('name')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.genres.index', compact('genres', 'search'));
     }
 
     /**
@@ -41,7 +48,7 @@ class GenreController extends Controller
             'slug' => Str::slug($request->name),
         ]);
 
-        return redirect()->route('admin.genres.index')->with('success', 'Genre added successfully!');
+        return redirect()->route('admin.genres.index')->with('success', 'Genre berhasil ditambahkan!');
     }
 
     /**
@@ -75,11 +82,11 @@ class GenreController extends Controller
     public function destroy(Genre $genre)
     {
         if ($genre->novels()->count() > 0) {
-            return back()->with('error', 'Genre cannot be deleted because it still has novels!');
+            return back()->with('error', 'Genre tidak bisa dihapus karena masih dipakai oleh novel.');
         }
 
         // Cascade di level aplikasi (lihat Genre::booted) → bungkus transaksi.
         DB::transaction(fn () => $genre->delete());
-        return redirect()->route('admin.genres.index')->with('success', 'Genre deleted successfully!');
+        return redirect()->route('admin.genres.index')->with('success', 'Genre berhasil dihapus!');
     }
 }

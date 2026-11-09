@@ -1,102 +1,98 @@
 @extends('layouts.admin')
 
+@php
+    $adminTitle = 'Spotlight Slider';
+    $adminBreadcrumbs = ['Admin', 'Curation', 'Spotlight Slider'];
+@endphp
+
 @section('content')
-<div class="max-w-6xl mx-auto my-12 px-4">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+<div class="admin-console mx-auto max-w-[1600px] space-y-5">
+    <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Carousel Banner Management</h1>
-            <p class="text-slate-500 dark:text-slate-400">Select novels to be featured in the main spotlight on the homepage.</p>
+            <p class="admin-kicker">Curation / homepage spotlight</p>
+            <h2 class="admin-display mt-1">Spotlight Slider</h2>
+            <p class="mt-2 text-sm text-slate-400">Pilih novel yang tampil di banner utama halaman depan.</p>
         </div>
-        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-            Back to Dashboard
-        </a>
+        <p class="admin-kicker">{{ number_format($featuredNovels->count()) }} novel aktif di slider</p>
     </div>
 
-    <!-- Active Carousel Novels -->
-    <div class="mb-12">
-        <div class="flex items-center gap-3 mb-6">
-            <div class="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+    <section class="console-card p-5">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <p class="admin-kicker" style="color:#c5a13c">Currently featured</p>
+                <h3 class="admin-section-title">Active slides</h3>
             </div>
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Currently Featured ({{ $featuredNovels->count() }})</h2>
         </div>
 
         @if($featuredNovels->isEmpty())
-            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] p-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-800">
-                <p class="text-slate-500 dark:text-slate-400 font-medium">No novels selected yet. The system will use popular novels as fallback.</p>
+            <div class="mt-4 rounded border border-dashed border-white/15 p-10 text-center text-sm text-zinc-500">
+                Belum ada novel terpilih. Sistem akan memakai novel populer sebagai fallback.
             </div>
         @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 @foreach($featuredNovels as $novel)
-                    <div class="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all">
-                        <div class="aspect-[16/9] overflow-hidden">
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='/error.png'">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
+                    <div class="group relative overflow-hidden rounded border border-white/10">
+                        <div class="aspect-[16/9] overflow-hidden bg-black/40">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/error.png'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                         </div>
-                        
-                        <div class="absolute bottom-0 left-0 right-0 p-5">
-                            <h3 class="text-white font-bold truncate mb-1">{{ $novel->title }}</h3>
-                            <p class="text-slate-300 text-xs mb-4">{{ $novel->author->name }}</p>
-                            
-                            <form action="{{ route('admin.carousel.toggle', $novel->id) }}" method="POST">
+                        <div class="absolute inset-x-0 bottom-0 p-4">
+                            <h4 class="truncate font-serif text-sm text-white">{{ $novel->title }}</h4>
+                            <p class="mt-1 text-[11px] text-zinc-400">{{ $novel->author?->name ?? 'Unknown' }}</p>
+                            <form action="{{ route('admin.carousel.toggle', $novel) }}" method="POST" class="mt-3">
                                 @csrf
-                                <button type="submit" class="w-full py-2 bg-white/10 hover:bg-red-500 text-white text-xs font-bold rounded-xl backdrop-blur-md transition-all border border-white/20 hover:border-red-400">
-                                    Remove from Carousel
-                                </button>
+                                <button type="submit" class="console-btn sm danger w-full">Remove from spotlight</button>
                             </form>
                         </div>
                     </div>
                 @endforeach
             </div>
         @endif
-    </div>
+    </section>
 
-    <!-- Search & Add More -->
-    <div class="bg-slate-50 dark:bg-slate-800/30 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Add Novel</h2>
-            
-            <form action="{{ route('admin.carousel.index') }}" method="GET" class="relative w-full md:w-80">
-                <input type="text" name="search" value="{{ $search }}" 
-                    class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
-                    placeholder="Search novel title...">
-                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                </div>
+    <section class="console-card p-5">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+            <div>
+                <p class="admin-kicker" style="color:#c5a13c">Add novel</p>
+                <h3 class="admin-section-title">Catalogue library</h3>
+            </div>
+            <form action="{{ route('admin.carousel.index') }}" method="GET" class="flex items-center gap-2">
+                <input type="text" name="search" value="{{ $search }}" placeholder="⌕　Cari judul novel..." class="console-input inline">
+                <button type="submit" class="console-btn sm">Search</button>
             </form>
         </div>
 
-        <div class="space-y-4">
+        <div class="mt-4 divide-y divide-white/5">
             @forelse($availableNovels as $novel)
-                <div class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all group">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png'">
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">{{ $novel->title }}</h4>
-                            <p class="text-xs text-slate-500">{{ $novel->author->name }}</p>
-                        </div>
+                <div class="flex items-center justify-between gap-4 py-3">
+                    <div class="flex min-w-0 items-center gap-3">
+                        <span class="h-14 w-10 shrink-0 overflow-hidden rounded border border-white/10">
+                            <img src="{{ asset('storage/' . $novel->cover_image) }}" alt="{{ $novel->title }}" class="h-full w-full object-cover" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/error.png'">
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block truncate font-serif text-sm text-zinc-200">{{ $novel->title }}</span>
+                            <span class="admin-kicker">{{ $novel->author?->name ?? 'Unknown' }}</span>
+                        </span>
                     </div>
-                    
-                    <form action="{{ route('admin.carousel.toggle', $novel->id) }}" method="POST">
+                    <form action="{{ route('admin.carousel.toggle', $novel) }}" method="POST">
                         @csrf
-                        <button type="submit" class="px-5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 text-slate-600 dark:text-slate-400 hover:text-white text-xs font-bold rounded-xl transition-all">
-                            Add
-                        </button>
+                        <button type="submit" class="console-btn sm">Add</button>
                     </form>
                 </div>
             @empty
-                <div class="text-center py-10">
-                    <p class="text-slate-500 dark:text-slate-400 text-sm italic">No other novels found.</p>
-                </div>
+                <p class="console-empty">Tidak ada novel lain yang cocok.</p>
             @endforelse
         </div>
 
-        <div class="mt-8">
-            {{ $availableNovels->links() }}
-        </div>
-    </div>
+        @if($availableNovels->hasPages())
+            <div class="console-pager mt-4 flex items-center justify-between gap-3 border-t border-white/5 pt-3">
+                <span class="admin-kicker">Halaman {{ $availableNovels->currentPage() }} / {{ $availableNovels->lastPage() }}</span>
+                <div class="flex gap-2">
+                    @if($availableNovels->previousPageUrl())<a href="{{ $availableNovels->previousPageUrl() }}">Prev</a>@endif
+                    @if($availableNovels->nextPageUrl())<a href="{{ $availableNovels->nextPageUrl() }}">Next</a>@endif
+                </div>
+            </div>
+        @endif
+    </section>
 </div>
 @endsection

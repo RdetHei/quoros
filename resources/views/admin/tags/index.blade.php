@@ -1,75 +1,70 @@
 @extends('layouts.admin')
 
+@php
+    $adminTitle = 'Manage Tags';
+    $adminBreadcrumbs = ['Admin', 'Curation', 'Tags'];
+@endphp
+
 @section('content')
-<div class="max-w-4xl mx-auto my-12">
-    <div class="flex items-center justify-between mb-8">
+<div class="admin-console mx-auto max-w-[1400px] space-y-5">
+    <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Manage Tags</h1>
-            <p class="text-slate-500 dark:text-slate-400">Add or edit tags for novel element details.</p>
+            <p class="admin-kicker">Curation / classification</p>
+            <h2 class="admin-display mt-1">Manage Tags</h2>
+            <p class="mt-2 text-sm text-slate-400">Tambahkan atau ubah tag untuk detail elemen novel.</p>
         </div>
-        <a href="{{ route('admin.tags.create') }}" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 dark:shadow-none flex items-center gap-2 text-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Add Tag
-        </a>
+        <a href="{{ route('admin.tags.create') }}" class="console-btn">＋ Add tag</a>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-2xl text-emerald-600 dark:text-emerald-400 text-sm font-medium">
-            {{ session('success') }}
-        </div>
-    @endif
+    <form method="GET" action="{{ route('admin.tags.index') }}" class="flex flex-wrap items-center gap-2">
+        <input type="search" name="q" value="{{ $search }}" placeholder="⌕　Cari tag..." class="console-input inline">
+        <button type="submit" class="console-btn sm">Search</button>
+    </form>
 
-    @if(session('error'))
-        <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-2xl text-red-600 dark:text-red-400 text-sm font-medium">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <div class="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
+    <section class="console-card overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[520px]">
-            <thead>
-                <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Tag Name</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Novel Count</th>
-                    <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Action</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                @forelse($tags as $tag)
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                        <td class="px-6 py-4">
-                            <span class="font-bold text-slate-700 dark:text-slate-300">#{{ $tag->name }}</span>
-                            <span class="block text-[10px] text-slate-400 font-medium uppercase tracking-tighter">{{ $tag->slug }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-bold text-slate-500">{{ $tag->novels_count }}</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('admin.tags.edit', $tag->id) }}" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </a>
-                                <form action="{{ route('admin.tags.destroy', $tag->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this tag?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
+            <table class="console-table w-full text-left">
+                <thead>
                     <tr>
-                        <td colspan="3" class="px-6 py-12 text-center">
-                            <p class="text-slate-500 italic text-sm">No tags added yet.</p>
-                        </td>
+                        <th>Tag name</th>
+                        <th>Novel count</th>
+                        <th class="text-right">Action</th>
                     </tr>
-                @endforelse
-            </tbody>
+                </thead>
+                <tbody>
+                    @forelse($tags as $tag)
+                        <tr>
+                            <td>
+                                <span class="block font-serif text-sm text-zinc-200">#{{ $tag->name }}</span>
+                                <span class="admin-kicker">{{ $tag->slug }}</span>
+                            </td>
+                            <td><span class="console-badge info">{{ number_format($tag->novels_count) }} novel</span></td>
+                            <td>
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('admin.tags.edit', $tag) }}" class="console-btn sm neutral">Edit</a>
+                                    <form action="{{ route('admin.tags.destroy', $tag) }}" method="POST" onsubmit="return confirm('Hapus tag ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="console-btn sm danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="3" class="console-empty">Belum ada tag yang cocok.</td></tr>
+                    @endforelse
+                </tbody>
             </table>
         </div>
-    </div>
+        @if($tags->hasPages())
+            <div class="console-pager flex items-center justify-between gap-3 border-t border-white/5 px-4 py-3">
+                <span class="admin-kicker">Halaman {{ $tags->currentPage() }} / {{ $tags->lastPage() }}</span>
+                <div class="flex gap-2">
+                    @if($tags->previousPageUrl())<a href="{{ $tags->previousPageUrl() }}">Prev</a>@endif
+                    @if($tags->nextPageUrl())<a href="{{ $tags->nextPageUrl() }}">Next</a>@endif
+                </div>
+            </div>
+        @endif
+    </section>
 </div>
 @endsection

@@ -17,6 +17,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'not_banned' => \App\Http\Middleware\EnsureNotBanned::class,
         ]);
+
+        // Selama maintenance, area admin tetap dapat diakses agar administrator
+        // dapat memantau dan menonaktifkan mode pemeliharaan kembali.
+        $middleware->preventRequestsDuringMaintenance(except: [
+            'admin',
+            'admin/*',
+            'login',
+            'logout',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
