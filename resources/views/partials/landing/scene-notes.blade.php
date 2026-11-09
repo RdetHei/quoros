@@ -1,5 +1,5 @@
 <section style="padding:3rem 0 5rem;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="lp-container">
         <div class="flex items-end justify-between gap-4 mb-5 sm:mb-7">
             <div class="min-w-0">
                 <div class="showcase-eyebrow mb-2.5">

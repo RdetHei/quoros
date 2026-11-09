@@ -271,13 +271,18 @@
             </div>
         </div>
 
-        <main class="flex-grow {{ request()->routeIs('welcome') ? 'pt-4' : 'pt-[70px]' }} bg-[#0a0a0a]">
-            <div class="{{ request()->routeIs('welcome') ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-8' }}">
+        @php
+            // Beberapa halaman menggambar container-nya sendiri (full-bleed):
+            // landing page dan halaman baca bab (navbar disembunyikan di reader).
+            $isFullBleed = request()->routeIs('welcome') || request()->routeIs('chapters.show');
+            $mainTopPadding = request()->routeIs('welcome') ? 'pt-4' : ($isFullBleed ? 'pt-0' : 'pt-[70px]');
+        @endphp
+
+        <main class="flex-grow {{ $mainTopPadding }} bg-[#0a0a0a]">
+            <div class="{{ $isFullBleed ? '' : 'mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-10 pt-8 pb-8' }}">
                 @if(session('success'))
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                        <div class="p-4 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/25 text-[#f5e0b7] text-sm font-medium">
-                            {{ session('success') }}
-                        </div>
+                    <div class="mb-6 rounded-xl border border-[#d4af37]/25 bg-[#d4af37]/10 p-4 text-sm font-medium text-[#f5e0b7]">
+                        {{ session('success') }}
                     </div>
                 @endif
                 @yield('content')
@@ -285,7 +290,7 @@
         </main>
 
         <footer class="site-footer py-14">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-10">
                 <div class="grid grid-cols-1 gap-10 md:grid-cols-12 mb-12">
                     <div class="md:col-span-5">
                         <div class="flex items-center gap-3 mb-5">

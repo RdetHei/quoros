@@ -314,8 +314,8 @@
 @endpush
 
 @section('content')
-<main class="ul-page min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 pb-12">
-    <div class="mx-auto w-full max-w-[1200px] px-5 sm:px-7 lg:px-10">
+<main class="ul-page min-h-screen w-full overflow-x-hidden pb-12">
+    <div class="mx-auto w-full max-w-[1200px]">
 
         @php
             $owner = $list->user;

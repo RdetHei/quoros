@@ -404,15 +404,6 @@ body:has(.landing-page) {
     background-color: #0a0a0a !important;
 }
 
-.lp-container {
-    width: min(1280px, calc(100% - 1.5rem));
-    margin-inline: auto;
-}
-
-@media (min-width: 640px) {
-    .lp-container { width: min(1280px, calc(100% - 2.25rem)); }
-}
-
 .lp-panel {
     background: var(--lp-surface);
     border: 1px solid var(--lp-border);
@@ -539,13 +530,10 @@ body:has(.landing-page) {
 .lp-hero-inner {
     position: relative;
     z-index: 2;
-    width: min(1280px, calc(100% - 1.5rem));
+    width: 100%;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 3.75rem 0 2.1rem;
-}
-
-@media (min-width: 640px) {
-    .lp-hero-inner { width: min(1280px, calc(100% - 2.25rem)); }
+    padding: 3.75rem 1.4rem 2.1rem;
 }
 
 .lp-hero-copy {
@@ -684,15 +672,12 @@ body:has(.landing-page) {
 .lp-marathon-inner {
     position: relative;
     z-index: 1;
-    width: min(1280px, calc(100% - 1.5rem));
+    width: 100%;
+    max-width: 1440px;
     margin: 0 auto;
     display: flex;
     align-items: center;
-    padding: 0.75rem 0;
-}
-
-@media (min-width: 640px) {
-    .lp-marathon-inner { width: min(1280px, calc(100% - 2.25rem)); }
+    padding: 0.75rem 1.4rem;
 }
 
 .lp-marathon-title {
@@ -1258,7 +1243,6 @@ body:has(.landing-page) {
 }
 
 @media (max-width: 640px) {
-    .lp-container { padding-inline: 0.75rem; }
     .lp-section-wrap { padding-block: 0.95rem; }
     .lp-section-head {
         margin-bottom: 0.62rem;
@@ -1306,7 +1290,7 @@ body:has(.landing-page) {
         border-radius: 1.5px;
     }
     .lp-hero { min-height: min(68vh, 440px); }
-    .lp-hero-inner { padding: 4rem 0 2rem; }
+    .lp-hero-inner { padding: 4rem 0.75rem 2rem; }
     .lp-hero-content { max-width: 34rem; }
     .lp-editor-badge {
         font-size: 0.5rem;
@@ -1344,7 +1328,7 @@ body:has(.landing-page) {
     .lp-marathon-inner {
         flex-direction: column;
         align-items: flex-start;
-        padding: 0.85rem 0 0.9rem;
+        padding: 0.85rem 0.75rem 0.9rem;
     }
     .lp-hot-takes-inner {
         flex-direction: column;
@@ -1435,7 +1419,6 @@ body:has(.landing-page) {
 }
 
 @media (max-width: 400px) {
-    .lp-container { padding-inline: 0.65rem; }
     .lp-panel { padding: 0.65rem 0.7rem 0.72rem; }
     .lp-side-panel { padding: 0.62rem 0.65rem 0.68rem; }
     .lp-section-title { font-size: 0.76rem; letter-spacing: 0.065em; }
@@ -1457,7 +1440,7 @@ body:has(.landing-page) {
         letter-spacing: 0.03em;
     }
     .lp-hero { min-height: min(66vh, 400px); }
-    .lp-hero-inner { padding: 3.4rem 0 1.7rem; }
+    .lp-hero-inner { padding: 3.4rem 0.6rem 1.7rem; }
     .lp-hero-title {
         font-size: clamp(1.55rem, 8.5vw, 1.95rem);
         margin: 0.5rem 0 0.55rem;
@@ -1530,6 +1513,16 @@ body:has(.landing-page) {
     max-width: 1440px;
     margin-inline: auto;
     padding-inline: 1.4rem;
+}
+
+/* Padding mobile WAJIB berada setelah definisi di atas (source-order)
+   agar tidak tertimpa oleh padding-inline desktop. */
+@media (max-width: 640px) {
+    .lp-container { padding-inline: 0.75rem; }
+}
+
+@media (max-width: 400px) {
+    .lp-container { padding-inline: 0.6rem; }
 }
 
 .site-header,

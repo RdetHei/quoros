@@ -8,7 +8,7 @@
 ])
 
 @section('content')
-<div class="{{ $useWriterShell ? 'space-y-10' : 'max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24' }}">
+<div class="{{ $useWriterShell ? 'space-y-10' : 'pt-12 pb-24' }}">
     @if(!$useWriterShell)
     <nav class="mb-10 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
         <a href="{{ route('guides.index') }}" class="hover:text-[#c7a64a] transition-colors">GUIDANCE</a>

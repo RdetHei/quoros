@@ -24,7 +24,7 @@
 @endpush
 
 @section('content')
-<main class="updates-page mx-auto w-full max-w-[1240px] px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+<main class="updates-page mx-auto w-full max-w-[1240px] pb-16">
     <header class="mb-8 border-b border-white/10 pb-7 sm:mb-9 sm:pb-8">
         <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>

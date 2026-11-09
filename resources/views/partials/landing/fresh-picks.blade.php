@@ -1,6 +1,6 @@
 @if($recentlyUpdated->count() > 0)
 <section class="latest-updates" style="padding:2.5rem 0 3rem; border-top:1px solid rgba(255,255,255,0.05); background:#000000;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="lp-container">
         <div class="section-heading">
             <div class="section-heading-bar" style="background:linear-gradient(to bottom,#22c55e,#16a34a);"></div>
             <h2>Fresh Picks</h2>

@@ -715,7 +715,7 @@
     'baseUrl'            => url('/'),
     'protectChapter'      => $protectContent ?? false,
     'autoLoadChapters'    => auth()->check() ? (bool) (auth()->user()->auto_load_chapters ?? true) : true,
-]))" class="max-w-5xl mx-auto px-2 sm:px-6 pb-16 pt-8">
+]))" class="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 pt-6 pb-24 sm:pb-16">
 
     {{-- ── Reading progress bar ───────────────────── --}}
     <div id="reader-progress-bar">

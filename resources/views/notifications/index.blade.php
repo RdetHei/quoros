@@ -371,8 +371,8 @@
 @endpush
 
 @section('content')
-<main class="nt-page min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 pb-12">
-    <div class="mx-auto w-full max-w-[1100px] px-5 sm:px-7 lg:px-10">
+<main class="nt-page min-h-screen w-full overflow-x-hidden pb-12">
+    <div class="mx-auto w-full max-w-[1100px]">
 
         {{-- ─── HERO ────────────────────────────────────────────────────── --}}
         <header class="mb-8 border-b border-white/[.08] pb-9 sm:mb-10 sm:pb-10">

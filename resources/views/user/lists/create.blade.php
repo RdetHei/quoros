@@ -166,8 +166,8 @@
 @endpush
 
 @section('content')
-<main class="ul-page min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 pb-16">
-    <div class="mx-auto w-full max-w-[820px] px-5 sm:px-7 lg:px-10">
+<main class="ul-page min-h-screen w-full overflow-x-hidden pb-16">
+    <div class="mx-auto w-full max-w-[820px]">
 
         {{-- Breadcrumb --}}
         <a href="{{ route('lists.index') }}" class="inline-flex items-center gap-6 text-[9px] uppercase tracking-[.16em] font-semibold text-[#a3a3a3] mb-6 hover:text-[#e8d39a] transition-colors">

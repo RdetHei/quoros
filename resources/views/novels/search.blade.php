@@ -151,7 +151,7 @@
 @endpush
 
 @section('content')
-<main class="search-page mx-auto w-full max-w-[1240px] px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+<main class="search-page mx-auto w-full max-w-[1240px] pb-16">
     @php
         $genreJson = $genres->map(fn($g) => ['slug' => $g->slug, 'name' => $g->name])->values()->toJson();
         $tagJson = $tags->map(fn($t) => ['slug' => $t->slug, 'name' => $t->name])->values()->toJson();

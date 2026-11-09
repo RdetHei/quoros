@@ -1,6 +1,6 @@
 @if($featuredNovels->count() > 0)
 <section style="padding:3rem 0 2.5rem;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="lp-container">
         <div class="section-heading">
             <div class="section-heading-bar" style="background: linear-gradient(to bottom,#818cf8,#6366f1);"></div>
             <h2>Pilihan Editor</h2>

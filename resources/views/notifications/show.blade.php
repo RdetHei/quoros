@@ -210,8 +210,8 @@
 @endpush
 
 @section('content')
-<main class="nv-page min-h-screen w-full overflow-x-hidden pt-24 sm:pt-28 pb-12">
-    <div class="mx-auto w-full max-w-[860px] px-5 sm:px-7 lg:px-10">
+<main class="nv-page min-h-screen w-full overflow-x-hidden pb-12">
+    <div class="mx-auto w-full max-w-[860px]">
 
         {{-- Breadcrumb --}}
         <a href="{{ route('notifications.index') }}" class="nv-back-link mb-6 inline-flex">
