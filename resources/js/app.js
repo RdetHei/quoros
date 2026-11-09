@@ -1,7 +1,11 @@
 import Alpine from 'alpinejs';
 import { landingHero } from './modules/landing-hero';
+import { inject } from '@vercel/analytics';
 
 window.Alpine = Alpine;
+
+// Initialize Vercel Analytics
+inject();
 
 // Theme logic
 if (localStorage.getItem('color-theme') === 'dark' || !('color-theme' in localStorage) || window.matchMedia('(prefers-color-scheme: dark)').matches) {
