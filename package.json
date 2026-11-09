@@ -17,6 +17,7 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
+        "@vercel/analytics": "^2.0.1",
         "cloudinary": "^2.11.0"
     }
 }

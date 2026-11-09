@@ -1,7 +1,14 @@
 import Alpine from 'alpinejs';
+import { inject as injectVercelAnalytics } from '@vercel/analytics';
 import { landingHero } from './modules/landing-hero';
 
 window.Alpine = Alpine;
+
+// Vercel Web Analytics — framework-agnostic (bukan entry `/next` yang khusus Next.js).
+// Hanya dijalankan pada build produksi agar tidak berisik di lingkungan lokal.
+if (import.meta.env.PROD) {
+    injectVercelAnalytics();
+}
 
 // Theme logic
 if (localStorage.getItem('color-theme') === 'dark' || !('color-theme' in localStorage) || window.matchMedia('(prefers-color-scheme: dark)').matches) {
