@@ -36,8 +36,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [NovelController::class, 'landing'])->name('welcome');
 
 Route::get('/site.webmanifest', function () {
-    $icon192 = asset('storage/logo/icon-192.png');
-    $icon512 = asset('storage/logo/icon-512.png');
+    $icon192 = asset('storage/logo/app-icon-192.png');
+    $icon512 = asset('storage/logo/app-icon-512.png');
 
     return response()->json([
         'name' => config('app.name', 'Quoros'),

@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Account') — {{ config('app.name', 'Quoros') }}</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('storage/logo/favicon-32.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">

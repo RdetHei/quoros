@@ -12,23 +12,23 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('title', config('app.name', 'Quoros'))">
     <meta property="og:description" content="@yield('meta_description', 'Quoros adalah platform novel premium.')">
-    <meta property="og:image" content="{{ asset('storage/logo/quorosLogo.png') }}">
+    <meta property="og:image" content="{{ asset('storage/logo/quoros.png') }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
     <meta property="twitter:title" content="@yield('title', config('app.name', 'Quoros'))">
     <meta property="twitter:description" content="@yield('meta_description', 'Quoros adalah platform novel premium.')">
-    <meta property="twitter:image" content="{{ asset('storage/logo/quorosLogo.png') }}">
+    <meta property="twitter:image" content="{{ asset('storage/logo/quoros.png') }}">
 
-    <!-- Favicon: pakai ikon square kecil (7.8 KB), bukan logo 132x80 (85 KB). -->
-    <link rel="icon" type="image/png" href="{{ asset('storage/logo/icon-192.png') }}">
+    <!-- Favicon: ikon square kecil dari logo aplikasi (q.png), bukan wordmark lebar. -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('storage/logo/favicon-32.png') }}">
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="{{ asset('storage/logo/icon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('storage/logo/app-icon-192.png') }}">
     
     <!-- Preload Critical Assets -->
     @stack('preload')
@@ -226,7 +226,7 @@
                  class="mobile-menu-panel relative w-[84vw] max-w-[340px] h-full shadow-2xl flex flex-col overflow-y-auto">
                 <div class="px-5 py-5 border-b border-[#d4af37]/12 flex items-center justify-between sticky top-0 bg-[#0c0c0c]/95 backdrop-blur z-10">
                     <div class="flex items-center gap-2.5">
-                        <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros Logo" width="132" height="80" class="h-8 w-auto" loading="lazy" decoding="async">
+                        <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros Logo" width="85" height="32" class="h-8 w-auto" loading="lazy" decoding="async">
                         <span class="text-xs font-bold uppercase tracking-[0.28em] text-[#f5f1e8]">QUOROS</span>
                     </div>
                     <button @click="closeMobileMenu()" class="h-9 w-9 inline-flex items-center justify-center rounded-md text-[#f5f1e8] hover:bg-white/5 transition-colors" aria-label="Close menu">
@@ -289,7 +289,7 @@
                 <div class="grid grid-cols-1 gap-10 md:grid-cols-12 mb-12">
                     <div class="md:col-span-5">
                         <div class="flex items-center gap-3 mb-5">
-                            <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros Logo" width="132" height="80" class="h-10 w-auto" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/error.png'">
+                            <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros Logo" width="106" height="40" class="h-10 w-auto" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/error.png'">
                             <span class="footer-brand">QUOROS</span>
                         </div>
                         <p class="text-sm text-[#9a9488] max-w-sm leading-relaxed">

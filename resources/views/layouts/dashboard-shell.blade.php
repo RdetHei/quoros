@@ -6,13 +6,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Quoros') }} - Author Studio</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('storage/logo/quorosLogo.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('storage/logo/favicon-32.png') }}">
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
     <meta name="theme-color" content="#0a0a0a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="{{ asset('storage/logo/icon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('storage/logo/app-icon-192.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +47,7 @@
             <div class="flex h-full flex-col overflow-y-auto bg-[#0a0a0a] custom-scrollbar">
                 <header class="lg:hidden flex items-center justify-between h-14 px-4 bg-[#0a0a0a] border-b border-white/5 sticky top-0 z-40">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('storage/logo/quorosLogo.webp') }}" alt="Quoros Logo" width="132" height="80" class="h-7 w-auto">
+                        <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros Logo" width="74" height="28" class="h-7 w-auto">
                         <span class="text-base font-semibold tracking-tight text-[#f2efe8]">Quoros</span>
                     </div>
                     <button @click="sidebarOpen = !sidebarOpen" class="p-2 text-[#a3a3a3] hover:text-[#f2efe8] transition-colors">

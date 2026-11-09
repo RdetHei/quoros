@@ -361,7 +361,7 @@ Username TiDB harus lengkap dengan prefix, mis. `3Yk9aBcD.root`, bukan hanya
 **Session hilang / selalu logout**
 `SESSION_DRIVER` masih `file` atau `array`. Set ke `database` di Vercel.
 
-**Gambar 404 (`/storage/logo/quorosLogo.png`)**
+**Gambar 404 (`/storage/logo/quoros.png`)**
 Symlink `public/storage` belum terbentuk. Pastikan `php artisan storage:link`
 ada di stage `dependencies` pada `Dockerfile.vercel` dan folder
 `storage/app/public` tidak dikecualikan oleh `.dockerignore`.

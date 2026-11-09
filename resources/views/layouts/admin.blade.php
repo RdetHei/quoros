@@ -14,7 +14,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Quoros') }} - Admin</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('storage/logo/icon-192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('storage/logo/favicon-32.png') }}">
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
