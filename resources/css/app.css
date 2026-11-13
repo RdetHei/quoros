@@ -1670,3 +1670,113 @@ nav.navbar {
     .lp-cover-grid--5,
     .lp-cover-grid--7 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Keep the home novel shelves compact and scannable on phones. */
+@media (max-width: 640px) {
+    .lp-panel { padding: 0.72rem 0.72rem 0.86rem; }
+
+    .lp-hero-copy {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .lp-hero-title {
+        font-size: clamp(1.35rem, 6.4vw, 1.7rem);
+        line-height: 1.05;
+        letter-spacing: 0.025em;
+        -webkit-line-clamp: 2;
+        overflow-wrap: anywhere;
+    }
+
+    .lp-hero-desc {
+        display: -webkit-box;
+        max-width: 27rem;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        font-size: 0.58rem;
+        line-height: 1.55;
+        letter-spacing: 0.035em;
+    }
+
+    .lp-marathon-title {
+        font-size: clamp(0.95rem, 4.2vw, 1.2rem);
+        letter-spacing: 0.1em;
+    }
+
+    .lp-side-head .lp-section-title {
+        font-size: clamp(0.78rem, 3.5vw, 0.9rem);
+        letter-spacing: 0.065em;
+    }
+
+    .lp-side-head-sub { font-size: 0.55rem; }
+
+    .lp-panel > .lp-section-head {
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.72rem;
+    }
+
+    .lp-panel > .lp-section-head .lp-section-title {
+        min-width: 0;
+        padding: 0 0 0.28rem;
+        font-size: clamp(0.75rem, 3.2vw, 0.9rem);
+        line-height: 1.2;
+        letter-spacing: 0.045em;
+    }
+
+    .lp-panel > .lp-section-head .lp-see-all {
+        flex-shrink: 0;
+        padding-bottom: 0.28rem;
+        font-size: 0.58rem;
+        white-space: nowrap;
+    }
+
+    .lp-cover-grid--5,
+    .lp-cover-grid--7 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.9rem 0.5rem;
+        padding-inline: 0;
+    }
+
+    .lp-cover-frame {
+        aspect-ratio: 2 / 3;
+        margin-bottom: 0.28rem;
+    }
+
+    .lp-cover-title {
+        margin: 0.25rem 0 0.22rem;
+        font-size: clamp(0.625rem, 2.6vw, 0.72rem);
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: 0;
+    }
+
+    .lp-cover-meta {
+        min-width: 0;
+        gap: 0.2rem;
+        padding: 0.18rem 0.25rem;
+        border-radius: 3px;
+        letter-spacing: 0.01em;
+    }
+
+    .lp-cover-meta-chapter {
+        min-width: 0;
+        font-size: 0.47rem;
+        letter-spacing: 0;
+    }
+
+    .lp-cover-meta-time {
+        font-size: 0.45rem;
+        letter-spacing: 0;
+    }
+}
+
+@media (max-width: 400px) {
+    .lp-panel { padding: 0.64rem 0.64rem 0.76rem; }
+
+    .lp-cover-grid--5,
+    .lp-cover-grid--7 { gap: 0.78rem 0.38rem; }
+
+    .lp-cover-meta { padding-inline: 0.2rem; }
+}
