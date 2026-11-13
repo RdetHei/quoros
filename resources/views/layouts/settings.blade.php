@@ -7,42 +7,42 @@
     <title>@yield('title', 'Settings') - {{ config('app.name', 'Quoros') }}</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('storage/logo/favicon-32.png') }}">
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
-    <meta name="theme-color" content="#0b0b0b">
+    <meta name="theme-color" content="#0a0a0a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>[x-cloak] { display: none !important; }</style>
     @stack('styles')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-neutral-950 font-sans text-white antialiased">
+<body class="min-h-screen bg-[#0a0a0a] font-sans text-white antialiased">
     <div class="min-h-screen">
-        <header class="border-b border-white/10 bg-neutral-950/95 backdrop-blur">
-            <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-                <div class="flex min-w-0 items-center gap-4">
-                    <a href="{{ $settingsBackUrl ?? route('welcome') }}" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-neutral-700 text-neutral-300 transition-colors hover:border-white hover:bg-white hover:text-black" aria-label="Back">
+        <header class="sticky top-0 z-30 border-b border-white/[.08] bg-[#0a0a0a]/90 backdrop-blur">
+            <div class="mx-auto flex h-[54px] max-w-[1440px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
+                <div class="flex min-w-0 items-center gap-3">
+                    <a href="{{ $settingsBackUrl ?? route('welcome') }}" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[.12] text-neutral-300 transition-colors hover:border-[#c7a64a]/60 hover:text-[#c7a64a]" aria-label="Back">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
                     </a>
-                    <a href="{{ route('welcome') }}" class="flex min-w-0 items-center gap-3">
-                        <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros" width="74" height="28" class="h-7 w-auto">
-                        <span class="hidden text-sm font-bold tracking-wide text-white sm:block">QUOROS</span>
+                    <a href="{{ route('welcome') }}" class="flex min-w-0 items-center gap-2.5">
+                        <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros" width="74" height="28" class="h-6 w-auto">
+                        <span class="hidden text-[13px] font-bold tracking-[0.2em] text-white sm:block">QUOROS</span>
                     </a>
-                    <span class="hidden h-5 w-px bg-neutral-700 sm:block"></span>
-                    <span class="truncate text-sm font-semibold text-neutral-300">Account Settings</span>
+                    <span class="hidden h-4 w-px bg-white/[.12] sm:block"></span>
+                    <span class="truncate text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Account Settings</span>
                 </div>
                 <div class="flex shrink-0 items-center gap-3">
-                    <span class="hidden text-xs text-neutral-500 sm:block">{{ auth()->user()->name }}</span>
-                    <a href="{{ route('profile.show', auth()->user()->username ?? auth()->user()->id) }}" class="inline-flex h-9 items-center rounded-lg border border-neutral-700 px-3 text-xs font-semibold text-neutral-300 transition-colors hover:border-white hover:text-white">Profile</a>
+                    <span class="hidden text-[11px] text-neutral-500 sm:block">{{ auth()->user()->name }}</span>
+                    <a href="{{ route('profile.show', auth()->user()->username ?? auth()->user()->id) }}" class="inline-flex h-8 items-center rounded-lg border border-white/[.12] px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-300 transition-colors hover:border-[#c7a64a]/60 hover:text-[#c7a64a]">Profile</a>
                 </div>
             </div>
         </header>
 
-        <main class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        <main class="mx-auto w-full max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
             @if(session('success'))
-                <div class="mb-6 rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-3 text-sm text-neutral-200">{{ session('success') }}</div>
+                <div class="mx-auto mb-6 max-w-3xl rounded-xl border border-[#c7a64a]/25 bg-[#c7a64a]/10 px-4 py-3 text-[13px] text-[#f0dfae]">{{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="mb-6 rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-3 text-sm text-neutral-200">{{ session('error') }}</div>
+                <div class="mx-auto mb-6 max-w-3xl rounded-xl border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-[13px] text-rose-200">{{ session('error') }}</div>
             @endif
             @yield('content')
         </main>

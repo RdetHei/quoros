@@ -7,7 +7,6 @@
             <div class="h-10 w-1 rounded-full bg-neutral-400"></div>
             <div>
                 <p class="mb-2 text-[10px] font-medium uppercase tracking-[0.24em] text-neutral-500">Community</p>
-                <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">Novel Request</h1>
             </div>
         </div>
 

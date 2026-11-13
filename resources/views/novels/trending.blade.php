@@ -5,8 +5,7 @@
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div class="flex items-center">
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">Trending</h1>
-                <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">Novel paling banyak dibaca — {{ $periodLabel }}.</p>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Novel paling banyak dibaca — {{ $periodLabel }}.</p>
             </div>
         </div>
         <div class="flex gap-2">

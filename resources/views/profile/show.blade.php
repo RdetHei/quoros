@@ -22,65 +22,74 @@
     }
     body:has(.pf-page) { background-color: var(--pf-bg) !important; }
 
-    .pf-kicker {
-        font-size: 9px;
-        letter-spacing: 0.22em;
-        font-weight: 650;
-        text-transform: uppercase;
-        color: var(--pf-gold);
+    /* Profile hero (full-bleed cover wrapping the identity block) */
+    .pf-hero {
+        position: relative;
+        margin-bottom: 0;
+        padding: 48px 0 56px;
     }
-    .pf-kicker .sep { color: var(--pf-subtle); margin: 0 8px; }
+    @media (max-width: 639px) { .pf-hero { padding: 34px 0 44px; } }
 
-    .pf-divider-grad {
-        height: 1px;
-        background: linear-gradient(to right, var(--pf-gold), transparent);
-    }
-
-    .pf-hero-title {
-        font-family: 'Cormorant Garamond', Georgia, serif;
-        font-weight: 600;
-        font-size: 56px;
-        line-height: 1;
-        letter-spacing: 0.015em;
-        text-transform: uppercase;
-        color: var(--pf-title);
-    }
-    @media (max-width: 639px) {
-        .pf-hero-title { font-size: 40px; }
+    .pf-hero-cover {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background:
+            radial-gradient(130% 150% at 16% 0%, rgba(199, 166, 74, 0.30) 0%, rgba(199, 166, 74, 0) 58%),
+            linear-gradient(135deg, #1b1710 0%, #101010 55%, #141414 100%);
     }
 
-    .pf-hero-sub {
-        font-size: 12px;
-        line-height: 1.7;
-        color: var(--pf-muted);
-        max-width: 480px;
+    .pf-hero-cover-img {
+        position: absolute;
+        top: -14%;
+        left: -6%;
+        width: 112%;
+        height: 128%;
+        object-fit: cover;
+        filter: blur(34px) saturate(1.2) brightness(0.5);
+        opacity: 0.9;
     }
 
-    .pf-tab-link {
-        padding: 14px 0;
-        font-size: 10px;
-        letter-spacing: 0.16em;
-        font-weight: 600;
-        text-transform: uppercase;
-        color: var(--pf-muted);
-        border-bottom: 2px solid transparent;
-        transition: color .18s ease, border-color .18s ease;
-    }
-    .pf-tab-link:hover { color: #d4d4d4; }
-    .pf-tab-link.is-active {
-        color: var(--pf-gold);
-        border-bottom-color: var(--pf-gold);
+    .pf-hero-cover-scrim {
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(180deg, rgba(10, 10, 10, 0.42) 0%, rgba(10, 10, 10, 0.50) 50%, rgba(10, 10, 10, 0.82) 100%),
+            radial-gradient(125% 110% at 8% 50%, rgba(10, 10, 10, 0.55) 0%, rgba(10, 10, 10, 0) 62%);
     }
 
-    .pf-identity-card {
-        background: linear-gradient(180deg, #141414 0%, #101010 100%);
-        border: 1px solid var(--pf-border);
-        border-radius: 8px;
-        padding: 28px 32px;
+    .pf-hero-body {
+        position: relative;
     }
-    @media (max-width: 639px) {
-        .pf-identity-card { padding: 20px; }
+
+    .pf-hero-top {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
     }
+    @media (min-width: 640px) {
+        .pf-hero-top { flex-direction: row; align-items: flex-end; gap: 22px; }
+    }
+
+    .pf-hero-info { flex: 1; min-width: 0; }
+
+    .pf-hero-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    @media (min-width: 640px) {
+        .pf-hero-actions { align-items: flex-end; }
+    }
+
+    .pf-hero-stats {
+        margin-top: 32px;
+        padding-top: 28px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    @media (max-width: 639px) { .pf-hero-stats { margin-top: 26px; padding-top: 22px; } }
 
     .pf-avatar-wrap {
         width: 88px;
@@ -92,6 +101,14 @@
         flex-shrink: 0;
     }
     @media (max-width: 639px) { .pf-avatar-wrap { width: 72px; height: 72px; } }
+
+    .pf-avatar-hero {
+        width: 112px;
+        height: 112px;
+        border: 2px solid rgba(199, 166, 74, 0.55);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+    }
+    @media (max-width: 639px) { .pf-avatar-hero { width: 88px; height: 88px; } }
 
     .pf-role-label {
         font-size: 8px;
@@ -605,7 +622,7 @@
     .pf-foot-bottom .links .sep { margin: 0 7px; color: #2e2e2e; }
 
     @media (prefers-reduced-motion: reduce) {
-        .pf-cj-card, .pf-shelf-card, .pf-list-card, .pf-tab-link, .pf-view-all-link, .pf-edit-btn, .pf-btn-solid, .pf-btn-outline {
+        .pf-cj-card, .pf-shelf-card, .pf-list-card, .pf-view-all-link, .pf-edit-btn, .pf-btn-solid, .pf-btn-outline {
             transition: none !important;
         }
     }
@@ -614,60 +631,31 @@
 
 @section('content')
 <main class="pf-page min-h-screen w-full overflow-x-hidden pb-12">
-    <div class="mx-auto w-full max-w-[1200px]">
+    @php
+        $profileImg = null;
+        if (!empty($user->profile_photo_url)) {
+            $profileImg = $user->profile_photo_url;
+        } elseif (!empty($user->profile_photo)) {
+            $profileImg = asset('storage/' . $user->profile_photo);
+        }
+    @endphp
 
-        {{-- ─── HERO HEADER ─────────────────────────────────────────────── --}}
-        <header class="mb-8 border-b border-white/[.08] pb-9 sm:mb-10 sm:pb-10">
-            <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end sm:gap-8">
-                <div class="min-w-0 max-w-2xl">
-                    <p class="mb-3 pf-kicker">
-                        Your Identity <span class="sep">/</span> Reader's Archive
-                    </p>
-                    <h1 class="pf-hero-title">Profile</h1>
-                    <p class="mt-4 pf-hero-sub">
-                        A home for your stories, your shelves, and the worlds you return to.
-                    </p>
-                    <div class="mt-6 pf-divider-grad w-56"></div>
-                </div>
-            </div>
+    {{-- ─── PROFILE HERO (full-bleed cover) ─────────────────────────── --}}
+    <section class="pf-hero">
+        <div class="pf-hero-cover">
+            @if($profileImg)
+                <img src="{{ $profileImg }}" alt="" aria-hidden="true" class="pf-hero-cover-img" width="1200" height="400" loading="lazy" decoding="async" onerror="this.style.display='none'">
+            @endif
+            <div class="pf-hero-cover-scrim"></div>
+        </div>
 
-            {{-- TABS --}}
-            <nav class="mt-9 flex flex-wrap items-center gap-x-8 sm:mt-10 sm:gap-x-10" role="tablist" aria-label="Profile sections">
-                @php
-                    $profileTabs = [
-                        ['id' => 'profile', 'label' => 'Profile', 'route' => route('profile.show', $user->username ?? $user->id), 'active' => true],
-                        ['id' => 'bookmark', 'label' => 'Bookmark', 'route' => route('bookmarks.index'), 'active' => false],
-                        ['id' => 'lists', 'label' => 'Reading Lists', 'route' => route('lists.index'), 'active' => false],
-                        ['id' => 'history', 'label' => 'History', 'route' => route('history.index'), 'active' => false],
-                    ];
-                @endphp
-                @foreach($profileTabs as $t)
-                    <a href="{{ $t['route'] }}"
-                       role="tab"
-                       aria-selected="{{ $t['active'] ? 'true' : 'false' }}"
-                       class="pf-tab-link @if($t['active']) is-active @endif">
-                        {{ $t['label'] }}
-                    </a>
-                @endforeach
-            </nav>
-        </header>
-
-        {{-- ─── IDENTITY CARD ───────────────────────────────────────────── --}}
-        <section class="mb-10">
-            <div class="pf-identity-card">
-                <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-7">
-                    @php
-                        $profileImg = null;
-                        if (!empty($user->profile_photo_url)) {
-                            $profileImg = $user->profile_photo_url;
-                        } elseif (!empty($user->profile_photo)) {
-                            $profileImg = asset('storage/' . $user->profile_photo);
-                        }
-                    @endphp
+        <div class="pf-hero-body">
+            <div class="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
+                <div class="pf-hero-top">
                     {{-- Avatar --}}
-                    <div class="pf-avatar-wrap">
+                    <div class="pf-avatar-wrap pf-avatar-hero">
                         @if($profileImg)
-                            <img src="{{ $profileImg }}" alt="{{ e($user->name) }}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='/error.png'">
+                            <img src="{{ $profileImg }}" alt="{{ e($user->name) }}" class="w-full h-full object-cover" width="112" height="112" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/error.png'">
                         @else
                             <div class="w-full h-full flex items-center justify-center">
                                 <span class="pf-serif text-4xl font-semibold text-[#c7a64a]/60 uppercase tracking-wide">
@@ -678,10 +666,10 @@
                     </div>
 
                     {{-- Identity info --}}
-                    <div class="flex-1 min-w-0">
+                    <div class="pf-hero-info">
                         <div class="pf-role-label mb-1.5">Keeper of the Archive</div>
-                        <div class="flex flex-wrap items-baseline gap-3">
-                            <h2 class="pf-display-name">{{ $user->name }}</h2>
+                        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                            <h1 class="pf-display-name">{{ $user->name }}</h1>
                             <span class="pf-username">@<span>{{ $user->username ?? $user->id }}</span></span>
                         </div>
                         @if($user->bio)
@@ -697,7 +685,7 @@
                     </div>
 
                     {{-- Actions --}}
-                    <div class="flex flex-col items-end gap-2 shrink-0 sm:self-start">
+                    <div class="pf-hero-actions">
                         @if($isOwner)
                             <a href="{{ route('settings') }}" class="pf-edit-btn">
                                 <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
@@ -714,47 +702,49 @@
                         @endif
                     </div>
                 </div>
-            </div>
-        </section>
 
-        {{-- ─── STATS ROW ───────────────────────────────────────────────── --}}
-        <section class="mb-11">
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8 md:gap-10">
-                @php
-                    $statSaved = str_pad((string) max(0, (int) ($statsCounts['saved'] ?? 0)), 2, '0', STR_PAD_LEFT);
-                    $statReading = str_pad((string) max(0, (int) ($statsCounts['reading'] ?? 0)), 2, '0', STR_PAD_LEFT);
-                    $statCompleted = str_pad((string) max(0, (int) ($statsCounts['completed'] ?? 0)), 2, '0', STR_PAD_LEFT);
-                    $statLists = str_pad((string) max(0, (int) ($totalListsCount ?? 0)), 2, '0', STR_PAD_LEFT);
-                    $statHours = $readingHours ?? 1234;
-                @endphp
-                <div>
-                    <div class="pf-stat-num">{{ $statSaved }}</div>
-                    <div class="pf-stat-label">Saved Novels</div>
-                    <div class="pf-stat-sub">Your personal library</div>
-                </div>
-                <div>
-                    <div class="pf-stat-num">{{ $statReading }}</div>
-                    <div class="pf-stat-label">Currently Reading</div>
-                    <div class="pf-stat-sub">Across four realms</div>
-                </div>
-                <div>
-                    <div class="pf-stat-num">{{ $statCompleted }}</div>
-                    <div class="pf-stat-label">Completed Novels</div>
-                    <div class="pf-stat-sub">Journeys remembered</div>
-                </div>
-                <div>
-                    <div class="pf-stat-num">{{ $statLists }}</div>
-                    <div class="pf-stat-label">Reading Lists</div>
-                    <div class="pf-stat-sub">{{ $publicListsCount ?? 0 }} public · {{ $privateListsCount ?? 0 }} private</div>
-                </div>
-                <div>
-                    <div class="pf-stat-num">{{ $statHours }}<span style="font-size:22px;">h</span></div>
-                    <div class="pf-stat-label">Hour of Reading</div>
-                    <div class="pf-stat-sub">{{ $publicListsCount ?? 0 }} public · {{ $privateListsCount ?? 0 }} private</div>
-                </div>
+                {{-- STATS --}}
+                <section class="pf-hero-stats">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8 md:gap-10">
+                        @php
+                            $statSaved = str_pad((string) max(0, (int) ($statsCounts['saved'] ?? 0)), 2, '0', STR_PAD_LEFT);
+                            $statReading = str_pad((string) max(0, (int) ($statsCounts['reading'] ?? 0)), 2, '0', STR_PAD_LEFT);
+                            $statCompleted = str_pad((string) max(0, (int) ($statsCounts['completed'] ?? 0)), 2, '0', STR_PAD_LEFT);
+                            $statLists = str_pad((string) max(0, (int) ($totalListsCount ?? 0)), 2, '0', STR_PAD_LEFT);
+                            $statHours = $readingHours ?? 1234;
+                        @endphp
+                        <div>
+                            <div class="pf-stat-num">{{ $statSaved }}</div>
+                            <div class="pf-stat-label">Saved Novels</div>
+                            <div class="pf-stat-sub">Your personal library</div>
+                        </div>
+                        <div>
+                            <div class="pf-stat-num">{{ $statReading }}</div>
+                            <div class="pf-stat-label">Currently Reading</div>
+                            <div class="pf-stat-sub">Across four realms</div>
+                        </div>
+                        <div>
+                            <div class="pf-stat-num">{{ $statCompleted }}</div>
+                            <div class="pf-stat-label">Completed Novels</div>
+                            <div class="pf-stat-sub">Journeys remembered</div>
+                        </div>
+                        <div>
+                            <div class="pf-stat-num">{{ $statLists }}</div>
+                            <div class="pf-stat-label">Reading Lists</div>
+                            <div class="pf-stat-sub">{{ $publicListsCount ?? 0 }} public · {{ $privateListsCount ?? 0 }} private</div>
+                        </div>
+                        <div>
+                            <div class="pf-stat-num">{{ $statHours }}<span style="font-size:22px;">h</span></div>
+                            <div class="pf-stat-label">Hour of Reading</div>
+                            <div class="pf-stat-sub">{{ $publicListsCount ?? 0 }} public · {{ $privateListsCount ?? 0 }} private</div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </section>
+        </div>
+    </section>
 
+    <div class="mx-auto w-full max-w-[1200px] px-5 sm:px-8 lg:px-10 pt-6">
         {{-- ─── CONTINUE YOUR JOURNEY ──────────────────────────────────── --}}
         <section class="mb-11">
             <div class="pf-section-head">

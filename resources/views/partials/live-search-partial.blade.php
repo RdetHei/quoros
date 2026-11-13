@@ -47,7 +47,7 @@
          class="live-search-dropdown absolute left-0 right-0 top-[calc(100%+8px)] z-[200]
                 rounded-2xl border border-slate-700/90 bg-slate-900
                 shadow-2xl shadow-black/50 overflow-hidden"
-         style="display:none; min-width: 320px;">
+         style="display:none;">
 
         <div id="{{ $componentId }}-loading" class="hidden flex px-4 py-4 items-center gap-3 text-slate-400 text-sm">
             <svg class="animate-spin h-4 w-4 shrink-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

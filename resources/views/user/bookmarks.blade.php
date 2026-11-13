@@ -227,9 +227,6 @@
                         </span>
                         Your Library <span class="text-neutral-700">/</span> Saved Legends
                     </p>
-                    <h1 class="bm-serif text-5xl font-semibold uppercase leading-none tracking-[.015em] text-[#f2efe8] sm:text-6xl md:text-[4.4rem]">
-                        Bookmark
-                    </h1>
                     <p class="mt-4 max-w-lg text-xs leading-6 text-neutral-400 sm:text-[12.5px] sm:leading-7">
                         The stories you keep close. Pick up where you left off, or begin a new journey.
                     </p>

@@ -5,7 +5,6 @@
     <div class="flex items-center gap-4 mb-8">
         <div class="w-2 h-10 bg-neutral-400 rounded-full"></div>
         <div>
-            <h1 class="text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">Tag Populer</h1>
             <p class="text-neutral-500 dark:text-neutral-400 font-medium">Cari cerita dengan elemen yang lebih spesifik.</p>
         </div>
     </div>

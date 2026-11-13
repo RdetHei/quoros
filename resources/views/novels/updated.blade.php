@@ -29,7 +29,6 @@
         <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>
                 <p class="mb-2 text-[9px] font-semibold uppercase tracking-[.24em] text-[#c7a64a]">Chronicle <span class="mx-1 text-neutral-600">/</span> Live Archive</p>
-                <h1 class="updates-serif text-[2.5rem] font-semibold uppercase leading-none tracking-[.015em] text-[#f2efe8] sm:text-5xl">Latest Updates</h1>
                 <p class="mt-3 max-w-xl text-xs leading-6 text-neutral-400 sm:text-sm">Bab terbaru dari setiap dunia, tersusun dari rilis paling baru.</p>
             </div>
             <div class="flex shrink-0 flex-col gap-3 sm:items-end">

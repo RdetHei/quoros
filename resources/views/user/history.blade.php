@@ -532,7 +532,6 @@
                     <p class="mb-3 rh-kicker">
                         Your Chronicle <span class="sep">/</span> Reading Archive
                     </p>
-                    <h1 class="rh-hero-title">Reading History</h1>
                     <p class="mt-4 rh-hero-sub">
                         Retrace your journey through the realms. Every chapter leaves a mark.
                     </p>

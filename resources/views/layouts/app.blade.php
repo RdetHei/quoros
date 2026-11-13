@@ -97,7 +97,7 @@
                         </button>
 
                         <a href="{{ url('/') }}" class="flex items-center gap-2 group shrink-0">
-                            <span class="site-brand text-[13px] sm:text-[14px] tracking-[0.28em] font-[600]">QUOROS</span>
+                            <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros Logo" width="106" height="40" class="h-10 w-auto" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/error.png'">
                         </a>
                     </div>
 
@@ -121,7 +121,7 @@
                                  x-transition:enter="transition ease-out duration-200"
                                  x-transition:enter-start="opacity-0 -translate-y-2"
                                  x-transition:enter-end="opacity-100 translate-y-0"
-                                 class="absolute right-0 top-full mt-2 w-[min(92vw,20rem)] bg-[#111111]/98 backdrop-blur border border-[#d4af37]/20 px-3 py-3 shadow-xl z-50 rounded-lg">
+                                 class="fixed top-[62px] right-5 sm:right-8 w-[min(92vw,20rem)] bg-[#111111]/98 backdrop-blur border border-[#d4af37]/20 px-3 py-3 shadow-xl z-50 rounded-lg">
                                 @include('partials.live-search-partial', [ 'id' => 'mobile-search', 'placeholder' => 'SEARCH THE LEGEND' ])
                             </div>
                         </div>
@@ -227,7 +227,6 @@
                 <div class="px-5 py-5 border-b border-[#d4af37]/12 flex items-center justify-between sticky top-0 bg-[#0c0c0c]/95 backdrop-blur z-10">
                     <div class="flex items-center gap-2.5">
                         <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros Logo" width="85" height="32" class="h-8 w-auto" loading="lazy" decoding="async">
-                        <span class="text-xs font-bold uppercase tracking-[0.28em] text-[#f5f1e8]">QUOROS</span>
                     </div>
                     <button @click="closeMobileMenu()" class="h-9 w-9 inline-flex items-center justify-center rounded-md text-[#f5f1e8] hover:bg-white/5 transition-colors" aria-label="Close menu">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -274,8 +273,8 @@
         @php
             // Beberapa halaman menggambar container-nya sendiri (full-bleed):
             // landing page dan halaman baca bab (navbar disembunyikan di reader).
-            $isFullBleed = request()->routeIs('welcome') || request()->routeIs('chapters.show');
-            $mainTopPadding = request()->routeIs('welcome') ? 'pt-4' : ($isFullBleed ? 'pt-0' : 'pt-[70px]');
+            $isFullBleed = request()->routeIs('welcome') || request()->routeIs('chapters.show') || request()->routeIs('profile.show');
+            $mainTopPadding = request()->routeIs('welcome') ? 'pt-4' : (request()->routeIs('chapters.show') ? 'pt-0' : 'pt-[70px]');
         @endphp
 
         <main class="flex-grow {{ $mainTopPadding }} bg-[#0a0a0a]">
@@ -294,8 +293,7 @@
                 <div class="grid grid-cols-1 gap-10 md:grid-cols-12 mb-12">
                     <div class="md:col-span-5">
                         <div class="flex items-center gap-3 mb-5">
-                            <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros Logo" width="106" height="40" class="h-10 w-auto" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/error.png'">
-                            <span class="footer-brand">QUOROS</span>
+                            <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros Logo" width="106" height="40" class="h-10 w-auto" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/error.png'">                        
                         </div>
                         <p class="text-sm text-[#9a9488] max-w-sm leading-relaxed">
                             Platform novel dengan ruang baca yang gelap, tenang, dan fokus — temukan cerita pilihan, update harian, dan bacaan yang cocok dengan ritmemu.

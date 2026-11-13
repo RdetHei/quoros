@@ -183,7 +183,6 @@
                 Your Archive <span class="sep">/</span> Reading Lists <span class="sep">/</span>
                 <span style="color: var(--ul-subtle); letter-spacing:0.14em;">New</span>
             </p>
-            <h1 class="ul-hero-title">Create a Shelf</h1>
             <p class="ul-hero-sub mt-4">
                 A shelf is a small, private library — give it a title that hints at what's inside. When you're ready, you can flip the lock and share it with other readers.
             </p>

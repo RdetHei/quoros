@@ -168,7 +168,6 @@
         <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>
                 <p class="mb-2 text-[9px] font-semibold uppercase tracking-[.24em] text-[#c7a64a]">Codex <span class="mx-1 text-neutral-600">/</span> Directory</p>
-                <h1 class="search-serif text-[2.5rem] font-semibold uppercase leading-none tracking-[.015em] text-[#f2efe8] sm:text-5xl">Novel Navigation</h1>
                 <p class="mt-3 max-w-xl text-xs leading-6 text-neutral-400 sm:text-sm">Telusuri seluruh arkip — saring berdasarkan genre, tag, status, region, dan rating.</p>
             </div>
             <div class="flex shrink-0 flex-col gap-3 sm:items-end">

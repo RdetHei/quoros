@@ -381,7 +381,6 @@
                     <p class="mb-3 nt-kicker">
                         Your Chronicle <span class="sep">/</span> Messenger
                     </p>
-                    <h1 class="nt-hero-title">Notifications</h1>
                     <p class="mt-4 nt-hero-sub">
                         Every reply, new chapter, and archive announcement kept in one ledger.
                     </p>

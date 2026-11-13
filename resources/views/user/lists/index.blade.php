@@ -271,7 +271,6 @@
                     <p class="mb-3 ul-kicker">
                         Your Archive <span class="sep">/</span> Reading Lists
                     </p>
-                    <h1 class="ul-hero-title">Curated Shelves</h1>
                     <p class="ul-hero-sub mt-4">
                         Group novels by mood, theme, or reading plan — then share a shelf with other readers or keep it private for the next quiet weekend.
                     </p>
