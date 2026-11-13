@@ -210,13 +210,13 @@
         gap: 16px;
         margin-bottom: 18px;
     }
+    .pf-section-head > :last-child { margin-left: auto; }
 
     .pf-section-title {
         display: flex;
         align-items: center;
         gap: 18px;
-        flex: 1;
-        min-width: 0;
+        flex: 1 0 auto;
     }
 
     .pf-section-title-text {
