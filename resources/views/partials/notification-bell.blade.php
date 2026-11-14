@@ -23,7 +23,7 @@
          x-transition:leave="transition ease-in duration-70"
          x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="transform opacity-0 scale-[0.985] translate-y-1"
-         class="absolute right-0 top-full mt-2 w-[340px] sm:w-[380px] bg-[#111111] rounded-lg border border-white/[0.08] shadow-[0_20px_44px_-20px_rgba(0,0,0,0.9)] z-50 overflow-hidden"
+         class="fixed inset-x-5 top-[62px] z-50 overflow-hidden rounded-lg border border-white/[0.08] bg-[#111111] shadow-[0_20px_44px_-20px_rgba(0,0,0,0.9)] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[340px] md:w-[380px]"
          style="display: none;">
 
         {{-- Header --}}
@@ -51,7 +51,7 @@
         </div>
 
         {{-- List --}}
-        <div class="max-h-[340px] overflow-y-auto bg-[#121212]">
+        <div class="max-h-[min(60vh,340px)] overflow-y-auto bg-[#121212]">
             @forelse($recentNotifications ?? [] as $n)
                 @php
                     $isUnread = $n->isUnread();

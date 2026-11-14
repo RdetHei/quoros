@@ -37,6 +37,7 @@
         line-height: 1.08;
         letter-spacing: 0.01em;
         color: var(--nv-title);
+        overflow-wrap: anywhere;
     }
     @media (max-width: 639px) { .nv-hero-title { font-size: 28px; } }
 
@@ -110,6 +111,8 @@
         line-height: 1.82;
         letter-spacing: 0.002em;
         white-space: pre-line;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
     @media (max-width: 639px) { .nv-notif-body { padding: 14px 14px; font-size: 12.5px; } }
 

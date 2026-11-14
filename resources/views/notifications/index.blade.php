@@ -167,6 +167,14 @@
     .nt-date-count .num { color: #d4d4d4; }
     .nt-date-count .lbl { color: var(--nt-subtle); margin-left: 2px; }
 
+    @media (max-width: 639px) {
+        .nt-date-group { gap: 10px; margin: 22px 0 10px; }
+        .nt-date-left { gap: 10px; }
+        .nt-date-rule { min-width: 0; }
+        .nt-date-label { font-size: 15px; }
+        .nt-date-count .lbl { display: none; }
+    }
+
     /* Notification card */
     .nt-card {
         background: var(--nt-card);
