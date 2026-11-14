@@ -146,7 +146,11 @@
 
             <div class="flex items-start justify-between mb-5 gap-3">
                 <p class="text-[36px] font-serif font-medium text-[#f2efe8] leading-none tracking-tight">{{ $currSymbol }}{{ number_format($payout['available'], 2) }}</p>
-                <span class="shrink-0 mt-1 rounded border border-[#c7a64a]/30 px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.15em] text-[#c7a64a]">Scheduled</span>
+                @if($payout['available'] > 0)
+                    <span class="shrink-0 mt-1 rounded border border-[#c7a64a]/30 px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.15em] text-[#c7a64a]">Ready</span>
+                @else
+                    <span class="shrink-0 mt-1 rounded border border-white/10 px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.15em] text-[#a3a3a3]">Empty</span>
+                @endif
             </div>
 
             <div class="border-t border-white/5 pt-4 mb-4">
@@ -155,8 +159,13 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </span>
                     <div class="flex-1 min-w-0">
-                        <p class="text-[13px] font-medium text-[#f2efe8]">{{ $payout['method_label'] }}{{ $payout['account'] ? ' · ' . $payout['account'] : '' }}</p>
-                        <p class="text-[10px] uppercase tracking-[0.2em] text-[#a3a3a3] mt-0.5 font-semibold">{{ $payout['account_name'] ?: auth()->user()->name }} · {{ $payout['currency'] }}</p>
+                        @if($payout['configured'])
+                            <p class="text-[13px] font-medium text-[#f2efe8]">{{ $payout['method_label'] }}{{ $payout['account'] ? ' · ' . $payout['account'] : '' }}</p>
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#a3a3a3] mt-0.5 font-semibold">{{ $payout['account_name'] ?: auth()->user()->name }} · {{ $payout['currency'] }}</p>
+                        @else
+                            <p class="text-[13px] font-medium text-[#f2efe8]">No payout method set</p>
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#a3a3a3] mt-0.5 font-semibold">Add your details to receive payouts</p>
+                        @endif
                     </div>
                 </div>
                 <p class="mt-3.5 text-[11px] text-[#a3a3a3]">
@@ -172,7 +181,7 @@
             <div class="flex flex-wrap gap-2.5">
                 <button type="button" @click="showPayout = !showPayout" class="inline-flex items-center gap-2 rounded-md border border-white/10 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2efe8] transition-all hover:border-white/20 hover:bg-white/5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543-.94-3.31.826-2.37 2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Payout Settings
+                    {{ $payout['configured'] ? 'Payout Settings' : 'Set Up Payout' }}
                 </button>
             </div>
 
@@ -180,36 +189,42 @@
                 @csrf
                 @method('PUT')
 
+                @if($errors->any())
+                    <div class="rounded-md border border-red-500/30 bg-red-500/5 px-3 py-2.5 text-[11px] text-red-300">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
                 <div>
                     <label class="mb-1.5 block text-[9.5px] font-semibold uppercase tracking-[0.18em] text-[#a3a3a3]">Method</label>
                     <select name="method" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
-                        <option value="bank" @selected(($payout['method'] ?? 'bank') === 'bank')>Bank account</option>
-                        <option value="paypal" @selected(($payout['method'] ?? 'bank') === 'paypal')>PayPal</option>
+                        <option value="bank" @selected(old('method', $payout['method'] ?? 'bank') === 'bank')>Bank account</option>
+                        <option value="paypal" @selected(old('method', $payout['method'] ?? 'bank') === 'paypal')>PayPal</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="mb-1.5 block text-[9.5px] font-semibold uppercase tracking-[0.18em] text-[#a3a3a3]">Account Name</label>
-                    <input type="text" name="account_name" value="{{ $payout['account_name'] }}" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
+                    <input type="text" name="account_name" value="{{ old('account_name', $payout['account_name']) }}" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
                 </div>
 
                 <div>
                     <label class="mb-1.5 block text-[9.5px] font-semibold uppercase tracking-[0.18em] text-[#a3a3a3]">Account Number</label>
-                    <input type="text" name="account_number" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
+                    <input type="text" name="account_number" value="{{ old('account_number') }}" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
                 </div>
 
                 <div>
                     <label class="mb-1.5 block text-[9.5px] font-semibold uppercase tracking-[0.18em] text-[#a3a3a3]">Currency</label>
-                    <input type="text" name="currency" value="{{ $payout['currency'] }}" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
+                    <input type="text" name="currency" value="{{ old('currency', $payout['currency']) }}" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
                 </div>
 
                 <div>
                     <label class="mb-1.5 block text-[9.5px] font-semibold uppercase tracking-[0.18em] text-[#a3a3a3]">Minimum Payout</label>
-                    <input type="number" step="0.01" min="0" name="min_payout" value="{{ number_format($payout['min_payout'], 2, '.', '') }}" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
+                    <input type="number" step="0.01" min="0" name="min_payout" value="{{ old('min_payout', number_format($payout['min_payout'], 2, '.', '')) }}" class="w-full rounded-md border border-white/10 bg-[#0a0a0a] px-3 py-2 text-[12px] text-[#f2efe8] focus:border-[#c7a64a]/40 focus:outline-none">
                 </div>
 
                 <label class="flex items-center gap-2.5 text-[11px] text-[#a3a3a3]">
-                    <input type="checkbox" name="auto_payout" value="1" @checked($payout['auto_payout']) class="h-3.5 w-3.5 rounded border-white/10 bg-[#0a0a0a] text-[#c7a64a] focus:ring-0">
+                    <input type="checkbox" name="auto_payout" value="1" @checked(old('auto_payout', $payout['auto_payout'])) class="h-3.5 w-3.5 rounded border-white/10 bg-[#0a0a0a] text-[#c7a64a] focus:ring-0">
                     Automatic monthly payouts
                 </label>
 

@@ -28,8 +28,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-[#0a0a0a] text-[#f2efe8] min-h-screen" x-data="{ sidebarOpen: false }">
-    <div class="flex min-h-screen">
+<body class="font-sans antialiased bg-[#0a0a0a] text-[#f2efe8] h-dvh overflow-hidden" x-data="{ sidebarOpen: false }">
+    <div class="flex h-dvh overflow-hidden">
         <x-writer.sidebar :active="$active ?? (request()->routeIs('writer.dashboard') ? 'dashboard' : (request()->routeIs('writer.analytics') ? 'analytics' : (request()->routeIs('writer.earnings') ? 'earnings' : (request()->routeIs('writer.novels*') && !request()->routeIs('writer.novels.create') ? 'novels' : (request()->routeIs('writer.chapters') ? 'chapters' : 'dashboard')))))" />
 
         <div x-show="sidebarOpen"
@@ -43,8 +43,8 @@
              x-transition:leave-end="opacity-0"
              class="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm lg:hidden"></div>
 
-        <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-            <div class="flex h-full flex-col overflow-y-auto bg-[#0a0a0a] custom-scrollbar">
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+            <div class="flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#0a0a0a] custom-scrollbar">
                 <header class="lg:hidden flex items-center justify-between h-14 px-5 sm:px-8 bg-[#0a0a0a] border-b border-white/5 sticky top-0 z-40">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('storage/logo/quoros.webp') }}" alt="Quoros Logo" width="74" height="28" class="h-7 w-auto">
@@ -76,6 +76,7 @@
 
                 @yield('content')
             </main>
+            </div>
         </div>
     </div>
 

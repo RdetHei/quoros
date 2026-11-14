@@ -414,12 +414,13 @@ class DashboardController extends Controller
         $payout = [
             'method' => $setting->method ?? 'bank',
             'method_label' => ($setting->method ?? 'bank') === 'paypal' ? 'PayPal' : 'Bank account',
-            'account' => $setting->masked_account,
-            'account_name' => $setting->account_name,
+            'account' => $setting?->masked_account,
+            'account_name' => $setting?->account_name,
             'currency' => $currency,
             'auto_payout' => $setting->auto_payout ?? true,
             'min_payout' => (float) ($setting->min_payout ?? 50),
             'available' => $available,
+            'configured' => (bool) $setting,
         ];
 
         return view('writer.earnings', array_merge($shared, compact(
@@ -531,7 +532,14 @@ class DashboardController extends Controller
             ]));
         }
 
-        $chapters = $selectedNovel->chapters;
+        // Terbitkan chapter terjadwal yang waktunya sudah lewat agar status di
+        // Author Studio sinkron dengan yang tampil di halaman publik.
+        Chapter::publishScheduledDue($selectedNovel->id);
+
+        $chapters = $selectedNovel->chapters()
+            ->orderByRaw('COALESCE(NULLIF(`order`, 0), id) asc')
+            ->orderBy('id')
+            ->get();
 
         $activeChapterId = (int) $request->get('chapter_id');
         $activeChapter = $chapters->firstWhere('id', $activeChapterId) ?? $chapters->last();
@@ -542,8 +550,8 @@ class DashboardController extends Controller
                 'num' => str_pad((string) ($ch->order ?: $index + 1), 2, '0', STR_PAD_LEFT),
                 'title' => $ch->title,
                 'words' => number_format($ch->word_count) . ' words',
-                'status' => ucfirst($ch->status),
-                'status_class' => $ch->status === 'published' ? 'published' : 'draft',
+                'status' => $ch->status_label,
+                'status_class' => $ch->isPubliclyPublished() ? 'published' : 'draft',
                 'active' => $activeChapter && $ch->id === $activeChapter->id,
             ];
         });

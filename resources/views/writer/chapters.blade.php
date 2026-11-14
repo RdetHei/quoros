@@ -83,9 +83,10 @@
                 <div class="flex items-center gap-5">
                     <span @class([
                         'rounded-sm border px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.15em]',
-                        'border-emerald-500/30 text-emerald-400' => $activeChapter->status === 'published',
-                        'border-[#c7a64a]/40 bg-[#c7a64a]/12 text-[#c7a64a]' => $activeChapter->status !== 'published',
-                    ])>{{ ucfirst($activeChapter->status) }}</span>
+                        'border-emerald-500/30 text-emerald-400' => $activeChapter->isPubliclyPublished(),
+                        'border-amber-500/30 text-amber-400' => ! $activeChapter->isPubliclyPublished() && $activeChapter->status_label === 'Scheduled',
+                        'border-[#c7a64a]/40 bg-[#c7a64a]/12 text-[#c7a64a]' => ! $activeChapter->isPubliclyPublished() && $activeChapter->status_label !== 'Scheduled',
+                    ])>{{ $activeChapter->status_label }}</span>
                     <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#f2efe8] tabular-nums">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-[#c7a64a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         {{ number_format($activeChapter->word_count) }} words
@@ -93,28 +94,47 @@
                 </div>
             </div>
 
-            <div class="px-6 sm:px-12 md:px-20 py-10 md:py-14 max-w-full">
+            <div class="px-6 sm:px-10 md:px-16 py-8 md:py-10 max-w-full">
                 <div class="mx-auto max-w-[65ch]">
-                    <p class="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#c7a64a] mb-4">Chapter {{ $chapterLabel }}</p>
-                    <h1 class="font-serif text-[34px] md:text-[38px] text-center text-[#f2efe8] tracking-tight mb-4">
+                    <div class="mb-5 flex items-center justify-between gap-3">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-[#c7a64a]">Chapter {{ $chapterLabel }}</p>
+                        <p class="text-[9.5px] font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Preview</p>
+                    </div>
+                    <h1 class="font-serif text-[28px] md:text-[32px] text-[#f2efe8] tracking-tight mb-3">
                         {{ $activeChapter->title }}
                     </h1>
-                    <div class="mx-auto w-10 h-px bg-[#c7a64a]/60 mb-10"></div>
+                    <div class="w-10 h-px bg-[#c7a64a]/60 mb-7"></div>
 
                     @if(count($paragraphs))
-                        <div class="space-y-6 text-[15.5px] md:text-[16px] leading-[1.95] text-[#e5dfd0] font-serif">
-                            @foreach($paragraphs as $i => $p)
-                                <p class="@if($i === 0) first-letter:font-serif first-letter:text-[56px] first-letter:leading-none first-letter:mr-2 first-letter:mt-1.5 first-letter:float-left first-letter:text-[#c7a64a] first-letter:font-medium @endif">{!! nl2br(e(trim($p))) !!}</p>
-                            @endforeach
+                        @php
+                            $excerpt = array_slice($paragraphs, 0, 3);
+                            $isClipped = count($paragraphs) > count($excerpt) || mb_strlen(trim((string) $activeChapter->content)) > 1200;
+                        @endphp
+                        <div class="relative {{ $isClipped ? 'max-h-[360px] overflow-hidden' : '' }}">
+                            <div class="space-y-4 text-[14.5px] leading-[1.9] text-[#e5dfd0] font-serif">
+                                @foreach($excerpt as $i => $p)
+                                    <p class="@if($i === 0) first-letter:font-serif first-letter:text-[46px] first-letter:leading-none first-letter:mr-2 first-letter:mt-1 first-letter:float-left first-letter:text-[#c7a64a] first-letter:font-medium @endif">{!! nl2br(e(trim($p))) !!}</p>
+                                @endforeach
+                            </div>
+                            @if($isClipped)
+                                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#121212] to-transparent"></div>
+                            @endif
+                        </div>
+
+                        <div class="mt-7 flex flex-wrap items-center justify-between gap-3">
+                            @if($isClipped)
+                                <p class="text-[11px] text-[#a3a3a3]">Opening excerpt · {{ number_format($activeChapter->word_count) }} words in full</p>
+                            @else
+                                <p class="text-[11px] text-[#a3a3a3]">{{ number_format($activeChapter->word_count) }} words</p>
+                            @endif
+                            <a href="{{ route('writer.novels.chapters.edit', ['novel' => $selectedNovel->id, 'chapter' => $activeChapter->id]) }}" class="inline-flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#c7a64a] hover:text-[#d4b55a] transition-colors">
+                                Continue in editor
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                            </a>
                         </div>
                     @else
-                        <p class="text-center text-[13px] text-[#a3a3a3] italic">This chapter has no content yet. Open the editor to begin writing.</p>
+                        <p class="text-[13px] text-[#a3a3a3] italic">This chapter has no content yet. Open the editor to begin writing.</p>
                     @endif
-
-                    <div class="mt-12 flex items-center justify-center gap-3">
-                        <span class="h-1.5 w-1.5 rounded-full bg-[#c7a64a]"></span>
-                        <div class="h-px w-24 bg-gradient-to-r from-transparent via-[#c7a64a]/30 to-transparent"></div>
-                    </div>
                 </div>
             </div>
 
@@ -130,7 +150,7 @@
                     </a>
                 </div>
                 <div class="flex flex-wrap gap-2.5">
-                    @if($activeChapter->status !== 'published')
+                    @if(! $activeChapter->isPubliclyPublished())
                         <a href="{{ route('writer.novels.chapters.edit', ['novel' => $selectedNovel->id, 'chapter' => $activeChapter->id]) }}" class="inline-flex items-center gap-2 rounded-md bg-[#c7a64a] px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-black transition-all hover:bg-[#d4b55a]">
                             Publish
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>

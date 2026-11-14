@@ -12,8 +12,8 @@
     }
 @endphp
 
-<div class="hidden w-[260px] shrink-0 flex-col border-r border-white/5 bg-[#0a0a0a] lg:flex">
-    <aside class="flex h-full flex-col" aria-label="Sidebar">
+<div class="hidden w-[260px] shrink-0 flex-col overflow-hidden border-r border-white/5 bg-[#0a0a0a] lg:flex">
+    <aside class="flex h-full min-h-0 flex-col" aria-label="Sidebar">
         <div class="border-b border-white/5 px-5 pb-5 pt-6">
             <a href="{{ route('welcome') }}" class="flex items-center gap-3 group">
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#c7a64a]/30 bg-[#121212] text-[#c7a64a]">
@@ -54,7 +54,7 @@
             </div>
         </div>
 
-        <nav class="flex flex-1 flex-col gap-5 overflow-y-auto px-4 pb-4 custom-scrollbar">
+        <nav class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pb-4 custom-scrollbar">
             <div class="space-y-1">
                 <p class="px-3 text-[9px] font-medium uppercase tracking-[0.22em] text-[#a3a3a3] mb-2">Overview</p>
 
@@ -206,7 +206,7 @@
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="text-[13px] font-semibold text-[#f2efe8] truncate">{{ auth()->user()->name ?? 'Mara Voss' }}</p>
-                    <p class="mt-0.5 text-[9px] font-medium uppercase tracking-[0.2em] text-[#a3a3a3]">Historical Fiction</p>
+                    <p class="mt-0.5 text-[9px] font-medium uppercase tracking-[0.2em] text-[#a3a3a3]">{{ auth()->user()->bio ? \Illuminate\Support\Str::limit(auth()->user()->bio, 24) : 'Historical Fiction' }}</p>
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-[#a3a3a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -267,7 +267,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-[17px] w-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                 </span>
                 <span>Comments</span>
-                <span class="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full border border-[#c7a64a]/30 bg-[#c7a64a]/10 text-[10px] font-semibold text-[#c7a64a]">8</span>
+                @if($writerUnreadComments > 0)
+                    <span class="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full border border-[#c7a64a]/30 bg-[#c7a64a]/10 text-[10px] font-semibold text-[#c7a64a]">{{ $writerUnreadComments }}</span>
+                @endif
             </a>
             <a href="{{ route('writer.codex') }}" class="group flex items-center gap-3 rounded-md px-3 py-2 text-[12.5px] font-medium transition-all text-[#a3a3a3] hover:bg-white/5 hover:text-[#f2efe8]">
                 <span class="flex h-[22px] w-[22px] items-center justify-center text-[#a3a3a3] group-hover:text-[#f2efe8]">

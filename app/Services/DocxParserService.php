@@ -89,7 +89,10 @@ class DocxParserService
                         $hasHeading1 = true;
                     }
 
-                    if (!$isHeading1 && $style && is_string($style) && (stripos($style, 'Heading1') !== false || stripos($style, 'Heading 1') !== false || stripos($style, 'Heading') !== false)) {
+                    // Hanya Heading level 1 yang memisahkan chapter. Heading 2/3
+                    // biasanya sub-judul di dalam satu chapter, bukan chapter baru.
+                    if (!$isHeading1 && $style && is_string($style)
+                        && preg_match('/(?:heading|titre|berschrift|titulo)[\s\-_]*1(?:\b|$)/i', $style)) {
                         $isHeading1 = true;
                         $hasHeading1 = true;
                     }
@@ -128,15 +131,24 @@ class DocxParserService
         }
 
         // 4. Validation & Fallback
-        if (!$hasHeading1 && !empty($fullText)) {
-            // If no Heading 1 found, fallback to splitByKeywords
+        // Heading 1 tidak selalu dipakai penulis. Jika tidak ada Heading 1, atau
+        // hanya ada satu bab (mis. Heading 1 cuma untuk judul buku), coba pecah
+        // ulang berdasarkan penanda teks "Chapter / Bab / Part" dan pakai hasil
+        // yang menghasilkan pemisahan lebih banyak.
+        if (! empty($fullText)) {
+            if (! $hasHeading1 || count($chapters) < 2) {
+                $keywordChapters = NovelParserService::splitByKeywords($fullText);
+
+                if (count($keywordChapters) > count($chapters)) {
+                    return $keywordChapters;
+                }
+            }
+        }
+
+        if (empty($chapters) && ! empty($fullText)) {
             return NovelParserService::splitByKeywords($fullText);
         }
 
-        // Include metadata in the response if needed, 
-        // but typically bulk upload only expects chapters.
-        // If the controller handles metadata, we could return it separately.
-        // For now, let's just return chapters as per original contract.
         return $chapters;
     }
 

@@ -79,7 +79,7 @@ class ChapterController extends Controller
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'file' => 'required|file|mimes:epub,docx,pdf,zip|max:51200', // 50MB max
+            'file' => 'required|file|mimes:epub,docx,pdf|max:51200', // 50MB max
         ]);
 
         try {
@@ -90,6 +90,8 @@ class ChapterController extends Controller
             if (empty($chapters)) {
                 return back()->with('error', 'No chapters found in the file.');
             }
+
+            $nextOrder = (int) $novel->chapters()->max('order');
 
             foreach ($chapters as $index => $data) {
                 $slug = Str::slug($data['title']);
@@ -106,6 +108,9 @@ class ChapterController extends Controller
                     'title' => $data['title'],
                     'slug' => $slug,
                     'content' => $data['content'],
+                    'status' => 'published',
+                    'published_at' => now(),
+                    'order' => ++$nextOrder,
                 ]);
             }
 
@@ -166,6 +171,7 @@ class ChapterController extends Controller
             'content' => $request->content,
             'status' => 'published',
             'published_at' => now(),
+            'order' => ((int) $novel->chapters()->max('order')) + 1,
         ]);
 
         return response()->json([

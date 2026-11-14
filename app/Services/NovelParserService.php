@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Str;
-
 class NovelParserService
 {
     protected $epubParser;
@@ -31,36 +29,95 @@ class NovelParserService
     }
 
     /**
-     * Helper to split content by chapter keywords if it's all in one big block
+     * Pecah satu blok teks panjang menjadi chapter berdasarkan penanda judul.
+     *
+     * Dijalankan dua tahap supaya dialog huruf kapital tidak salah dianggap
+     * judul: (1) penanda eksplisit "Chapter 1 / Bab 2 / Part 3", lalu (2) baris
+     * judul HURUF BESAR bila tahap pertama tidak menemukan penanda apa pun.
      */
     public static function splitByKeywords(string $text): array
     {
-        // Pattern: Matches "Chapter 1", "Chp 2", "Episode 3", "Bab 4", "Part 5", etc.
-        // Also matches lines that look like titles (all caps or short lines before long text)
-        $pattern = '/(?:\n|^)(?=(?:chapter|chp|eps|episode|bab|bagian|part)\s*\d+|(?:[A-Z\s]{5,}\n))/i';
-        
-        $parts = preg_split($pattern, $text, -1, PREG_SPLIT_NO_EMPTY);
-        
+        $text = trim(str_replace(["\r\n", "\r"], "\n", $text));
+
+        if ($text === '') {
+            return [];
+        }
+
+        $chapters = self::splitByHeadingLines($text, false);
+        if (! empty($chapters)) {
+            return $chapters;
+        }
+
+        $chapters = self::splitByHeadingLines($text, true);
+        if (! empty($chapters)) {
+            return $chapters;
+        }
+
+        return [['title' => 'Full Story', 'content' => $text]];
+    }
+
+    /**
+     * @param  bool  $allowCapsHeadings  Izinkan baris HURUF BESAR dianggap judul.
+     */
+    private static function splitByHeadingLines(string $text, bool $allowCapsHeadings): array
+    {
         $chapters = [];
-        foreach ($parts as $index => $content) {
-            $lines = explode("\n", trim($content));
-            $title = $lines[0];
-            
-            // If title is too long, it might not be a title
-            if (strlen($title) > 100) {
-                $title = "Chapter " . ($index + 1);
-                $body = $content;
-            } else {
-                array_shift($lines);
-                $body = implode("\n", $lines);
+        $title = null;
+        $buffer = [];
+
+        foreach (explode("\n", $text) as $line) {
+            $trimmed = trim($line);
+
+            if ($trimmed !== '' && self::isChapterHeading($trimmed, $allowCapsHeadings)) {
+                if ($title !== null) {
+                    $chapters[] = [
+                        'title' => $title,
+                        'content' => trim(implode("\n", $buffer)),
+                    ];
+                }
+
+                $title = $trimmed;
+                $buffer = [];
+                continue;
             }
 
+            // Buang kata pengantar (judul buku, metadata) sebelum judul chapter pertama.
+            if ($title === null) {
+                continue;
+            }
+
+            $buffer[] = $line;
+        }
+
+        if ($title !== null) {
             $chapters[] = [
-                'title' => trim($title),
-                'content' => trim($body)
+                'title' => $title,
+                'content' => trim(implode("\n", $buffer)),
             ];
         }
 
         return $chapters;
+    }
+
+    private static function isChapterHeading(string $line, bool $allowCapsHeadings): bool
+    {
+        if (mb_strlen($line) > 120) {
+            return false;
+        }
+
+        // "Chapter 12", "Ch. 3: The Awakening", "Bab 4", "Part 5", "Prologue".
+        if (preg_match('/^(?:chapter|chp|chap|bab|bagian|part|episode|eps|volume|book|prologue|epilogue|interlude|afterword)\b/i', $line)) {
+            return true;
+        }
+
+        if (! $allowCapsHeadings || mb_strlen($line) > 80) {
+            return false;
+        }
+
+        // Baris judul HURUF BESAR, minimal tiga huruf kapital, tanpa diakhiri
+        // tanda baca kalimat agar kalimat kapital seperti "STOP!" tidak lolos.
+        return (bool) preg_match('/^[A-Z0-9][A-Z0-9 \'\-:,\.!&\/]+$/', $line)
+            && (bool) preg_match('/[A-Z]{3,}/', $line)
+            && ! preg_match('/[.!?,;:]$/', $line);
     }
 }

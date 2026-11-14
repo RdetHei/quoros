@@ -10,7 +10,7 @@
         ?: optional($novelList->first())->title;
 @endphp
 
-<header class="border-b border-white/5 bg-[#0a0a0a]">
+<header class="border-b border-white/5 bg-[#0a0a0a] lg:sticky lg:top-0 lg:z-20">
     <div class="max-w-[1600px] mx-auto px-5 sm:px-8 lg:px-10 py-4 sm:py-5">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>

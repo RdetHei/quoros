@@ -43,6 +43,23 @@ class Chapter extends Model
     }
 
     /**
+     * Label status tunggal yang dipakai di seluruh Author Studio agar
+     * dashboard, Write Chapter, workspace, dan bulk import selalu sinkron.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        if ($this->isPubliclyPublished()) {
+            return 'Published';
+        }
+
+        if ($this->status === 'scheduled' || ($this->published_at && $this->published_at->isFuture())) {
+            return 'Scheduled';
+        }
+
+        return 'Draft';
+    }
+
+    /**
      * Terbitkan chapter berstatus "scheduled" yang waktunya sudah lewat.
      * Dipakai sebagai pengganti scheduled task karena InfinityFree
      * tidak menyediakan cron job.

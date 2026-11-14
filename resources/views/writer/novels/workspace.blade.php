@@ -76,8 +76,10 @@
                         <div class="flex-grow min-w-0">
                             <div class="flex items-center gap-3 mb-1 flex-wrap">
                                 <h4 class="text-sm font-medium text-white truncate max-w-[80%] group-hover:text-neutral-200 transition-colors">{{ $chapter->title }}</h4>
-                                @if($chapter->is_published)
+                                @if($chapter->isPubliclyPublished())
                                     <span class="px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-white bg-neutral-800 border border-neutral-600 rounded">Published</span>
+                                @elseif($chapter->status_label === 'Scheduled')
+                                    <span class="px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-amber-400 bg-neutral-900 border border-amber-500/40 rounded">Scheduled</span>
                                 @else
                                     <span class="px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-neutral-500 bg-neutral-900 border border-neutral-700 rounded">Draft</span>
                                 @endif

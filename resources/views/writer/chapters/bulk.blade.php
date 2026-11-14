@@ -142,9 +142,10 @@
                 <ul class="border border-neutral-800 rounded-xl overflow-hidden divide-y divide-neutral-800 bg-black/30">
                     @foreach($existingChapters as $chap)
                         @php
-                            $statusBadgeClass = match($chap->status) {
-                                'published' => 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-                                'scheduled' => 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                            $statusLabel = $chap->status_label;
+                            $statusBadgeClass = match($statusLabel) {
+                                'Published' => 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                                'Scheduled' => 'bg-amber-500/10 text-amber-400 border-amber-500/20',
                                 default => 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20',
                             };
                         @endphp
@@ -171,7 +172,7 @@
                             </div>
 
                             <span class="inline-flex items-center px-2.5 py-1 rounded-md border text-[10px] font-semibold uppercase tracking-[0.18em] shrink-0 {{ $statusBadgeClass }}">
-                                {{ $chap->status }}
+                                {{ $statusLabel }}
                             </span>
 
                             <div class="flex items-center gap-1 shrink-0">

@@ -113,8 +113,8 @@
                     @if($heroChapter)
                         <p class="mt-4 text-[13px] text-[#f2efe8]">
                             Continue <span class="font-serif italic">{{ $heroChapter->title }}</span>
-                            @if($heroChapter->status !== 'published')
-                                <span class="text-[#a3a3a3] text-[11px]">(draft)</span>
+                            @if(! $heroChapter->isPubliclyPublished())
+                                <span class="text-[#a3a3a3] text-[11px]">({{ strtolower($heroChapter->status_label) }})</span>
                             @endif
                         </p>
                     @else
@@ -152,7 +152,7 @@
             <div class="space-y-2">
                 @foreach($recentChapters as $ch)
                 @php
-                    $isPublished = $ch->status === 'published' && $ch->published_at && $ch->published_at->isPast();
+                    $isPublished = $ch->isPubliclyPublished();
                     $num = $ch->order > 0 ? $ch->order : $ch->id;
                 @endphp
                 <a href="{{ route('writer.chapters', ['novel_id' => $ch->novel_id, 'chapter_id' => $ch->id]) }}" class="flex items-center gap-3 rounded-md border border-white/5 bg-[#0a0a0a] p-3.5 hover:border-white/10 transition-all">
@@ -161,7 +161,7 @@
                         <p class="text-[13px] font-medium text-[#f2efe8] truncate">{{ $ch->title }}</p>
                         <p class="mt-0.5 text-[10.5px] text-[#a3a3a3]">{{ number_format($ch->word_count) }} words · Edited {{ $ch->updated_at->diffForHumans() }}</p>
                     </div>
-                    <span class="shrink-0 rounded border {{ $isPublished ? 'border-[#c7a64a]/30 text-[#c7a64a]' : 'border-white/10 text-[#a3a3a3]' }} px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.15em]">{{ $isPublished ? 'Published' : 'Draft' }}</span>
+                    <span class="shrink-0 rounded border {{ $isPublished ? 'border-[#c7a64a]/30 text-[#c7a64a]' : 'border-white/10 text-[#a3a3a3]' }} px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.15em]">{{ $ch->status_label }}</span>
                 </a>
                 @endforeach
             </div>

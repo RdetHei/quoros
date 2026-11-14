@@ -121,6 +121,7 @@
                 <div>
                     <p class="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[#c7a64a] mb-1.5">Published Chapters</p>
                     <h3 class="text-[22px] font-serif font-medium text-[#f2efe8] tracking-tight">Chapter performance</h3>
+                    <p class="mt-2 text-[11.5px] text-[#a3a3a3]">Top performing chapters by reads</p>
                 </div>
                 <a href="{{ route('writer.chapters') }}" class="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-[#c7a64a] hover:text-[#d4b55a] inline-flex items-center gap-1.5 shrink-0 mt-1">
                     All {{ $publishedTotal }} Chapters
@@ -131,6 +132,7 @@
             @if($chapterTable->isEmpty())
                 <p class="py-8 text-center text-[12.5px] text-[#a3a3a3]">No published chapters yet. Publish a chapter to see its performance.</p>
             @else
+            @php $topChapters = $chapterTable->take(8); @endphp
             <div class="overflow-hidden rounded-md border border-white/5">
                 <div class="grid grid-cols-12 bg-[#0a0a0a] px-4 py-3 text-[9.5px] font-semibold uppercase tracking-[0.18em] text-[#a3a3a3]">
                     <div class="col-span-6">Chapter</div>
@@ -138,7 +140,7 @@
                     <div class="col-span-2 text-right">Words</div>
                     <div class="col-span-2 text-right">Comments</div>
                 </div>
-                @foreach($chapterTable as $row)
+                @foreach($topChapters as $row)
                 <div class="grid grid-cols-12 items-center px-4 py-3.5 border-t border-white/5 hover:bg-white/[0.015] transition-colors">
                     <div class="col-span-6 text-[13px] text-[#f2efe8] font-medium truncate">
                         <span class="text-[#a3a3a3] mr-1.5 font-semibold">{{ $row['num'] }} ·</span>{{ $row['title'] }}
@@ -149,6 +151,15 @@
                 </div>
                 @endforeach
             </div>
+            @if($publishedTotal > $topChapters->count())
+                <div class="mt-3.5 flex items-center justify-between">
+                    <p class="text-[11px] text-[#a3a3a3]">Showing top {{ $topChapters->count() }} of {{ $publishedTotal }} published chapters</p>
+                    <a href="{{ route('writer.chapters') }}" class="text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#c7a64a] hover:text-[#d4b55a] inline-flex items-center gap-1.5">
+                        View all
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                </div>
+            @endif
             @endif
         </div>
 

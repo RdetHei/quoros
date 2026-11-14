@@ -4,9 +4,19 @@
 ])
 
 @section('content')
+@php
+    // Samakan label di form dengan status yang ditampilkan di dashboard
+    // (lihat Chapter::getStatusLabelAttribute) agar tidak ada perbedaan
+    // "published / tidak" antara Author Studio dan halaman Write Chapter.
+    $canonicalStatus = match ($chapter->status_label) {
+        'Published' => 'published',
+        'Scheduled' => 'scheduled',
+        default => 'draft',
+    };
+@endphp
 <div class="space-y-6">
     <div class="bg-neutral-900 rounded-xl p-8 border border-neutral-800">
-        <form action="{{ route('writer.novels.chapters.update', [$novel, $chapter]) }}" method="POST" enctype="multipart/form-data" class="space-y-8" x-data="{ status: '{{ old('status', $chapter->status) }}' }">
+        <form action="{{ route('writer.novels.chapters.update', [$novel, $chapter]) }}" method="POST" enctype="multipart/form-data" class="space-y-8" x-data="{ status: '{{ old('status', $canonicalStatus) }}' }">
             @csrf
             @method('PUT')
 
