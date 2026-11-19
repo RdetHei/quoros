@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Models\Chapter;
+use App\Models\ChatMessage;
 use App\Models\Comment;
 use App\Models\InAppNotification;
 use App\Models\Novel;
 use App\Models\Review;
 use App\Observers\ChapterNotificationObserver;
 use App\Policies\ChapterPolicy;
+use App\Policies\ChatMessagePolicy;
 use App\Policies\CommentPolicy;
 use App\Policies\NovelPolicy;
 use App\Policies\ReviewPolicy;
@@ -44,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Chapter::class, ChapterPolicy::class);
         Gate::policy(Review::class, ReviewPolicy::class);
         Gate::policy(Comment::class, CommentPolicy::class);
+        Gate::policy(ChatMessage::class, ChatMessagePolicy::class);
 
         Chapter::observe(ChapterNotificationObserver::class);
 
@@ -82,6 +85,16 @@ class AppServiceProvider extends ServiceProvider
             $perMinute = max(5, min(200, (int) config('quoros.chapter_read_per_minute', 45)));
 
             return Limit::perMinute($perMinute)->by($request->ip());
+        });
+
+        RateLimiter::for('chat-post', function (Request $request) {
+            $user = $request->user();
+
+            if ($user && $user->role === 'admin') {
+                return Limit::perMinute(60)->by('chat-admin-'.$user->id);
+            }
+
+            return Limit::perMinute(20)->by($user?->id ?: $request->ip());
         });
     }
 }

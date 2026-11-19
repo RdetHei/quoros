@@ -2,208 +2,185 @@
 
 namespace App\Services;
 
+use PhpOffice\PhpWord\Element\TextBreak;
+use PhpOffice\PhpWord\Element\Title;
 use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Element\Text;
-use PhpOffice\PhpWord\Element\TextRun;
+use Symfony\Component\Process\Process;
 
 class DocxParserService
 {
-    public function parse($filePath)
+    public function __construct(private DocumentSegmenter $segmenter) {}
+
+    public function parse(string $filePath): array
     {
-        $phpWord = IOFactory::load($filePath);
-        $chapters = [];
-        $metadata = [
-            'title' => null,
-            'description' => null,
-            'genres' => null,
-            'tags' => null,
-        ];
-        
-        $currentChapter = [
-            'title' => '',
-            'content' => []
-        ];
+        if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'doc') {
+            return $this->parseLegacyDoc($filePath);
+        }
 
-        $hasHeading1 = false;
-        $fullText = '';
+        $document = IOFactory::load($filePath);
+        $blocks = [];
 
-        foreach ($phpWord->getSections() as $section) {
+        foreach ($document->getSections() as $section) {
             foreach ($section->getElements() as $element) {
-                $text = $this->getElementText($element);
-                $trimmedText = trim($text);
-                $fullText .= $text . "\n";
-
-                if (empty($trimmedText)) {
-                    if (!empty($currentChapter['title'])) {
-                        $currentChapter['content'][] = '';
-                    }
+                $text = $this->normalizeText($this->elementText($element));
+                if ($text === '') {
                     continue;
                 }
 
-                // 1. Metadata Block Detection (Prioritized before first chapter)
-                if (empty($chapters) && empty($currentChapter['title'])) {
-                    $cleanText = ltrim($trimmedText);
-                    if (preg_match('/^Title:\s*(.*)$/i', $cleanText, $matches)) {
-                        $metadata['title'] = trim($matches[1]);
-                        continue;
-                    }
-                    if (preg_match('/^Description:\s*(.*)$/i', $cleanText, $matches)) {
-                        $metadata['description'] = trim($matches[1]);
-                        continue;
-                    }
-                    if (preg_match('/^Genres:\s*(.*)$/i', $cleanText, $matches)) {
-                        $metadata['genres'] = trim($matches[1]);
-                        continue;
-                    }
-                    if (preg_match('/^Tags:\s*(.*)$/i', $cleanText, $matches)) {
-                        $metadata['tags'] = trim($matches[1]);
-                        continue;
-                    }
-                }
-
-                // 2. Chapter Delimiter: Heading 1
-                $isHeading1 = false;
-                
-                // Handle Title elements (Heading 1, 2, etc.)
-                if ($element instanceof \PhpOffice\PhpWord\Element\Title) {
-                    $depth = $element->getDepth();
-                    if ($depth == 1) {
-                        $isHeading1 = true;
-                        $hasHeading1 = true;
-                    }
-                } 
-                // Handle Paragraph elements with styles
-                if (!$isHeading1 && method_exists($element, 'getParagraphStyle')) {
-                    $style = $element->getParagraphStyle();
-                    
-                    // If style is an object, get its name
-                    if (is_object($style) && method_exists($style, 'getStyleName')) {
-                        $style = $style->getStyleName();
-                    } elseif (is_object($style)) {
-                        $style = method_exists($style, '__toString') ? (string)$style : null;
-                    }
-
-                    // Handle integer style (Heading level)
-                    if (is_numeric($style) && (int)$style === 1) {
-                        $isHeading1 = true;
-                        $hasHeading1 = true;
-                    }
-
-                    // Hanya Heading level 1 yang memisahkan chapter. Heading 2/3
-                    // biasanya sub-judul di dalam satu chapter, bukan chapter baru.
-                    if (!$isHeading1 && $style && is_string($style)
-                        && preg_match('/(?:heading|titre|berschrift|titulo)[\s\-_]*1(?:\b|$)/i', $style)) {
-                        $isHeading1 = true;
-                        $hasHeading1 = true;
-                    }
-                }
-                
-                if ($isHeading1) {
-                    // Save previous chapter if it has a title
-                    if (!empty($currentChapter['title'])) {
-                        $chapters[] = [
-                            'title' => $currentChapter['title'],
-                            'content' => implode("\n", $currentChapter['content'])
-                        ];
-                    }
-                    
-                    $currentChapter = [
-                        'title' => $trimmedText,
-                        'content' => []
-                    ];
-                } else {
-                    // 3. Content: Text with Normal style (or any non-heading)
-                    // Only collect content if we are already inside a chapter
-                    if (!empty($currentChapter['title'])) {
-                        // Preserve empty lines for paragraph spacing
-                        $currentChapter['content'][] = $trimmedText;
-                    }
-                }
+                $headingLevel = $this->headingLevel($element);
+                $blocks[] = [
+                    'text' => $text,
+                    'heading_level' => $headingLevel,
+                    'source' => 'docx',
+                    'style' => $this->styleName($element),
+                    'bold' => $this->isBold($element),
+                ];
             }
         }
 
-        // Add last chapter
-        if (!empty($currentChapter['title'])) {
-            $chapters[] = [
-                'title' => $currentChapter['title'],
-                'content' => implode("\n", $currentChapter['content'])
-            ];
-        }
-
-        // 4. Validation & Fallback
-        // Heading 1 tidak selalu dipakai penulis. Jika tidak ada Heading 1, atau
-        // hanya ada satu bab (mis. Heading 1 cuma untuk judul buku), coba pecah
-        // ulang berdasarkan penanda teks "Chapter / Bab / Part" dan pakai hasil
-        // yang menghasilkan pemisahan lebih banyak.
-        if (! empty($fullText)) {
-            if (! $hasHeading1 || count($chapters) < 2) {
-                $keywordChapters = NovelParserService::splitByKeywords($fullText);
-
-                if (count($keywordChapters) > count($chapters)) {
-                    return $keywordChapters;
-                }
-            }
-        }
-
-        if (empty($chapters) && ! empty($fullText)) {
-            return NovelParserService::splitByKeywords($fullText);
-        }
-
-        return $chapters;
+        return $this->segmenter->segment($blocks);
     }
 
-    private function getElementText($element)
+    private function parseLegacyDoc(string $filePath): array
     {
-        if ($element instanceof \PhpOffice\PhpWord\Element\TextBreak) {
+        $text = $this->extractLegacyDocText($filePath);
+        $blocks = [];
+
+        foreach (preg_split('/\n\s*\n/u', str_replace(["\r\n", "\r"], "\n", $text)) ?: [] as $paragraph) {
+            $paragraph = $this->normalizeText($paragraph);
+            if ($paragraph !== '') {
+                $blocks[] = ['text' => $paragraph, 'source' => 'legacy_doc'];
+            }
+        }
+
+        return $this->segmenter->segment($blocks);
+    }
+
+    private function extractLegacyDocText(string $filePath): string
+    {
+        foreach ([['antiword', $filePath]] as $command) {
+            try {
+                $process = new Process($command);
+                $process->setTimeout(120);
+                $process->run();
+                if ($process->isSuccessful() && trim($process->getOutput()) !== '') {
+                    return $process->getOutput();
+                }
+            } catch (\Throwable) {
+                // Try the office converter below.
+            }
+        }
+
+        $directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.'quoros-doc-'.bin2hex(random_bytes(8));
+        if (! mkdir($directory) && ! is_dir($directory)) {
+            throw new \RuntimeException('Tidak dapat membuat direktori sementara untuk membaca DOC.');
+        }
+
+        try {
+            $process = new Process(['soffice', '--headless', '--convert-to', 'txt:Text', '--outdir', $directory, $filePath]);
+            $process->setTimeout(120);
+            $process->run();
+            $convertedPath = $directory.DIRECTORY_SEPARATOR.pathinfo($filePath, PATHINFO_FILENAME).'.txt';
+
+            if ($process->isSuccessful() && is_file($convertedPath)) {
+                return (string) file_get_contents($convertedPath);
+            }
+        } catch (\Throwable) {
+            // Return one actionable error after both optional converters fail.
+        } finally {
+            foreach (glob($directory.DIRECTORY_SEPARATOR.'*') ?: [] as $temporaryFile) {
+                @unlink($temporaryFile);
+            }
+            @rmdir($directory);
+        }
+
+        throw new \RuntimeException('File DOC lama memerlukan antiword atau LibreOffice/soffice di server. Simpan ulang sebagai DOCX atau pasang salah satu alat tersebut.');
+    }
+
+    private function headingLevel(object $element): ?int
+    {
+        if ($element instanceof Title) {
+            $depth = (int) $element->getDepth();
+            return $depth > 0 ? $depth : null;
+        }
+
+        $style = $this->styleName($element);
+        if ($style && preg_match('/(?:heading|titre|berschrift|titulo)[\s_-]*([1-9])/iu', $style, $matches)) {
+            return (int) $matches[1];
+        }
+
+        return null;
+    }
+
+    private function styleName(object $element): ?string
+    {
+        if (! method_exists($element, 'getParagraphStyle')) {
+            return null;
+        }
+
+        $style = $element->getParagraphStyle();
+        if (is_string($style)) {
+            return $style;
+        }
+
+        if (is_object($style)) {
+            foreach (['getStyleName', 'getName'] as $method) {
+                if (method_exists($style, $method)) {
+                    $name = $style->{$method}();
+                    if (is_string($name)) {
+                        return $name;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function isBold(object $element): bool
+    {
+        if (method_exists($element, 'getFontStyle')) {
+            $style = $element->getFontStyle();
+            return is_object($style) && method_exists($style, 'isBold') && $style->isBold();
+        }
+
+        return false;
+    }
+
+    private function elementText(object $element): string
+    {
+        if ($element instanceof TextBreak) {
             return "\n";
         }
 
         if (method_exists($element, 'getText')) {
             $text = $element->getText();
-            if (is_string($text)) return $this->normalizeText($text);
+            if (is_string($text)) {
+                return $text;
+            }
+        }
+
+        if (! method_exists($element, 'getElements')) {
+            return '';
         }
 
         $text = '';
-        if (method_exists($element, 'getElements')) {
-            foreach ($element->getElements() as $childElement) {
-                $text .= $this->getElementText($childElement);
+        foreach ($element->getElements() as $child) {
+            if (is_object($child)) {
+                $text .= $this->elementText($child);
             }
         }
-        return $this->normalizeText($text);
+
+        return $text;
     }
 
     private function normalizeText(string $text): string
     {
-        // Handle special characters like curly quotes, various dashes and ellipses
-        $search = [
-            "\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9a", "\xe2\x80\x9b", // single quotes
-            "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x9e", "\xe2\x80\x9f", // double quotes
-            "\xe2\x80\x93", "\xe2\x80\x94", // dashes
-            "\xe2\x80\xa6", // ellipsis
-            "‘", "’", "‚", "‛",
-            "“", "”", "„", "‟",
-            "–", "—", "…",
-        ];
-        $replace = [
-            "'", "'", "'", "'",
-            '"', '"', '"', '"',
-            '-', '--',
-            '...',
-            "'", "'", "'", "'",
-            '"', '"', '"', '"',
-            '-', '--', '...',
-        ];
-        $text = str_replace($search, $replace, $text);
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = str_replace(["\r\n", "\r"], "\n", $text);
+        $text = preg_replace('/[\t ]+/u', ' ', $text) ?? $text;
+        $text = preg_replace('/\n{3,}/u', "\n\n", $text) ?? $text;
 
-        // Decode HTML entities if any
-        $decoded = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        
-        // Normalize whitespace
-        $decoded = str_replace(["\r\n", "\r"], "\n", $decoded);
-        $decoded = preg_replace("/[ \t]+/u", ' ', $decoded);
-        // Normalize multiple newlines to double newlines (paragraphed)
-        $decoded = preg_replace("/\n{3,}/u", "\n\n", $decoded);
-        
-        return trim($decoded ?? '');
+        return trim($text);
     }
 }

@@ -24,7 +24,7 @@ use Illuminate\Support\Str;
 class NovelController extends Controller
 {
     /** Naikkan versi ini saat struktur data landing berubah agar cache lama tidak dipakai. */
-    private const LANDING_CACHE_VERSION = 'v1';
+    private const LANDING_CACHE_VERSION = 'v3';
 
     protected $cloudinaryService;
 
@@ -943,7 +943,9 @@ class NovelController extends Controller
 
         $isAuthorOrAdmin = Auth::check() && (Auth::user()->role === 'admin' || $novel->author_id === Auth::id());
 
-        $novel->load(['author', 'genres', 'tags', 'characters', 'reviews.user', 'chapters' => function ($query) use ($isAuthorOrAdmin) {
+        $novel->load(['author', 'genres', 'tags', 'characters', 'reviews' => function ($query) {
+            $query->with(['user', 'reactions'])->withCount(['likes', 'dislikes']);
+        }, 'chapters' => function ($query) use ($isAuthorOrAdmin) {
             $query->select('id', 'novel_id', 'title', 'slug', 'status', 'published_at', 'created_at', 'order');
             if (! $isAuthorOrAdmin) {
                 $query->published();

@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import { inject as injectVercelAnalytics } from '@vercel/analytics';
 import { landingHero } from './modules/landing-hero';
+import { chatLounge, communityComposer } from './modules/chat-lounge';
 
 window.Alpine = Alpine;
 
@@ -37,6 +38,9 @@ window.closeCropModal = async function(...args) {
 if (document.querySelector('[x-data*="landingHero"]')) {
     window.landingHero = landingHero;
 }
+
+window.chatLounge = chatLounge;
+window.communityComposer = communityComposer;
 
 // Start Alpine
 Alpine.start();

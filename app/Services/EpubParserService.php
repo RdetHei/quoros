@@ -5,175 +5,241 @@ namespace App\Services;
 use ZipArchive;
 use DOMDocument;
 use DOMXPath;
-use Illuminate\Support\Str;
+use Throwable;
 
 class EpubParserService
 {
-    public function parse($filePath)
+    public function __construct(private DocumentSegmenter $segmenter) {}
+
+    public function parse(string $filePath): array
     {
         $zip = new ZipArchive();
         if ($zip->open($filePath) !== true) {
-            throw new \Exception("Gagal membuka file EPUB.");
+            throw new \RuntimeException('Gagal membuka file EPUB.');
         }
 
-        // 1. Find .opf file via container.xml
-        $containerContent = $zip->getFromName('META-INF/container.xml');
-        if (!$containerContent) {
-            throw new \Exception("Format EPUB tidak valid (META-INF/container.xml tidak ditemukan).");
-        }
+        try {
+            $containerContent = $zip->getFromName('META-INF/container.xml');
+            if (! $containerContent) {
+                throw new \RuntimeException('EPUB tidak memiliki META-INF/container.xml.');
+            }
 
-        $containerDom = new DOMDocument();
-        if (!@$containerDom->loadXML($containerContent)) {
-            // Silently fail or log if needed, but continue
-        }
-        $rootfile = $containerDom->getElementsByTagName('rootfile')->item(0);
-        if (!$rootfile) {
-            throw new \Exception("Format EPUB tidak valid (rootfile tidak ditemukan).");
-        }
-        $opfPath = $rootfile->getAttribute('full-path');
-        $baseDir = dirname($opfPath);
-        if ($baseDir === '.') $baseDir = '';
-        else $baseDir .= '/';
+            $containerDom = new DOMDocument();
+            if (! @$containerDom->loadXML($containerContent, LIBXML_NONET)) {
+                throw new \RuntimeException('Struktur container EPUB rusak.');
+            }
+            $rootfile = $containerDom->getElementsByTagName('rootfile')->item(0);
+            if (! $rootfile) {
+                throw new \RuntimeException('EPUB tidak memiliki file OPF.');
+            }
 
-        // 2. Parse .opf for Metadata, Manifest, and Spine
-        $opfContent = $zip->getFromName($opfPath);
-        if (!$opfContent) {
-            throw new \Exception("OPF content not found at $opfPath");
-        }
-        $opfDom = new DOMDocument();
-        if (!@$opfDom->loadXML($opfContent)) {
-            throw new \Exception("Failed to load OPF XML");
-        }
-        $xpath = new DOMXPath($opfDom);
-        $xpath->registerNamespace('opf', 'http://www.idpf.org/2007/opf');
-        $xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+            $opfPath = $this->normalizePath($rootfile->getAttribute('full-path'));
+            $opfContent = $zip->getFromName($opfPath);
+            if (! $opfContent) {
+                throw new \RuntimeException('File OPF EPUB tidak dapat dibaca.');
+            }
 
-        // Extract Metadata (Dublin Core)
-        $metadata = [
-            'title' => $xpath->query('//dc:title')->item(0)?->nodeValue,
-            'author' => $xpath->query('//dc:creator')->item(0)?->nodeValue,
-            'description' => $xpath->query('//dc:description')->item(0)?->nodeValue,
-            'language' => $xpath->query('//dc:language')->item(0)?->nodeValue,
-        ];
-
-        // Parse Manifest
-        $manifest = [];
-        $items = $opfDom->getElementsByTagName('item');
-        $tocId = null;
-        $coverId = null;
-
-        foreach ($items as $item) {
-            $id = $item->getAttribute('id');
-            $href = $item->getAttribute('href');
-            $mediaType = $item->getAttribute('media-type');
-            $properties = $item->getAttribute('properties');
-
-            $manifest[$id] = [
-                'href' => $href,
-                'media-type' => $mediaType
+            $opfDom = new DOMDocument();
+            if (! @$opfDom->loadXML($opfContent, LIBXML_NONET)) {
+                throw new \RuntimeException('XML OPF EPUB rusak.');
+            }
+            $xpath = new DOMXPath($opfDom);
+            $xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+            $metadata = [
+                'title' => trim((string) $xpath->query('//*[local-name()="title" and namespace-uri()="http://purl.org/dc/elements/1.1/"]')->item(0)?->textContent),
+                'author' => trim((string) $xpath->query('//*[local-name()="creator" and namespace-uri()="http://purl.org/dc/elements/1.1/"]')->item(0)?->textContent),
+                'description' => trim((string) $xpath->query('//*[local-name()="description" and namespace-uri()="http://purl.org/dc/elements/1.1/"]')->item(0)?->textContent),
+                'language' => trim((string) $xpath->query('//*[local-name()="language" and namespace-uri()="http://purl.org/dc/elements/1.1/"]')->item(0)?->textContent),
             ];
 
-            // Identify TOC (NCX for v2, Nav for v3)
-            if ($mediaType === 'application/x-dtbncx+xml') {
-                $tocId = $id;
-            } elseif (str_contains($properties, 'nav')) {
-                $tocId = $id;
+            $manifest = [];
+            $tocItems = [];
+            $items = $opfDom->getElementsByTagName('item');
+            foreach ($items as $item) {
+                $id = $item->getAttribute('id');
+                $properties = preg_split('/\s+/', trim($item->getAttribute('properties'))) ?: [];
+                $manifest[$id] = [
+                    'href' => $item->getAttribute('href'),
+                    'media_type' => $item->getAttribute('media-type'),
+                    'properties' => $properties,
+                ];
+                if ($item->getAttribute('media-type') === 'application/x-dtbncx+xml' || in_array('nav', $properties, true)) {
+                    $tocItems[$id] = $manifest[$id];
+                }
             }
 
-            // Identify Cover
-            if (str_contains($properties, 'cover-image') || $id === 'cover' || $id === 'cover-image') {
-                $coverId = $id;
+            $tocTitles = [];
+            foreach ($tocItems as $tocItem) {
+                $tocPath = $this->resolvePath(dirname($opfPath), $tocItem['href']);
+                $tocContent = $zip->getFromName($tocPath);
+                if ($tocContent) {
+                    $tocTitles += $this->parseToc($tocContent, $tocItem['media_type'], dirname($tocPath));
+                }
             }
+
+            $blocks = [];
+            foreach ($opfDom->getElementsByTagName('itemref') as $itemref) {
+                if (strtolower($itemref->getAttribute('linear')) === 'no') {
+                    continue;
+                }
+
+                $item = $manifest[$itemref->getAttribute('idref')] ?? null;
+                if (! $item || ! str_contains($item['media_type'], 'html') || in_array('nav', $item['properties'], true)) {
+                    continue;
+                }
+
+                $path = $this->resolvePath(dirname($opfPath), $item['href']);
+                $content = $zip->getFromName($path);
+                if (! $content) {
+                    continue;
+                }
+
+                $cleaned = $this->cleanHtmlContent($content);
+                $itemBlocks = $this->extractBlocks($cleaned['node']);
+                if ($itemBlocks === []) {
+                    continue;
+                }
+
+                $navTitle = $tocTitles[$path] ?? null;
+                $firstText = trim((string) ($itemBlocks[0]['text'] ?? ''));
+                if ($navTitle && ! $this->isFrontMatterTitle($navTitle)) {
+                    if ($this->sameTitle($firstText, $navTitle)) {
+                        $itemBlocks[0]['text'] = $navTitle;
+                        $itemBlocks[0]['heading_level'] = 1;
+                        $itemBlocks[0]['nav_boundary'] = true;
+                        $itemBlocks[0]['source'] = 'epub_navigation';
+                    } else {
+                        array_unshift($itemBlocks, [
+                            'text' => $navTitle,
+                            'heading_level' => 1,
+                            'nav_boundary' => true,
+                            'source' => 'epub_navigation',
+                        ]);
+                    }
+                }
+
+                array_push($blocks, ...$itemBlocks);
+            }
+
+            $chapters = $this->segmenter->segment($blocks);
+            if ($chapters !== []) {
+                $chapters[0]['metadata'] = $metadata;
+            }
+
+            return $chapters;
+        } finally {
+            $zip->close();
         }
-
-        // Parse Spine
-        $spine = [];
-        $itemrefs = $opfDom->getElementsByTagName('itemref');
-        foreach ($itemrefs as $itemref) {
-            $idref = $itemref->getAttribute('idref');
-            if (isset($manifest[$idref])) {
-                $spine[] = $manifest[$idref]['href'];
-            }
-        }
-
-        // 3. Parse TOC for Chapter Titles
-        $chapterTitles = [];
-        if ($tocId && isset($manifest[$tocId])) {
-            $tocPath = $baseDir . $manifest[$tocId]['href'];
-            $tocContent = $zip->getFromName($tocPath);
-            if ($tocContent) {
-                $chapterTitles = $this->parseToc($tocContent, $manifest[$tocId]['media-type']);
-            }
-        }
-
-        // 4. Extract and Clean Chapters
-        $allChapters = [];
-        foreach ($spine as $index => $href) {
-            $fullPath = $baseDir . $href;
-            
-            // Optimization: Use stream if content is large (for now getFromName is fine for typical xhtml)
-            $content = $zip->getFromName($fullPath);
-            if (!$content) {
-                continue;
-            }
-
-            $cleaned = $this->cleanHtmlContent($content);
-            $plainText = $this->extractReadableText($cleaned['node']);
-            
-            // Skip empty content
-            if (empty(trim($plainText))) {
-                continue;
-            }
-
-            // Title Detection Priority: 1. TOC, 2. H1/H2 from file, 3. Default
-            $title = $chapterTitles[$href] ?? $cleaned['title'] ?? "Chapter " . (count($allChapters) + 1);
-
-            $allChapters[] = [
-                'title' => $title,
-                'content' => $plainText,
-                'metadata' => $index === 0 ? $metadata : null // Attach metadata only to first item for controller
-            ];
-        }
-
-        $zip->close();
-        return $allChapters;
     }
 
-    private function parseToc($content, $mediaType)
+    private function parseToc(string $content, string $mediaType, string $tocDirectory): array
     {
         $titles = [];
         $dom = new DOMDocument();
-        @$dom->loadXML($content);
+        @$dom->loadXML($content, LIBXML_NONET);
         $xpath = new DOMXPath($dom);
 
         if ($mediaType === 'application/x-dtbncx+xml') {
-            // NCX (EPUB 2)
-            $xpath->registerNamespace('ncx', 'http://www.daisy.org/z3986/2005/ncx/');
-            $navPoints = $xpath->query('//ncx:navPoint');
+            $navPoints = $xpath->query('//*[local-name()="navPoint"]');
             foreach ($navPoints as $point) {
-                $label = $xpath->query('ncx:navLabel/ncx:text', $point)->item(0)?->nodeValue;
-                $src = $xpath->query('ncx:content', $point)->item(0)?->getAttribute('src');
+                $label = $xpath->query('./*[local-name()="navLabel"]/*[local-name()="text"]', $point)->item(0)?->textContent;
+                $src = $xpath->query('./*[local-name()="content"]', $point)->item(0)?->getAttribute('src');
                 if ($label && $src) {
-                    $cleanSrc = explode('#', $src)[0];
-                    $titles[$cleanSrc] = trim($label);
+                    $titles[$this->resolvePath($tocDirectory, $src)] = trim($label);
                 }
             }
         } else {
-            // Nav (EPUB 3)
-            $xpath->registerNamespace('xhtml', 'http://www.w3.org/1999/xhtml');
-            $xpath->registerNamespace('epub', 'http://www.idpf.org/2007/ops');
-            $links = $xpath->query('//xhtml:nav[@epub:type="toc"]//xhtml:a');
+            @$dom->loadHTML('<?xml encoding="UTF-8">'.$content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET);
+            $xpath = new DOMXPath($dom);
+            $links = $xpath->query('//*[local-name()="nav" and (contains(@*[local-name()="type"], "toc") or @type="toc")]//*[local-name()="a"]');
             foreach ($links as $link) {
-                $label = $link->nodeValue;
+                $label = $link->textContent;
                 $src = $link->getAttribute('href');
                 if ($label && $src) {
-                    $cleanSrc = explode('#', $src)[0];
-                    $titles[$cleanSrc] = trim($label);
+                    $titles[$this->resolvePath($tocDirectory, $src)] = trim($label);
                 }
             }
         }
 
         return $titles;
+    }
+
+    private function resolvePath(string $directory, string $href): string
+    {
+        $href = rawurldecode((string) (parse_url($href, PHP_URL_PATH) ?? $href));
+        if (str_starts_with($href, '/')) {
+            $directory = '';
+            $href = ltrim($href, '/');
+        }
+
+        return $this->normalizePath(trim($directory.'/'.$href, '/'));
+    }
+
+    private function normalizePath(string $path): string
+    {
+        $parts = [];
+        foreach (explode('/', str_replace('\\', '/', rawurldecode($path))) as $part) {
+            if ($part === '' || $part === '.') {
+                continue;
+            }
+            if ($part === '..') {
+                array_pop($parts);
+                continue;
+            }
+            $parts[] = $part;
+        }
+
+        return implode('/', $parts);
+    }
+
+    /** @return list<array<string, mixed>> */
+    private function extractBlocks(DOMNode $node): array
+    {
+        $blocks = [];
+        $this->collectBlocks($node, $blocks);
+
+        return $blocks;
+    }
+
+    /** @param list<array<string, mixed>> $blocks */
+    private function collectBlocks(DOMNode $node, array &$blocks): void
+    {
+        foreach ($node->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+
+            $tag = strtolower($child->tagName);
+            if (preg_match('/^h([1-6])$/', $tag, $matches)) {
+                $text = $this->normalizeText($child->textContent);
+                if ($text !== '') {
+                    $blocks[] = ['text' => $text, 'heading_level' => (int) $matches[1], 'source' => 'epub_heading'];
+                }
+                continue;
+            }
+
+            if (in_array($tag, ['p', 'li', 'blockquote'], true)) {
+                $text = $this->normalizeText($child->textContent);
+                if ($text !== '') {
+                    $blocks[] = ['text' => $text, 'source' => 'epub_paragraph'];
+                }
+                continue;
+            }
+
+            $this->collectBlocks($child, $blocks);
+        }
+    }
+
+    private function isFrontMatterTitle(string $title): bool
+    {
+        return preg_match('/^(cover|title page|copyright|contents|table of contents|daftar isi|nav|halaman judul)$/iu', trim($title)) === 1;
+    }
+
+    private function sameTitle(string $left, string $right): bool
+    {
+        $normalize = fn (string $title) => mb_strtolower(preg_replace('/[^\p{L}\p{N}]+/u', '', $title) ?? $title);
+
+        return $normalize($left) !== '' && $normalize($left) === $normalize($right);
     }
 
     private function cleanHtmlContent($html)

@@ -131,6 +131,7 @@
                                 $navLinks = [];
                                 $navLinks[] = ['route' => 'welcome', 'label' => 'Home', 'active' => request()->routeIs('welcome')];
                                 $navLinks[] = ['route' => 'novels.updated', 'label' => 'Updates', 'active' => request()->routeIs('novels.updated')];
+                                $navLinks[] = ['route' => 'chat.index', 'label' => 'Lounge', 'active' => request()->routeIs('chat.*')];
                                 if (Auth::check()) {
                                     $navLinks[] = ['route' => 'bookmarks.index', 'label' => 'Bookmark', 'active' => request()->routeIs('bookmarks.index')];
                                     $navLinks[] = ['route' => 'history.index', 'label' => 'History', 'active' => request()->routeIs('history.index')];
@@ -237,6 +238,7 @@
                     <p class="px-2 pb-2 pt-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[#d4af37]">Menu</p>
                     <a href="{{ route('welcome') }}" class="menu-item h-11 flex items-center px-3 rounded-lg text-sm font-medium {{ request()->routeIs('welcome') ? 'active' : '' }}">Home</a>
                     <a href="{{ route('novels.updated') }}" class="menu-item h-11 flex items-center px-3 rounded-lg text-sm font-medium {{ request()->routeIs('novels.updated') ? 'active' : '' }}">Updates</a>
+                    <a href="{{ route('chat.index') }}" class="menu-item h-11 flex items-center px-3 rounded-lg text-sm font-medium {{ request()->routeIs('chat.*') ? 'active' : '' }}">Lounge</a>
                     <a href="{{ route('novels.trending') }}" class="menu-item h-11 flex items-center px-3 rounded-lg text-sm font-medium {{ request()->routeIs('novels.trending') ? 'active' : '' }}">Trending</a>
                     <a href="{{ route('genres.index') }}" class="menu-item h-11 flex items-center px-3 rounded-lg text-sm font-medium {{ request()->routeIs('genres.*') ? 'active' : '' }}">Genres</a>
                     <a href="{{ route('tags.index') }}" class="menu-item h-11 flex items-center px-3 rounded-lg text-sm font-medium {{ request()->routeIs('tags.*') ? 'active' : '' }}">Tags</a>
@@ -324,6 +326,7 @@
                     <div class="md:col-span-3">
                         <h2 class="footer-title">Community</h2>
                         <ul class="space-y-3 mt-4">
+                            <li><a href="{{ route('chat.index') }}" class="text-sm">Lounge</a></li>
                             <li><a href="#" class="text-sm">Discord</a></li>
                             <li><a href="#" class="text-sm">Support</a></li>
                             <li><a href="#" class="text-sm">Privacy</a></li>

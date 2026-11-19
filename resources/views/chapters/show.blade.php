@@ -1122,14 +1122,21 @@
     {{-- ═══════════════════════════════════════════════
          COMMENTS SECTION
     ════════════════════════════════════════════════ --}}
-    <div class="comments-section">
-        <h2 class="text-lg font-bold mb-6 flex items-center gap-2.5 text-slate-900 dark:text-white">
+    <div class="comments-section" id="diskusi">
+        <h2 class="text-lg font-bold mb-2 flex items-center gap-2.5 text-slate-900 dark:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
             </svg>
             Diskusi
             <span class="ml-auto text-sm font-semibold text-slate-400">{{ $commentsCount ?? $chapter->comments->count() }}</span>
         </h2>
+        <div class="mb-6 flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-widest">
+            <a href="{{ request()->fullUrlWithQuery(['sort' => 'new']) }}#diskusi"
+               class="{{ ($sort ?? 'new') === 'new' ? 'text-slate-900 dark:text-white' : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200' }}">Terbaru</a>
+            <a href="{{ request()->fullUrlWithQuery(['sort' => 'best']) }}#diskusi"
+               class="{{ ($sort ?? 'new') === 'best' ? 'text-slate-900 dark:text-white' : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200' }}">Terbaik</a>
+            <a href="{{ route('chat.index') }}" class="ml-auto text-amber-600 dark:text-amber-400 hover:underline">Lounge publik</a>
+        </div>
 
         <div x-data="{ replyParentId: null, replyName: '' }" @open-reply.window="replyParentId = $event.detail.parentId; replyName = $event.detail.name">
 
@@ -1143,9 +1150,10 @@
                     <p class="text-xs font-bold text-amber-700 dark:text-amber-300 mb-2">
                         Membalas <span x-text="replyName" class="text-amber-600 dark:text-amber-200"></span>
                     </p>
-                    <textarea name="content" rows="2" required
-                              class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                              placeholder="Tulis balasan…"></textarea>
+                    @include('partials.community-composer', [
+                        'placeholder' => 'Tulis balasan…',
+                        'rows' => 2,
+                    ])
                     <div class="mt-2 flex gap-2 justify-end">
                         <button type="button" @click="replyParentId = null"
                                 class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
@@ -1163,9 +1171,10 @@
                       action="{{ route('comments.store', $chapter->id) }}" method="POST"
                       class="mb-8">
                     @csrf
-                    <textarea name="content" rows="3"
-                              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all placeholder-slate-400 resize-none"
-                              placeholder="Bagikan pendapatmu tentang chapter ini…"></textarea>
+                    @include('partials.community-composer', [
+                        'placeholder' => 'Bagikan pendapatmu tentang chapter ini…',
+                        'rows' => 3,
+                    ])
                     <div class="mt-3 flex justify-end">
                         <button type="submit"
                                 class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm hover:opacity-90 transition-opacity shadow-lg shadow-slate-900/10">

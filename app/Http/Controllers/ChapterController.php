@@ -79,45 +79,31 @@ class ChapterController extends Controller
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'file' => 'required|file|mimes:epub,docx,pdf|max:51200', // 50MB max
+            'file' => 'required|file|mimes:epub,docx,doc,pdf|max:51200',
         ]);
 
         try {
             $file = $request->file('file');
-            $path = $file->path();
-            $chapters = $parser->parse($path, $file->getClientOriginalExtension());
+            $chapters = $parser->parse($file->path(), $file->getClientOriginalExtension());
 
             if (empty($chapters)) {
-                return back()->with('error', 'No chapters found in the file.');
+                return back()->with('error', 'Tidak ada bagian terstruktur yang ditemukan. Gunakan Preview & Edit sebelum menyimpan.');
             }
 
-            $nextOrder = (int) $novel->chapters()->max('order');
+            $data = ['chapters' => $chapters];
 
-            foreach ($chapters as $index => $data) {
-                $slug = Str::slug($data['title']);
-
-                // Pastikan slug unik dalam novel ini
-                $originalSlug = $slug;
-                $count = 1;
-                while (Chapter::where('novel_id', $novel->id)->where('slug', $slug)->exists()) {
-                    $slug = $originalSlug.'-'.$count++;
-                }
-
-                Chapter::create([
-                    'novel_id' => $novel->id,
-                    'title' => $data['title'],
-                    'slug' => $slug,
-                    'content' => $data['content'],
-                    'status' => 'published',
-                    'published_at' => now(),
-                    'order' => ++$nextOrder,
-                ]);
+            if ($request->wantsJson()) {
+                return response()->json($data);
             }
 
-            return redirect()->route('writer.chapters', ['novel_id' => $novel->id])
-                ->with('success', count($chapters).' chapters successfully imported!');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Failed to process file: '.$e->getMessage());
+            return back()->with('info', 'Gunakan Preview & Edit untuk meninjau hasil sebelum menyimpan.')
+                ->with('detected_chapters', $chapters);
+        } catch (\Throwable $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'Gagal memproses file: '.$e->getMessage()], 422);
+            }
+
+            return back()->with('error', 'Gagal memproses file: '.$e->getMessage());
         }
     }
 
@@ -126,23 +112,22 @@ class ChapterController extends Controller
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'file' => 'required|file|mimes:epub,docx,pdf|max:51200',
+            'file' => 'required|file|mimes:epub,docx,doc,pdf|max:51200',
         ]);
 
         try {
             $file = $request->file('file');
-            $path = $file->path();
-            $chapters = $parser->parse($path, $file->getClientOriginalExtension());
+            $chapters = $parser->parse($file->path(), $file->getClientOriginalExtension());
 
             if (empty($chapters)) {
                 return response()->json(['error' => 'Tidak ada chapter yang ditemukan dalam file tersebut.'], 422);
             }
 
             return response()->json([
-                'chapters' => $chapters
+                'chapters' => $chapters,
             ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Gagal memproses file: '.$e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Gagal memproses file: '.$e->getMessage()], 422);
         }
     }
 
@@ -150,34 +135,74 @@ class ChapterController extends Controller
     {
         Gate::authorize('manageChapters', $novel);
 
-        $request->validate([
+        if ($request->has('chapters')) {
+            $validated = $request->validate([
+                'chapters' => 'required|array|min:1|max:500',
+                'chapters.*.title' => 'required|string|max:255',
+                'chapters.*.content' => 'nullable|string',
+            ]);
+
+            $created = DB::transaction(function () use ($novel, $validated) {
+                $nextOrder = (int) $novel->chapters()->max('order');
+                $created = [];
+
+                foreach ($validated['chapters'] as $data) {
+                    $title = trim($data['title']);
+                    $slug = $this->uniqueChapterSlug($novel, $title);
+
+                    $created[] = Chapter::create([
+                        'novel_id' => $novel->id,
+                        'title' => $title,
+                        'slug' => $slug,
+                        'content' => (string) ($data['content'] ?? ''),
+                        'status' => 'published',
+                        'published_at' => now(),
+                        'order' => ++$nextOrder,
+                    ]);
+                }
+
+                return $created;
+            });
+
+            return response()->json(['success' => true, 'chapters' => $created], 201);
+        }
+
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
         ]);
 
-        $slug = Str::slug($request->title);
+        $chapter = DB::transaction(function () use ($novel, $validated) {
+            $slug = $this->uniqueChapterSlug($novel, $validated['title']);
 
-        // Pastikan slug unik dalam novel ini
-        $originalSlug = $slug;
-        $count = 1;
-        while (Chapter::where('novel_id', $novel->id)->where('slug', $slug)->exists()) {
-            $slug = $originalSlug.'-'.$count++;
-        }
-
-        $chapter = Chapter::create([
-            'novel_id' => $novel->id,
-            'title' => $request->title,
-            'slug' => $slug,
-            'content' => $request->content,
-            'status' => 'published',
-            'published_at' => now(),
-            'order' => ((int) $novel->chapters()->max('order')) + 1,
-        ]);
+            return Chapter::create([
+                'novel_id' => $novel->id,
+                'title' => trim($validated['title']),
+                'slug' => $slug,
+                'content' => (string) ($validated['content'] ?? ''),
+                'status' => 'published',
+                'published_at' => now(),
+                'order' => ((int) $novel->chapters()->max('order')) + 1,
+            ]);
+        });
 
         return response()->json([
             'success' => true,
-            'chapter' => $chapter
-        ]);
+            'chapter' => $chapter,
+        ], 201);
+    }
+
+    private function uniqueChapterSlug(Novel $novel, string $title): string
+    {
+        $slug = Str::slug($title) ?: 'chapter';
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (Chapter::where('novel_id', $novel->id)->where('slug', $slug)->exists()) {
+            $slug = $originalSlug.'-'.$counter++;
+        }
+
+        return $slug;
     }
 
     public function show(Novel $novel, $chapter)
@@ -210,16 +235,22 @@ class ChapterController extends Controller
             abort(404);
         }
 
+        $sort = request('sort') === 'best' ? 'best' : 'new';
+
         $chapter->load([
-            'comments' => function ($query) {
+            'comments' => function ($query) use ($sort) {
                 $query->whereNull('parent_id')
                     ->with([
                         'user',
-                        'likes',
-                        'dislikes',
-                        'replies' => fn ($q) => $q->with(['user', 'likes', 'dislikes']),
+                        'reactions',
+                        'replies' => fn ($q) => $q->with(['user', 'reactions'])->withCount(['likes', 'dislikes']),
                     ])
-                    ->latest();
+                    ->withCount(['likes', 'dislikes'])
+                    ->when(
+                        $sort === 'best',
+                        fn ($q) => $q->orderByRaw('(likes_count - dislikes_count) desc')->latest(),
+                        fn ($q) => $q->latest(),
+                    );
             },
         ]);
         $commentsCount = $chapter->comments()->count();
@@ -283,6 +314,7 @@ class ChapterController extends Controller
             'protectContent',
             'chapterBodyHtml',
             'commentsCount',
+            'sort',
         ));
     }
 

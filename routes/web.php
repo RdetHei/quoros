@@ -16,6 +16,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserListController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
@@ -86,6 +87,9 @@ Route::get('/genres', [NovelController::class, 'genres'])->name('genres.index');
 Route::get('/tags', [NovelController::class, 'tags'])->name('tags.index');
 
 // Guide Routes
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::get('/chat/messages', [ChatController::class, 'feed'])->name('chat.feed');
+
 Route::get('/guides', [GuideController::class, 'index'])->name('guides.index');
 Route::get('/guides/{category:slug}', [GuideController::class, 'category'])->name('guides.category');
 Route::get('/guides/{category:slug}/{article:slug}', [GuideController::class, 'show'])->name('guides.show');
@@ -125,6 +129,10 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
     Route::post('/chapters/{chapter}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
     Route::post('/reactions/{type}/{id}', [ReactionController::class, 'toggle'])->name('reactions.toggle');
+    Route::post('/chat/messages', [ChatController::class, 'store'])
+        ->middleware('throttle:chat-post')
+        ->name('chat.store');
+    Route::delete('/chat/messages/{message}', [ChatController::class, 'destroy'])->name('chat.destroy');
 
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
 

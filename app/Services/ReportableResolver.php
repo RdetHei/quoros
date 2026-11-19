@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ChatMessage;
 use App\Models\Comment;
 use App\Models\Novel;
 use App\Models\User;
@@ -14,6 +15,7 @@ class ReportableResolver
     private const MAP = [
         'novel' => Novel::class,
         'comment' => Comment::class,
+        'chat' => ChatMessage::class,
         'user' => User::class,
     ];
 

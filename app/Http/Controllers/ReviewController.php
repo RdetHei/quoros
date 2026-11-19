@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Novel;
 use App\Models\Review;
 use App\Services\RecommendationService;
+use App\Support\ChatCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class ReviewController extends Controller
 {
@@ -16,14 +18,23 @@ class ReviewController extends Controller
     {
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'content' => 'required|string',
+            'content' => 'nullable|string|max:5000',
+            'sticker' => ['nullable', 'string', Rule::in(ChatCatalog::stickerIds())],
         ]);
+
+        $content = trim((string) $request->input('content', ''));
+        $sticker = $request->input('sticker');
+
+        if ($content === '' && ! $sticker) {
+            return back()->withErrors(['content' => 'Tulis review atau pilih stiker.'])->withInput();
+        }
 
         Review::create([
             'user_id' => Auth::id(),
             'novel_id' => $novel->id,
             'rating' => $request->rating,
-            'content' => $request->content,
+            'content' => $content,
+            'sticker' => $sticker,
         ]);
         app(RecommendationService::class)->forgetForUser(Auth::id());
 

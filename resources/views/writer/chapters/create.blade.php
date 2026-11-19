@@ -93,7 +93,7 @@
                             <p class="text-sm font-medium text-white uppercase tracking-wider" x-text="docFile ? docFile.name : 'Choose file or drag & drop'"></p>
                             <p class="text-[10px] text-neutral-500 uppercase mt-2">Maximum 50MB</p>
                         </div>
-                        <input type="file" accept=".epub,.docx,.pdf" class="hidden" @change="docFile = $event.target.files[0]" />
+                        <input type="file" accept=".epub,.docx,.doc,.pdf" class="hidden" @change="docFile = $event.target.files[0]" />
                     </label>
                 </div>
 
@@ -111,47 +111,34 @@
                 <div class="bg-black/40 rounded-xl p-8 border border-neutral-800">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h3 class="text-xl font-semibold text-white">Processing Library...</h3>
-                            <p class="text-sm text-neutral-400 mt-1">Please keep this window open while we work.</p>
+                            <h3 class="text-xl font-semibold text-white">Review Extracted Chapters</h3>
+                            <p class="text-sm text-neutral-400 mt-1"><span x-text="chapters.length"></span> sections detected · review and edit before saving.</p>
                         </div>
-                        <span class="text-3xl font-semibold text-white tabular-nums" x-text="Math.round(progress) + '%'"></span>
+                        <button type="button" @click="step = 'upload'; chapters = [];" class="px-4 py-2 text-xs uppercase tracking-wider text-neutral-400 hover:text-white border border-neutral-700 rounded-lg">Start Over</button>
                     </div>
 
-                    <div class="w-full h-2 bg-neutral-800 rounded-full overflow-hidden mb-8">
-                        <div class="h-full bg-white transition-all duration-500" :style="`width: ${progress}%`"></div>
-                    </div>
-
-                    <div class="flex items-center gap-5 p-5 bg-neutral-900 rounded-xl border border-neutral-800 mb-8">
-                        <div class="w-12 h-12 rounded-lg bg-neutral-800 border border-neutral-700 flex items-center justify-center text-white">
-                            <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        </div>
-                        <div class="flex-grow min-w-0">
-                            <p class="text-[10px] font-medium text-neutral-500 uppercase tracking-wider mb-1">Current Task</p>
-                            <h4 class="text-base font-medium text-white truncate" x-text="chapters[currentIndex] ? chapters[currentIndex].title : 'Preparing extraction...'"></h4>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider"><span x-text="currentIndex + 1"></span> / <span x-text="chapters.length"></span></p>
-                        </div>
-                    </div>
-
-                    <div class="max-h-72 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+                    <div class="max-h-[32rem] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
                         <template x-for="(chapter, index) in chapters" :key="index">
-                            <div class="flex items-center justify-between p-3.5 rounded-lg transition-all"
-                                 :class="index === currentIndex ? 'bg-neutral-800 border border-neutral-600' : 'opacity-50'">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <template x-if="index < currentIndex">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                    </template>
-                                    <template x-if="index === currentIndex">
-                                        <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"></div>
-                                    </template>
-                                    <template x-if="index > currentIndex">
-                                        <div class="w-5 h-5 rounded-full border-2 border-neutral-700 shrink-0"></div>
-                                    </template>
-                                    <span class="text-sm font-medium truncate" :class="index === currentIndex ? 'text-white' : 'text-neutral-500'" x-text="chapter.title"></span>
+                            <div class="p-4 rounded-xl border border-neutral-800 bg-neutral-900 space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-8 h-8 shrink-0 rounded-lg border border-neutral-700 flex items-center justify-center text-xs text-neutral-400" x-text="index + 1"></span>
+                                    <input type="text" x-model="chapter.title" class="flex-1 bg-black border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white">
+                                    <button type="button" @click="chapters.splice(index, 1)" class="px-2 py-1 text-xs text-rose-400 hover:text-rose-300">Remove</button>
                                 </div>
+                                <div class="flex flex-wrap gap-2 text-[10px] uppercase tracking-wider">
+                                    <span class="text-neutral-500" x-text="chapter.chapter_type || 'unknown'"></span>
+                                    <span :class="(chapter.confidence || 0) >= 0.75 ? 'text-emerald-400' : 'text-amber-400'" x-text="Math.round((chapter.confidence || 0) * 100) + '% confidence'"></span>
+                                    <span x-show="chapter.warnings?.length" class="normal-case text-amber-300" x-text="chapter.warnings?.join(' ')"></span>
+                                </div>
+                                <textarea x-model="chapter.content" rows="5" class="w-full bg-black border border-neutral-700 rounded-lg px-3 py-2 text-xs text-neutral-300 leading-relaxed"></textarea>
                             </div>
                         </template>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" @click="uploadChapters()" :disabled="!chapters.length || isSaving" class="px-8 py-3 bg-white text-black text-xs font-semibold uppercase tracking-wider rounded-lg disabled:opacity-50">
+                            Save <span x-text="chapters.length"></span> Chapters
+                        </button>
                     </div>
                 </div>
             </div>
@@ -180,6 +167,7 @@
             step: 'upload',
             docFile: null,
             isParsing: false,
+            isSaving: false,
             chapters: [],
             currentIndex: 0,
             progress: 0,
@@ -208,7 +196,6 @@
                     this.chapters = data.chapters;
                     this.isParsing = false;
                     this.step = 'processing';
-                    this.uploadChapters();
                 } catch (error) {
                     alert(error.message);
                     this.isParsing = false;
@@ -216,31 +203,29 @@
             },
 
             async uploadChapters() {
-                for (let i = 0; i < this.chapters.length; i++) {
-                    this.currentIndex = i;
-                    this.progress = (i / this.chapters.length) * 100;
-
-                    try {
-                        const response = await fetch('{{ route('writer.novels.chapters.store-bulk', $novel->id) }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: JSON.stringify({
-                                title: this.chapters[i].title,
-                                content: this.chapters[i].content
-                            })
-                        });
-                        if (!response.ok) throw new Error('Failed to upload chapter');
-                    } catch (error) {
-                        console.error(error);
-                    }
+                if (!this.chapters.length) return;
+                this.isSaving = true;
+                try {
+                    const response = await fetch('{{ route('writer.novels.chapters.store-bulk', $novel->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ chapters: this.chapters.map(c => ({ title: c.title, content: c.content ?? '' })) })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || data.error || 'Failed to upload chapters');
+                    this.progress = 100;
+                    this.isSaving = false;
+                    this.step = 'finished';
+                } catch (error) {
+                    alert(error.message);
+                    this.isSaving = false;
+                    this.step = 'processing';
                 }
-                this.progress = 100;
-                this.step = 'finished';
             }
         }
     }

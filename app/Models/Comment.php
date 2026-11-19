@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCommunityReactions;
+use App\Support\ChatCatalog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,9 +11,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Comment extends Model
 {
+    use HasCommunityReactions;
     use HasFactory;
 
-    protected $fillable = ['user_id', 'chapter_id', 'parent_id', 'content'];
+    protected $fillable = ['user_id', 'chapter_id', 'parent_id', 'content', 'sticker'];
 
     public function user(): BelongsTo
     {
@@ -38,19 +41,14 @@ class Comment extends Model
         return $this->parent_id !== null;
     }
 
-    public function reactions()
+    /** @return array{id: string, emoji: string, label: string, pack: string}|null */
+    public function stickerMeta(): ?array
     {
-        return $this->morphMany(Reaction::class, 'reactable');
-    }
+        if (! $this->sticker) {
+            return null;
+        }
 
-    public function likes()
-    {
-        return $this->reactions()->where('type', 'like');
-    }
-
-    public function dislikes()
-    {
-        return $this->reactions()->where('type', 'dislike');
+        return ChatCatalog::sticker($this->sticker);
     }
 
     /**

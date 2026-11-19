@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ReportReason;
 use App\Enums\ReportStatus;
+use App\Models\ChatMessage;
 use App\Models\Comment;
 use App\Models\Novel;
 use App\Models\Report;
@@ -22,7 +23,7 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'reportable_type' => ['required', Rule::in(['novel', 'comment', 'user'])],
+            'reportable_type' => ['required', Rule::in(['novel', 'comment', 'chat', 'user'])],
             'reportable_id' => ['required', 'integer', 'min:1'],
             'reason' => ['required', Rule::enum(ReportReason::class)],
             'details' => ['nullable', 'string', 'max:2000', 'required_if:reason,other'],
@@ -60,7 +61,7 @@ class ReportController extends Controller
         return back()->with('success', 'Report submitted successfully. The moderation team will review it.');
     }
 
-    private function assertCanReport(Novel|Comment|User $reportable): void
+    private function assertCanReport(Novel|Comment|ChatMessage|User $reportable): void
     {
         $userId = Auth::id();
 
@@ -86,6 +87,10 @@ class ReportController extends Controller
 
         if ($reportable instanceof Comment && $reportable->user_id === $userId) {
             abort(403, 'You cannot report your own comment.');
+        }
+
+        if ($reportable instanceof ChatMessage && $reportable->user_id === $userId) {
+            abort(403, 'You cannot report your own message.');
         }
     }
 }

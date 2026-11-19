@@ -22,7 +22,7 @@ class NovelParserService
     {
         return match (strtolower($extension)) {
             'epub' => $this->epubParser->parse($filePath),
-            'docx' => $this->docxParser->parse($filePath),
+            'docx', 'doc' => $this->docxParser->parse($filePath),
             'pdf' => $this->pdfParser->parse($filePath),
             default => throw new \Exception("Format file tidak didukung: {$extension}"),
         };
