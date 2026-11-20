@@ -39,20 +39,20 @@
 
             {{-- Cover --}}
             <div class="flex-shrink-0">
-                <div class="w-32 sm:w-40 md:w-52 lg:w-60 mx-auto md:mx-0">
+                <div class="w-40 sm:w-52 md:w-64 lg:w-80 mx-auto md:mx-0">
                     <div class="aspect-[3/4] rounded-lg md:rounded-xl overflow-hidden shadow-2xl shadow-neutral-900/20 dark:shadow-black/40 ring-1 ring-neutral-200 dark:ring-neutral-700">
                         @if($novel->cover_image_url)
                             <img src="{{ $novel->cover_image_url }}"
                                  class="w-full h-full object-cover"
                                  alt="{{ $novel->title }} cover image"
-                                 width="256" height="341"
+                                 width="320" height="427"
                                  fetchpriority="high"
                                  onerror="this.onerror=null; this.src='/error.png';">
                         @elseif($novel->cover_image)
                             <img src="{{ asset('storage/' . $novel->cover_image) }}"
                                  class="w-full h-full object-cover"
                                  alt="{{ $novel->title }} cover image"
-                                 width="256" height="341"
+                                 width="320" height="427"
                                  fetchpriority="high"
                                  onerror="this.onerror=null; this.src='/error.png';">
                         @else
