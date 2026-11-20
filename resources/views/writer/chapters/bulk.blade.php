@@ -35,10 +35,16 @@
                     <label class="relative group cursor-pointer block">
                         <div class="p-8 border border-dashed border-neutral-700 rounded-xl bg-neutral-900 group-hover:border-[#c7a64a]/40 transition-all">
                             <p class="text-sm font-medium text-white uppercase tracking-wider" x-text="docFile ? docFile.name : 'Choose file or drag & drop here'"></p>
-                            <p class="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mt-2">EPUB · DOCX · PDF — Max 50MB</p>
+                            <p class="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mt-2">EPUB · DOCX · PDF — Max 10MB</p>
                         </div>
                         <input type="file" name="file" accept=".epub,.docx,.doc,.pdf" class="hidden" @change="docFile = $event.target.files[0]" />
                     </label>
+
+                    <div x-show="docFile && /\.pdf$/i.test(docFile.name)" x-cloak class="mt-4 text-left max-w-sm mx-auto">
+                        <label class="block text-[10px] uppercase tracking-[0.2em] text-neutral-500 mb-2">Password PDF (opsional)</label>
+                        <input type="password" x-model="docPassword" autocomplete="off" placeholder="Isi bila PDF terkunci"
+                            class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-[#c7a64a] focus:border-[#c7a64a] transition-all">
+                    </div>
 
                     @error('file')
                         <p class="mt-4 text-xs text-red-400">{{ $message }}</p>
@@ -206,6 +212,7 @@
         if (data && typeof data === 'object') {
             const direct = data.error ?? data.message;
             if (typeof direct === 'string' && direct.trim() !== '') return direct;
+            if (direct && typeof direct === 'object' && typeof direct.message === 'string') return direct.message;
             if (data.errors && typeof data.errors === 'object') {
                 return Object.values(data.errors).flat().filter(Boolean).join(' ');
             }
@@ -228,6 +235,7 @@
     function bulkChapterManager(initialOrder) {
         return {
             docFile: null,
+            docPassword: '',
             isParsing: false,
             isSaving: false,
             progress: 0,
@@ -286,19 +294,31 @@
             },
             async startParsing() {
                 if (!this.docFile) return;
+
+                const maxBytes = 10 * 1024 * 1024;
+                if (this.docFile.size > maxBytes) {
+                    alert('Ukuran file melebihi batas 10MB.');
+                    return;
+                }
+
                 this.isParsing = true;
-                const formData = new FormData();
-                formData.append('file', this.docFile);
-                formData.append('_token', '{{ csrf_token() }}');
                 try {
+                    const form = new FormData();
+                    form.append('file', this.docFile);
+                    if (this.docPassword) form.append('password', this.docPassword);
+
                     const res = await fetch('{{ route('writer.novels.chapters.bulk-parse', $novel->id) }}', {
                         method: 'POST',
-                        body: formData,
-                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: form
                     });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.error || 'Failed to parse document');
-                    this.chapters = data.chapters.map(c => ({
+                    const data = await bulkReadResponse(res);
+                    if (!res.ok) throw new Error(bulkApiMessage(data, 'Failed to parse document'));
+                    this.chapters = (data.chapters || []).map(c => ({
                         title: c.title,
                         content: c.content ?? '',
                         confidence: c.confidence ?? 0,

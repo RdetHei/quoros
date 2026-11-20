@@ -91,10 +91,16 @@
                     <label class="relative group cursor-pointer block">
                         <div class="p-8 border border-dashed border-neutral-700 rounded-xl bg-neutral-900 group-hover:border-neutral-500 transition-all">
                             <p class="text-sm font-medium text-white uppercase tracking-wider" x-text="docFile ? docFile.name : 'Choose file or drag & drop'"></p>
-                            <p class="text-[10px] text-neutral-500 uppercase mt-2">Maximum 50MB</p>
+                            <p class="text-[10px] text-neutral-500 uppercase mt-2">Maximum 10MB</p>
                         </div>
                         <input type="file" accept=".epub,.docx,.doc,.pdf" class="hidden" @change="docFile = $event.target.files[0]" />
                     </label>
+
+                    <div x-show="docFile && /\.pdf$/i.test(docFile.name)" x-cloak class="mt-4 text-left max-w-sm mx-auto">
+                        <label class="block text-[10px] uppercase tracking-[0.2em] text-neutral-500 mb-2">Password PDF (opsional)</label>
+                        <input type="password" x-model="docPassword" autocomplete="off" placeholder="Isi bila PDF terkunci"
+                            class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-white focus:border-white transition-all">
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-center pt-6 border-t border-neutral-800">
@@ -166,6 +172,7 @@
         if (data && typeof data === 'object') {
             const direct = data.error ?? data.message;
             if (typeof direct === 'string' && direct.trim() !== '') return direct;
+            if (direct && typeof direct === 'object' && typeof direct.message === 'string') return direct.message;
             if (data.errors && typeof data.errors === 'object') {
                 return Object.values(data.errors).flat().filter(Boolean).join(' ');
             }
@@ -190,6 +197,7 @@
             uploadMode: 'single',
             step: 'upload',
             docFile: null,
+            docPassword: '',
             isParsing: false,
             isSaving: false,
             chapters: [],
@@ -199,23 +207,31 @@
             async startParsing() {
                 if (!this.docFile) return;
 
+                const maxBytes = 10 * 1024 * 1024;
+                if (this.docFile.size > maxBytes) {
+                    alert('Ukuran file melebihi batas 10MB.');
+                    return;
+                }
+
                 this.isParsing = true;
-                const formData = new FormData();
-                formData.append('file', this.docFile);
-                formData.append('_token', '{{ csrf_token() }}');
 
                 try {
+                    const form = new FormData();
+                    form.append('file', this.docFile);
+                    if (this.docPassword) form.append('password', this.docPassword);
+
                     const response = await fetch('{{ route('writer.novels.chapters.bulk-parse', $novel->id) }}', {
                         method: 'POST',
-                        body: formData,
                         headers: {
                             'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'X-Requested-With': 'XMLHttpRequest'
-                        }
+                        },
+                        body: form
                     });
 
-                    const data = await response.json();
-                    if (!response.ok) throw new Error(data.error || 'Failed to process document');
+                    const data = await bulkReadResponse(response);
+                    if (!response.ok) throw new Error(bulkApiMessage(data, 'Failed to process document'));
 
                     this.chapters = data.chapters;
                     this.isParsing = false;

@@ -4,15 +4,37 @@ namespace App\Services;
 
 use App\Support\ParagraphReflow;
 use Smalot\PdfParser\Parser;
+use Symfony\Component\Process\Process;
 
 class PdfParserService
 {
     public function __construct(private DocumentSegmenter $segmenter) {}
 
-    public function parse(string $filePath): array
+    public function parse(string $filePath, ?string $password = null): array
     {
         $parser = new Parser();
-        $pdf = $parser->parseFile($filePath);
+
+        try {
+            $pdf = $parser->parseFile($filePath);
+        } catch (\Throwable $e) {
+            // Library smalot/pdfparser tidak mendukung PDF berpassword/enkripsi.
+            if (! preg_match('/secured pdf|possible secured/i', $e->getMessage())) {
+                throw $e;
+            }
+
+            $decryptedPath = $this->decryptProtectedPdf($filePath, $password);
+
+            if ($decryptedPath === null) {
+                throw new \RuntimeException($this->protectedPdfMessage($password), 0, $e);
+            }
+
+            try {
+                $pdf = $parser->parseFile($decryptedPath);
+            } finally {
+                @unlink($decryptedPath);
+            }
+        }
+
         $pages = $pdf->getPages();
         $pageTexts = array_map(fn ($page) => trim($page->getText()), $pages);
         $narrativeStart = $this->findNarrativeStart($pageTexts);
@@ -31,6 +53,114 @@ class PdfParserService
         }
 
         return $this->segmenter->segment($this->mergeContinuations($blocks));
+    }
+
+    /**
+     * Coba membuka proteksi PDF memakai qpdf menjadi berkas sementara yang bersih.
+     *
+     * Mengembalikan path berkas hasil dekripsi, atau null bila qpdf tidak ada
+     * atau PDF gagal dibuka (password salah / butuh password).
+     */
+    private function decryptProtectedPdf(string $filePath, ?string $password): ?string
+    {
+        $binary = $this->qpdfBinary();
+
+        if ($binary === null) {
+            return null;
+        }
+
+        $tempPath = tempnam(sys_get_temp_dir(), 'quoros_pdf_');
+
+        if ($tempPath === false) {
+            return null;
+        }
+
+        $command = [$binary, '--decrypt'];
+
+        if (is_string($password) && $password !== '') {
+            $command[] = '--password='.$password;
+        }
+
+        // "--" mengakhiri opsi agar path berkas tidak pernah ditafsirkan sebagai flag.
+        $command[] = '--';
+        $command[] = $filePath;
+        $command[] = $tempPath;
+
+        try {
+            $process = new Process($command);
+            $process->setTimeout(120);
+            $process->run();
+        } catch (\Throwable) {
+            @unlink($tempPath);
+
+            return null;
+        }
+
+        // qpdf memakai 0 = sukses, 3 = sukses dengan peringatan.
+        if (! in_array($process->getExitCode(), [0, 3], true) || ! $this->isPdf($tempPath)) {
+            @unlink($tempPath);
+
+            return null;
+        }
+
+        return $tempPath;
+    }
+
+    /**
+     * Pesan kegagalan dekripsi yang sesuai konteks (alat belum tersedia,
+     * password salah, atau PDF meminta password).
+     */
+    private function protectedPdfMessage(?string $password): string
+    {
+        if ($this->qpdfBinary() === null) {
+            return 'PDF ini terproteksi dan server belum memiliki alat untuk membukanya. Buka dokumen di pembaca PDF lalu simpan ulang tanpa proteksi, kemudian unggah ulang.';
+        }
+
+        if (is_string($password) && $password !== '') {
+            return 'PDF ini terproteksi dan password yang dimasukkan tidak cocok. Periksa kembali password-nya, atau hapus proteksi lalu unggah ulang.';
+        }
+
+        return 'PDF ini terproteksi dan meminta password. Isi kolom "Password PDF" lalu unggah ulang — atau hapus proteksinya lebih dulu.';
+    }
+
+    /**
+     * Deteksi path binary qpdf (di-cache agar hanya dijalankan sekali).
+     */
+    private function qpdfBinary(): ?string
+    {
+        static $resolved = false;
+        static $binary = null;
+
+        if ($resolved) {
+            return $binary;
+        }
+
+        $resolved = true;
+
+        $candidate = (string) config('services.qpdf.binary', 'qpdf');
+
+        try {
+            $process = new Process([$candidate, '--version']);
+            $process->setTimeout(10);
+            $process->run();
+
+            if ($process->isSuccessful()) {
+                $binary = $candidate;
+            }
+        } catch (\Throwable) {
+            $binary = null;
+        }
+
+        return $binary;
+    }
+
+    private function isPdf(string $path): bool
+    {
+        if (! is_file($path) || filesize($path) < 5) {
+            return false;
+        }
+
+        return str_starts_with((string) file_get_contents($path, false, null, 0, 5), '%PDF-');
     }
 
     /**

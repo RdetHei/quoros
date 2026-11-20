@@ -79,12 +79,13 @@ class ChapterController extends Controller
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'file' => 'required|file|mimes:epub,docx,doc,pdf|max:51200',
+            'file' => 'required|file|mimes:epub,docx,doc,pdf|max:10240',
+            'password' => 'nullable|string|max:255',
         ]);
 
         try {
             $file = $request->file('file');
-            $chapters = $parser->parse($file->path(), $file->getClientOriginalExtension());
+            $chapters = $parser->parse($file->path(), $file->getClientOriginalExtension(), $request->input('password'));
 
             if (empty($chapters)) {
                 return back()->with('error', 'Tidak ada bagian terstruktur yang ditemukan. Gunakan Preview & Edit sebelum menyimpan.');
@@ -112,12 +113,13 @@ class ChapterController extends Controller
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'file' => 'required|file|mimes:epub,docx,doc,pdf|max:51200',
+            'file' => 'required|file|mimes:epub,docx,doc,pdf|max:10240',
+            'password' => 'nullable|string|max:255',
         ]);
 
         try {
             $file = $request->file('file');
-            $chapters = $parser->parse($file->path(), $file->getClientOriginalExtension());
+            $chapters = $parser->parse($file->path(), $file->getClientOriginalExtension(), $request->input('password'));
 
             if (empty($chapters)) {
                 return response()->json(['error' => 'Tidak ada chapter yang ditemukan dalam file tersebut.'], 422);

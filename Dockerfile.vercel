@@ -18,6 +18,11 @@ FROM dunglas/frankenphp:1-php8.4-bookworm AS base
 RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && install-php-extensions intl zip pdo_mysql gd
 
+# qpdf: membuka proteksi PDF (owner/user password) sebelum diimpor bulk upload.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends qpdf \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # ---------- Stage 2: build aset front-end (Vite + Tailwind) ----------

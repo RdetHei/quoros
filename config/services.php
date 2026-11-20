@@ -46,4 +46,10 @@ return [
         'secret_token' => env('DISCORD_SECRET_TOKEN'),
     ],
 
+    'qpdf' => [
+        // Path binary qpdf (dipakai membuka proteksi PDF). Biarkan "qpdf"
+        // bila sudah ada di PATH; isi path lengkap di lokal Windows bila perlu.
+        'binary' => env('QPDF_BINARY', 'qpdf'),
+    ],
+
 ];

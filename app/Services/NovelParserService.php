@@ -18,12 +18,12 @@ class NovelParserService
         $this->pdfParser = $pdfParser;
     }
 
-    public function parse($filePath, $extension)
+    public function parse($filePath, $extension, ?string $password = null)
     {
         return match (strtolower($extension)) {
             'epub' => $this->epubParser->parse($filePath),
             'docx', 'doc' => $this->docxParser->parse($filePath),
-            'pdf' => $this->pdfParser->parse($filePath),
+            'pdf' => $this->pdfParser->parse($filePath, $password),
             default => throw new \Exception("Format file tidak didukung: {$extension}"),
         };
     }
