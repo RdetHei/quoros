@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Support\ParagraphReflow;
+
 class DocumentSegmenter
 {
     public function isExplicitHeading(string $text): bool
@@ -100,16 +102,23 @@ class DocumentSegmenter
             $text = preg_replace('/ *\n */u', "\n", $text) ?? $text;
             $text = trim($text);
 
-            if ($text === '' || preg_match('/^\d{1,4}$/u', $text)) {
+            if ($text === '') {
                 continue;
             }
 
-            $block['text'] = $text;
-            $clean[] = $block;
+            foreach ($this->expandParagraphs($block, $text) as $expanded) {
+                $value = $expanded['text'];
 
-            if (! empty($block['page_edge']) && mb_strlen($text) <= 80) {
-                $key = mb_strtolower($text);
-                $edgeCounts[$key] = ($edgeCounts[$key] ?? 0) + 1;
+                if ($value === '' || preg_match('/^\d{1,4}$/u', $value)) {
+                    continue;
+                }
+
+                $clean[] = $expanded;
+
+                if (! empty($expanded['page_edge']) && mb_strlen($value) <= 80) {
+                    $key = mb_strtolower($value);
+                    $edgeCounts[$key] = ($edgeCounts[$key] ?? 0) + 1;
+                }
             }
         }
 
@@ -120,6 +129,45 @@ class DocumentSegmenter
 
             return ($edgeCounts[mb_strtolower($block['text'])] ?? 0) < 2;
         }));
+    }
+
+    /**
+     * Bila satu blok masih berisi beberapa baris (mis. paragraf DOCX yang
+     * dipisah <w:br/> atau EPUB dengan <br>), pecah menjadi beberapa blok
+     * paragraf. Metadata heading hanya dipertahankan pada paragraf pertama.
+     *
+     * @param  array<string, mixed>  $block
+     * @return list<array<string, mixed>>
+     */
+    private function expandParagraphs(array $block, string $text): array
+    {
+        if (! str_contains($text, "\n")) {
+            $block['text'] = $text;
+
+            return [$block];
+        }
+
+        $expanded = [];
+        foreach (ParagraphReflow::paragraphs($text) as $index => $paragraph) {
+            $paragraph = trim($paragraph);
+            if ($paragraph === '') {
+                continue;
+            }
+
+            $sub = $block;
+            $sub['text'] = $paragraph;
+
+            if ($index > 0) {
+                $sub['heading_level'] = null;
+                $sub['isolated_heading'] = false;
+                $sub['nav_boundary'] = false;
+                unset($sub['heading']);
+            }
+
+            $expanded[] = $sub;
+        }
+
+        return $expanded;
     }
 
     /** @param list<array<string, mixed>> $blocks

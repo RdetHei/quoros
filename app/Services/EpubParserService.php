@@ -211,7 +211,7 @@ class EpubParserService
 
             $tag = strtolower($child->tagName);
             if (preg_match('/^h([1-6])$/', $tag, $matches)) {
-                $text = $this->normalizeText($child->textContent);
+                $text = $this->extractReadableText($child);
                 if ($text !== '') {
                     $blocks[] = ['text' => $text, 'heading_level' => (int) $matches[1], 'source' => 'epub_heading'];
                 }
@@ -219,7 +219,7 @@ class EpubParserService
             }
 
             if (in_array($tag, ['p', 'li', 'blockquote'], true)) {
-                $text = $this->normalizeText($child->textContent);
+                $text = $this->extractReadableText($child);
                 if ($text !== '') {
                     $blocks[] = ['text' => $text, 'source' => 'epub_paragraph'];
                 }

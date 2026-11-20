@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\ParagraphReflow;
 use PhpOffice\PhpWord\Element\TextBreak;
 use PhpOffice\PhpWord\Element\Title;
 use PhpOffice\PhpWord\IOFactory;
@@ -46,7 +47,7 @@ class DocxParserService
         $text = $this->extractLegacyDocText($filePath);
         $blocks = [];
 
-        foreach (preg_split('/\n\s*\n/u', str_replace(["\r\n", "\r"], "\n", $text)) ?: [] as $paragraph) {
+        foreach (ParagraphReflow::paragraphs($text) as $paragraph) {
             $paragraph = $this->normalizeText($paragraph);
             if ($paragraph !== '') {
                 $blocks[] = ['text' => $paragraph, 'source' => 'legacy_doc'];

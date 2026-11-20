@@ -171,11 +171,30 @@
                     <span class="status-badge {{ $r['dot'] }} {{ $r['bg'] }} {{ $r['text'] }} {{ $r['border'] }}">{{ $novel->content_rating }}</span>
                 </div>
 
-                {{-- Description --}}
-                <div class="relative group/desc">
-                    <p class="text-sm md:text-base text-neutral-700 dark:text-neutral-300 leading-relaxed mb-6 max-w-3xl text-center md:text-left font-medium line-clamp-4 group-hover/desc:line-clamp-none transition-all duration-500">
-                        {{ $novel->description ?: 'No description available for this novel.' }}
-                    </p>
+                {{-- Detailed Information --}}
+                <div class="mb-6">
+                    <p class="text-[9px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-[0.15em] mb-4">Detailed Information</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-5">
+                        @foreach([
+                            ['label' => 'Origin Region',       'value' => $novel->region ?: 'Global'],
+                            ['label' => 'Original Language',      'value' => $novel->language ?: 'English'],
+                            ['label' => 'Novel Type',       'value' => strtoupper(str_replace('_', ' ', $novel->type))],
+                            ['label' => 'Age Rating',     'value' => strtoupper($novel->content_rating)],
+                        ] as $info)
+                        <div>
+                            <p class="text-[8px] sm:text-[9px] font-bold text-neutral-400 uppercase tracking-wider mb-1">{{ $info['label'] }}</p>
+                            <p class="text-[11px] sm:text-xs font-semibold text-neutral-700 dark:text-neutral-300">{{ $info['value'] }}</p>
+                        </div>
+                        @endforeach
+                        <div class="col-span-2 sm:col-span-4">
+                            <p class="text-[8px] sm:text-[9px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Main Genres</p>
+                            <div class="flex flex-wrap gap-1">
+                                @foreach($novel->genres as $genre)
+                                    <span class="text-[10px] font-semibold text-neutral-600 dark:text-neutral-400">{{ $genre->name }}{{ !$loop->last ? ',' : '' }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Tags --}}
@@ -261,29 +280,13 @@
             </div>
         </div>
 
-        {{-- Detail Info Grid --}}
+        {{-- Synopsis --}}
         <div class="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800/70">
-            <p class="text-[9px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-[0.15em] mb-4">Detailed Information</p>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-5">
-                @foreach([
-                    ['label' => 'Origin Region',       'value' => $novel->region ?: 'Global'],
-                    ['label' => 'Original Language',      'value' => $novel->language ?: 'English'],
-                    ['label' => 'Novel Type',       'value' => strtoupper(str_replace('_', ' ', $novel->type))],
-                    ['label' => 'Age Rating',     'value' => strtoupper($novel->content_rating)],
-                ] as $info)
-                <div>
-                    <p class="text-[8px] sm:text-[9px] font-bold text-neutral-400 uppercase tracking-wider mb-1">{{ $info['label'] }}</p>
-                    <p class="text-[11px] sm:text-xs font-semibold text-neutral-700 dark:text-neutral-300">{{ $info['value'] }}</p>
-                </div>
-                @endforeach
-                <div class="col-span-2 sm:col-span-4">
-                    <p class="text-[8px] sm:text-[9px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Main Genres</p>
-                    <div class="flex flex-wrap gap-1">
-                        @foreach($novel->genres as $genre)
-                            <span class="text-[10px] font-semibold text-neutral-600 dark:text-neutral-400">{{ $genre->name }}{{ !$loop->last ? ',' : '' }}</span>
-                        @endforeach
-                    </div>
-                </div>
+            <p class="text-[9px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-[0.15em] mb-4">Synopsis</p>
+            <div class="relative group/desc">
+                <p class="text-sm md:text-base text-neutral-700 dark:text-neutral-300 leading-relaxed max-w-3xl font-medium line-clamp-4 group-hover/desc:line-clamp-none transition-all duration-500">
+                    {{ $novel->description ?: 'No description available for this novel.' }}
+                </p>
             </div>
         </div>
     </div>
@@ -404,54 +407,111 @@
 </div>
 
 {{-- ===== REVIEWS ===== --}}
+@php
+    $reviewsAll = $novel->reviews->sortByDesc('created_at');
+    $totalReviews = $reviewsAll->count();
+    $ratingAvg = (float) ($novel->rating_avg ?? 0);
+    $dist = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+    foreach ($reviewsAll as $r) {
+        $star = (int) $r->rating;
+        if ($star >= 1 && $star <= 5) {
+            $dist[$star]++;
+        }
+    }
+    $starRow = function (int $filled, string $size = 'h-3.5 w-3.5') {
+        $html = '';
+        for ($i = 1; $i <= 5; $i++) {
+            $cls = $i <= $filled ? 'text-amber-400' : 'text-neutral-200 dark:text-neutral-700';
+            $html .= '<svg class="'.$size.' '.$cls.'" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>';
+        }
+        return $html;
+    };
+@endphp
 <div class="mb-16">
     <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 overflow-hidden">
+        {{-- Header --}}
         <div class="flex items-center gap-3 px-7 py-5 border-b border-neutral-100 dark:border-neutral-800">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
             </svg>
             <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100">User Reviews</h2>
-            <span class="text-xs font-bold text-neutral-400 bg-rose-50 dark:bg-rose-900/30 px-2 py-0.5 rounded-full">
-                {{ $novel->reviews->count() }}
+            <span class="text-xs font-bold text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-0.5 rounded-full">
+                {{ $totalReviews }}
             </span>
         </div>
 
-        <div class="p-7">
-            <div class="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10">
-                {{-- Left Side: Form --}}
-                <div>
-                    @auth
-                    <form action="{{ route('reviews.store', $novel->id) }}" method="POST"
-                          class="p-5 bg-neutral-50 dark:bg-neutral-800/40 rounded-2xl border border-neutral-100 dark:border-neutral-700/50"
-                          x-data="Object.assign(communityComposer(), { rating: 0, hover: 0 })">
-                        @csrf
-                        <p class="text-[10px] font-black text-neutral-400 uppercase tracking-[0.15em] mb-4">Give a Review</p>
-                        <div class="mb-4 flex items-center gap-1.5">
+        <div class="p-7 space-y-8">
+            {{-- Rating Summary --}}
+            <div class="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8">
+                {{-- Average score --}}
+                <div class="flex flex-col items-center justify-center text-center">
+                    <div class="text-6xl font-black text-neutral-900 dark:text-white leading-none tabular-nums">
+                        {{ number_format($ratingAvg, 1) }}
+                    </div>
+                    <div class="mt-2 flex items-center gap-0.5">{!! $starRow((int) round($ratingAvg)) !!}</div>
+                    <p class="mt-2 text-xs font-semibold uppercase tracking-widest text-neutral-400">
+                        {{ $totalReviews }} {{ \Illuminate\Support\Str::plural('review', $totalReviews) }}
+                    </p>
+                </div>
+
+                {{-- Distribution bars --}}
+                <div class="flex flex-col justify-center gap-1.5">
+                    @foreach([5,4,3,2,1] as $star)
+                        @php
+                            $count = $dist[$star];
+                            $pct = $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0;
+                        @endphp
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 text-xs font-bold text-neutral-500 text-right tabular-nums">{{ $star }}</span>
+                            <svg class="h-3.5 w-3.5 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <div class="flex-1 h-2 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                                <div class="h-full rounded-full bg-amber-400 transition-all duration-500" style="width: {{ $pct }}%"></div>
+                            </div>
+                            <span class="w-8 text-[11px] font-semibold text-neutral-400 tabular-nums">{{ $count }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Review Form --}}
+            <div class="border-t border-neutral-100 dark:border-neutral-800 pt-8">
+                @auth
+                <form action="{{ route('reviews.store', $novel->id) }}" method="POST"
+                      class="p-5 bg-neutral-50 dark:bg-neutral-800/30 rounded-2xl border border-neutral-100 dark:border-neutral-700/40"
+                      x-data="Object.assign(communityComposer(), { rating: 0, hover: 0 })">
+                    @csrf
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <p class="text-[10px] font-black text-neutral-400 uppercase tracking-[0.15em]">Write a Review</p>
+                        <div class="flex items-center gap-0.5">
                             <input type="hidden" name="rating" :value="rating">
-                            <template x-for="i in 5">
+                            <template x-for="i in 5" :key="i">
                                 <button type="button"
                                         @click="rating = i"
                                         @mouseenter="hover = i"
                                         @mouseleave="hover = 0"
                                         class="p-0.5 transition-transform hover:scale-110 outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 transition-colors"
-                                         :class="(hover >= i || (!hover && rating >= i)) ? 'text-neutral-300' : 'text-neutral-200 dark:text-neutral-700'"
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 transition-colors"
+                                         :class="(hover >= i || (!hover && rating >= i)) ? 'text-amber-400' : 'text-neutral-200 dark:text-neutral-700'"
                                          viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                     </svg>
                                 </button>
                             </template>
                         </div>
-                        <textarea name="content" x-ref="composer" rows="4"
-                                  class="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 placeholder-neutral-400 text-neutral-700 dark:text-neutral-300 resize-none mb-4 shadow-sm"
-                                  placeholder="Share your thoughts on this novel…"></textarea>
-                        <input type="hidden" name="sticker" :value="sticker">
-                        <div x-show="stickerPreview" x-cloak class="-mt-2 mb-3 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900">
-                            <span class="text-xl" x-text="stickerPreview?.emoji"></span>
-                            <span class="text-xs text-neutral-500" x-text="stickerPreview?.label"></span>
-                            <button type="button" @click="clearSticker()" class="ml-1 text-xs text-neutral-400 hover:text-rose-500" aria-label="Hapus stiker">×</button>
-                        </div>
-                        <div class="mb-4 flex flex-wrap items-center gap-2">
+                    </div>
+                    <textarea name="content" x-ref="composer" rows="4"
+                              class="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 placeholder-neutral-400 text-neutral-700 dark:text-neutral-300 resize-none mb-3 shadow-sm"
+                              placeholder="Share your thoughts on this novel…"></textarea>
+                    <input type="hidden" name="sticker" :value="sticker">
+                    <div x-show="stickerPreview" x-cloak class="-mt-1 mb-3 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900">
+                        <span class="text-xl" x-text="stickerPreview?.emoji"></span>
+                        <span class="text-xs text-neutral-500" x-text="stickerPreview?.label"></span>
+                        <button type="button" @click="clearSticker()" class="ml-1 text-xs text-neutral-400 hover:text-rose-500" aria-label="Hapus stiker">×</button>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center gap-2">
                             <div class="relative">
                                 <button type="button" @click="showEmoji = !showEmoji; showStickers = false" class="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800">Emoji</button>
                                 <div x-show="showEmoji" @click.away="showEmoji = false" x-cloak class="absolute bottom-11 left-0 z-30 grid w-56 grid-cols-8 gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
@@ -467,7 +527,7 @@
                                         <p class="mb-2 text-[9px] font-black uppercase tracking-widest text-neutral-400">{{ $pack['label'] }}</p>
                                         <div class="mb-3 grid grid-cols-4 gap-1.5 last:mb-0">
                                             @foreach($pack['items'] as $item)
-                                                <button type="button" @click="pickSticker(@js($item))" class="rounded-lg border border-neutral-100 p-2 text-center hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
+                                                <button type="button" @click="pickSticker(@js($item))" class="rounded-lg border border-neutral-100 p-2 text-center hover:border-amber-300 hover:bg-amber-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
                                                     <span class="block text-xl">{{ $item['emoji'] }}</span>
                                                     <span class="block truncate text-[9px] text-neutral-400">{{ $item['label'] }}</span>
                                                 </button>
@@ -478,105 +538,109 @@
                             </div>
                         </div>
                         <button type="submit"
-                                class="w-full py-3 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-black rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-neutral-900/10 active:scale-95">
+                                class="rounded-lg border border-neutral-200 bg-white px-4 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 transition-colors">
                             Submit Review
                         </button>
-                    </form>
-                    @else
-                    <div class="p-6 bg-neutral-50 dark:bg-neutral-800/20 border border-neutral-100 dark:border-neutral-700/40 rounded-2xl text-center">
-                        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4">Log in to write a review and rate this novel.</p>
-                        <a href="{{ route('login') }}"
-                           class="inline-block w-full py-3 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold rounded-xl text-xs uppercase tracking-wider transition-all">
-                            Log In Now
-                        </a>
                     </div>
-                    @endauth
+                </form>
+                @else
+                <div class="p-6 bg-neutral-50 dark:bg-neutral-800/20 border border-neutral-100 dark:border-neutral-700/40 rounded-2xl text-center">
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4">Log in to write a review and rate this novel.</p>
+                    <a href="{{ route('login') }}"
+                       class="inline-flex items-center px-6 py-2.5 bg-amber-400 hover:bg-amber-300 text-neutral-900 font-black rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-amber-400/20">
+                        Log In Now
+                    </a>
                 </div>
+                @endauth
+            </div>
 
-                {{-- Right Side: List --}}
-                <div x-data="{ showAll: false }">
-                    <div class="space-y-5">
-                        @forelse($novel->reviews->sortByDesc('created_at') as $review)
-                        <div class="p-5 bg-neutral-50 dark:bg-neutral-800/30 rounded-2xl border border-neutral-100 dark:border-neutral-700/40 transition-all hover:border-neutral-300 dark:hover:border-neutral-600"
-                             x-data="{
-                                score: {{ $review->voteScore() }},
-                                userVote: @js($review->currentUserVote(Auth::id())),
-                                emojis: @js($review->groupedEmojis(Auth::id())),
-                                emojiOpen: false,
-                                async send(payload) {
-                                    const response = await fetch(@js(route('reactions.toggle', ['type' => 'review', 'id' => $review->id])), {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            Accept: 'application/json',
-                                            'X-Requested-With': 'XMLHttpRequest',
-                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '',
-                                        },
-                                        body: JSON.stringify(payload),
-                                    });
-                                    if (!response.ok) return;
-                                    const data = await response.json();
-                                    this.score = data.score;
-                                    this.userVote = data.user_vote;
-                                    this.emojis = data.emojis;
-                                }
-                             }"
-                             x-show="showAll || {{ $loop->index }} < 3">
-                            <div class="flex items-center justify-between mb-3">
-                                @if($review->user)
-                                <a href="{{ route('profile.show', $review->user->username ?? $review->user->id) }}"
-                                   class="flex items-center gap-3 min-w-0 group/rev">
-                                    <div class="w-9 h-9 shrink-0 rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-xs font-black text-neutral-600 dark:text-neutral-400 ring-1 ring-neutral-200 dark:ring-neutral-700">
-                                        @if($review->user->profile_photo_url)
-                                            <img src="{{ $review->user->profile_photo_url }}" alt="{{ $review->user->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png';">
-                                        @elseif($review->user->profile_photo)
-                                            <img src="{{ asset('storage/' . $review->user->profile_photo) }}" alt="{{ $review->user->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png';">
-                                        @else
-                                            {{ substr($review->user->name, 0, 1) }}
-                                        @endif
-                                    </div>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-bold text-neutral-800 dark:text-neutral-100 truncate group-hover/rev:text-neutral-900 dark:group-hover/rev:text-white transition-colors">{{ $review->user->name }}</p>
-                                        <p class="text-[10px] text-neutral-400">{{ $review->created_at->diffForHumans() }}</p>
-                                    </div>
-                                </a>
-                                @else
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-9 h-9 shrink-0 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400">?</div>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-bold text-neutral-400 italic">Deleted User</p>
-                                        <p class="text-[10px] text-neutral-400">{{ $review->created_at->diffForHumans() }}</p>
-                                    </div>
+            {{-- Reviews List --}}
+            <div x-data="{ showAll: false }">
+                <div class="space-y-4">
+                    @forelse($reviewsAll as $review)
+                    <div class="p-5 bg-white dark:bg-neutral-800/30 rounded-2xl border border-neutral-100 dark:border-neutral-700/40 transition-all hover:border-neutral-200 dark:hover:border-neutral-600"
+                         x-data="{
+                            score: {{ $review->voteScore() }},
+                            userVote: @js($review->currentUserVote(Auth::id())),
+                            emojis: @js($review->groupedEmojis(Auth::id())),
+                            emojiOpen: false,
+                            async send(payload) {
+                                const response = await fetch(@js(route('reactions.toggle', ['type' => 'review', 'id' => $review->id])), {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        Accept: 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '',
+                                    },
+                                    body: JSON.stringify(payload),
+                                });
+                                if (!response.ok) return;
+                                const data = await response.json();
+                                this.score = data.score;
+                                this.userVote = data.user_vote;
+                                this.emojis = data.emojis;
+                            }
+                         }"
+                         x-show="showAll || {{ $loop->index }} < 5">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            @if($review->user)
+                            <a href="{{ route('profile.show', $review->user->username ?? $review->user->id) }}"
+                               class="flex items-center gap-3 min-w-0 group/rev">
+                                <div class="w-10 h-10 shrink-0 rounded-full overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-xs font-black text-neutral-600 dark:text-neutral-400 ring-1 ring-neutral-200 dark:ring-neutral-700">
+                                    @if($review->user->profile_photo_url)
+                                        <img src="{{ $review->user->profile_photo_url }}" alt="{{ $review->user->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png';">
+                                    @elseif($review->user->profile_photo)
+                                        <img src="{{ asset('storage/' . $review->user->profile_photo) }}" alt="{{ $review->user->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/error.png';">
+                                    @else
+                                        {{ substr($review->user->name, 0, 1) }}
+                                    @endif
                                 </div>
-                                @endif
-                                <div class="flex items-center gap-0.5 px-2.5 py-1 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-100 dark:border-neutral-800 shadow-sm">
-                                    @for($i = 0; $i < 5; $i++)
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $i < $review->rating ? 'text-neutral-300' : 'text-neutral-200 dark:text-neutral-700' }}" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    @endfor
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-neutral-800 dark:text-neutral-100 truncate group-hover/rev:text-neutral-900 dark:group-hover/rev:text-white transition-colors">{{ $review->user->name }}</p>
+                                    <p class="text-[10px] text-neutral-400">{{ $review->created_at->diffForHumans() }}</p>
+                                </div>
+                            </a>
+                            @else
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 shrink-0 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400">?</div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-neutral-400 italic">Deleted User</p>
+                                    <p class="text-[10px] text-neutral-400">{{ $review->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
-                            @if($sticker = $review->stickerMeta())
-                                <div class="mb-2 inline-flex flex-col items-center rounded-xl border border-neutral-200 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900">
-                                    <span class="text-3xl leading-none">{{ $sticker['emoji'] }}</span>
-                                    <span class="mt-1 text-[9px] uppercase tracking-widest text-neutral-400">{{ $sticker['label'] }}</span>
-                                </div>
                             @endif
-                            @if(filled($review->content))
-                                <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed whitespace-pre-wrap">{{ $review->content }}</p>
-                            @endif
+                            <div class="flex items-center gap-0.5 shrink-0">{!! $starRow((int) $review->rating) !!}</div>
+                        </div>
 
-                            <div class="mt-3 flex flex-wrap items-center gap-1.5">
-                                <div class="inline-flex items-center rounded-lg border border-neutral-200 bg-white p-0.5 dark:border-neutral-700 dark:bg-neutral-900">
+                        @if($sticker = $review->stickerMeta())
+                            <div class="mb-3 inline-flex flex-col items-center rounded-xl border border-neutral-200 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900">
+                                <span class="text-3xl leading-none">{{ $sticker['emoji'] }}</span>
+                                <span class="mt-1 text-[9px] uppercase tracking-widest text-neutral-400">{{ $sticker['label'] }}</span>
+                            </div>
+                        @endif
+
+                        @if(filled($review->content))
+                            <p class="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">{{ $review->content }}</p>
+                        @endif
+
+                        <div class="mt-4 flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                {{-- Vote buttons --}}
+                                <div class="inline-flex items-center rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900 overflow-hidden">
                                     @auth
-                                        <button type="button" @click="send({ reaction_type: 'like' })" class="h-7 w-7 rounded-md text-xs text-neutral-400 hover:text-amber-500" :class="userVote === 'like' && 'bg-amber-500/10 text-amber-500'" title="Like" aria-label="Like">▲</button>
+                                        <button type="button" @click="send({ reaction_type: 'like' })" class="h-8 px-2 flex items-center gap-1 text-neutral-400 hover:text-amber-500 border-r border-neutral-100 dark:border-neutral-800 transition-colors" :class="userVote === 'like' && 'text-amber-500 bg-amber-50 dark:bg-amber-400/10'" title="Helpful" aria-label="Helpful">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
+                                        </button>
                                     @endauth
-                                    <span class="min-w-7 text-center text-[11px] font-bold tabular-nums" :class="score > 0 ? 'text-amber-600 dark:text-amber-400' : (score < 0 ? 'text-rose-500' : 'text-neutral-400')" x-text="score">{{ $review->voteScore() }}</span>
+                                    <span class="px-2 min-w-7 text-center text-[11px] font-bold tabular-nums" :class="score > 0 ? 'text-amber-600 dark:text-amber-400' : (score < 0 ? 'text-rose-500' : 'text-neutral-400')" x-text="score">{{ $review->voteScore() }}</span>
                                     @auth
-                                        <button type="button" @click="send({ reaction_type: 'dislike' })" class="h-7 w-7 rounded-md text-xs text-neutral-400 hover:text-rose-500" :class="userVote === 'dislike' && 'bg-rose-500/10 text-rose-500'" title="Dislike" aria-label="Dislike">▼</button>
+                                        <button type="button" @click="send({ reaction_type: 'dislike' })" class="h-8 px-2 flex items-center gap-1 text-neutral-400 hover:text-rose-500 border-l border-neutral-100 dark:border-neutral-800 transition-colors" :class="userVote === 'dislike' && 'text-rose-500 bg-rose-50 dark:bg-rose-500/10'" title="Not helpful" aria-label="Not helpful">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 17a1 1 0 01-1-1v-5H4a1 1 0 110-2h5V4a1 1 0 112 0v5h5a1 1 0 110 2h-5v5a1 1 0 01-1 1z"/></svg>
+                                        </button>
                                     @endauth
                                 </div>
+                                {{-- Emoji chips --}}
                                 <template x-for="chip in emojis" :key="chip.emoji">
                                     <button type="button" @auth @click="send({ emoji: chip.emoji })" @endauth class="inline-flex h-7 items-center gap-1 rounded-full border px-2 text-xs" :class="chip.mine ? 'border-amber-400/50 bg-amber-400/10' : 'border-neutral-200 dark:border-neutral-700'">
                                         <span x-text="chip.emoji"></span><span class="text-[10px] font-bold text-neutral-500" x-text="chip.count"></span>
@@ -584,7 +648,7 @@
                                 </template>
                                 @auth
                                     <div class="relative">
-                                        <button type="button" @click="emojiOpen = !emojiOpen" class="h-7 rounded-full border border-neutral-200 px-2 text-[10px] font-bold text-neutral-500 dark:border-neutral-700">+ Emoji</button>
+                                        <button type="button" @click="emojiOpen = !emojiOpen" class="h-7 rounded-full border border-neutral-200 px-2 text-[10px] font-bold text-neutral-500 dark:border-neutral-700 hover:border-amber-300 hover:text-amber-500 transition-colors">+ React</button>
                                         <div x-show="emojiOpen" @click.away="emojiOpen = false" x-cloak class="absolute bottom-9 left-0 z-20 grid w-56 grid-cols-8 gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
                                             @foreach(\App\Support\ChatCatalog::emojis() as $emoji)
                                                 <button type="button" class="h-7 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" @click="send({ emoji: @js($emoji) }); emojiOpen = false">{{ $emoji }}</button>
@@ -593,42 +657,41 @@
                                     </div>
                                 @endauth
                             </div>
-                            
+
                             @can('delete', $review)
-                            <div class="mt-3 flex justify-end">
-                                <form action="{{ route('reviews.destroy', $review->id) }}" method="POST">
-                                    @csrf @method('DELETE')
-                                    <button type="submit"
-                                            onclick="return confirm('Delete this review?')"
-                                            class="text-[10px] font-black text-neutral-400/50 hover:text-neutral-400 transition-colors uppercase tracking-widest">
-                                        Delete
-                                    </button>
-                                </form>
-                            </div>
+                            <form action="{{ route('reviews.destroy', $review->id) }}" method="POST">
+                                @csrf @method('DELETE')
+                                <button type="submit"
+                                        onclick="return confirm('Delete this review?')"
+                                        class="text-[10px] font-bold text-neutral-400 hover:text-rose-500 transition-colors uppercase tracking-widest flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                    Delete
+                                </button>
+                            </form>
                             @endcan
                         </div>
-                        @empty
-                        <div class="py-16 text-center">
-                            <div class="w-16 h-16 bg-neutral-50 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.049 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                            </div>
-                            <p class="text-sm text-neutral-400 font-medium italic">No reviews for this novel yet.</p>
+                    </div>
+                    @empty
+                    <div class="py-16 text-center">
+                        <div class="w-16 h-16 bg-neutral-50 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.049 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         </div>
-                        @endforelse
+                        <p class="text-sm text-neutral-400 font-medium italic">No reviews for this novel yet.</p>
                     </div>
-
-                    @if($novel->reviews->count() > 3)
-                    <div class="mt-8 text-center">
-                        <button @click="showAll = !showAll" 
-                                class="inline-flex items-center gap-2 px-8 py-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-xs font-black uppercase tracking-widest text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all shadow-sm">
-                            <span x-text="showAll ? 'Hide' : 'View More (' + ({{ $novel->reviews->count() }} - 3) + ')'"></span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" :class="showAll ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                    </div>
-                    @endif
+                    @endforelse
                 </div>
+
+                @if($totalReviews > 5)
+                <div class="mt-8 text-center">
+                    <button @click="showAll = !showAll"
+                            class="inline-flex items-center gap-2 px-8 py-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-xs font-black uppercase tracking-widest text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all shadow-sm">
+                        <span x-text="showAll ? 'Hide Reviews' : 'View All (' + ({{ $totalReviews }} - 5) + ' More)'"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" :class="showAll ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+                @endif
             </div>
         </div>
     </div>

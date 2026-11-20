@@ -60,8 +60,5 @@
                 @endforeach
             </div>
         </div>
-        <div class="ml-auto">
-            {{ $slot }}
-        </div>
     </div>
 </div>

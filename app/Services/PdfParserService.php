@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\ParagraphReflow;
 use Smalot\PdfParser\Parser;
 
 class PdfParserService
@@ -29,7 +30,47 @@ class PdfParserService
             throw new \RuntimeException('PDF tidak memiliki lapisan teks yang dapat dibaca. Jalankan OCR pada dokumen hasil scan, lalu unggah ulang.');
         }
 
-        return $this->segmenter->segment($blocks);
+        return $this->segmenter->segment($this->mergeContinuations($blocks));
+    }
+
+    /**
+     * Sambungkan paragraf yang terpotong di batas halaman. Paragraf yang belum
+     * ditutup tanda baca akhir kalimat di dasar halaman digabung dengan blok
+     * pertama halaman berikutnya agar tidak terbelah menjadi dua paragraf.
+     *
+     * @param  list<array<string, mixed>>  $blocks
+     * @return list<array<string, mixed>>
+     */
+    private function mergeContinuations(array $blocks): array
+    {
+        $merged = [];
+
+        foreach ($blocks as $block) {
+            $lastIndex = count($merged) - 1;
+            $last = $lastIndex >= 0 ? $merged[$lastIndex] : null;
+
+            $crossesPage = $last !== null
+                && ($last['source_page'] ?? null) !== ($block['source_page'] ?? null);
+
+            if ($crossesPage
+                && empty($block['heading'])
+                && empty($last['heading'])
+                && ! $this->endsSentence((string) $last['text'])) {
+                $merged[$lastIndex]['text'] = trim($merged[$lastIndex]['text'].' '.$block['text']);
+                $merged[$lastIndex]['page_edge'] = (bool) ($merged[$lastIndex]['page_edge'] ?? false)
+                    || (bool) ($block['page_edge'] ?? false);
+                continue;
+            }
+
+            $merged[] = $block;
+        }
+
+        return $merged;
+    }
+
+    private function endsSentence(string $text): bool
+    {
+        return (bool) preg_match('/[.!?…]["\'”’)\]]*\s*$/u', trim($text));
     }
 
     /** @param list<string> $pages */
@@ -60,10 +101,18 @@ class PdfParserService
     private function pageBlocks(string $text, int $page): array
     {
         $lines = preg_split('/\R/u', str_replace("\f", "\n", $text)) ?: [];
+        $count = count($lines);
+
+        $clean = [];
+        foreach ($lines as $lineIndex => $line) {
+            $clean[$lineIndex] = trim(preg_replace('/[\t ]+/u', ' ', (string) $line) ?? (string) $line);
+        }
+
+        $width = ParagraphReflow::columnWidth($clean);
+
         $blocks = [];
         $paragraph = [];
         $lineIndexes = [];
-        $count = count($lines);
 
         $flush = function () use (&$paragraph, &$lineIndexes, &$blocks, $page, $count): void {
             if ($paragraph === []) {
@@ -88,9 +137,7 @@ class PdfParserService
             $lineIndexes = [];
         };
 
-        foreach ($lines as $lineIndex => $line) {
-            $line = trim(preg_replace('/\s+/u', ' ', $line) ?? $line);
-
+        foreach ($clean as $lineIndex => $line) {
             if ($line === '' || preg_match('/^\d{1,4}$/u', $line)) {
                 $flush();
                 continue;
@@ -102,8 +149,16 @@ class PdfParserService
                     'text' => $line,
                     'source_page' => $page,
                     'page_edge' => $lineIndex < 2 || $lineIndex >= $count - 2,
+                    'heading' => true,
                 ];
                 continue;
+            }
+
+            // Baris baru dipisah menjadi paragraf sendiri bila terdeteksi batas
+            // paragraf; jika tidak, baris dilanjutkan ke paragraf yang sama.
+            if ($paragraph !== []
+                && ParagraphReflow::startsNewParagraph($paragraph[count($paragraph) - 1], $line, $width)) {
+                $flush();
             }
 
             $paragraph[] = $line;
