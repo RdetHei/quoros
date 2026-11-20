@@ -201,6 +201,30 @@
 </div>
 
 <script>
+    function bulkApiMessage(data, fallback) {
+        if (typeof data === 'string' && data.trim() !== '') return data;
+        if (data && typeof data === 'object') {
+            const direct = data.error ?? data.message;
+            if (typeof direct === 'string' && direct.trim() !== '') return direct;
+            if (data.errors && typeof data.errors === 'object') {
+                return Object.values(data.errors).flat().filter(Boolean).join(' ');
+            }
+            try { return JSON.stringify(direct ?? data); } catch (_) { return fallback; }
+        }
+        return fallback;
+    }
+
+    async function bulkReadResponse(res) {
+        const text = await res.text();
+        if (!text) return {};
+        try {
+            return JSON.parse(text);
+        } catch (_) {
+            const clean = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            return { error: clean.slice(0, 300) || `Server mengembalikan respons tidak valid (${res.status}).` };
+        }
+    }
+
     function bulkChapterManager(initialOrder) {
         return {
             docFile: null,
@@ -302,8 +326,8 @@
                         },
                         body: JSON.stringify({ chapters: this.chapters.map(c => ({ title: c.title, content: c.content ?? '' })) })
                     });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.message || data.error || 'Failed to save chapters');
+                    const data = await bulkReadResponse(res);
+                    if (!res.ok) throw new Error(bulkApiMessage(data, 'Failed to save chapters'));
                     this.progress = 100;
                     window.location.href = '{{ route('writer.chapters', ['novel_id' => $novel->id]) }}';
                 } catch (err) {
