@@ -35,7 +35,7 @@
                     <label class="relative group cursor-pointer block">
                         <div class="p-8 border border-dashed border-neutral-700 rounded-xl bg-neutral-900 group-hover:border-[#c7a64a]/40 transition-all">
                             <p class="text-sm font-medium text-white uppercase tracking-wider" x-text="docFile ? docFile.name : 'Choose file or drag & drop here'"></p>
-                            <p class="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mt-2">EPUB · DOCX · PDF — Max 10MB</p>
+                            <p class="text-[10px] text-neutral-500 uppercase tracking-[0.2em] mt-2">EPUB · DOCX · PDF</p>
                         </div>
                         <input type="file" name="file" accept=".epub,.docx,.doc,.pdf" class="hidden" @change="docFile = $event.target.files[0]" />
                     </label>
@@ -294,12 +294,6 @@
             },
             async startParsing() {
                 if (!this.docFile) return;
-
-                const maxBytes = 10 * 1024 * 1024;
-                if (this.docFile.size > maxBytes) {
-                    alert('Ukuran file melebihi batas 10MB.');
-                    return;
-                }
 
                 this.isParsing = true;
                 try {

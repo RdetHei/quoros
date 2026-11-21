@@ -39,7 +39,7 @@
 
             {{-- Cover --}}
             <div class="flex-shrink-0">
-                <div class="w-40 sm:w-52 md:w-64 lg:w-80 mx-auto md:mx-0">
+                <div class="w-60 sm:w-64 md:w-64 lg:w-80 mx-auto md:mx-0">
                     <div class="aspect-[3/4] rounded-lg md:rounded-xl overflow-hidden shadow-2xl shadow-neutral-900/20 dark:shadow-black/40 ring-1 ring-neutral-200 dark:ring-neutral-700">
                         @if($novel->cover_image_url)
                             <img src="{{ $novel->cover_image_url }}"
@@ -212,21 +212,21 @@
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-2.5">
                     @if($novel->chapters->isNotEmpty())
                     <a href="{{ route('chapters.show', [$novel->slug, $novel->chapters->first()->route_identifier]) }}"
-                       class="flex-grow sm:flex-grow-0 inline-flex items-center justify-center gap-1.5 px-5 sm:px-6 py-2.5 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-neutral-900 font-bold rounded-lg text-xs transition-all shadow-lg shadow-neutral-900/20 dark:shadow-none active:scale-95">
+                       class="w-full sm:w-auto sm:flex-grow-0 inline-flex items-center justify-center gap-1.5 px-5 sm:px-6 py-2.5 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-neutral-900 font-bold rounded-lg text-xs transition-all shadow-lg shadow-neutral-900/20 dark:shadow-none active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
                         </svg>
                         Start Reading
                     </a>
                     @else
-                    <button disabled class="flex-grow sm:flex-grow-0 inline-flex items-center justify-center gap-1.5 px-5 sm:px-6 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-400 font-bold rounded-lg text-xs cursor-not-allowed">
+                    <button disabled class="w-full sm:w-auto sm:flex-grow-0 inline-flex items-center justify-center gap-1.5 px-5 sm:px-6 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-400 font-bold rounded-lg text-xs cursor-not-allowed">
                         No Chapters Available
                     </button>
                     @endif
 
                     @auth
                         @php $isBookmarked = Auth::user()->bookmarks()->where('novel_id', $novel->id)->exists(); @endphp
-                        <form action="{{ route('bookmarks.toggle', $novel->id) }}" method="POST" class="flex-grow sm:flex-grow-0">
+                        <form action="{{ route('bookmarks.toggle', $novel->id) }}" method="POST" class="flex-1 sm:flex-grow-0">
                             @csrf
                             <button type="submit"
                                     class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold transition-all border
@@ -241,7 +241,7 @@
                         </form>
                     @else
                         <a href="{{ route('login') }}"
-                           class="flex-grow sm:flex-grow-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 hover:text-neutral-400 transition-all">
+                           class="flex-1 sm:flex-grow-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 hover:text-neutral-400 transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                             </svg>
@@ -253,14 +253,14 @@
                         'type' => 'novel',
                         'id' => $novel->id,
                         'label' => $novel->title,
-                        'class' => 'inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 hover:text-neutral-400 transition-all',
+                        'class' => 'flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 hover:text-neutral-400 transition-all',
                     ])
 
                     @auth
                     @if($userLists->isNotEmpty())
-                        <form id="add-to-list-form" action="{{ route('lists.novels.add', ['list' => $userLists->first()->slug, 'novel' => $novel]) }}" method="POST" class="inline-flex items-center gap-1.5">
+                        <form id="add-to-list-form" action="{{ route('lists.novels.add', ['list' => $userLists->first()->slug, 'novel' => $novel]) }}" method="POST" class="w-full sm:w-auto inline-flex items-center gap-1.5">
                             @csrf
-                            <select class="text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2.5 py-2 max-w-[120px]"
+                            <select class="text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2.5 py-2 flex-1 min-w-0 sm:flex-none sm:max-w-[120px]"
                                     onchange="document.getElementById('add-to-list-form').action = '{{ url('/lists') }}/' + this.value + '/novels/{{ $novel->id }}'">
                                 @foreach($userLists as $list)
                                     <option value="{{ $list->slug }}">{{ $list->title }}</option>
@@ -271,7 +271,7 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('lists.create') }}" class="inline-flex items-center px-3 py-2.5 rounded-lg text-[11px] font-semibold border border-neutral-200 dark:border-neutral-700 text-neutral-500 hover:border-neutral-400 hover:text-violet-500 transition-all">
+                        <a href="{{ route('lists.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2.5 rounded-lg text-[11px] font-semibold border border-neutral-200 dark:border-neutral-700 text-neutral-500 hover:border-neutral-400 hover:text-violet-500 transition-all">
                             Create List
                         </a>
                     @endif

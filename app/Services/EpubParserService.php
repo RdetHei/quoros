@@ -5,6 +5,7 @@ namespace App\Services;
 use ZipArchive;
 use DOMDocument;
 use DOMXPath;
+use DOMNode;
 use Throwable;
 
 class EpubParserService

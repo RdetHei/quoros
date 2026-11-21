@@ -79,7 +79,7 @@
 @else
 <section class="lp-marathon">
 @endif
-    <div class="lp-marathon-bg" @if($marathonCover) style="background-image: url('{{ \App\Services\CloudinaryService::transform($marathonCover, 'w_1600,h_400,c_fill,f_auto,q_auto') }}');" @endif></div>
+    <div class="lp-marathon-bg" style="background-image: url('{{ asset('storage/logo/quoros.webp') }}');"></div>
     <div class="lp-marathon-shade"></div>
     <div class="lp-marathon-inner">
         <h2 class="lp-marathon-title">{{ $marathonTitle }}</h2>

@@ -656,9 +656,10 @@ body:has(.landing-page) {
 .lp-marathon-bg {
     position: absolute;
     inset: 0;
-    background-size: cover;
+    background-repeat: no-repeat;
     background-position: center;
-    filter: grayscale(0.1) brightness(0.7) saturate(1.05);
+    background-size: auto 62%;
+    opacity: 0.45;
 }
 
 .lp-marathon-shade {
@@ -1333,9 +1334,10 @@ body:has(.landing-page) {
     .lp-hot-takes-inner {
         flex-direction: column;
         align-items: flex-start;
-        padding: 1rem 0;
+        gap: 0.9rem;
+        padding: 1.15rem 1.15rem 1.25rem;
     }
-    .lp-hot-cover { flex-basis: 4.6rem; width: 4.6rem; }
+    .lp-hot-cover { flex: 0 0 auto; width: 5.25rem; }
     .lp-hot-tags { gap: 0.35rem; margin-bottom: 0.45rem; }
     .lp-hot-tag {
         padding: 0.15rem 0.4rem;
@@ -1476,7 +1478,7 @@ body:has(.landing-page) {
         font-size: 0.4rem;
         font-weight: 550;
     }
-    .lp-hot-cover { flex-basis: 4.2rem; width: 4.2rem; }
+    .lp-hot-cover { flex: 0 0 auto; width: 4.6rem; }
     .lp-pill-cloud { gap: 0.22rem; }
     .lp-pill {
         padding: 0.2rem 0.38rem;

@@ -79,7 +79,7 @@ class ChapterController extends Controller
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'file' => 'required|file|mimes:epub,docx,doc,pdf|max:10240',
+            'file' => 'required|file|mimes:epub,docx,doc,pdf',
             'password' => 'nullable|string|max:255',
         ]);
 
@@ -113,7 +113,7 @@ class ChapterController extends Controller
         Gate::authorize('manageChapters', $novel);
 
         $request->validate([
-            'file' => 'required|file|mimes:epub,docx,doc,pdf|max:10240',
+            'file' => 'required|file|mimes:epub,docx,doc,pdf',
             'password' => 'nullable|string|max:255',
         ]);
 
@@ -139,7 +139,7 @@ class ChapterController extends Controller
 
         if ($request->has('chapters')) {
             $validated = $request->validate([
-                'chapters' => 'required|array|min:1|max:500',
+                'chapters' => 'required|array|min:1',
                 'chapters.*.title' => 'required|string|max:255',
                 'chapters.*.content' => 'nullable|string',
             ]);

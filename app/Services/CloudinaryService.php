@@ -13,7 +13,7 @@ class CloudinaryService
     protected ?Cloudinary $cloudinary = null;
 
     /** Transformasi Cloudinary untuk banner hero (landscape lebar). */
-    public const HERO_TRANSFORMATION = 'w_1600,h_720,c_fill,g_north,f_auto,q_auto';
+    public const HERO_TRANSFORMATION = 'w_1600,h_720,c_fill,g_center,f_auto,q_auto';
 
     /** Transformasi Cloudinary untuk cover grid/thumbnail (rasio 2:3, kecil). */
     public const THUMB_TRANSFORMATION = 'w_240,h_360,c_fill,f_auto,q_auto';
