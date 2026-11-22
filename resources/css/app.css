@@ -1,5 +1,10 @@
 @import 'tailwindcss';
 
+/* Situs ini dark-only. Tailwind v4 secara default mengikat varian `dark:`
+   ke prefers-color-scheme (tema OS/browser). Kita alihkan agar mengikuti
+   class .dark pada <html>, sehingga tampilan tidak rusak di browser bertema terang. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';

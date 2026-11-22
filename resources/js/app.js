@@ -11,12 +11,9 @@ if (import.meta.env.PROD) {
     injectVercelAnalytics();
 }
 
-// Theme logic
-if (localStorage.getItem('color-theme') === 'dark' || !('color-theme' in localStorage) || window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.documentElement.classList.add('dark');
-} else {
-    document.documentElement.classList.remove('dark');
-}
+// Theme logic — situs dark-only. Pastikan class `dark` selalu aktif pada <html>.
+// Varian `dark:` sendiri diikat ke class ini via @custom-variant di app.css.
+document.documentElement.classList.add('dark');
 
 // Global Cropper Logic (Lazy Loaded Module)
 window.initCropper = async function(...args) {
