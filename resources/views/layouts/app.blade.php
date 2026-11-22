@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name', 'Quoros') . ' - Where Story Lives')</title>
     <meta name="description" content="@yield('meta_description', 'Quoros adalah platform novel premium yang didedikasikan untuk menghadirkan cerita terbaik dengan pengalaman membaca yang nyaman.')">
+    <meta name="google-site-verification" content="oXfr_yoyNNP37CmQ2vCaXkbfrFoFeDUWyhgOgOIeMb0">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
