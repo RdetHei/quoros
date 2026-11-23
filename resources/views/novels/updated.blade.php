@@ -15,7 +15,7 @@
     }
     .updates-card { transition: border-color .2s ease, background-color .2s ease, transform .2s ease; }
     .updates-card:hover { transform: translateY(-1px); }
-    .updates-card[hidden], .updates-day[hidden] { display: none !important; }
+    .updates-card[hidden] { display: none !important; }
     .updates-filter option { background: #171717; color: #eee; }
     #updates-sort { color-scheme: dark; }
     #updates-sort option { background: #171717; color: #e5e5e5; }
@@ -85,36 +85,17 @@
             </label>
         </div>
 
-        @php $currentUpdateDate = null; @endphp
-        <div id="updates-groups" class="space-y-8 sm:space-y-9">
+        <div id="updates-list" class="space-y-2">
             @foreach($novels as $novel)
                 @php
                     $latestChapter = $novel->chapters->first();
                     $releaseAt = $latestChapter ? ($latestChapter->published_at ?? $latestChapter->created_at) : ($novel->chapters_max_published_at ?? $novel->chapters_max_created_at);
                     $releaseCarbon = $releaseAt ? \Illuminate\Support\Carbon::parse($releaseAt) : null;
-                    $releaseDate = $releaseCarbon?->toDateString() ?? 'unknown';
                     $coverUrl = $novel->cover_image_url ?: ($novel->cover_image ? asset('storage/' . $novel->cover_image) : null);
                     $genreNames = $novel->genres->pluck('name')->values();
                     $tagNames = $novel->tags->pluck('name')->values();
                     $authorName = $novel->author?->name ?? 'Unknown author';
                 @endphp
-
-                @if($releaseDate !== $currentUpdateDate)
-                    @if($currentUpdateDate !== null)
-                        </div></section>
-                    @endif
-                    @php $currentUpdateDate = $releaseDate; @endphp
-                    <section class="updates-day" data-date-group="{{ $releaseDate }}">
-                        <header class="mb-3 flex items-center gap-3 sm:mb-3.5">
-                            <h2 class="updates-serif shrink-0 text-lg font-semibold uppercase tracking-[.04em] text-[#eeeae1] sm:text-xl">
-                                @if($releaseCarbon?->isToday()) Today @elseif($releaseCarbon?->isYesterday()) Yesterday @elseif($releaseCarbon) {{ $releaseCarbon->format('d M Y') }} @else Archive @endif
-                            </h2>
-                            <span class="shrink-0 font-mono text-[8px] uppercase tracking-[.12em] text-neutral-600">{{ $releaseCarbon?->format('d M Y') ?? '—' }}</span>
-                            <span class="h-px flex-1 bg-white/[.09]"></span>
-                            <span class="updates-day-count shrink-0 text-[8px] uppercase tracking-[.12em] text-neutral-600">Releases</span>
-                        </header>
-                        <div class="space-y-2">
-                @endif
 
                 @if($latestChapter)
                     <article class="updates-card group rounded-lg border border-white/[.10] bg-[#131313] p-3 hover:border-[#c7a64a]/35 hover:bg-[#171717] sm:p-3.5"
@@ -160,7 +141,6 @@
                     </article>
                 @endif
             @endforeach
-            @if($currentUpdateDate !== null)</div></section>@endif
         </div>
 
         <div id="updates-empty-filter" class="hidden rounded-lg border border-white/10 bg-[#121212] px-5 py-16 text-center">
@@ -213,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     populate(controls.status, cards.map(card => card.dataset.status.replaceAll('_', ' ')));
     populate(controls.region, cards.map(card => card.dataset.region));
 
-    const groups = [...document.querySelectorAll('.updates-day')];
+    const list = document.getElementById('updates-list');
     const visibleCount = document.getElementById('updates-visible-count');
     const emptyState = document.getElementById('updates-empty-filter');
     const applyFilters = () => {
@@ -229,12 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 && (!controls.region.value || normalize(card.dataset.region) === controls.region.value);
             card.hidden = !matches;
             if (matches) visible++;
-        });
-        groups.forEach(group => {
-            const count = [...group.querySelectorAll('.updates-card')].filter(card => !card.hidden).length;
-            group.hidden = count === 0;
-            const label = group.querySelector('.updates-day-count');
-            if (label) label.textContent = `${String(count).padStart(2, '0')} ${count === 1 ? 'release' : 'releases'}`;
         });
         visibleCount.textContent = visible;
         emptyState.classList.toggle('hidden', visible > 0);
@@ -252,15 +226,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     controls.sort.addEventListener('change', () => {
         const oldest = controls.sort.value === 'oldest';
-        const orderedGroups = [...groups].sort((a, b) => a.dataset.dateGroup.localeCompare(b.dataset.dateGroup) * (oldest ? 1 : -1));
-        const wrapper = document.getElementById('updates-groups');
-        orderedGroups.forEach(group => {
-            const list = group.querySelector('.space-y-2');
-            [...list.querySelectorAll('.updates-card')]
-                .sort((a, b) => (Number(a.dataset.release) - Number(b.dataset.release)) * (oldest ? 1 : -1))
-                .forEach(card => list.appendChild(card));
-            wrapper.appendChild(group);
-        });
+        [...cards]
+            .sort((a, b) => (Number(a.dataset.release) - Number(b.dataset.release)) * (oldest ? 1 : -1))
+            .forEach(card => list.appendChild(card));
     });
 
     document.addEventListener('keydown', event => {

@@ -491,23 +491,8 @@ class NovelController extends Controller
             ->withMax('chapters', 'published_at')
             ->withMax('chapters', 'created_at');
 
-        if (Auth::check()) {
-            $preferredIds = $this->recommendations->discoveryIds(Auth::user());
-
-            if ($preferredIds !== []) {
-                $bindings = [];
-                $priority = collect($preferredIds)->values()->map(function ($novelId, $index) use (&$bindings) {
-                    $bindings[] = $novelId;
-                    $bindings[] = $index;
-
-                    return 'WHEN novels.id = ? THEN ?';
-                })->implode(' ');
-
-                $bindings[] = count($preferredIds);
-                $query->orderByRaw("CASE {$priority} ELSE ? END ASC", $bindings);
-            }
-        }
-
+        // Urutkan murni dari bab yang paling baru dipublikasikan, agar novel yang
+        // baru di-update selalu muncul di paling atas (tanpa prioritas rekomendasi).
         $query->orderByRaw('COALESCE(chapters_max_published_at, chapters_max_created_at) DESC');
 
         $novels = $query->paginate(24)->withQueryString();
