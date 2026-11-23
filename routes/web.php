@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GuideController;
 use App\Http\Controllers\Admin\CarouselController as AdminCarouselController;
+use App\Http\Controllers\Admin\ChatCatalogController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\NovelRequestController as AdminNovelRequestController;
@@ -255,5 +256,17 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
         // System
         Route::get('/maintenance', [SystemController::class, 'maintenance'])->name('admin.maintenance');
         Route::patch('/maintenance', [SystemController::class, 'toggleMaintenance'])->name('admin.maintenance.toggle');
+
+        // Chat catalog (emoji & sticker management)
+        Route::get('/chat-catalog', [ChatCatalogController::class, 'index'])->name('admin.chat-catalog.index');
+        Route::post('/chat-catalog/emojis', [ChatCatalogController::class, 'storeEmoji'])->name('admin.chat-catalog.emojis.store');
+        Route::put('/chat-catalog/emojis/{emoji}', [ChatCatalogController::class, 'updateEmoji'])->name('admin.chat-catalog.emojis.update');
+        Route::delete('/chat-catalog/emojis/{emoji}', [ChatCatalogController::class, 'destroyEmoji'])->name('admin.chat-catalog.emojis.destroy');
+        Route::post('/chat-catalog/packs', [ChatCatalogController::class, 'storePack'])->name('admin.chat-catalog.packs.store');
+        Route::put('/chat-catalog/packs/{pack}', [ChatCatalogController::class, 'updatePack'])->name('admin.chat-catalog.packs.update');
+        Route::delete('/chat-catalog/packs/{pack}', [ChatCatalogController::class, 'destroyPack'])->name('admin.chat-catalog.packs.destroy');
+        Route::post('/chat-catalog/packs/{pack}/items', [ChatCatalogController::class, 'storeItem'])->name('admin.chat-catalog.items.store');
+        Route::put('/chat-catalog/items/{item}', [ChatCatalogController::class, 'updateItem'])->name('admin.chat-catalog.items.update');
+        Route::delete('/chat-catalog/items/{item}', [ChatCatalogController::class, 'destroyItem'])->name('admin.chat-catalog.items.destroy');
     });
 });

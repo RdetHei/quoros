@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             AnnouncementSeeder::class,
             GuideSeeder::class,
             ChaptersOrderSeeder::class,
+            ChatCatalogSeeder::class,
         ]);
     }
 }

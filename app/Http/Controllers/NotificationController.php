@@ -2,25 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\NotificationType;
 use App\Models\InAppNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $notifications = InAppNotification::query()
-            ->where('user_id', Auth::id())
+        $filter = (string) $request->query('filter', 'all');
+        if (! in_array($filter, ['all', 'unread', 'announcements'], true)) {
+            $filter = 'all';
+        }
+
+        $base = InAppNotification::query()->where('user_id', Auth::id());
+
+        $notifications = (clone $base)
+            ->when($filter === 'unread', fn ($query) => $query->whereNull('read_at'))
+            ->when($filter === 'announcements', fn ($query) => $query->where('type', NotificationType::Announcement->value))
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        $hasUnread = InAppNotification::query()
-            ->where('user_id', Auth::id())
-            ->whereNull('read_at')
-            ->exists();
+        $totalCount = (clone $base)->count();
+        $unreadCount = (clone $base)->whereNull('read_at')->count();
+        $announcementCount = (clone $base)->where('type', NotificationType::Announcement->value)->count();
 
-        return view('notifications.index', compact('notifications', 'hasUnread'));
+        $hasUnread = $unreadCount > 0;
+
+        return view('notifications.index', compact(
+            'notifications',
+            'hasUnread',
+            'filter',
+            'totalCount',
+            'unreadCount',
+            'announcementCount',
+        ));
     }
 
     public function show(InAppNotification $notification)

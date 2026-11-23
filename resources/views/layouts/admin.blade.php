@@ -255,6 +255,18 @@
             </div>
 
             <div class="space-y-4">
+                <p class="px-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500/80">Community</p>
+                <div class="space-y-1">
+                    <a href="{{ route('admin.chat-catalog.index') }}"
+                       @class([
+                           'flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group relative overflow-hidden',
+                           'admin-nav-active' => request()->routeIs('admin.chat-catalog.*'),
+                           'text-slate-400 hover:text-white hover:bg-white/5' => !request()->routeIs('admin.chat-catalog.*'),
+                       ])>Emoji &amp; Stiker</a>
+                </div>
+            </div>
+
+            <div class="space-y-4">
                 <p class="px-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500/80">System</p>
                 <div class="space-y-1">
                     <a href="{{ route('admin.announcements.index') }}"
@@ -348,6 +360,7 @@
 
                         <div
                             x-show="profileOpen"
+                            x-cloak
                             x-transition
                             class="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden z-50"
                         >

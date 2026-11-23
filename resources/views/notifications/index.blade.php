@@ -394,13 +394,8 @@
                     </p>
                     <div class="mt-6 nt-divider-grad w-56"></div>
                 </div>
-                @php
-                    $totalNt = $notifications->total();
-                    $unreadNt = $notifications->getCollection()->where(fn($n)=>$n->isUnread())->count();
-                    if ($unreadNt === 0) $unreadNt = \App\Models\InAppNotification::where('user_id', auth()->id())->whereNull('read_at')->count();
-                @endphp
                 <div class="flex shrink-0 flex-col items-end justify-end gap-1">
-                    <div class="nt-count-num">{{ str_pad((string) max(0, (int) $unreadNt), 2, '0', STR_PAD_LEFT) }}</div>
+                    <div class="nt-count-num">{{ str_pad((string) max(0, (int) $unreadCount), 2, '0', STR_PAD_LEFT) }}</div>
                     <div class="nt-count-label">Unread dispatches</div>
                 </div>
             </div>
@@ -410,14 +405,16 @@
                 <nav class="flex flex-wrap items-center gap-x-8 sm:gap-x-10" role="tablist" aria-label="Notification lists">
                     @php
                         $ntTabs = [
-                            ['id' => 'all', 'label' => 'All', 'count' => (int) $totalNt, 'active' => true],
-                            ['id' => 'unread', 'label' => 'Unread', 'count' => max(0, (int) $unreadNt), 'active' => false],
-                            ['id' => 'announcements', 'label' => 'Announcements', 'count' => 0, 'active' => false],
+                            ['id' => 'all', 'label' => 'All', 'count' => (int) $totalCount],
+                            ['id' => 'unread', 'label' => 'Unread', 'count' => max(0, (int) $unreadCount)],
+                            ['id' => 'announcements', 'label' => 'Announcements', 'count' => max(0, (int) $announcementCount)],
                         ];
                     @endphp
                     @foreach($ntTabs as $t)
-                        <a href="#" role="tab" aria-selected="{{ $t['active'] ? 'true' : 'false' }}"
-                           class="nt-tab-link @if($t['active']) is-active @endif">
+                        @php $isActiveTab = $filter === $t['id']; @endphp
+                        <a href="{{ route('notifications.index', $t['id'] === 'all' ? [] : ['filter' => $t['id']]) }}"
+                           role="tab" aria-selected="{{ $isActiveTab ? 'true' : 'false' }}"
+                           class="nt-tab-link @if($isActiveTab) is-active @endif">
                             {{ $t['label'] }}
                             <span class="nt-tab-count">{{ $t['count'] }}</span>
                         </a>
@@ -425,7 +422,7 @@
                 </nav>
 
                 <div class="shrink-0 flex items-center gap-2">
-                    @if(($hasUnread ?? false) || $unreadNt > 0)
+                    @if($hasUnread)
                         <form action="{{ route('notifications.read-all') }}" method="POST">
                             @csrf
                             <button type="submit" class="nt-mark-all-btn">
@@ -443,7 +440,7 @@
         {{-- ─── INFO ROW ────────────────────────────────────────────────── --}}
         <div class="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div class="text-[9px] uppercase tracking-[.12em] text-neutral-500 font-semibold">
-                Showing <span style="color:#d4d4d4;">{{ $notifications->count() ? '1–'.$notifications->count() : '0' }}</span> of <span style="color:#d4d4d4;">{{ $totalNt }}</span> entries
+                Showing <span style="color:#d4d4d4;">{{ $notifications->count() ? '1–'.$notifications->count() : '0' }}</span> of <span style="color:#d4d4d4;">{{ $notifications->total() }}</span> entries
             </div>
             <div class="text-[9px] uppercase tracking-[.12em] text-neutral-500 font-semibold sm:text-right">
                 Most recent first <span style="color:#525252;margin-left:2px;">↓</span>
@@ -515,7 +512,11 @@
                         @endphp
                         <a href="{{ route('notifications.show', $n) }}" class="nt-card block @if($isUnread) is-unread @endif">
                             <div class="flex items-start gap-4">
-                                {{ $isUnread ? '<span class="nt-unread-dot"></span>' : '<span class="nt-read-dot"></span>' }}
+                                @if($isUnread)
+                                    <span class="nt-unread-dot"></span>
+                                @else
+                                    <span class="nt-read-dot"></span>
+                                @endif
 
                                 <div class="min-w-0 flex-1">
                                     <div class="flex flex-wrap items-center gap-2 mb-2">

@@ -33,10 +33,10 @@
             this.emojis = data.emojis;
         }
      }"
-     @class(['flex gap-3 md:gap-4 group', 'ml-8 md:ml-12 border-l-2 border-slate-100 dark:border-slate-800 pl-4' => $isReply])>
+     @class(['flex gap-3 md:gap-4 group', 'ml-8 md:ml-12 border-l-2 border-white/10 pl-4' => $isReply])>
     @if($comment->user)
         <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}"
-           class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs md:text-sm hover:ring-2 hover:ring-slate-500/40 transition-all">
+           class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-[#a3a3a3] font-bold text-xs md:text-sm hover:ring-[#c7a64a]/50 transition-all">
             @if($comment->user->profile_photo_url)
                 <img src="{{ $comment->user->profile_photo_url }}" alt="" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='/error.png'">
             @elseif($comment->user->profile_photo)
@@ -46,66 +46,66 @@
             @endif
         </a>
     @else
-        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-xs">?</div>
+        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-[#a3a3a3] font-bold text-xs">?</div>
     @endif
     <div class="flex-grow min-w-0">
         <div class="flex items-center justify-between mb-1 gap-2">
             @if($comment->user)
-                <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}" class="font-bold text-xs md:text-sm text-slate-900 dark:text-white truncate">{{ $comment->user->name }}</a>
+                <a href="{{ route('profile.show', $comment->user->username ?? $comment->user->id) }}" class="font-bold text-xs md:text-sm text-[#f2efe8] truncate hover:text-[#c7a64a] transition-colors">{{ $comment->user->name }}</a>
             @else
-                <span class="font-bold text-xs md:text-sm text-slate-400 italic">Deleted User</span>
+                <span class="font-bold text-xs md:text-sm text-[#7a7a7a] italic">Deleted User</span>
             @endif
-            <span class="text-[9px] md:text-[10px] font-medium text-slate-400 uppercase tracking-widest shrink-0">{{ $comment->created_at->diffForHumans() }}</span>
+            <span class="text-[9px] md:text-[10px] font-medium text-[#7a7a7a] uppercase tracking-widest shrink-0">{{ $comment->created_at->diffForHumans() }}</span>
         </div>
 
         @if($sticker)
-            <div class="mb-2 inline-flex flex-col items-center rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2">
+            <div class="mb-2 inline-flex flex-col items-center rounded-xl border border-white/10 bg-white/[.04] px-3 py-2">
                 <span class="text-4xl leading-none">{{ $sticker['emoji'] }}</span>
-                <span class="mt-1 text-[9px] uppercase tracking-widest text-slate-400">{{ $sticker['label'] }}</span>
+                <span class="mt-1 text-[9px] uppercase tracking-widest text-[#a3a3a3]">{{ $sticker['label'] }}</span>
             </div>
         @endif
 
         @if(filled($comment->content))
-            <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">{{ $comment->content }}</p>
+            <p class="text-xs md:text-sm text-[#d6d3cc] leading-relaxed whitespace-pre-wrap">{{ $comment->content }}</p>
         @endif
 
         <div class="mt-3 flex flex-wrap items-center gap-2">
-            <div class="inline-flex items-center rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-0.5">
+            <div class="inline-flex items-center rounded-lg bg-white/[.04] border border-white/10 p-0.5">
                 @auth
                     <button type="button" @click="send({ reaction_type: 'like' })"
-                            class="h-7 w-7 rounded-md text-[11px] text-slate-400 hover:text-amber-500"
-                            :class="userVote === 'like' && 'text-amber-500 bg-amber-500/10'"
+                            class="h-7 w-7 rounded-md text-[11px] text-[#a3a3a3] hover:text-[#c7a64a] transition-colors"
+                            :class="userVote === 'like' && 'text-[#c7a64a] bg-[#c7a64a]/10'"
                             title="Upvote">▲</button>
                 @endauth
-                <span class="min-w-[1.4rem] text-center text-[10px] font-bold tabular-nums text-slate-500"
-                      :class="score > 0 ? 'text-amber-600 dark:text-amber-400' : (score < 0 ? 'text-rose-500' : '')"
+                <span class="min-w-[1.4rem] text-center text-[10px] font-bold tabular-nums text-[#a3a3a3]"
+                      :class="score > 0 ? 'text-[#c7a64a]' : (score < 0 ? 'text-rose-400' : '')"
                       x-text="score">{{ $score }}</span>
                 @auth
                     <button type="button" @click="send({ reaction_type: 'dislike' })"
-                            class="h-7 w-7 rounded-md text-[11px] text-slate-400 hover:text-rose-500"
-                            :class="userVote === 'dislike' && 'text-rose-500 bg-rose-500/10'"
+                            class="h-7 w-7 rounded-md text-[11px] text-[#a3a3a3] hover:text-rose-400 transition-colors"
+                            :class="userVote === 'dislike' && 'text-rose-400 bg-rose-400/10'"
                             title="Downvote">▼</button>
                 @endauth
             </div>
 
             <template x-for="chip in emojis" :key="chip.emoji">
                 <button type="button" @click="send({ emoji: chip.emoji })"
-                        class="h-7 px-2 rounded-full border text-[12px] inline-flex items-center gap-1"
-                        :class="chip.mine ? 'border-amber-400/50 bg-amber-400/10' : 'border-slate-200 dark:border-slate-700'">
+                        class="h-7 px-2 rounded-full border text-[12px] inline-flex items-center gap-1 transition-colors"
+                        :class="chip.mine ? 'border-[#c7a64a]/50 bg-[#c7a64a]/10' : 'border-white/10 bg-white/[.03] hover:border-white/20'">
                     <span x-text="chip.emoji"></span>
-                    <span class="text-[10px] font-bold text-slate-500" x-text="chip.count"></span>
+                    <span class="text-[10px] font-bold text-[#a3a3a3]" x-text="chip.count"></span>
                 </button>
             </template>
 
             @auth
                 <div class="relative">
-                    <button type="button" @click="emojiOpen = !emojiOpen" class="h-7 px-2 rounded-full border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    <button type="button" @click="emojiOpen = !emojiOpen" class="h-7 px-2 rounded-full border border-white/10 bg-white/[.03] text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#f2efe8] hover:border-white/20 transition-colors">
                         Emoji
                     </button>
                     <div x-show="emojiOpen" @click.away="emojiOpen = false" x-cloak
-                         class="absolute z-20 mt-2 w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 grid grid-cols-8 gap-1 shadow-xl">
+                         class="absolute z-20 mt-2 w-56 rounded-xl border border-white/10 bg-[#161616] p-2 grid grid-cols-8 gap-1 shadow-2xl">
                         @foreach(\App\Support\ChatCatalog::emojis() as $emoji)
-                            <button type="button" class="h-7 rounded hover:bg-slate-100 dark:hover:bg-slate-800" @click="send({ emoji: @js($emoji) }); emojiOpen = false">{{ $emoji }}</button>
+                            <button type="button" class="h-7 rounded-md hover:bg-white/10 transition-colors" @click="send({ emoji: @js($emoji) }); emojiOpen = false">{{ $emoji }}</button>
                         @endforeach
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                 <form action="{{ route('comments.destroy', $comment->id) }}" method="POST" class="inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="text-slate-400 hover:text-red-500 text-[9px] font-bold uppercase tracking-widest" onclick="return confirm('Hapus komentar ini?')">Hapus</button>
+                    <button type="submit" class="text-[#7a7a7a] hover:text-rose-400 text-[9px] font-bold uppercase tracking-widest transition-colors" onclick="return confirm('Hapus komentar ini?')">Hapus</button>
                 </form>
             @endcan
 
@@ -123,7 +123,7 @@
                 @if(! $isReply && $comment->user)
                     <button type="button"
                             @click="$dispatch('open-reply', { parentId: {{ $comment->id }}, name: @js($comment->user->name) })"
-                            class="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-indigo-500 transition-colors">
+                            class="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-[#7a7a7a] hover:text-[#c7a64a] transition-colors">
                         Reply
                     </button>
                 @endif
@@ -132,6 +132,7 @@
                         'type' => 'comment',
                         'id' => $comment->id,
                         'label' => 'Comment by '.$comment->user->name,
+                        'class' => 'text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-[#7a7a7a] hover:text-rose-400 transition-colors',
                     ])
                 @endif
             @endauth

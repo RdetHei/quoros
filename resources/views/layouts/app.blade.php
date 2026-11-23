@@ -118,6 +118,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </button>
                             <div x-show="open"
+                                 x-cloak
                                  @click.away="open = false"
                                  x-transition:enter="transition ease-out duration-200"
                                  x-transition:enter-start="opacity-0 -translate-y-2"
@@ -178,6 +179,7 @@
                                     </div>
                                 </button>
                                 <div x-show="open"
+                                     x-cloak
                                      @click.away="open = false"
                                      x-transition:enter="transition ease-out duration-100"
                                      x-transition:enter-start="transform opacity-0 scale-95 translate-y-1"

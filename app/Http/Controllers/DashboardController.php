@@ -518,7 +518,7 @@ class DashboardController extends Controller
         $shared['dashboardTitle'] = 'Welcome back, ' . explode(' ', $user->name)[0] . '.';
         $shared['dashboardSubtitle'] = 'The morning is quiet. Your next page is waiting.';
 
-        $selectedNovel = $novels->firstWhere('id', (int) $request->get('novel_id')) ?? $novels->first();
+        $selectedNovel = $novels->firstWhere('id', (int) ($shared['selectedNovelId'] ?? 0)) ?? $novels->first();
 
         if (! $selectedNovel) {
             return view('writer.chapters', array_merge($shared, [
@@ -580,7 +580,7 @@ class DashboardController extends Controller
         $shared['breadcrumbs'] = ['Author Studio', 'Reader Mode'];
         $shared['showCreateBtn'] = false;
 
-        $selectedNovel = $novels->firstWhere('id', (int) $request->get('novel_id')) ?? $novels->first();
+        $selectedNovel = $novels->firstWhere('id', (int) ($shared['selectedNovelId'] ?? 0)) ?? $novels->first();
         $shared['dashboardTitle'] = $selectedNovel->title ?? 'Reader Mode';
         $shared['dashboardSubtitle'] = null;
 
@@ -634,7 +634,7 @@ class DashboardController extends Controller
 
         $palette = ['#c7a64a', '#8b6b3a', '#a3835a', '#6b8b7a', '#7a6b8b', '#5a6b8b'];
 
-        $selectedNovel = $novels->firstWhere('id', (int) $request->get('novel_id')) ?? $novels->first();
+        $selectedNovel = $novels->firstWhere('id', (int) ($shared['selectedNovelId'] ?? 0)) ?? $novels->first();
 
         if (! $selectedNovel) {
             return view('writer.codex', array_merge($shared, [
@@ -874,7 +874,7 @@ class DashboardController extends Controller
         $shared['breadcrumbs'] = ['Author Studio', 'Plot Notes'];
         $shared['dashboardTitle'] = 'Keep the threads of your story.';
 
-        $selectedNovel = $novels->firstWhere('id', (int) $request->get('novel_id')) ?? $novels->first();
+        $selectedNovel = $novels->firstWhere('id', (int) ($shared['selectedNovelId'] ?? 0)) ?? $novels->first();
 
         $notesQuery = PlotNote::where('user_id', $user->id);
         if ($selectedNovel) {
@@ -948,14 +948,17 @@ class DashboardController extends Controller
         $allNovels = $user->novels()->select('id', 'title', 'status', 'view_count', 'created_at')->get();
         $allNovelIds = $allNovels->pluck('id');
 
-        $selectedNovelId = $request->get('novel_id');
-        if ($selectedNovelId && $allNovels->contains('id', (int) $selectedNovelId)) {
-            $selectedNovelId = (int) $selectedNovelId;
-            $scopeNovelIds = collect([$selectedNovelId]);
+        $requestedNovelId = (int) $request->get('novel_id');
+
+        if ($requestedNovelId && $allNovels->contains('id', $requestedNovelId)) {
+            $selectedNovelId = $requestedNovelId;
+            $request->session()->put('writer_current_novel_id', $selectedNovelId);
         } else {
-            $selectedNovelId = null;
-            $scopeNovelIds = $allNovelIds;
+            $sessionNovelId = (int) $request->session()->get('writer_current_novel_id');
+            $selectedNovelId = ($sessionNovelId && $allNovels->contains('id', $sessionNovelId)) ? $sessionNovelId : null;
         }
+
+        $scopeNovelIds = $selectedNovelId ? collect([$selectedNovelId]) : $allNovelIds;
 
         $myNovels = Novel::where('author_id', $user->id)
             ->with([

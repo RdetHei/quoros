@@ -1123,19 +1123,19 @@
          COMMENTS SECTION
     ════════════════════════════════════════════════ --}}
     <div class="comments-section" id="diskusi">
-        <h2 class="text-lg font-bold mb-2 flex items-center gap-2.5 text-slate-900 dark:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <h2 class="text-lg font-bold mb-2 flex items-center gap-2.5 text-[#f2efe8]">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#a3a3a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
             </svg>
             Diskusi
-            <span class="ml-auto text-sm font-semibold text-slate-400">{{ $commentsCount ?? $chapter->comments->count() }}</span>
+            <span class="ml-auto text-sm font-semibold text-[#a3a3a3]">{{ $commentsCount ?? $chapter->comments->count() }}</span>
         </h2>
         <div class="mb-6 flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-widest">
             <a href="{{ request()->fullUrlWithQuery(['sort' => 'new']) }}#diskusi"
-               class="{{ ($sort ?? 'new') === 'new' ? 'text-slate-900 dark:text-white' : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200' }}">Terbaru</a>
+               class="{{ ($sort ?? 'new') === 'new' ? 'text-[#c7a64a]' : 'text-[#a3a3a3] hover:text-[#f2efe8]' }} transition-colors">Terbaru</a>
             <a href="{{ request()->fullUrlWithQuery(['sort' => 'best']) }}#diskusi"
-               class="{{ ($sort ?? 'new') === 'best' ? 'text-slate-900 dark:text-white' : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200' }}">Terbaik</a>
-            <a href="{{ route('chat.index') }}" class="ml-auto text-amber-600 dark:text-amber-400 hover:underline">Lounge publik</a>
+               class="{{ ($sort ?? 'new') === 'best' ? 'text-[#c7a64a]' : 'text-[#a3a3a3] hover:text-[#f2efe8]' }} transition-colors">Terbaik</a>
+            <a href="{{ route('chat.index') }}" class="ml-auto text-[#c7a64a] hover:text-[#d4b65a] hover:underline transition-colors">Lounge publik</a>
         </div>
 
         <div x-data="{ replyParentId: null, replyName: '' }" @open-reply.window="replyParentId = $event.detail.parentId; replyName = $event.detail.name">
@@ -1144,11 +1144,11 @@
                 {{-- Reply form --}}
                 <form x-show="replyParentId" x-cloak
                       action="{{ route('comments.store', $chapter->id) }}" method="POST"
-                      class="mb-5 p-4 rounded-2xl bg-amber-50 dark:bg-amber-400/10 border border-amber-200 dark:border-amber-400/20">
+                      class="mb-5 p-4 rounded-2xl bg-[#c7a64a]/10 border border-[#c7a64a]/25">
                     @csrf
                     <input type="hidden" name="parent_id" x-model="replyParentId">
-                    <p class="text-xs font-bold text-amber-700 dark:text-amber-300 mb-2">
-                        Membalas <span x-text="replyName" class="text-amber-600 dark:text-amber-200"></span>
+                    <p class="text-xs font-bold text-[#c7a64a] mb-2">
+                        Membalas <span x-text="replyName" class="text-[#f2efe8]"></span>
                     </p>
                     @include('partials.community-composer', [
                         'placeholder' => 'Tulis balasan…',
@@ -1156,11 +1156,11 @@
                     ])
                     <div class="mt-2 flex gap-2 justify-end">
                         <button type="button" @click="replyParentId = null"
-                                class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                                class="px-4 py-2 text-xs font-bold text-[#a3a3a3] hover:text-[#f2efe8] transition-colors">
                             Batal
                         </button>
                         <button type="submit"
-                                class="px-5 py-2 text-xs font-bold bg-amber-600 text-neutral-950 rounded-lg hover:bg-amber-500 transition-colors">
+                                class="px-5 py-2 text-xs font-bold bg-[#c7a64a] text-[#141414] rounded-lg hover:bg-[#d4b65a] transition-colors">
                             Kirim Balasan
                         </button>
                     </div>
@@ -1177,16 +1177,16 @@
                     ])
                     <div class="mt-3 flex justify-end">
                         <button type="submit"
-                                class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm hover:opacity-90 transition-opacity shadow-lg shadow-slate-900/10">
+                                class="w-full sm:w-auto px-6 py-2.5 bg-[#c7a64a] text-[#141414] font-bold rounded-xl text-sm hover:bg-[#d4b65a] transition-colors shadow-lg shadow-black/20">
                             Kirim Komentar
                         </button>
                     </div>
                 </form>
             @else
-                <div class="mb-8 p-6 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-center">
-                    <p class="text-slate-500 dark:text-slate-400 mb-4 text-sm">Bergabung dalam diskusi?</p>
+                <div class="mb-8 p-6 bg-white/[.03] border border-white/10 rounded-2xl text-center">
+                    <p class="text-[#a3a3a3] mb-4 text-sm">Bergabung dalam diskusi?</p>
                     <a href="{{ route('login') }}"
-                       class="inline-block w-full sm:w-auto px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm hover:opacity-90 transition-opacity shadow-lg shadow-slate-900/10">
+                       class="inline-block w-full sm:w-auto px-8 py-3 bg-[#c7a64a] text-[#141414] font-bold rounded-xl text-sm hover:bg-[#d4b65a] transition-colors shadow-lg shadow-black/20">
                         Masuk Sekarang
                     </a>
                 </div>
@@ -1196,7 +1196,7 @@
                 @forelse($chapter->comments as $comment)
                     @include('partials.comment-item', ['comment' => $comment, 'chapter' => $chapter])
                 @empty
-                    <div class="py-10 text-center text-slate-400 text-sm">
+                    <div class="py-10 text-center text-[#7a7a7a] text-sm">
                         Belum ada komentar. Jadilah yang pertama!
                     </div>
                 @endforelse
