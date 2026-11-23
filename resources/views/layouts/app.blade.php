@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name', 'Quoros') . ' - Where Story Lives')</title>
-    <meta name="description" content="@yield('meta_description', 'Quoros adalah platform novel premium yang didedikasikan untuk menghadirkan cerita terbaik dengan pengalaman membaca yang nyaman.')">
+    <meta name="description" content="@yield('meta_description', 'Quoros a platform to read all kind of webnovel, we could receive your request of novel or you make them yourself!')">
     <meta name="google-site-verification" content="oXfr_yoyNNP37CmQ2vCaXkbfrFoFeDUWyhgOgOIeMb0">
     
     <!-- Open Graph / Facebook -->
