@@ -2,14 +2,17 @@
 
 @php
     $packs = \App\Support\ChatCatalog::packs();
-    $emojis = \App\Support\ChatCatalog::emojis();
+    $emojis = \App\Support\ChatCatalog::emojiEntries();
 @endphp
 
 <div x-data="communityComposer()" class="space-y-2">
     <input type="hidden" name="sticker" :value="sticker">
 
     <div x-show="stickerPreview" x-cloak class="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[.04] px-3 py-2">
-        <span class="text-2xl" x-text="stickerPreview?.emoji"></span>
+        <template x-if="stickerPreview?.image">
+            <img :src="stickerPreview.image" alt="" class="h-9 w-9 object-contain">
+        </template>
+        <span x-show="!stickerPreview?.image" class="text-2xl" x-text="stickerPreview?.emoji"></span>
         <span class="text-xs text-[#a3a3a3]" x-text="stickerPreview?.label"></span>
         <button type="button" @click="clearSticker()" class="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#f2efe8] transition-colors">Hapus</button>
     </div>
@@ -26,8 +29,14 @@
             </button>
             <div x-show="showEmoji" @click.away="showEmoji = false" x-cloak
                  class="absolute bottom-11 left-0 z-20 w-64 rounded-xl border border-white/10 bg-[#161616] p-2 grid grid-cols-8 gap-1 shadow-2xl">
-                @forelse($emojis as $emoji)
-                    <button type="button" class="h-8 rounded-md text-base hover:bg-white/10 transition-colors" @click="insertEmoji(@js($emoji))">{{ $emoji }}</button>
+                @forelse($emojis as $entry)
+                    <button type="button" class="h-8 rounded-md hover:bg-white/10 transition-colors inline-flex items-center justify-center" @click="insertEmoji(@js($entry))">
+                        @if(! empty($entry['image']))
+                            <img src="{{ $entry['image'] }}" alt="" class="h-5 w-5 object-contain">
+                        @else
+                            {{ $entry['emoji'] }}
+                        @endif
+                    </button>
                 @empty
                     <p class="col-span-8 px-1 py-2 text-center text-[10px] uppercase tracking-widest text-[#7a7a7a]">Belum ada emoji</p>
                 @endforelse
@@ -54,7 +63,11 @@
                         @foreach($pack['items'] as $item)
                             <button type="button" @click='pickSticker(@json($item))'
                                     class="rounded-lg border border-white/10 bg-white/[.02] p-2 hover:border-[#c7a64a]/50 hover:bg-white/[.05] transition-colors">
-                                <span class="block text-2xl text-center">{{ $item['emoji'] }}</span>
+                                @if(! empty($item['image']))
+                                    <img src="{{ $item['image'] }}" alt="" class="h-8 w-8 mx-auto object-contain" loading="lazy">
+                                @else
+                                    <span class="block text-2xl text-center">{{ $item['emoji'] }}</span>
+                                @endif
                                 <span class="block text-[9px] text-center text-[#a3a3a3] truncate">{{ $item['label'] }}</span>
                             </button>
                         @endforeach

@@ -102,9 +102,12 @@
                             <p x-show="message.parent" class="mt-1 text-[11px] text-[#c7a64a]/80 truncate">
                                 Membalas <span x-text="message.parent?.name"></span>: <span x-text="message.parent?.excerpt"></span>
                             </p>
-                            <p x-show="message.body" class="mt-1 text-sm text-[#d9d4c8] whitespace-pre-wrap break-words" x-text="message.body"></p>
+                            <p x-show="message.body" class="mt-1 text-sm text-[#d9d4c8] whitespace-pre-wrap break-words" x-html="message.body_html"></p>
                             <div x-show="message.sticker" class="mt-2 inline-flex flex-col items-center rounded-2xl border border-[#c7a64a]/15 bg-white/5 px-4 py-3">
-                                <span class="text-5xl leading-none" x-text="message.sticker?.emoji"></span>
+                                <template x-if="message.sticker?.image">
+                                    <img :src="message.sticker.image" alt="" class="h-20 w-20 object-contain" loading="lazy">
+                                </template>
+                                <span x-show="!message.sticker?.image" class="text-5xl leading-none" x-text="message.sticker?.emoji"></span>
                                 <span class="mt-1 text-[10px] uppercase tracking-widest text-[#a3a3a3]" x-text="message.sticker?.label"></span>
                             </div>
 
@@ -123,11 +126,14 @@
                                             title="Downvote">▼</button>
                                 </div>
 
-                                <template x-for="chip in message.emojis" :key="chip.emoji">
-                                    <button type="button" @click="react(message, chip.emoji)"
+                                <template x-for="chip in message.emojis" :key="chip.value">
+                                    <button type="button" @click="react(message, chip.value)"
                                             class="h-7 px-2 rounded-full border text-[12px] inline-flex items-center gap-1"
                                             :class="chip.mine ? 'border-[#c7a64a]/40 bg-[#c7a64a]/15' : 'border-white/10 bg-white/5'">
-                                        <span x-text="chip.emoji"></span>
+                                        <template x-if="chip.image">
+                                            <img :src="chip.image" alt="" class="h-4 w-4 object-contain">
+                                        </template>
+                                        <span x-show="!chip.image" x-text="chip.emoji"></span>
                                         <span class="text-[10px] font-bold text-[#a3a3a3]" x-text="chip.count"></span>
                                     </button>
                                 </template>
@@ -139,9 +145,14 @@
                                     </button>
                                     <div x-show="message._emojiOpen" @click.away="message._emojiOpen = false" x-cloak
                                          class="absolute z-20 mt-2 w-56 rounded-xl border border-[#c7a64a]/20 bg-[#161616] p-2 grid grid-cols-8 gap-1 shadow-xl">
-                                        <template x-for="emoji in emojis" :key="emoji">
-                                            <button type="button" class="h-7 rounded hover:bg-white/10" x-text="emoji"
-                                                    @click="react(message, emoji); message._emojiOpen = false"></button>
+                                        <template x-for="emoji in emojis" :key="emoji.value">
+                                            <button type="button" class="h-7 rounded hover:bg-white/10 inline-flex items-center justify-center"
+                                                    @click="react(message, emoji.value); message._emojiOpen = false">
+                                                <template x-if="emoji.image">
+                                                    <img :src="emoji.image" alt="" class="h-5 w-5 object-contain">
+                                                </template>
+                                                <span x-show="!emoji.image" x-text="emoji.emoji"></span>
+                                            </button>
                                         </template>
                                     </div>
                                 </div>
@@ -167,7 +178,10 @@
                     <button type="button" @click="parent = null" class="text-[#a3a3a3] hover:text-white">Batal</button>
                 </div>
                 <div x-show="sticker" class="mb-2 inline-flex items-center gap-2 rounded-xl border border-[#c7a64a]/20 bg-white/5 px-3 py-2">
-                    <span class="text-2xl" x-text="sticker?.emoji"></span>
+                    <template x-if="sticker?.image">
+                        <img :src="sticker.image" alt="" class="h-9 w-9 object-contain">
+                    </template>
+                    <span x-show="!sticker?.image" class="text-2xl" x-text="sticker?.emoji"></span>
                     <span class="text-xs text-[#a3a3a3]" x-text="sticker?.label"></span>
                     <button type="button" @click="sticker = null" class="text-[10px] uppercase tracking-widest text-[#737373]">Hapus</button>
                 </div>
@@ -179,8 +193,13 @@
                                     class="h-11 w-11 rounded-xl border border-white/10 text-lg hover:bg-white/5">😊</button>
                             <div x-show="showEmoji" @click.away="showEmoji = false" x-cloak
                                  class="absolute bottom-12 left-0 z-20 w-64 rounded-xl border border-[#c7a64a]/20 bg-[#161616] p-2 grid grid-cols-8 gap-1 shadow-2xl">
-                                <template x-for="emoji in emojis" :key="emoji">
-                                    <button type="button" class="h-8 rounded hover:bg-white/10" x-text="emoji" @click="insertEmoji(emoji)"></button>
+                                <template x-for="emoji in emojis" :key="emoji.value">
+                                    <button type="button" class="h-8 rounded hover:bg-white/10 inline-flex items-center justify-center" @click="insertEmoji(emoji)">
+                                        <template x-if="emoji.image">
+                                            <img :src="emoji.image" alt="" class="h-5 w-5 object-contain">
+                                        </template>
+                                        <span x-show="!emoji.image" x-text="emoji.emoji"></span>
+                                    </button>
                                 </template>
                             </div>
                         </div>
@@ -201,7 +220,10 @@
                                     <template x-for="item in (packs[stickerPack]?.items || [])" :key="item.id">
                                         <button type="button" @click="pickSticker(item)"
                                                 class="rounded-xl border border-white/10 bg-white/5 p-2 hover:border-[#c7a64a]/40">
-                                            <span class="block text-2xl text-center" x-text="item.emoji"></span>
+                                            <template x-if="item.image">
+                                                <img :src="item.image" alt="" class="h-8 w-8 mx-auto object-contain" loading="lazy">
+                                            </template>
+                                            <span x-show="!item.image" class="block text-2xl text-center" x-text="item.emoji"></span>
                                             <span class="block text-[9px] text-center text-[#a3a3a3] truncate" x-text="item.label"></span>
                                         </button>
                                     </template>

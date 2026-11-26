@@ -10,7 +10,7 @@ class ChatStickerItem extends Model
 {
     protected $table = 'chat_sticker_items';
 
-    protected $fillable = ['chat_sticker_pack_id', 'key', 'emoji', 'label', 'sort_order', 'is_active'];
+    protected $fillable = ['chat_sticker_pack_id', 'key', 'emoji', 'label', 'image_url', 'image_public_id', 'sort_order', 'is_active'];
 
     protected function casts(): array
     {

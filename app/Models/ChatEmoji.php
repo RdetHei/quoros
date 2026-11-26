@@ -9,7 +9,17 @@ class ChatEmoji extends Model
 {
     protected $table = 'chat_emojis';
 
-    protected $fillable = ['emoji', 'label', 'sort_order', 'is_active'];
+    protected $fillable = ['emoji', 'shortcode', 'label', 'image_url', 'image_public_id', 'sort_order', 'is_active'];
+
+    /** Nilai unik yang dipakai untuk reaksi & sisipan teks. */
+    public function value(): string
+    {
+        if ($this->image_url) {
+            return $this->shortcode ?: 'emoji-'.$this->id;
+        }
+
+        return $this->emoji ?: 'emoji-'.$this->id;
+    }
 
     protected function casts(): array
     {

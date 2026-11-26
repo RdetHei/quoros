@@ -16,7 +16,7 @@ class ReactionController extends Controller
     {
         $request->validate([
             'reaction_type' => ['nullable', 'in:like,dislike'],
-            'emoji' => ['nullable', 'string', 'max:16'],
+            'emoji' => ['nullable', 'string', 'max:64'],
         ]);
 
         if (! $request->filled('reaction_type') && ! $request->filled('emoji')) {

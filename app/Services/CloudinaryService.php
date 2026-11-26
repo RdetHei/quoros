@@ -93,6 +93,21 @@ class CloudinaryService
         return $this->upload($file, 'profiles', Resize::fill(300, 300));
     }
 
+    /**
+     * Emoji kustom (gambar). Cloudinary menyajikan format auto (WebP/AVIF)
+     * lewat f_auto sehingga tidak perlu konversi manual di server.
+     */
+    public function uploadEmoji(UploadedFile $file): array
+    {
+        return $this->upload($file, 'chat/emoji', Resize::limitFit(256, 256));
+    }
+
+    /** Stiker kustom (gambar), rasio tetap dipertahankan. */
+    public function uploadSticker(UploadedFile $file): array
+    {
+        return $this->upload($file, 'chat/stickers', Resize::limitFit(512, 512));
+    }
+
     protected function upload(UploadedFile $file, string $folder, $resizeAction): array
     {
         try {

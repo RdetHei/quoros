@@ -2,6 +2,22 @@ function csrfToken() {
     return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 }
 
+/**
+ * Nilai yang disisipkan ke teks untuk sebuah emoji: shortcode (:value:) bila
+ * emoji berupa gambar, atau emoji unicode bila tanpa gambar.
+ */
+function emojiToken(entry) {
+    if (typeof entry === 'string') {
+        return entry;
+    }
+
+    if (entry && entry.image) {
+        return `:${entry.value}:`;
+    }
+
+    return entry?.emoji || entry?.value || '';
+}
+
 async function jsonFetch(url, options = {}) {
     const headers = {
         Accept: 'application/json',
@@ -79,8 +95,8 @@ export function chatLounge(config) {
             }
         },
 
-        insertEmoji(emoji) {
-            this.body = `${this.body}${emoji}`;
+        insertEmoji(entry) {
+            this.body = `${this.body}${emojiToken(entry)}`;
             this.showEmoji = false;
             this.$nextTick(() => this.$refs.composer?.focus());
         },
@@ -224,17 +240,18 @@ export function communityComposer() {
         showStickers: false,
         stickerPack: 0,
 
-        insertEmoji(emoji) {
+        insertEmoji(entry) {
             const field = this.$refs.composer;
             if (!field) return;
+            const token = emojiToken(entry);
             const start = field.selectionStart ?? field.value.length;
             const end = field.selectionEnd ?? field.value.length;
-            field.value = field.value.slice(0, start) + emoji + field.value.slice(end);
+            field.value = field.value.slice(0, start) + token + field.value.slice(end);
             field.dispatchEvent(new Event('input'));
             this.showEmoji = false;
             this.$nextTick(() => {
                 field.focus();
-                const cursor = start + emoji.length;
+                const cursor = start + token.length;
                 field.setSelectionRange(cursor, cursor);
             });
         },

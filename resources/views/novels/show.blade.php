@@ -506,7 +506,10 @@
                               placeholder="Share your thoughts on this novel…"></textarea>
                     <input type="hidden" name="sticker" :value="sticker">
                     <div x-show="stickerPreview" x-cloak class="-mt-1 mb-3 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900">
-                        <span class="text-xl" x-text="stickerPreview?.emoji"></span>
+                        <template x-if="stickerPreview?.image">
+                            <img :src="stickerPreview.image" alt="" class="h-8 w-8 object-contain">
+                        </template>
+                        <span x-show="!stickerPreview?.image" class="text-xl" x-text="stickerPreview?.emoji"></span>
                         <span class="text-xs text-neutral-500" x-text="stickerPreview?.label"></span>
                         <button type="button" @click="clearSticker()" class="ml-1 text-xs text-neutral-400 hover:text-rose-500" aria-label="Hapus stiker">×</button>
                     </div>
@@ -515,8 +518,14 @@
                             <div class="relative">
                                 <button type="button" @click="showEmoji = !showEmoji; showStickers = false" class="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800">Emoji</button>
                                 <div x-show="showEmoji" @click.away="showEmoji = false" x-cloak class="absolute bottom-11 left-0 z-30 grid w-56 grid-cols-8 gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
-                                    @foreach(\App\Support\ChatCatalog::emojis() as $emoji)
-                                        <button type="button" class="h-7 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" @click="insertEmoji(@js($emoji))">{{ $emoji }}</button>
+                                    @foreach(\App\Support\ChatCatalog::emojiEntries() as $entry)
+                                        <button type="button" class="flex h-7 items-center justify-center rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" @click="insertEmoji(@js($entry))">
+                                            @if(! empty($entry['image']))
+                                                <img src="{{ $entry['image'] }}" alt="" class="h-5 w-5 object-contain">
+                                            @else
+                                                {{ $entry['emoji'] }}
+                                            @endif
+                                        </button>
                                     @endforeach
                                 </div>
                             </div>
@@ -528,7 +537,11 @@
                                         <div class="mb-3 grid grid-cols-4 gap-1.5 last:mb-0">
                                             @foreach($pack['items'] as $item)
                                                 <button type="button" @click="pickSticker(@js($item))" class="rounded-lg border border-neutral-100 p-2 text-center hover:border-amber-300 hover:bg-amber-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
-                                                    <span class="block text-xl">{{ $item['emoji'] }}</span>
+                                                    @if(! empty($item['image']))
+                                                        <img src="{{ $item['image'] }}" alt="" class="mx-auto h-8 w-8 object-contain" loading="lazy">
+                                                    @else
+                                                        <span class="block text-xl">{{ $item['emoji'] }}</span>
+                                                    @endif
                                                     <span class="block truncate text-[9px] text-neutral-400">{{ $item['label'] }}</span>
                                                 </button>
                                             @endforeach
@@ -615,13 +628,17 @@
 
                         @if($sticker = $review->stickerMeta())
                             <div class="mb-3 inline-flex flex-col items-center rounded-xl border border-neutral-200 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900">
-                                <span class="text-3xl leading-none">{{ $sticker['emoji'] }}</span>
+                                @if(! empty($sticker['image']))
+                                    <img src="{{ $sticker['image'] }}" alt="{{ $sticker['label'] }}" class="h-16 w-16 object-contain" loading="lazy">
+                                @else
+                                    <span class="text-3xl leading-none">{{ $sticker['emoji'] }}</span>
+                                @endif
                                 <span class="mt-1 text-[9px] uppercase tracking-widest text-neutral-400">{{ $sticker['label'] }}</span>
                             </div>
                         @endif
 
                         @if(filled($review->content))
-                            <p class="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">{{ $review->content }}</p>
+                            <p class="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">{!! \App\Support\ChatCatalog::renderText($review->content) !!}</p>
                         @endif
 
                         <div class="mt-4 flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
@@ -641,17 +658,24 @@
                                     @endauth
                                 </div>
                                 {{-- Emoji chips --}}
-                                <template x-for="chip in emojis" :key="chip.emoji">
-                                    <button type="button" @auth @click="send({ emoji: chip.emoji })" @endauth class="inline-flex h-7 items-center gap-1 rounded-full border px-2 text-xs" :class="chip.mine ? 'border-amber-400/50 bg-amber-400/10' : 'border-neutral-200 dark:border-neutral-700'">
-                                        <span x-text="chip.emoji"></span><span class="text-[10px] font-bold text-neutral-500" x-text="chip.count"></span>
+                                <template x-for="chip in emojis" :key="chip.value">
+                                    <button type="button" @auth @click="send({ emoji: chip.value })" @endauth class="inline-flex h-7 items-center gap-1 rounded-full border px-2 text-xs" :class="chip.mine ? 'border-amber-400/50 bg-amber-400/10' : 'border-neutral-200 dark:border-neutral-700'">
+                                        <template x-if="chip.image"><img :src="chip.image" alt="" class="h-4 w-4 object-contain"></template>
+                                        <span x-show="!chip.image" x-text="chip.emoji"></span><span class="text-[10px] font-bold text-neutral-500" x-text="chip.count"></span>
                                     </button>
                                 </template>
                                 @auth
                                     <div class="relative">
                                         <button type="button" @click="emojiOpen = !emojiOpen" class="h-7 rounded-full border border-neutral-200 px-2 text-[10px] font-bold text-neutral-500 dark:border-neutral-700 hover:border-amber-300 hover:text-amber-500 transition-colors">+ React</button>
                                         <div x-show="emojiOpen" @click.away="emojiOpen = false" x-cloak class="absolute bottom-9 left-0 z-20 grid w-56 grid-cols-8 gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
-                                            @foreach(\App\Support\ChatCatalog::emojis() as $emoji)
-                                                <button type="button" class="h-7 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" @click="send({ emoji: @js($emoji) }); emojiOpen = false">{{ $emoji }}</button>
+                                            @foreach(\App\Support\ChatCatalog::emojiEntries() as $entry)
+                                                <button type="button" class="flex h-7 items-center justify-center rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" @click="send({ emoji: @js($entry['value']) }); emojiOpen = false">
+                                                    @if(! empty($entry['image']))
+                                                        <img src="{{ $entry['image'] }}" alt="" class="h-5 w-5 object-contain">
+                                                    @else
+                                                        {{ $entry['emoji'] }}
+                                                    @endif
+                                                </button>
                                             @endforeach
                                         </div>
                                     </div>

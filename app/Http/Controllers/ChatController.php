@@ -25,7 +25,7 @@ class ChatController extends Controller
         return view('chat.index', [
             'messages' => $messages->map(fn (ChatMessage $message) => $this->serialize($message))->all(),
             'packs' => ChatCatalog::packs(),
-            'emojis' => ChatCatalog::emojis(),
+            'emojis' => ChatCatalog::emojiEntries(),
         ]);
     }
 
@@ -127,6 +127,7 @@ class ChatController extends Controller
         return [
             'id' => $message->id,
             'body' => $message->body,
+            'body_html' => ChatCatalog::renderText($message->body),
             'sticker' => $sticker,
             'score' => $message->voteScore(),
             'user_vote' => $message->currentUserVote($userId),

@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use App\Models\Reaction;
+use App\Support\ChatCatalog;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 trait HasCommunityReactions
@@ -51,7 +52,7 @@ trait HasCommunityReactions
         return $vote?->type;
     }
 
-    /** @return list<array{emoji: string, count: int, mine: bool}> */
+    /** @return list<array{value: string, emoji: string, image: ?string, count: int, mine: bool}> */
     public function groupedEmojis(?int $userId = null): array
     {
         $reactions = $this->relationLoaded('reactions')
@@ -62,8 +63,13 @@ trait HasCommunityReactions
             ->filter(fn (Reaction $reaction) => str_starts_with($reaction->type, 'e:'))
             ->groupBy('type')
             ->map(function ($group, string $type) use ($userId) {
+                $value = substr($type, 2);
+                $entry = ChatCatalog::emojiByValue($value);
+
                 return [
-                    'emoji' => substr($type, 2),
+                    'value' => $value,
+                    'emoji' => $entry['emoji'] ?? $value,
+                    'image' => $entry['image'] ?? null,
                     'count' => $group->count(),
                     'mine' => $userId ? $group->contains('user_id', $userId) : false,
                 ];
