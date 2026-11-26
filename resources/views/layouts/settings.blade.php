@@ -38,17 +38,12 @@
         </header>
 
         <main class="mx-auto w-full max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
-            @if(session('success'))
-                <div class="mx-auto mb-6 max-w-3xl rounded-xl border border-[#c7a64a]/25 bg-[#c7a64a]/10 px-4 py-3 text-[13px] text-[#f0dfae]">{{ session('success') }}</div>
-            @endif
-            @if(session('error'))
-                <div class="mx-auto mb-6 max-w-3xl rounded-xl border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-[13px] text-rose-200">{{ session('error') }}</div>
-            @endif
             @yield('content')
         </main>
     </div>
     @auth @include('partials.report-modal') @endauth
     @include('partials.cookie-consent')
+    @include('partials.toast')
     @stack('scripts')
 </body>
 </html>

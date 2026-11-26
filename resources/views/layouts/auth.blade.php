@@ -166,20 +166,6 @@
             <main class="flex-1 flex items-center justify-center px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
                 <div class="w-full max-w-[420px]">
 
-
-
-                    {{-- Flash messages --}}
-                    @if(session('success'))
-                        <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    @if(session('error'))
-                        <div class="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm font-medium">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
                     {{-- Heading — rata kiri --}}
                     <div class="mb-8 text-left">
                         <p class="text-[10px] font-black uppercase tracking-[0.28em] text-white/60 mb-2">@yield('eyebrow', 'Welcome')</p>
@@ -197,6 +183,7 @@
         </div>
     </div>
     @include('partials.cookie-consent')
+    @include('partials.toast')
     @stack('scripts')
 </body>
 </html>

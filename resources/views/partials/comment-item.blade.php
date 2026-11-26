@@ -15,22 +15,29 @@
         emojis: @js($emojis),
         emojiOpen: false,
         async send(payload) {
-            const token = document.querySelector('meta[name=csrf-token]')?.content;
-            const res = await fetch(@js($reactionUrl), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': token,
-                },
-                body: JSON.stringify(payload),
-            });
-            if (!res.ok) return;
-            const data = await res.json();
-            this.score = data.score;
-            this.userVote = data.user_vote;
-            this.emojis = data.emojis;
+            try {
+                const token = document.querySelector('meta[name=csrf-token]')?.content;
+                const res = await fetch(@js($reactionUrl), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token,
+                    },
+                    body: JSON.stringify(payload),
+                });
+                if (!res.ok) {
+                    window.quorosToast?.error('Gagal mengirim reaksi.');
+                    return;
+                }
+                const data = await res.json();
+                this.score = data.score;
+                this.userVote = data.user_vote;
+                this.emojis = data.emojis;
+            } catch (e) {
+                window.quorosToast?.error('Gagal mengirim reaksi.');
+            }
         }
      }"
      @class(['flex gap-3 md:gap-4 group', 'ml-8 md:ml-12 border-l-2 border-white/10 pl-4' => $isReply])>

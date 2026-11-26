@@ -578,21 +578,28 @@
                             emojis: @js($review->groupedEmojis(Auth::id())),
                             emojiOpen: false,
                             async send(payload) {
-                                const response = await fetch(@js(route('reactions.toggle', ['type' => 'review', 'id' => $review->id])), {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        Accept: 'application/json',
-                                        'X-Requested-With': 'XMLHttpRequest',
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '',
-                                    },
-                                    body: JSON.stringify(payload),
-                                });
-                                if (!response.ok) return;
-                                const data = await response.json();
-                                this.score = data.score;
-                                this.userVote = data.user_vote;
-                                this.emojis = data.emojis;
+                                try {
+                                    const response = await fetch(@js(route('reactions.toggle', ['type' => 'review', 'id' => $review->id])), {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            Accept: 'application/json',
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '',
+                                        },
+                                        body: JSON.stringify(payload),
+                                    });
+                                    if (!response.ok) {
+                                        window.quorosToast?.error('Gagal mengirim reaksi.');
+                                        return;
+                                    }
+                                    const data = await response.json();
+                                    this.score = data.score;
+                                    this.userVote = data.user_vote;
+                                    this.emojis = data.emojis;
+                                } catch (e) {
+                                    window.quorosToast?.error('Gagal mengirim reaksi.');
+                                }
                             }
                          }"
                          x-show="showAll || {{ $loop->index }} < 5">

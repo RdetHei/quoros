@@ -2,6 +2,7 @@ import Alpine from 'alpinejs';
 import { inject as injectVercelAnalytics } from '@vercel/analytics';
 import { landingHero } from './modules/landing-hero';
 import { chatLounge, communityComposer } from './modules/chat-lounge';
+import { createToastStore } from './modules/toast';
 
 window.Alpine = Alpine;
 
@@ -38,6 +39,27 @@ if (document.querySelector('[x-data*="landingHero"]')) {
 
 window.chatLounge = chatLounge;
 window.communityComposer = communityComposer;
+
+// Store toast global + helper imperatif untuk dipanggil dari script mana pun.
+Alpine.store('toast', createToastStore());
+
+window.quorosToast = {
+    show(payload) {
+        window.Alpine?.store('toast')?.push(payload);
+    },
+    success(message, title) {
+        this.show({ type: 'success', message, title });
+    },
+    error(message, title) {
+        this.show({ type: 'error', message, title });
+    },
+    info(message, title) {
+        this.show({ type: 'info', message, title });
+    },
+    warning(message, title) {
+        this.show({ type: 'warning', message, title });
+    },
+};
 
 // Start Alpine
 Alpine.start();

@@ -827,14 +827,17 @@ function featuredCarousel() {
             })
                 .then((r) => r.json())
                 .then((d) => {
+                    const added = d.status === 'added';
                     const i = this.activeSlide;
                     if (this.novels[i]) {
-                        this.novels[i] = { ...this.novels[i], is_bookmarked: d.status === 'added' };
+                        this.novels[i] = { ...this.novels[i], is_bookmarked: added };
                     }
                     this.bookmarkLoading = false;
+                    window.quorosToast?.success(added ? 'Ditambahkan ke bookmark.' : 'Dihapus dari bookmark.');
                 })
                 .catch(() => {
                     this.bookmarkLoading = false;
+                    window.quorosToast?.error('Gagal memperbarui bookmark.');
                 });
         },
     };

@@ -383,12 +383,6 @@
 
         <!-- Content -->
         <main class="admin-main-content px-4 sm:px-6 lg:px-8 py-8 bg-slate-800 dark:bg-slate-950 min-h-[calc(100vh-80px)]">
-            @if(session('success') || session('status'))
-                <div class="console-alert success mx-auto mb-4 max-w-[1600px]">{{ session('success') ?? session('status') }}</div>
-            @endif
-            @if(session('error'))
-                <div class="console-alert error mx-auto mb-4 max-w-[1600px]">{{ session('error') }}</div>
-            @endif
             @yield('content')
         </main>
     </div>
@@ -398,6 +392,7 @@
     @include('partials.report-modal')
 @endauth
 
+@include('partials.toast')
 @stack('scripts')
 </body>
 </html>

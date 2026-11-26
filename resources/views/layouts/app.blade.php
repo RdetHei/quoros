@@ -284,11 +284,6 @@
 
         <main class="flex-grow {{ $mainTopPadding }} bg-[#0a0a0a]">
             <div class="{{ $isFullBleed ? '' : 'mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-10 pt-8 pb-8' }}">
-                @if(session('success'))
-                    <div class="mb-6 rounded-xl border border-[#d4af37]/25 bg-[#d4af37]/10 p-4 text-sm font-medium text-[#f5e0b7]">
-                        {{ session('success') }}
-                    </div>
-                @endif
                 @yield('content')
             </div>
         </main>
@@ -351,6 +346,7 @@
 
     @auth @include('partials.report-modal') @endauth
     @include('partials.novel-hover-card')
+    @include('partials.toast')
     @stack('scripts')
 </body>
 </html>
