@@ -717,6 +717,32 @@ class NovelController extends Controller
         return view('writer.novels.workspace', compact('novel', 'chapters'));
     }
 
+    /**
+     * Halaman ringkasan novel: sinopsis, cover, genre, karakter, dan menu
+     * pengelolaan. Dipakai sebagai pintu masuk "Details" alih-alih form edit.
+     */
+    public function detail(Novel $novel)
+    {
+        Gate::authorize('update', $novel);
+
+        // Sinkronkan bab terjadwal agar ringkasan status di halaman ini akurat.
+        Chapter::publishScheduledDue($novel->id);
+
+        $novel->load([
+            'genres:id,name,slug',
+            'tags:id,name,slug',
+            'characters' => fn ($q) => $q->orderBy('sort_order')->orderBy('id'),
+        ]);
+
+        $novel->loadCount(['chapters', 'bookmarks', 'reviews']);
+        $novel->loadCount(['chapters as published_chapters_count' => fn ($q) => $q->published()]);
+        $novel->loadAvg('reviews', 'rating');
+
+        $novels = Auth::user()->novels()->select('id', 'title', 'cover_image_url')->latest()->get();
+
+        return view('writer.novels.detail', compact('novel', 'novels'));
+    }
+
     public function create()
     {
         return redirect()->route('writer.novels.create.step-1');

@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('chapter_id')->constrained()->onDelete('cascade');
+            $table->foreignId('parent_id')->nullable()->constrained('comments')->cascadeOnDelete();
             $table->text('content');
+            $table->string('sticker', 64)->nullable();
             $table->timestamps();
         });
     }

@@ -165,7 +165,7 @@
                     <span class="truncate">Continue Writing</span>
                 </a>
             @endif
-            <a href="{{ route('writer.novels.edit', $n['id']) }}" class="inline-flex items-center justify-center gap-2 rounded-md border border-white/10 px-3.5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2efe8] transition-all hover:border-white/20 hover:bg-white/5">
+            <a href="{{ route('writer.novels.detail', $n['id']) }}" class="inline-flex items-center justify-center gap-2 rounded-md border border-white/10 px-3.5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2efe8] transition-all hover:border-white/20 hover:bg-white/5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" /></svg>
                 Details
             </a>

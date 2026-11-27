@@ -19,6 +19,8 @@ return new class extends Migration
             $table->longText('content')->nullable();
             $table->string('file_path')->nullable();
             $table->integer('order')->default(0);
+            $table->string('status')->default('published'); // draft, published, scheduled
+            $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });
     }

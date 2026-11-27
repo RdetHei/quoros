@@ -10,8 +10,12 @@ return new class extends Migration
     {
         Schema::create('chat_emojis', function (Blueprint $table) {
             $table->id();
-            $table->string('emoji', 32);
+            // Emoji unicode opsional: entri dapat berupa gambar hasil upload.
+            $table->string('emoji', 32)->nullable();
+            $table->string('shortcode', 64)->nullable()->unique();
             $table->string('label', 64)->nullable();
+            $table->string('image_url', 512)->nullable();
+            $table->string('image_public_id', 255)->nullable();
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -37,6 +41,8 @@ return new class extends Migration
             $table->string('key', 64)->unique();
             $table->string('emoji', 32);
             $table->string('label', 64);
+            $table->string('image_url', 512)->nullable();
+            $table->string('image_public_id', 255)->nullable();
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

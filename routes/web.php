@@ -186,6 +186,7 @@ Route::middleware(['auth', 'not_banned'])->group(function () {
             Route::get('/{novel}/edit', [NovelController::class, 'edit'])->name('edit');
             Route::put('/{novel}', [NovelController::class, 'update'])->name('update');
             Route::delete('/{novel}', [NovelController::class, 'destroy'])->name('destroy');
+            Route::get('/{novel}/detail', [NovelController::class, 'detail'])->name('detail');
             Route::get('/{novel}/workspace', [NovelController::class, 'workspace'])->name('workspace');
 
             // Character Relationships

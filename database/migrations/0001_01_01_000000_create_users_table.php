@@ -14,10 +14,22 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('username')->unique()->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            // Foto profil: penyimpanan lokal (profile_photo) maupun Cloudinary.
+            $table->string('profile_photo')->nullable();
+            $table->string('profile_photo_url')->nullable();
+            $table->string('profile_photo_public_id')->nullable();
+            $table->text('bio')->nullable();
+            $table->boolean('is_public_reading_list')->default(true);
+            $table->boolean('auto_load_chapters')->default(true);
             $table->enum('role', ['admin', 'writer', 'user'])->default('user');
+            // Moderasi: pembatasan akun.
+            $table->boolean('is_banned')->default(false);
+            $table->timestamp('banned_until')->nullable();
+            $table->text('ban_reason')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

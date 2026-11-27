@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('novel_id')->constrained()->onDelete('cascade');
             $table->integer('rating');
             $table->text('content');
+            $table->string('sticker', 64)->nullable();
             $table->timestamps();
         });
     }
