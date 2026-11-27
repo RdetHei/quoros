@@ -22,8 +22,8 @@
                         $ago = $latest
                             ? \Illuminate\Support\Carbon::parse($latest->published_at ?? $latest->created_at)->diffForHumans(null, true)
                             : null;
-                        $chapterNo = $latest?->order ?? $novel->chapters_count;
-                        if ($latest && preg_match('/(\d+)/', $latest->title, $m)) {
+                        $chapterNo = $latest?->order ?: null;
+                        if (! $chapterNo && $latest && preg_match('/(\d+)/', $latest->title, $m)) {
                             $chapterNo = $m[1];
                         }
                         $chapterLabel = $chapterNo ? 'CHAPTER '.$chapterNo : 'TRENDING';

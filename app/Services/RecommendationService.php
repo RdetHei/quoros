@@ -461,7 +461,7 @@ class RecommendationService
         return Novel::query()
             ->select('novels.*')
             ->with(['author', 'genres', 'tags', 'chapters' => function ($query) {
-                $query->published()->latest('published_at')->latest('id')->take(3);
+                $query->published()->latestFirst()->take(3);
             }])
             ->whereHas('chapters', fn ($query) => $query->published())
             ->withMax(['chapters as latest_published_at' => fn ($query) => $query->published()], 'published_at')

@@ -29,6 +29,25 @@ class Chapter extends Model
             });
     }
 
+    /**
+     * Urutan kanonik bab: pakai nomor bab (`order`), fallback id bila 0/NULL.
+     */
+    public function scopeInReadingOrder($query)
+    {
+        return $query->orderByRaw('COALESCE(NULLIF(`order`, 0), id) asc');
+    }
+
+    /**
+     * Bab paling baru (nomor terbesar) — dipakai untuk kartu update/terbaru.
+     * Sengaja TIDAK memakai created_at/published_at: bulk upload membuat semua
+     * bab punya timestamp identik sehingga urutannya ambigu dan jatuh ke id asc
+     * (efeknya selalu menampilkan chapter 1).
+     */
+    public function scopeLatestFirst($query)
+    {
+        return $query->orderByRaw('COALESCE(NULLIF(`order`, 0), id) desc');
+    }
+
     public function isPubliclyPublished(): bool
     {
         if ($this->status !== 'published') {

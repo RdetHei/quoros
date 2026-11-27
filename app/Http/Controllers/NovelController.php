@@ -85,12 +85,14 @@ class NovelController extends Controller
         }
 
         $projectUpdates = Novel::with(['author', 'genres', 'chapters' => function ($q) {
-                $q->published()->latest()->take(1);
+                $q->published()->latestFirst()->take(1);
             }])
             ->withCount('chapters')
             ->whereHas('chapters')
             ->withMax('chapters', 'created_at')
+            ->withMax('chapters', 'id')
             ->orderByDesc('chapters_max_created_at')
+            ->orderByDesc('chapters_max_id')
             ->take(15)
             ->get();
 
@@ -111,7 +113,7 @@ class NovelController extends Controller
         $monthlyViewed = $this->novelViews->trending(30, 14);
         if ($monthlyViewed->isEmpty()) {
             $monthlyViewed = Novel::with(['author', 'genres', 'chapters' => function ($q) {
-                    $q->published()->latest()->take(1);
+                    $q->published()->latestFirst()->take(1);
                 }])
                 ->withCount('chapters')
                 ->orderByDesc('view_count')
@@ -119,7 +121,7 @@ class NovelController extends Controller
                 ->get();
         } else {
             $monthlyViewed->load(['chapters' => function ($q) {
-                $q->published()->latest()->take(1);
+                $q->published()->latestFirst()->take(1);
             }]);
         }
 
@@ -139,7 +141,7 @@ class NovelController extends Controller
 
         if ($forYou->isEmpty()) {
             $forYou = Novel::with(['author', 'genres', 'chapters' => function ($q) {
-                    $q->published()->latest()->take(3);
+                    $q->published()->latestFirst()->take(3);
                 }])
                 ->withCount('chapters')
                 ->whereHas('chapters')
@@ -229,12 +231,14 @@ class NovelController extends Controller
 
         // Recently Updated: Novels with the most recent chapters
         $recentlyUpdated = Novel::with(['author', 'genres', 'chapters' => function($q) {
-                $q->published()->latest()->take(3);
+                $q->published()->latestFirst()->take(3);
             }])
             ->withCount('chapters')
             ->whereHas('chapters')
             ->withMax('chapters', 'created_at')
+            ->withMax('chapters', 'id')
             ->orderByDesc('chapters_max_created_at')
+            ->orderByDesc('chapters_max_id')
             ->take(6)
             ->get();
 
@@ -469,7 +473,7 @@ class NovelController extends Controller
         }
 
         $query = Novel::with(['author:id,name', 'genres:id,name', 'tags:id,name', 'chapters' => function ($q) {
-                $q->published()->latest('published_at')->latest('id')->take(3);
+                $q->published()->latestFirst()->take(3);
             }])
             ->whereHas('chapters', function ($q) use ($periods, $period) {
                 if ($periods[$period]['days']) {
@@ -489,11 +493,15 @@ class NovelController extends Controller
                 }
             })
             ->withMax('chapters', 'published_at')
-            ->withMax('chapters', 'created_at');
+            ->withMax('chapters', 'created_at')
+            ->withMax('chapters', 'id');
 
         // Urutkan murni dari bab yang paling baru dipublikasikan, agar novel yang
         // baru di-update selalu muncul di paling atas (tanpa prioritas rekomendasi).
-        $query->orderByRaw('COALESCE(chapters_max_published_at, chapters_max_created_at) DESC');
+        // chapters_max_id dipakai sebagai tie-breaker karena bulk upload membuat
+        // published_at/created_at semua bab identik.
+        $query->orderByRaw('COALESCE(chapters_max_published_at, chapters_max_created_at) DESC')
+            ->orderByDesc('chapters_max_id');
 
         $novels = $query->paginate(24)->withQueryString();
 

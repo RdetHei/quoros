@@ -6,6 +6,7 @@ use App\Models\Chapter;
 use App\Models\ChatMessage;
 use App\Models\Comment;
 use App\Models\InAppNotification;
+use App\Database\TiDbMySqlConnection;
 use App\Models\Novel;
 use App\Models\Review;
 use App\Observers\ChapterNotificationObserver;
@@ -15,6 +16,7 @@ use App\Policies\CommentPolicy;
 use App\Policies\NovelPolicy;
 use App\Policies\ReviewPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Connection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -30,7 +32,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // TiDB dilaporkan sebagai MySQL 8.0.11 sehingga Laravel memakai emulasi
+        // LIMIT yang tidak deterministik untuk eager loading. Pakai koneksi yang
+        // memaksa window function (lihat TiDbMySqlConnection).
+        Connection::resolverFor('mysql', function ($connection, $database, $prefix, $config) {
+            return new TiDbMySqlConnection($connection, $database, $prefix, $config);
+        });
     }
 
     /**

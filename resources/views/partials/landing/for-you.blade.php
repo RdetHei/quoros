@@ -31,8 +31,8 @@
                             @forelse($recentChapters as $chapter)
                                 @php
                                     $ago = \Illuminate\Support\Carbon::parse($chapter->published_at ?? $chapter->created_at)->diffForHumans(null, true);
-                                    $chapterNo = $chapter->order;
-                                    if (preg_match('/(\d+)/', $chapter->title, $m)) {
+                                    $chapterNo = $chapter->order ?: null;
+                                    if (! $chapterNo && preg_match('/(\d+)/', $chapter->title, $m)) {
                                         $chapterNo = $m[1];
                                     }
                                     $label = 'CHAPTER '.$chapterNo;
