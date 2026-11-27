@@ -433,6 +433,27 @@
     .reader-chapter-shell {
         user-select: none;
         -webkit-user-select: none;
+        -webkit-touch-callout: none;
+    }
+
+    .reader-chapter-shell img {
+        -webkit-user-drag: none;
+        pointer-events: none;
+    }
+
+    /* Peringatan khusus cetak — hanya tampil di media print */
+    .reader-print-notice { display: none; }
+
+    @media print {
+        /* Sembunyikan isi chapter yang dilindungi dari hasil cetak/PDF. */
+        .reader-chapter-shell { display: none !important; }
+        .reader-print-notice {
+            display: block !important;
+            padding: 3rem 1rem;
+            text-align: center;
+            font-weight: 700;
+            color: #111;
+        }
     }
 
     /* ============================================
@@ -1056,6 +1077,11 @@
          READING AREA
     ════════════════════════════════════════════════ --}}
     <div id="chapters-container">
+        @if($protectContent ?? false)
+            <div class="reader-print-notice" x-cloak>
+                Konten ini dilindungi. Mencetak atau menyimpan sebagai PDF tidak diizinkan.
+            </div>
+        @endif
         <div data-slug="{{ $chapter->slug }}"
              data-order="{{ $chapter->route_identifier }}"
              data-title="{{ $chapter->title }}"
@@ -1282,14 +1308,43 @@ window.reader = function (config = {}) {
 
             if (this.readingSessionUrl) this.startReadingSessionTracking();
 
-            if (this.protectChapter) {
-                const zone = document.getElementById('chapters-container');
-                if (zone) {
-                    ['copy', 'cut', 'contextmenu'].forEach(ev =>
-                        zone.addEventListener(ev, e => { if (this.protectChapter) e.preventDefault(); }, true)
-                    );
+            if (this.protectChapter) this.enableScreenProtection();
+        },
+
+        /**
+         * Proteksi konten chapter: blokir klik kanan, copy/cut, print, dan
+         * shortcut devtools. Aktif hanya untuk pembaca (bukan pemilik/admin).
+         */
+        enableScreenProtection() {
+            const block = (e) => { e.preventDefault(); e.stopPropagation(); return false; };
+
+            // Klik kanan, copy, cut, dan drag gambar di seluruh dokumen.
+            ['contextmenu', 'copy', 'cut', 'dragstart'].forEach(ev =>
+                document.addEventListener(ev, block, true)
+            );
+
+            // Cegah seleksi teks (kecuali pada input/textarea).
+            document.addEventListener('selectstart', (e) => {
+                if (!e.target.closest('input, textarea')) block(e);
+            }, true);
+
+            // Shortcut keyboard sensitif: print, save, view-source, devtools, copy.
+            document.addEventListener('keydown', (e) => {
+                const key = (e.key || '').toLowerCase();
+                const mod = e.ctrlKey || e.metaKey;
+                const blocked =
+                    (mod && ['c', 'x', 's', 'p', 'u'].includes(key)) ||
+                    (mod && e.shiftKey && ['i', 'j', 'c'].includes(key)) ||
+                    key === 'f12';
+                if (blocked) block(e);
+            }, true);
+
+            // Cadangan bila dialog cetak dipicu lewat menu browser.
+            window.addEventListener('beforeprint', () => {
+                if (window.quorosToast) {
+                    window.quorosToast.warning('Konten ini dilindungi. Mencetak tidak diizinkan.');
                 }
-            }
+            });
         },
 
         startReadingSessionTracking() {
