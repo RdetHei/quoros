@@ -17,7 +17,8 @@
 
 # --- Artefak lokal (dibangun ulang di dalam image) ---
 node_modules
-vendor
+# Hanya composer vendor di root — jangan gugurkan resources/views/vendor/*.
+/vendor
 public/build
 public/hot
 public/storage

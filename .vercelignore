@@ -12,7 +12,9 @@
 .env.*
 
 node_modules
-vendor
+# Ancor "/" agar hanya menggugurkan composer vendor di root,
+# bukan resources/views/vendor/* (mis. view pagination).
+/vendor
 public/build
 public/hot
 
